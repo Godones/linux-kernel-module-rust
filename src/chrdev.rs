@@ -1,7 +1,7 @@
 use core::convert::TryInto;
 use core::mem;
 use core::ops::Range;
-
+use core::ptr::addr_of_mut;
 use alloc::boxed::Box;
 use alloc::vec;
 use alloc::vec::Vec;
@@ -56,7 +56,7 @@ impl Builder {
         for (i, file_op) in self.file_ops.iter().enumerate() {
             unsafe {
                 bindings::cdev_init(&mut cdevs[i], *file_op);
-                cdevs[i].owner = &mut bindings::__this_module;
+                cdevs[i].owner = addr_of_mut!(bindings::__this_module);
                 let rc = bindings::cdev_add(&mut cdevs[i], dev + i as bindings::dev_t, 1);
                 if rc != 0 {
                     // Clean up the ones that were allocated.

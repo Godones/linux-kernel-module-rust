@@ -1,14 +1,17 @@
-obj-m := helloworld.o
-helloworld-objs := hello_world.rust.o
+obj-m := hello_world.o
+helloworld-objs := hello_world.o
 
 CARGO ?= cargo
+TARGET := x86_64-kernel
+TARGET_PROFILE := ./x86_64-kernel.json
+BUILD := release
 
 export c_flags
 
-$(src)/target/x86_64-linux-kernel/debug/libhello_world.a: cargo_will_determine_dependencies
-	cd $(src); $(CARGO) build -Z build-std=core,alloc --target=x86_64-linux-kernel
+$(src)/target/$(TARGET)/$(BUILD)/libhello_world.a: cargo_will_determine_dependencies
+	cd $(src); $(CARGO) build --$(BUILD) -Z build-std=core,alloc --target=$(TARGET_PROFILE)
 
 .PHONY: cargo_will_determine_dependencies
 
-%.rust.o: target/x86_64-linux-kernel/debug/lib%.a
+%.o: target/$(TARGET)/$(BUILD)/lib%.a	
 	$(LD) -r -o $@ --whole-archive $<

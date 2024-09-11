@@ -69,24 +69,29 @@ fn handle_kernel_version_cfg(bindings_path: &PathBuf) {
         }
     }
     let version = version.expect("Couldn't find kernel version");
-    let (major, minor) = match version.to_be_bytes() {
+    let (mut major, mut minor) = match version.to_be_bytes() {
         [0, 0, 0, 0, 0, major, minor, _patch] => (major, minor),
         _ => panic!("unable to parse LINUX_VERSION_CODE {:x}", version),
     };
-
     if major >= 6 {
-        panic!("Please update build.rs with the last 5.x version");
+        major = 5;
+        minor = 6;
+    }
+    if major >= 6 {
+        // panic!("Please update build.rs with the last 5.x version");
         // Change this block to major >= 7, copy the below block for
         // major >= 6, fill in unimplemented!() for major >= 5
     }
     if major >= 5 {
         for x in 0..=if major > 5 { unimplemented!() } else { minor } {
+            println!("cargo:rustc-check-cfg=cfg(kernel_5_{}_0_or_greater)", x);
             println!("cargo:rustc-cfg=kernel_5_{}_0_or_greater", x);
         }
     }
     if major >= 4 {
         // We don't currently support anything older than 4.4
         for x in 4..=if major > 4 { 20 } else { minor } {
+            println!("cargo:rustc-check-cfg=cfg(kernel_4_{}_0_or_greater)", x);
             println!("cargo:rustc-cfg=kernel_4_{}_0_or_greater", x);
         }
     }
@@ -103,6 +108,7 @@ fn handle_kernel_symbols_cfg(symvers_path: &PathBuf) {
             }
         }
     }
+    println!("cargo:rustc-check-cfg=cfg(kernel_aufs_setfl)");
 }
 
 // Takes the CFLAGS from the kernel Makefile and changes all the include paths to be absolute
@@ -135,7 +141,15 @@ fn main() {
     println!("cargo:rerun-if-env-changed=c_flags");
 
     let kernel_dir = env::var("KDIR").expect("Must be invoked from kernel makefile");
-    let kernel_cflags = env::var("c_flags").expect("Add 'export c_flags' to Kbuild");
+    let mut kernel_cflags = env::var("c_flags").expect("Add 'export c_flags' to Kbuild");
+    kernel_cflags = kernel_cflags.replace("-mfunction-return=thunk-extern", "");
+    kernel_cflags = kernel_cflags.replace("-fzero-call-used-regs=used-gpr", "");
+    kernel_cflags = kernel_cflags.replace("-fconserve-stack", "");
+    kernel_cflags = kernel_cflags.replace("-mrecord-mcount", "");
+    kernel_cflags = kernel_cflags.replace("-Wno-maybe-uninitialized", "-Wno-uninitialized");
+    kernel_cflags = kernel_cflags.replace("-Wno-alloc-size-larger-than", "");
+    kernel_cflags = kernel_cflags.replace("-Wimplicit-fallthrough=5", "-Wimplicit-fallthrough");
+
     let kbuild_cflags_module =
         env::var("KBUILD_CFLAGS_MODULE").expect("Must be invoked from kernel makefile");
 
@@ -190,5 +204,6 @@ fn main() {
     for arg in kernel_args.iter() {
         builder.flag(&arg);
     }
+    builder.remove_flag("-pg");
     builder.compile("helpers");
 }

@@ -201,6 +201,8 @@ impl<T: FileOperations> FileOperationsVtable<T> {
         splice_write: None,
         unlocked_ioctl: None,
         write_iter: None,
+        uring_cmd: None,
+        uring_cmd_iopoll: None,
     };
 }
 

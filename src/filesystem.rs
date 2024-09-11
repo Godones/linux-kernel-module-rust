@@ -1,11 +1,11 @@
-use alloc::boxed::Box;
-use core::default::Default;
-use core::marker;
-
 use crate::bindings;
 use crate::c_types;
 use crate::error;
 use crate::types::CStr;
+use alloc::boxed::Box;
+use core::default::Default;
+use core::marker;
+use core::ptr::addr_of_mut;
 
 pub struct Registration<T: FileSystem> {
     _phantom: marker::PhantomData<T>,
@@ -61,7 +61,7 @@ pub fn register<T: FileSystem>() -> error::KernelResult<Registration<T>> {
     let mut fs_registration = Registration {
         ptr: Box::new(bindings::file_system_type {
             name: T::NAME.as_ptr() as *const i8,
-            owner: unsafe { &mut bindings::__this_module },
+            owner: addr_of_mut!(bindings::__this_module),
             fs_flags: T::FLAGS.bits(),
             mount: Some(mount_callback::<T>),
             kill_sb: Some(bindings::kill_litter_super),

@@ -13,7 +13,7 @@ pub fn printk(s: &[u8]) {
     fmt_str[bindings::KERN_INFO.len() - 1..].copy_from_slice(b"%.*s\0");
 
     // TODO: I believe printk never fails
-    unsafe { bindings::printk(fmt_str.as_ptr() as _, s.len() as c_int, s.as_ptr()) };
+    unsafe { bindings::_printk(fmt_str.as_ptr() as _, s.len() as c_int, s.as_ptr()) };
 }
 
 // From kernel/print/printk.c

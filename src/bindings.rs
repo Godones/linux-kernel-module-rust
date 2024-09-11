@@ -12,3 +12,6 @@ mod bindings {
 pub use bindings::*;
 
 pub const GFP_KERNEL: gfp_t = BINDINGS_GFP_KERNEL;
+extern "C" {
+    pub fn _printk(fmt: *const core::ffi::c_char, ...) -> core::ffi::c_int;
+}

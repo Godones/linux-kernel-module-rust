@@ -1,6 +1,8 @@
-use std::fs;
-use std::io::{Read, Seek, SeekFrom, Write};
-use std::os::unix::prelude::FileExt;
+use std::{
+    fs,
+    io::{Read, Seek, SeekFrom, Write},
+    os::unix::prelude::FileExt,
+};
 
 use kernel_module_testlib::*;
 

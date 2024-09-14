@@ -1,16 +1,12 @@
-use core::convert::TryInto;
-use core::mem;
-use core::ops::Range;
-use core::ptr::addr_of_mut;
-use alloc::boxed::Box;
-use alloc::vec;
-use alloc::vec::Vec;
+use alloc::{boxed::Box, vec, vec::Vec};
+use core::{convert::TryInto, mem, ops::Range, ptr::addr_of_mut};
 
-use crate::bindings;
-use crate::c_types;
-use crate::error::{Error, KernelResult};
-use crate::file_operations;
-use crate::types::CStr;
+use crate::{
+    bindings, c_types,
+    error::{Error, KernelResult},
+    file_operations,
+    types::CStr,
+};
 
 pub fn builder(name: CStr<'static>, minors: Range<u16>) -> KernelResult<Builder> {
     Ok(Builder {

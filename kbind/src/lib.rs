@@ -12,6 +12,7 @@ pub mod chrdev;
 mod error;
 pub mod file_operations;
 pub mod filesystem;
+pub mod kernel_ptr;
 pub mod printk;
 #[cfg(kernel_4_13_0_or_greater)]
 pub mod random;
@@ -19,8 +20,10 @@ pub mod sysctl;
 mod types;
 pub mod user_ptr;
 
-pub use crate::error::{Error, KernelResult};
-pub use crate::types::{CStr, Mode};
+pub use crate::{
+    error::{Error, KernelResult},
+    types::{CStr, Mode},
+};
 
 /// Declares the entrypoint for a kernel module. The first argument should be a type which
 /// implements the [`KernelModule`] trait. Also accepts various forms of kernel metadata.

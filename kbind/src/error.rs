@@ -1,7 +1,6 @@
-use core::num::TryFromIntError;
+use core::{fmt::Debug, num::TryFromIntError};
 
-use crate::bindings;
-use crate::c_types;
+use crate::{bindings, c_types};
 
 pub struct Error(c_types::c_int);
 
@@ -28,3 +27,16 @@ impl From<TryFromIntError> for Error {
 }
 
 pub type KernelResult<T> = Result<T, Error>;
+
+impl Debug for Error {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        f.write_str(match (-self.0) as u32 {
+            bindings::EINVAL => "EINVAL",
+            bindings::ENOMEM => "ENOMEM",
+            bindings::EFAULT => "EFAULT",
+            bindings::ESPIPE => "ESPIPE",
+            bindings::EAGAIN => "EAGAIN",
+            _ => "Unknown error",
+        })
+    }
+}

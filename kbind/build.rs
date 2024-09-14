@@ -1,6 +1,8 @@
-use std::io::{BufRead, BufReader};
-use std::path::PathBuf;
-use std::{env, fs};
+use std::{
+    env, fs,
+    io::{BufRead, BufReader},
+    path::PathBuf,
+};
 
 const INCLUDED_TYPES: &[&str] = &["file_system_type", "mode_t", "umode_t", "ctl_table"];
 const INCLUDED_FUNCTIONS: &[&str] = &[
@@ -140,7 +142,11 @@ fn main() {
     println!("cargo:rerun-if-env-changed=KDIR");
     println!("cargo:rerun-if-env-changed=c_flags");
 
-    let kernel_dir = env::var("KDIR").expect("Must be invoked from kernel makefile");
+    let kernel_dir = env::var("KDIR");
+    if kernel_dir.is_err() {
+        return;
+    }
+    let kernel_dir = kernel_dir.unwrap();
     let mut kernel_cflags = env::var("c_flags").expect("Add 'export c_flags' to Kbuild");
     kernel_cflags = kernel_cflags.replace("-mfunction-return=thunk-extern", "");
     kernel_cflags = kernel_cflags.replace("-fzero-call-used-regs=used-gpr", "");
@@ -162,8 +168,7 @@ fn main() {
         .use_core()
         .ctypes_prefix("c_types")
         .derive_default(true)
-        .size_t_is_usize(true)
-        .rustfmt_bindings(true);
+        .size_t_is_usize(true);
 
     builder = builder.clang_arg(format!("--target={}", target));
     for arg in kernel_args.iter() {
@@ -174,25 +179,26 @@ fn main() {
     builder = builder.header("src/bindings_helper.h");
 
     for t in INCLUDED_TYPES {
-        builder = builder.whitelist_type(t);
+        builder = builder.allowlist_type(t);
     }
     for f in INCLUDED_FUNCTIONS {
-        builder = builder.whitelist_function(f);
+        builder = builder.allowlist_function(f);
     }
     for v in INCLUDED_VARS {
-        builder = builder.whitelist_var(v);
+        builder = builder.allowlist_var(v);
     }
     for t in OPAQUE_TYPES {
         builder = builder.opaque_type(t);
     }
     let bindings = builder.generate().expect("Unable to generate bindings");
 
-    let out_path = PathBuf::from(env::var("OUT_DIR").unwrap());
+    // let out_path = PathBuf::from(env::var("OUT_DIR").unwrap());
+    let out_path = PathBuf::from("src");
     bindings
-        .write_to_file(out_path.join("bindings.rs"))
+        .write_to_file(out_path.join("bindings_c.rs"))
         .expect("Couldn't write bindings!");
 
-    handle_kernel_version_cfg(&out_path.join("bindings.rs"));
+    handle_kernel_version_cfg(&out_path.join("bindings_c.rs"));
     handle_kernel_symbols_cfg(&PathBuf::from(&kernel_dir).join("Module.symvers"));
 
     let mut builder = cc::Build::new();

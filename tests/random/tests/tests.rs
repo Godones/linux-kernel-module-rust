@@ -1,6 +1,4 @@
-use std::collections::HashSet;
-use std::fs;
-use std::io::Read;
+use std::{collections::HashSet, fs, io::Read};
 
 use kernel_module_testlib::with_kernel_module;
 
@@ -10,7 +8,7 @@ fn test_random_entropy_read() {
         let mut keys = HashSet::new();
         for _ in 0..1024 {
             let mut key = [0; 16];
-            let mut f = fs::File::open("/proc/sys/rust/random-tests/entropy").unwrap();
+            let mut f = fs::File::open("/proc/sys/rust/rrandom/entropy").unwrap();
             f.read_exact(&mut key).unwrap();
             keys.insert(key);
         }
@@ -21,6 +19,6 @@ fn test_random_entropy_read() {
 #[test]
 fn test_random_entropy_write() {
     with_kernel_module(|| {
-        fs::write("/proc/sys/rust/random-tests/entropy", b"1234567890").unwrap();
+        fs::write("/proc/sys/rust/rrandom/entropy", b"1234567890").unwrap();
     });
 }

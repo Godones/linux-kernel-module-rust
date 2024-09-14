@@ -12,7 +12,7 @@ test = false
 default = ["linux-kernel-module"]
 
 [dependencies]
-linux-kernel-module = { path = "../..", optional = true }
+linux-kernel-module = { path = "../../kbind", optional = true , package = "kbind"}
 
 [dev-dependencies]
 kernel-module-testlib = { path = "../../testlib" }

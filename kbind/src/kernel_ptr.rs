@@ -1,44 +1,10 @@
-use alloc::vec;
-use alloc::vec::Vec;
-use core::u32;
+use alloc::{vec, vec::Vec};
 
-use crate::bindings;
-use crate::c_types;
-use crate::error;
+use crate::{c_types, error};
 
-extern "C" {
-    fn access_ok_helper(addr: *const c_types::c_void, len: c_types::c_ulong) -> c_types::c_int;
-}
+pub struct KernelSlicePtr(*mut c_types::c_void, usize);
 
-/// A reference to an area in userspace memory, which can be either
-/// read-only or read-write.
-///
-/// All methods on this struct are safe: invalid pointers return
-/// `EFAULT`. Concurrent access, _including data races to/from userspace
-/// memory_, is permitted, because fundamentally another userspace
-/// thread / process could always be modifying memory at the same time
-/// (in the same way that userspace Rust's std::io permits data races
-/// with the contents of files on disk). In the presence of a race, the
-/// exact byte values read/written are unspecified but the operation is
-/// well-defined. Kernelspace code should validate its copy of data
-/// after completing a read, and not expect that multiple reads of the
-/// same address will return the same value.
-///
-/// All APIs enforce the invariant that a given byte of memory from userspace
-/// may only be read once. By pretenting double-fetches we avoid TOCTOU
-/// vulnerabilities. This is accomplished by taking `self` by value to prevent
-/// obtaining multiple readers on a given UserSlicePtr, and the readers only
-/// permitting forward reads.
-///
-/// Constructing a `UserSlicePtr` only checks that the range is in valid
-/// userspace memory, and does not depend on the current process (and
-/// can safely be constructed inside a kernel thread with no current
-/// userspace process). Reads and writes wrap the kernel APIs
-/// `copy_from_user` and `copy_to_user`, and check the memory map of the
-/// current process.
-pub struct UserSlicePtr(*mut c_types::c_void, usize);
-
-impl UserSlicePtr {
+impl KernelSlicePtr {
     /// Construct a user slice from a raw pointer and a length in bytes.
     ///
     /// Checks that the provided range is within the legal area for
@@ -54,11 +20,8 @@ impl UserSlicePtr {
     pub(crate) unsafe fn new(
         ptr: *mut c_types::c_void,
         length: usize,
-    ) -> error::KernelResult<UserSlicePtr> {
-        if access_ok_helper(ptr, length as c_types::c_ulong) == 0 {
-            return Err(error::Error::EFAULT);
-        }
-        Ok(UserSlicePtr(ptr, length))
+    ) -> error::KernelResult<KernelSlicePtr> {
+        Ok(KernelSlicePtr(ptr, length))
     }
 
     /// Read the entirety of the user slice and return it in a `Vec`.
@@ -71,8 +34,8 @@ impl UserSlicePtr {
 
     /// Construct a `UserSlicePtrReader` that can incrementally read
     /// from the user slice.
-    pub fn reader(self) -> UserSlicePtrReader {
-        UserSlicePtrReader(self.0, self.1)
+    pub fn reader(self) -> KernelSlicePtrReader {
+        KernelSlicePtrReader(self.0, self.1)
     }
 
     /// Write the provided slice into the user slice.
@@ -87,14 +50,14 @@ impl UserSlicePtr {
 
     /// Construct a `UserSlicePtrWrite` that can incrementally write
     /// into the user slice.
-    pub fn writer(self) -> UserSlicePtrWriter {
-        UserSlicePtrWriter(self.0, self.1)
+    pub fn writer(self) -> KernelSlicePtrWriter {
+        KernelSlicePtrWriter(self.0, self.1)
     }
 }
 
-pub struct UserSlicePtrReader(*mut c_types::c_void, usize);
+pub struct KernelSlicePtrReader(*mut c_types::c_void, usize);
 
-impl UserSlicePtrReader {
+impl KernelSlicePtrReader {
     /// Returns the number of bytes left to be read from this. Note that even
     /// reading less than this number of bytes may return an Error().
     pub fn len(&self) -> usize {
@@ -120,15 +83,8 @@ impl UserSlicePtrReader {
         if data.len() > self.1 || data.len() > u32::MAX as usize {
             return Err(error::Error::EFAULT);
         }
-        let res = unsafe {
-            bindings::_copy_from_user(
-                data.as_mut_ptr() as *mut c_types::c_void,
-                self.0,
-                data.len() as _,
-            )
-        };
-        if res != 0 {
-            return Err(error::Error::EFAULT);
+        unsafe {
+            core::ptr::copy_nonoverlapping(self.0 as *const u8, data.as_mut_ptr(), data.len());
         }
         // Since this is not a pointer to a valid object in our program,
         // we cannot use `add`, which has C-style rules for defined
@@ -139,9 +95,9 @@ impl UserSlicePtrReader {
     }
 }
 
-pub struct UserSlicePtrWriter(*mut c_types::c_void, usize);
+pub struct KernelSlicePtrWriter(*mut c_types::c_void, usize);
 
-impl UserSlicePtrWriter {
+impl KernelSlicePtrWriter {
     pub fn len(&self) -> usize {
         self.1
     }
@@ -154,15 +110,8 @@ impl UserSlicePtrWriter {
         if data.len() > self.1 || data.len() > u32::MAX as usize {
             return Err(error::Error::EFAULT);
         }
-        let res = unsafe {
-            bindings::_copy_to_user(
-                self.0,
-                data.as_ptr() as *const c_types::c_void,
-                data.len() as _,
-            )
-        };
-        if res != 0 {
-            return Err(error::Error::EFAULT);
+        unsafe {
+            core::ptr::copy_nonoverlapping(data.as_ptr(), self.0 as *mut u8, data.len());
         }
         // Since this is not a pointer to a valid object in our program,
         // we cannot use `add`, which has C-style rules for defined

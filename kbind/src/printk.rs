@@ -1,8 +1,6 @@
-use core::cmp;
-use core::fmt;
+use core::{cmp, fmt};
 
-use crate::bindings;
-use crate::c_types::c_int;
+use crate::{bindings, c_types::c_int};
 
 #[doc(hidden)]
 pub fn printk(s: &[u8]) {

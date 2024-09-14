@@ -1,5 +1,5 @@
 [package]
-name = "random-tests"
+name = "rrandom"
 version = "0.1.0"
 authors = ["Alex Gaynor <alex.gaynor@gmail.com>", "Geoffrey Thomas <geofft@ldpreload.com>"]
 edition = "2018"
@@ -12,7 +12,7 @@ test = false
 default = ["linux-kernel-module"]
 
 [dependencies]
-linux-kernel-module = { path = "../..", optional = true }
+linux-kernel-module = { path = "../../kbind", optional = true , package = "kbind"}
 
 [dev-dependencies]
 kernel-module-testlib = { path = "../../testlib" }

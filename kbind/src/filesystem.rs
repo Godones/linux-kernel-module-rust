@@ -1,11 +1,7 @@
-use crate::bindings;
-use crate::c_types;
-use crate::error;
-use crate::types::CStr;
 use alloc::boxed::Box;
-use core::default::Default;
-use core::marker;
-use core::ptr::addr_of_mut;
+use core::{default::Default, marker, ptr::addr_of_mut};
+
+use crate::{bindings, c_types, error, types::CStr};
 
 pub struct Registration<T: FileSystem> {
     _phantom: marker::PhantomData<T>,

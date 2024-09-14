@@ -2,8 +2,7 @@
 
 extern crate alloc;
 
-use alloc::borrow::ToOwned;
-use alloc::string::String;
+use alloc::{borrow::ToOwned, string::String};
 
 use linux_kernel_module::println;
 

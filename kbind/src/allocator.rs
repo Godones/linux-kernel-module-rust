@@ -1,8 +1,9 @@
-use core::alloc::{GlobalAlloc, Layout};
-use core::ptr;
+use core::{
+    alloc::{GlobalAlloc, Layout},
+    ptr,
+};
 
-use crate::bindings;
-use crate::c_types;
+use crate::{bindings, c_types};
 
 pub struct KernelAllocator;
 

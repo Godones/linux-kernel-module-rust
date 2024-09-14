@@ -1,7 +1,4 @@
-use std::env;
-use std::fs;
-use std::path::Path;
-use std::process::Command;
+use std::{env, fs, path::Path, process::Command};
 
 use kernel_module_testlib::with_kernel_module;
 

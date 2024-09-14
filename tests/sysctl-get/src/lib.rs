@@ -2,10 +2,7 @@
 
 use core::sync::atomic::{AtomicBool, Ordering};
 
-use linux_kernel_module::{self, cstr, println};
-
-use linux_kernel_module::sysctl::Sysctl;
-use linux_kernel_module::Mode;
+use linux_kernel_module::{self, cstr, println, sysctl::Sysctl, Mode};
 
 static A_VAL: AtomicBool = AtomicBool::new(false);
 

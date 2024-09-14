@@ -2,10 +2,7 @@
 
 use core::sync::atomic::AtomicBool;
 
-use linux_kernel_module::{self, cstr};
-
-use linux_kernel_module::sysctl::Sysctl;
-use linux_kernel_module::Mode;
+use linux_kernel_module::{self, cstr, sysctl::Sysctl, Mode};
 
 struct SysctlTestModule {
     _sysctl_a: Sysctl<AtomicBool>,

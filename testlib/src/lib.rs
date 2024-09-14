@@ -1,7 +1,4 @@
-use std::env;
-use std::fs;
-use std::path::PathBuf;
-use std::process::Command;
+use std::{env, fs, path::PathBuf, process::Command};
 
 use tempfile::TempDir;
 
@@ -17,7 +14,7 @@ impl LoadedModule {
             .status()
             .unwrap();
         assert!(status.success());
-        return LoadedModule { name };
+        LoadedModule { name }
     }
 }
 
@@ -61,13 +58,13 @@ pub fn get_device_major_number(name: &str) -> libc::dev_t {
     let elements = dev_no_line.rsplitn(2, " ").collect::<Vec<_>>();
     assert_eq!(elements.len(), 2);
     assert_eq!(elements[0], name);
-    return elements[1].trim().parse().unwrap();
+    elements[1].trim().parse().unwrap()
 }
 
 pub fn temporary_file_path() -> PathBuf {
     let mut p = TempDir::new().unwrap().into_path();
     p.push("device");
-    return p;
+    p
 }
 
 pub struct UnlinkOnDrop<'a> {
@@ -94,5 +91,5 @@ pub fn mknod(path: &PathBuf, major: libc::dev_t, minor: libc::dev_t) -> UnlinkOn
         .arg(minor.to_string())
         .status()
         .unwrap();
-    return UnlinkOnDrop { path };
+    UnlinkOnDrop { path }
 }

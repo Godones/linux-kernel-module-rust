@@ -1,18 +1,16 @@
-use alloc::boxed::Box;
-use alloc::vec;
-use core::mem;
-use core::ptr;
-use core::sync::atomic;
+use alloc::{boxed::Box, vec};
+use core::{mem, ptr, sync::atomic};
 
-use crate::bindings;
-use crate::c_types;
-use crate::error;
-use crate::types;
-use crate::user_ptr::{UserSlicePtr, UserSlicePtrWriter};
+use crate::{
+    bindings, c_types, error,
+    kernel_ptr::{KernelSlicePtr, KernelSlicePtrWriter},
+    println, types,
+    user_ptr::UserSlicePtrWriter,
+};
 
 pub trait SysctlStorage: Sync {
     fn store_value(&self, data: &[u8]) -> (usize, error::KernelResult<()>);
-    fn read_value(&self, data: &mut UserSlicePtrWriter) -> (usize, error::KernelResult<()>);
+    fn read_value(&self, data: &mut KernelSlicePtrWriter) -> (usize, error::KernelResult<()>);
 }
 
 fn trim_whitespace(mut data: &[u8]) -> &[u8] {
@@ -37,7 +35,7 @@ where
         (*self).store_value(data)
     }
 
-    fn read_value(&self, data: &mut UserSlicePtrWriter) -> (usize, error::KernelResult<()>) {
+    fn read_value(&self, data: &mut KernelSlicePtrWriter) -> (usize, error::KernelResult<()>) {
         (*self).read_value(data)
     }
 }
@@ -58,7 +56,7 @@ impl SysctlStorage for atomic::AtomicBool {
         (data.len(), result)
     }
 
-    fn read_value(&self, data: &mut UserSlicePtrWriter) -> (usize, error::KernelResult<()>) {
+    fn read_value(&self, data: &mut KernelSlicePtrWriter) -> (usize, error::KernelResult<()>) {
         let value = if self.load(atomic::Ordering::Relaxed) {
             b"1\n"
         } else {
@@ -86,6 +84,10 @@ unsafe extern "C" fn proc_handler<T: SysctlStorage>(
     len: *mut usize,
     ppos: *mut bindings::loff_t,
 ) -> c_types::c_int {
+    println!(
+        "proc_handler: ctl={:p}, write={}, buffer={:p}, len={}, ppos={}",
+        ctl, write, buffer, *len, *ppos
+    );
     // If we're reading from some offset other than the beginning of the file,
     // return an empty read to signal EOF.
     if *ppos != 0 && write == 0 {
@@ -93,9 +95,12 @@ unsafe extern "C" fn proc_handler<T: SysctlStorage>(
         return 0;
     }
 
-    let data = match UserSlicePtr::new(buffer, *len) {
+    let data = match KernelSlicePtr::new(buffer, *len) {
         Ok(ptr) => ptr,
-        Err(e) => return e.to_kernel_errno(),
+        Err(e) => {
+            println!("proc_handler: UserSlicePtr::new failed: {:?}", e);
+            return e.to_kernel_errno();
+        }
     };
     let storage = &*((*ctl).data as *const T);
     let (bytes_processed, result) = if write != 0 {

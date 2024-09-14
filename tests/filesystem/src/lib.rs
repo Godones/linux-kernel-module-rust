@@ -2,8 +2,11 @@
 
 extern crate alloc;
 
-use linux_kernel_module::filesystem::{self, FileSystem, FileSystemFlags};
-use linux_kernel_module::{self, cstr, CStr};
+use linux_kernel_module::{
+    self, cstr,
+    filesystem::{self, FileSystem, FileSystemFlags},
+    CStr,
+};
 
 struct TestFSModule {
     _fs_registration: filesystem::Registration<TestFS>,

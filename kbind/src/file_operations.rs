@@ -1,12 +1,14 @@
-use core::convert::{TryFrom, TryInto};
-use core::{marker, mem, ptr};
-
 use alloc::boxed::Box;
+use core::{
+    convert::{TryFrom, TryInto},
+    marker, mem, ptr,
+};
 
-use crate::bindings;
-use crate::c_types;
-use crate::error::{Error, KernelResult};
-use crate::user_ptr::{UserSlicePtr, UserSlicePtrReader, UserSlicePtrWriter};
+use crate::{
+    bindings, c_types,
+    error::{Error, KernelResult},
+    user_ptr::{UserSlicePtr, UserSlicePtrReader, UserSlicePtrWriter},
+};
 
 bitflags::bitflags! {
     pub struct FileFlags: c_types::c_uint {
@@ -159,7 +161,6 @@ impl<T: FileOperations> FileOperationsVtable<T> {
         } else {
             None
         },
-
         #[cfg(not(kernel_4_9_0_or_greater))]
         aio_fsync: None,
         check_flags: None,

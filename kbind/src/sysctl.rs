@@ -5,7 +5,6 @@ use crate::{
     bindings, c_types, error,
     kernel_ptr::{KernelSlicePtr, KernelSlicePtrWriter},
     println, types,
-    user_ptr::UserSlicePtrWriter,
 };
 
 pub trait SysctlStorage: Sync {

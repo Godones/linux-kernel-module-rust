@@ -19,6 +19,4 @@ Cargo.lock
 rust-project.json
 
 
-.*
-*.mod.*
-*.mod
+.idea

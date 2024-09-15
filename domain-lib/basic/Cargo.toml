@@ -1,0 +1,9 @@
+[package]
+name = "basic"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+corelib = { path = "../corelib", features = ["core_impl"]}
+log = "0.4.22"
+rref = { path = "../rref" }

@@ -1,4 +1,4 @@
-module-name := rrandom
+module-name := hello_world
 obj-m := $(module-name).o
 
 CARGO ?= cargo

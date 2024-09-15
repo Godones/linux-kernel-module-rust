@@ -1,0 +1,17 @@
+[target.riscv64]
+rustflags = [
+    "-Clink-arg=-T../../domain.ld",
+    "-Clink-arg=-pie",
+    "-A", "unused_imports",
+]
+linker = "riscv64-linux-gnu-gcc"
+
+[unstable]
+build-std = ["core", "alloc"]
+build-std-features = ["compiler-builtins-mem"]
+
+[profile.release]
+lto = true
+strip = true
+opt-level = 3
+panic = "abort"

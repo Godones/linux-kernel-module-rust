@@ -1,5 +1,5 @@
-obj-m := hello_world.o
-helloworld-objs := hello_world.o
+module-name := tcb
+obj-m := $(module-name).o
 
 CARGO ?= cargo
 TARGET := x86_64-kernel
@@ -8,7 +8,7 @@ BUILD := release
 
 export c_flags
 
-$(src)/../target/$(TARGET)/$(BUILD)/libhello_world.a:
+$(src)/../target/$(TARGET)/$(BUILD)/lib$(module-name).a:
 	cd $(src); $(CARGO) build --$(BUILD) -Z build-std=core,alloc --target=$(TARGET_PROFILE)
 
 .PHONY: clean

@@ -7,4 +7,18 @@ edition = "2021"
 crate-type = ["staticlib"]
 
 [dependencies]
+# domain lib
+interface = { path = "../domain-lib/interface" }
+corelib = { path = "../domain-lib/corelib" }
+basic = { path = "../domain-lib/basic" }
+ksync = { path = "../domain-lib/ksync" }
+rref = { path = "../domain-lib/rref" }
+storage = { path = "../domain-lib/storage" }
+#
+log = "0"
+hashbrown = "0.14.5"
+xmas-elf = "0.9"
+bitflags = "2.6.0"
+memory_addr = { git ="https://github.com/os-module/memory_addr" }
+# kernel bind
 linux-kernel-module = { path = "../kbind", package = "kbind" }

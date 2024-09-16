@@ -7,3 +7,4 @@ edition = "2021"
 corelib = { path = "../corelib", features = ["core_impl"]}
 log = "0.4.22"
 rref = { path = "../rref" }
+ksync = { path = "../ksync" }

@@ -1,8 +1,4 @@
-use std::{
-    env, fs,
-    io::{BufRead, BufReader},
-    path::PathBuf,
-};
+use std::{env, path::PathBuf};
 
 const INCLUDED_TYPES: &[&str] = &["file_system_type", "mode_t", "umode_t", "ctl_table"];
 const INCLUDED_FUNCTIONS: &[&str] = &[
@@ -57,62 +53,6 @@ const OPAQUE_TYPES: &[&str] = &[
     "xregs_state",
 ];
 
-fn handle_kernel_version_cfg(bindings_path: &PathBuf) {
-    let f = BufReader::new(fs::File::open(bindings_path).unwrap());
-    let mut version = None;
-    for line in f.lines() {
-        let line = line.unwrap();
-        if let Some(type_and_value) = line.split("pub const LINUX_VERSION_CODE").nth(1) {
-            if let Some(value) = type_and_value.split('=').nth(1) {
-                let raw_version = value.split(';').next().unwrap();
-                version = Some(raw_version.trim().parse::<u64>().unwrap());
-                break;
-            }
-        }
-    }
-    let version = version.expect("Couldn't find kernel version");
-    let (mut major, mut minor) = match version.to_be_bytes() {
-        [0, 0, 0, 0, 0, major, minor, _patch] => (major, minor),
-        _ => panic!("unable to parse LINUX_VERSION_CODE {:x}", version),
-    };
-    if major >= 6 {
-        major = 5;
-        minor = 6;
-    }
-    if major >= 6 {
-        // panic!("Please update build.rs with the last 5.x version");
-        // Change this block to major >= 7, copy the below block for
-        // major >= 6, fill in unimplemented!() for major >= 5
-    }
-    if major >= 5 {
-        for x in 0..=if major > 5 { unimplemented!() } else { minor } {
-            println!("cargo:rustc-check-cfg=cfg(kernel_5_{}_0_or_greater)", x);
-            println!("cargo:rustc-cfg=kernel_5_{}_0_or_greater", x);
-        }
-    }
-    if major >= 4 {
-        // We don't currently support anything older than 4.4
-        for x in 4..=if major > 4 { 20 } else { minor } {
-            println!("cargo:rustc-check-cfg=cfg(kernel_4_{}_0_or_greater)", x);
-            println!("cargo:rustc-cfg=kernel_4_{}_0_or_greater", x);
-        }
-    }
-}
-
-fn handle_kernel_symbols_cfg(symvers_path: &PathBuf) {
-    let f = BufReader::new(fs::File::open(symvers_path).unwrap());
-    for line in f.lines() {
-        let line = line.unwrap();
-        if let Some(symbol) = line.split_ascii_whitespace().nth(1) {
-            if symbol == "setfl" {
-                println!("cargo:rustc-cfg=kernel_aufs_setfl");
-                break;
-            }
-        }
-    }
-    println!("cargo:rustc-check-cfg=cfg(kernel_aufs_setfl)");
-}
-
 // Takes the CFLAGS from the kernel Makefile and changes all the include paths to be absolute
 // instead of relative.
 fn prepare_cflags(cflags: &str, kernel_dir: &str) -> Vec<String> {
@@ -166,7 +106,7 @@ fn main() {
 
     let mut builder = bindgen::Builder::default()
         .use_core()
-        .ctypes_prefix("c_types")
+        .ctypes_prefix("core::ffi")
         .derive_default(true)
         .size_t_is_usize(true);
 
@@ -197,9 +137,6 @@ fn main() {
     bindings
         .write_to_file(out_path.join("bindings_c.rs"))
         .expect("Couldn't write bindings!");
-
-    handle_kernel_version_cfg(&out_path.join("bindings_c.rs"));
-    handle_kernel_symbols_cfg(&PathBuf::from(&kernel_dir).join("Module.symvers"));
 
     let mut builder = cc::Build::new();
     builder.compiler(env::var("CC").unwrap_or_else(|_| "clang".to_string()));

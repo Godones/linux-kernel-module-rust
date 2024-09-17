@@ -2,7 +2,7 @@ use alloc::{boxed::Box, vec};
 use core::{mem, ptr, sync::atomic};
 
 use crate::{
-    bindings, c_types, error,
+    bindings, error,
     kernel_ptr::{KernelSlicePtr, KernelSlicePtrWriter},
     println, types,
 };
@@ -78,11 +78,11 @@ unsafe impl<T: SysctlStorage> Sync for Sysctl<T> {}
 
 unsafe extern "C" fn proc_handler<T: SysctlStorage>(
     ctl: *mut bindings::ctl_table,
-    write: c_types::c_int,
-    buffer: *mut c_types::c_void,
+    write: core::ffi::c_int,
+    buffer: *mut core::ffi::c_void,
     len: *mut usize,
     ppos: *mut bindings::loff_t,
-) -> c_types::c_int {
+) -> core::ffi::c_int {
     println!(
         "proc_handler: ctl={:p}, write={}, buffer={:p}, len={}, ppos={}",
         ctl, write, buffer, *len, *ppos
@@ -136,7 +136,7 @@ impl<T: SysctlStorage> Sysctl<T> {
             bindings::ctl_table {
                 procname: name.as_ptr() as *const i8,
                 mode: mode.as_int(),
-                data: &*storage as *const T as *mut c_types::c_void,
+                data: &*storage as *const T as *mut core::ffi::c_void,
                 proc_handler: Some(proc_handler::<T>),
 
                 maxlen: 0,

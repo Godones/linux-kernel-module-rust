@@ -1,7 +1,6 @@
-use core::{cmp, fmt};
+use core::{cmp, ffi::c_int, fmt};
 
-use crate::{bindings, c_types::c_int};
-
+use crate::bindings;
 #[doc(hidden)]
 pub fn printk(s: &[u8]) {
     // Don't copy the trailing NUL from `KERN_INFO`.

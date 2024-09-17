@@ -1,8 +1,8 @@
 use alloc::{vec, vec::Vec};
 
-use crate::{c_types, error};
+use crate::error;
 
-pub struct KernelSlicePtr(*mut c_types::c_void, usize);
+pub struct KernelSlicePtr(*mut core::ffi::c_void, usize);
 
 impl KernelSlicePtr {
     /// Construct a user slice from a raw pointer and a length in bytes.
@@ -18,7 +18,7 @@ impl KernelSlicePtr {
     /// `access_ok` will not do anything. As a result the only place you can safely use this is
     /// with an `__user` pointer that was provided by the kernel.
     pub(crate) unsafe fn new(
-        ptr: *mut c_types::c_void,
+        ptr: *mut core::ffi::c_void,
         length: usize,
     ) -> error::KernelResult<KernelSlicePtr> {
         Ok(KernelSlicePtr(ptr, length))
@@ -55,7 +55,7 @@ impl KernelSlicePtr {
     }
 }
 
-pub struct KernelSlicePtrReader(*mut c_types::c_void, usize);
+pub struct KernelSlicePtrReader(*mut core::ffi::c_void, usize);
 
 impl KernelSlicePtrReader {
     /// Returns the number of bytes left to be read from this. Note that even
@@ -95,7 +95,7 @@ impl KernelSlicePtrReader {
     }
 }
 
-pub struct KernelSlicePtrWriter(*mut c_types::c_void, usize);
+pub struct KernelSlicePtrWriter(*mut core::ffi::c_void, usize);
 
 impl KernelSlicePtrWriter {
     pub fn len(&self) -> usize {

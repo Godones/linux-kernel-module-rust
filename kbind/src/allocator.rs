@@ -3,7 +3,7 @@ use core::{
     ptr,
 };
 
-use crate::{bindings, c_types};
+use crate::bindings;
 
 pub struct KernelAllocator;
 
@@ -15,7 +15,7 @@ unsafe impl GlobalAlloc for KernelAllocator {
     }
 
     unsafe fn dealloc(&self, ptr: *mut u8, _layout: Layout) {
-        bindings::kfree(ptr as *const c_types::c_void);
+        bindings::kfree(ptr as *const core::ffi::c_void);
     }
 }
 

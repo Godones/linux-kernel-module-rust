@@ -2,7 +2,7 @@ use alloc::{boxed::Box, vec, vec::Vec};
 use core::{convert::TryInto, mem, ops::Range, ptr::addr_of_mut};
 
 use crate::{
-    bindings, c_types,
+    bindings,
     error::{Error, KernelResult},
     file_operations,
     types::CStr,
@@ -39,7 +39,7 @@ impl Builder {
                 &mut dev,
                 self.minors.start.into(),
                 self.minors.len().try_into()?,
-                self.name.as_ptr() as *const c_types::c_char,
+                self.name.as_ptr() as *const core::ffi::c_char,
             )
         };
         if res != 0 {

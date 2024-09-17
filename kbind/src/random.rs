@@ -1,6 +1,6 @@
 use core::convert::TryInto;
 
-use crate::{bindings, c_types, error};
+use crate::{bindings, error};
 
 /// Fills `dest` with random bytes generated from the kernel's CSPRNG. Ensures
 /// that the CSPRNG has been seeded before generating any random bytes, and
@@ -13,7 +13,7 @@ pub fn getrandom(dest: &mut [u8]) -> error::KernelResult<()> {
 
     unsafe {
         bindings::get_random_bytes(
-            dest.as_mut_ptr() as *mut c_types::c_void,
+            dest.as_mut_ptr() as *mut core::ffi::c_void,
             dest.len().try_into().unwrap(),
         );
     }
@@ -23,7 +23,6 @@ pub fn getrandom(dest: &mut [u8]) -> error::KernelResult<()> {
 /// Fills `dest` with random bytes generated from the kernel's CSPRNG. If the
 /// CSPRNG is not yet seeded, returns an `Err(EAGAIN)` immediately. Only
 /// available on 4.19 and later kernels.
-#[cfg(kernel_4_19_0_or_greater)]
 pub fn getrandom_nonblock(dest: &mut [u8]) -> error::KernelResult<()> {
     if !unsafe { bindings::rng_is_initialized() } {
         return Err(error::Error::EAGAIN);
@@ -36,7 +35,7 @@ pub fn getrandom_nonblock(dest: &mut [u8]) -> error::KernelResult<()> {
 pub fn add_randomness(data: &[u8]) {
     unsafe {
         bindings::add_device_randomness(
-            data.as_ptr() as *const c_types::c_void,
+            data.as_ptr() as *const core::ffi::c_void,
             data.len().try_into().unwrap(),
         );
     }

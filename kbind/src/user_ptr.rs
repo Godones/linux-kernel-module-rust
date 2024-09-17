@@ -1,10 +1,13 @@
 use alloc::{vec, vec::Vec};
 use core::u32;
 
-use crate::{bindings, c_types, error};
+use crate::{bindings, error};
 
 extern "C" {
-    fn access_ok_helper(addr: *const c_types::c_void, len: c_types::c_ulong) -> c_types::c_int;
+    fn access_ok_helper(
+        addr: *const core::ffi::c_void,
+        len: core::ffi::c_ulong,
+    ) -> core::ffi::c_int;
 }
 
 /// A reference to an area in userspace memory, which can be either
@@ -33,7 +36,7 @@ extern "C" {
 /// userspace process). Reads and writes wrap the kernel APIs
 /// `copy_from_user` and `copy_to_user`, and check the memory map of the
 /// current process.
-pub struct UserSlicePtr(*mut c_types::c_void, usize);
+pub struct UserSlicePtr(*mut core::ffi::c_void, usize);
 
 impl UserSlicePtr {
     /// Construct a user slice from a raw pointer and a length in bytes.
@@ -49,10 +52,10 @@ impl UserSlicePtr {
     /// `access_ok` will not do anything. As a result the only place you can safely use this is
     /// with an `__user` pointer that was provided by the kernel.
     pub(crate) unsafe fn new(
-        ptr: *mut c_types::c_void,
+        ptr: *mut core::ffi::c_void,
         length: usize,
     ) -> error::KernelResult<UserSlicePtr> {
-        if access_ok_helper(ptr, length as c_types::c_ulong) == 0 {
+        if access_ok_helper(ptr, length as core::ffi::c_ulong) == 0 {
             return Err(error::Error::EFAULT);
         }
         Ok(UserSlicePtr(ptr, length))
@@ -89,7 +92,7 @@ impl UserSlicePtr {
     }
 }
 
-pub struct UserSlicePtrReader(*mut c_types::c_void, usize);
+pub struct UserSlicePtrReader(*mut core::ffi::c_void, usize);
 
 impl UserSlicePtrReader {
     /// Returns the number of bytes left to be read from this. Note that even
@@ -119,7 +122,7 @@ impl UserSlicePtrReader {
         }
         let res = unsafe {
             bindings::_copy_from_user(
-                data.as_mut_ptr() as *mut c_types::c_void,
+                data.as_mut_ptr() as *mut core::ffi::c_void,
                 self.0,
                 data.len() as _,
             )
@@ -136,7 +139,7 @@ impl UserSlicePtrReader {
     }
 }
 
-pub struct UserSlicePtrWriter(*mut c_types::c_void, usize);
+pub struct UserSlicePtrWriter(*mut core::ffi::c_void, usize);
 
 impl UserSlicePtrWriter {
     pub fn len(&self) -> usize {
@@ -154,7 +157,7 @@ impl UserSlicePtrWriter {
         let res = unsafe {
             bindings::_copy_to_user(
                 self.0,
-                data.as_ptr() as *const c_types::c_void,
+                data.as_ptr() as *const core::ffi::c_void,
                 data.len() as _,
             )
         };

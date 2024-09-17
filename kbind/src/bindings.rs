@@ -6,7 +6,6 @@
     improper_ctypes
 )]
 mod bindings {
-    use crate::c_types;
     include!("bindings_c.rs");
 }
 pub use bindings::*;

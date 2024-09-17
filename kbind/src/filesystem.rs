@@ -1,7 +1,7 @@
 use alloc::boxed::Box;
 use core::{default::Default, marker, ptr::addr_of_mut};
 
-use crate::{bindings, c_types, error, types::CStr};
+use crate::{bindings, error, types::CStr};
 
 pub struct Registration<T: FileSystem> {
     _phantom: marker::PhantomData<T>,
@@ -23,20 +23,20 @@ pub trait FileSystem: Sync {
 }
 
 bitflags::bitflags! {
-    pub struct FileSystemFlags: c_types::c_int {
-        const REQUIRES_DEV = bindings::FS_REQUIRES_DEV as c_types::c_int;
-        const BINARY_MOUNTDATA = bindings::FS_BINARY_MOUNTDATA as c_types::c_int;
-        const HAS_SUBTYPE = bindings::FS_HAS_SUBTYPE as c_types::c_int;
-        const USERNS_MOUNT = bindings::FS_USERNS_MOUNT as c_types::c_int;
-        const RENAME_DOES_D_MOVE = bindings::FS_RENAME_DOES_D_MOVE as c_types::c_int;
+    pub struct FileSystemFlags: core::ffi::c_int {
+        const REQUIRES_DEV = bindings::FS_REQUIRES_DEV as core::ffi::c_int;
+        const BINARY_MOUNTDATA = bindings::FS_BINARY_MOUNTDATA as core::ffi::c_int;
+        const HAS_SUBTYPE = bindings::FS_HAS_SUBTYPE as core::ffi::c_int;
+        const USERNS_MOUNT = bindings::FS_USERNS_MOUNT as core::ffi::c_int;
+        const RENAME_DOES_D_MOVE = bindings::FS_RENAME_DOES_D_MOVE as core::ffi::c_int;
     }
 }
 
 extern "C" fn fill_super_callback<T: FileSystem>(
     _sb: *mut bindings::super_block,
-    _data: *mut c_types::c_void,
-    _silent: c_types::c_int,
-) -> c_types::c_int {
+    _data: *mut core::ffi::c_void,
+    _silent: core::ffi::c_int,
+) -> core::ffi::c_int {
     // T::fill_super(...)
     // This should actually create an object that gets dropped by
     // file_system_registration::kill_sb. You can point to it with
@@ -46,9 +46,9 @@ extern "C" fn fill_super_callback<T: FileSystem>(
 
 extern "C" fn mount_callback<T: FileSystem>(
     fs_type: *mut bindings::file_system_type,
-    flags: c_types::c_int,
-    _dev_name: *const c_types::c_char,
-    data: *mut c_types::c_void,
+    flags: core::ffi::c_int,
+    _dev_name: *const core::ffi::c_char,
+    data: *mut core::ffi::c_void,
 ) -> *mut bindings::dentry {
     unsafe { bindings::mount_nodev(fs_type, flags, data, Some(fill_super_callback::<T>)) }
 }

@@ -169,14 +169,14 @@ pub const FS_HAS_SUBTYPE: u32 = 4;
 pub const FS_USERNS_MOUNT: u32 = 8;
 pub const FS_RENAME_DOES_D_MOVE: u32 = 32768;
 pub const LINUX_VERSION_CODE: u32 = 393493;
-pub type __s8 = c_types::c_schar;
-pub type __u8 = c_types::c_uchar;
-pub type __s16 = c_types::c_short;
-pub type __u16 = c_types::c_ushort;
-pub type __s32 = c_types::c_int;
-pub type __u32 = c_types::c_uint;
-pub type __s64 = c_types::c_longlong;
-pub type __u64 = c_types::c_ulonglong;
+pub type __s8 = core::ffi::c_schar;
+pub type __u8 = core::ffi::c_uchar;
+pub type __s16 = core::ffi::c_short;
+pub type __u16 = core::ffi::c_ushort;
+pub type __s32 = core::ffi::c_int;
+pub type __u32 = core::ffi::c_uint;
+pub type __s64 = core::ffi::c_longlong;
+pub type __u64 = core::ffi::c_ulonglong;
 pub type s8 = __s8;
 pub type u8_ = __u8;
 pub type s16 = __s16;
@@ -185,22 +185,22 @@ pub type s32 = __s32;
 pub type u32_ = __u32;
 pub type s64 = __s64;
 pub type u64_ = __u64;
-pub type __kernel_long_t = c_types::c_long;
-pub type __kernel_ulong_t = c_types::c_ulong;
-pub type __kernel_mode_t = c_types::c_uint;
-pub type __kernel_pid_t = c_types::c_int;
-pub type __kernel_uid32_t = c_types::c_uint;
-pub type __kernel_gid32_t = c_types::c_uint;
-pub type __kernel_loff_t = c_types::c_longlong;
-pub type __kernel_time64_t = c_types::c_longlong;
+pub type __kernel_long_t = core::ffi::c_long;
+pub type __kernel_ulong_t = core::ffi::c_ulong;
+pub type __kernel_mode_t = core::ffi::c_uint;
+pub type __kernel_pid_t = core::ffi::c_int;
+pub type __kernel_uid32_t = core::ffi::c_uint;
+pub type __kernel_gid32_t = core::ffi::c_uint;
+pub type __kernel_loff_t = core::ffi::c_longlong;
+pub type __kernel_time64_t = core::ffi::c_longlong;
 pub type __kernel_clock_t = __kernel_long_t;
-pub type __kernel_timer_t = c_types::c_int;
-pub type __kernel_clockid_t = c_types::c_int;
-pub type __poll_t = c_types::c_uint;
+pub type __kernel_timer_t = core::ffi::c_int;
+pub type __kernel_clockid_t = core::ffi::c_int;
+pub type __poll_t = core::ffi::c_uint;
 pub type __kernel_dev_t = u32_;
 pub type dev_t = __kernel_dev_t;
 pub type mode_t = __kernel_mode_t;
-pub type umode_t = c_types::c_ushort;
+pub type umode_t = core::ffi::c_ushort;
 pub type pid_t = __kernel_pid_t;
 pub type clockid_t = __kernel_clockid_t;
 pub type bool_ = bool;
@@ -210,12 +210,12 @@ pub type loff_t = __kernel_loff_t;
 #[doc = " The type used for indexing onto a disc or disc partition.\n\n Linux always considers sectors to be 512 bytes long independently\n of the devices real block size.\n\n blkcnt_t is the type of the inode's block count."]
 pub type sector_t = u64_;
 pub type blkcnt_t = u64_;
-pub type gfp_t = c_types::c_uint;
-pub type fmode_t = c_types::c_uint;
+pub type gfp_t = core::ffi::c_uint;
+pub type fmode_t = core::ffi::c_uint;
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
 pub struct atomic_t {
-    pub counter: c_types::c_int,
+    pub counter: core::ffi::c_int,
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
 const _: () = {
@@ -327,65 +327,65 @@ impl Default for callback_head {
 pub struct module {
     pub state: module_state,
     pub list: list_head,
-    pub name: [c_types::c_char; 56usize],
+    pub name: [core::ffi::c_char; 56usize],
     pub mkobj: module_kobject,
     pub modinfo_attrs: *mut module_attribute,
-    pub version: *const c_types::c_char,
-    pub srcversion: *const c_types::c_char,
+    pub version: *const core::ffi::c_char,
+    pub srcversion: *const core::ffi::c_char,
     pub holders_dir: *mut kobject,
     pub syms: *const kernel_symbol,
     pub crcs: *const s32,
-    pub num_syms: c_types::c_uint,
+    pub num_syms: core::ffi::c_uint,
     pub param_lock: mutex,
     pub kp: *mut kernel_param,
-    pub num_kp: c_types::c_uint,
-    pub num_gpl_syms: c_types::c_uint,
+    pub num_kp: core::ffi::c_uint,
+    pub num_gpl_syms: core::ffi::c_uint,
     pub gpl_syms: *const kernel_symbol,
     pub gpl_crcs: *const s32,
     pub using_gplonly_symbols: bool_,
     pub async_probe_requested: bool_,
-    pub num_exentries: c_types::c_uint,
+    pub num_exentries: core::ffi::c_uint,
     pub extable: *mut exception_table_entry,
-    pub init: ::core::option::Option<unsafe extern "C" fn() -> c_types::c_int>,
+    pub init: ::core::option::Option<unsafe extern "C" fn() -> core::ffi::c_int>,
     pub core_layout: module_layout,
     pub init_layout: module_layout,
     pub arch: mod_arch_specific,
-    pub taints: c_types::c_ulong,
-    pub num_bugs: c_types::c_uint,
+    pub taints: core::ffi::c_ulong,
+    pub num_bugs: core::ffi::c_uint,
     pub bug_list: list_head,
     pub bug_table: *mut bug_entry,
     pub kallsyms: *mut mod_kallsyms,
     pub core_kallsyms: mod_kallsyms,
     pub sect_attrs: *mut module_sect_attrs,
     pub notes_attrs: *mut module_notes_attrs,
-    pub args: *mut c_types::c_char,
-    pub percpu: *mut c_types::c_void,
-    pub percpu_size: c_types::c_uint,
-    pub noinstr_text_start: *mut c_types::c_void,
-    pub noinstr_text_size: c_types::c_uint,
-    pub num_tracepoints: c_types::c_uint,
-    pub tracepoints_ptrs: *const c_types::c_int,
-    pub num_srcu_structs: c_types::c_uint,
+    pub args: *mut core::ffi::c_char,
+    pub percpu: *mut core::ffi::c_void,
+    pub percpu_size: core::ffi::c_uint,
+    pub noinstr_text_start: *mut core::ffi::c_void,
+    pub noinstr_text_size: core::ffi::c_uint,
+    pub num_tracepoints: core::ffi::c_uint,
+    pub tracepoints_ptrs: *const core::ffi::c_int,
+    pub num_srcu_structs: core::ffi::c_uint,
     pub srcu_struct_ptrs: *mut *mut srcu_struct,
-    pub num_bpf_raw_events: c_types::c_uint,
+    pub num_bpf_raw_events: core::ffi::c_uint,
     pub bpf_raw_events: *mut bpf_raw_event_map,
-    pub btf_data_size: c_types::c_uint,
-    pub btf_data: *mut c_types::c_void,
+    pub btf_data_size: core::ffi::c_uint,
+    pub btf_data: *mut core::ffi::c_void,
     pub jump_entries: *mut jump_entry,
-    pub num_jump_entries: c_types::c_uint,
-    pub num_trace_bprintk_fmt: c_types::c_uint,
-    pub trace_bprintk_fmt_start: *mut *const c_types::c_char,
+    pub num_jump_entries: core::ffi::c_uint,
+    pub num_trace_bprintk_fmt: core::ffi::c_uint,
+    pub trace_bprintk_fmt_start: *mut *const core::ffi::c_char,
     pub trace_events: *mut *mut trace_event_call,
-    pub num_trace_events: c_types::c_uint,
+    pub num_trace_events: core::ffi::c_uint,
     pub trace_evals: *mut *mut trace_eval_map,
-    pub num_trace_evals: c_types::c_uint,
-    pub num_ftrace_callsites: c_types::c_uint,
-    pub ftrace_callsites: *mut c_types::c_ulong,
-    pub kprobes_text_start: *mut c_types::c_void,
-    pub kprobes_text_size: c_types::c_uint,
-    pub kprobe_blacklist: *mut c_types::c_ulong,
-    pub num_kprobe_blacklist: c_types::c_uint,
-    pub num_static_call_sites: c_types::c_int,
+    pub num_trace_evals: core::ffi::c_uint,
+    pub num_ftrace_callsites: core::ffi::c_uint,
+    pub ftrace_callsites: *mut core::ffi::c_ulong,
+    pub kprobes_text_start: *mut core::ffi::c_void,
+    pub kprobes_text_size: core::ffi::c_uint,
+    pub kprobe_blacklist: *mut core::ffi::c_ulong,
+    pub num_kprobe_blacklist: core::ffi::c_uint,
+    pub num_static_call_sites: core::ffi::c_int,
     pub static_call_sites: *mut static_call_site,
     pub source_list: list_head,
     pub target_list: list_head,
@@ -516,9 +516,9 @@ extern "C" {
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
 pub struct kernel_symbol {
-    pub value_offset: c_types::c_int,
-    pub name_offset: c_types::c_int,
-    pub namespace_offset: c_types::c_int,
+    pub value_offset: core::ffi::c_int,
+    pub name_offset: core::ffi::c_int,
+    pub namespace_offset: core::ffi::c_int,
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
 const _: () = {
@@ -534,17 +534,17 @@ const _: () = {
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct file_system_type {
-    pub name: *const c_types::c_char,
-    pub fs_flags: c_types::c_int,
+    pub name: *const core::ffi::c_char,
+    pub fs_flags: core::ffi::c_int,
     pub init_fs_context:
-        ::core::option::Option<unsafe extern "C" fn(arg1: *mut fs_context) -> c_types::c_int>,
+        ::core::option::Option<unsafe extern "C" fn(arg1: *mut fs_context) -> core::ffi::c_int>,
     pub parameters: *const fs_parameter_spec,
     pub mount: ::core::option::Option<
         unsafe extern "C" fn(
             arg1: *mut file_system_type,
-            arg2: c_types::c_int,
-            arg3: *const c_types::c_char,
-            arg4: *mut c_types::c_void,
+            arg2: core::ffi::c_int,
+            arg3: *const core::ffi::c_char,
+            arg4: *mut core::ffi::c_void,
         ) -> *mut dentry,
     >,
     pub kill_sb: ::core::option::Option<unsafe extern "C" fn(arg1: *mut super_block)>,
@@ -790,12 +790,12 @@ pub type raw_spinlock_t = raw_spinlock;
 #[derive(Copy, Clone)]
 pub struct ratelimit_state {
     pub lock: raw_spinlock_t,
-    pub interval: c_types::c_int,
-    pub burst: c_types::c_int,
-    pub printed: c_types::c_int,
-    pub missed: c_types::c_int,
-    pub begin: c_types::c_ulong,
-    pub flags: c_types::c_ulong,
+    pub interval: core::ffi::c_int,
+    pub burst: core::ffi::c_int,
+    pub printed: core::ffi::c_int,
+    pub missed: core::ffi::c_int,
+    pub begin: core::ffi::c_ulong,
+    pub flags: core::ffi::c_ulong,
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
 const _: () = {
@@ -830,12 +830,12 @@ impl Default for ratelimit_state {
 pub struct file_operations {
     pub owner: *mut module,
     pub llseek: ::core::option::Option<
-        unsafe extern "C" fn(arg1: *mut file, arg2: loff_t, arg3: c_types::c_int) -> loff_t,
+        unsafe extern "C" fn(arg1: *mut file, arg2: loff_t, arg3: core::ffi::c_int) -> loff_t,
     >,
     pub read: ::core::option::Option<
         unsafe extern "C" fn(
             arg1: *mut file,
-            arg2: *mut c_types::c_char,
+            arg2: *mut core::ffi::c_char,
             arg3: usize,
             arg4: *mut loff_t,
         ) -> isize,
@@ -843,7 +843,7 @@ pub struct file_operations {
     pub write: ::core::option::Option<
         unsafe extern "C" fn(
             arg1: *mut file,
-            arg2: *const c_types::c_char,
+            arg2: *const core::ffi::c_char,
             arg3: usize,
             arg4: *mut loff_t,
         ) -> isize,
@@ -858,14 +858,14 @@ pub struct file_operations {
         unsafe extern "C" fn(
             kiocb: *mut kiocb,
             arg1: *mut io_comp_batch,
-            flags: c_types::c_uint,
-        ) -> c_types::c_int,
+            flags: core::ffi::c_uint,
+        ) -> core::ffi::c_int,
     >,
     pub iterate: ::core::option::Option<
-        unsafe extern "C" fn(arg1: *mut file, arg2: *mut dir_context) -> c_types::c_int,
+        unsafe extern "C" fn(arg1: *mut file, arg2: *mut dir_context) -> core::ffi::c_int,
     >,
     pub iterate_shared: ::core::option::Option<
-        unsafe extern "C" fn(arg1: *mut file, arg2: *mut dir_context) -> c_types::c_int,
+        unsafe extern "C" fn(arg1: *mut file, arg2: *mut dir_context) -> core::ffi::c_int,
     >,
     pub poll: ::core::option::Option<
         unsafe extern "C" fn(arg1: *mut file, arg2: *mut poll_table_struct) -> __poll_t,
@@ -873,79 +873,79 @@ pub struct file_operations {
     pub unlocked_ioctl: ::core::option::Option<
         unsafe extern "C" fn(
             arg1: *mut file,
-            arg2: c_types::c_uint,
-            arg3: c_types::c_ulong,
-        ) -> c_types::c_long,
+            arg2: core::ffi::c_uint,
+            arg3: core::ffi::c_ulong,
+        ) -> core::ffi::c_long,
     >,
     pub compat_ioctl: ::core::option::Option<
         unsafe extern "C" fn(
             arg1: *mut file,
-            arg2: c_types::c_uint,
-            arg3: c_types::c_ulong,
-        ) -> c_types::c_long,
+            arg2: core::ffi::c_uint,
+            arg3: core::ffi::c_ulong,
+        ) -> core::ffi::c_long,
     >,
     pub mmap: ::core::option::Option<
-        unsafe extern "C" fn(arg1: *mut file, arg2: *mut vm_area_struct) -> c_types::c_int,
+        unsafe extern "C" fn(arg1: *mut file, arg2: *mut vm_area_struct) -> core::ffi::c_int,
     >,
-    pub mmap_supported_flags: c_types::c_ulong,
+    pub mmap_supported_flags: core::ffi::c_ulong,
     pub open: ::core::option::Option<
-        unsafe extern "C" fn(arg1: *mut inode, arg2: *mut file) -> c_types::c_int,
+        unsafe extern "C" fn(arg1: *mut inode, arg2: *mut file) -> core::ffi::c_int,
     >,
     pub flush: ::core::option::Option<
-        unsafe extern "C" fn(arg1: *mut file, id: fl_owner_t) -> c_types::c_int,
+        unsafe extern "C" fn(arg1: *mut file, id: fl_owner_t) -> core::ffi::c_int,
     >,
     pub release: ::core::option::Option<
-        unsafe extern "C" fn(arg1: *mut inode, arg2: *mut file) -> c_types::c_int,
+        unsafe extern "C" fn(arg1: *mut inode, arg2: *mut file) -> core::ffi::c_int,
     >,
     pub fsync: ::core::option::Option<
         unsafe extern "C" fn(
             arg1: *mut file,
             arg2: loff_t,
             arg3: loff_t,
-            datasync: c_types::c_int,
-        ) -> c_types::c_int,
+            datasync: core::ffi::c_int,
+        ) -> core::ffi::c_int,
     >,
     pub fasync: ::core::option::Option<
         unsafe extern "C" fn(
-            arg1: c_types::c_int,
+            arg1: core::ffi::c_int,
             arg2: *mut file,
-            arg3: c_types::c_int,
-        ) -> c_types::c_int,
+            arg3: core::ffi::c_int,
+        ) -> core::ffi::c_int,
     >,
     pub lock: ::core::option::Option<
         unsafe extern "C" fn(
             arg1: *mut file,
-            arg2: c_types::c_int,
+            arg2: core::ffi::c_int,
             arg3: *mut file_lock,
-        ) -> c_types::c_int,
+        ) -> core::ffi::c_int,
     >,
     pub sendpage: ::core::option::Option<
         unsafe extern "C" fn(
             arg1: *mut file,
             arg2: *mut page,
-            arg3: c_types::c_int,
+            arg3: core::ffi::c_int,
             arg4: usize,
             arg5: *mut loff_t,
-            arg6: c_types::c_int,
+            arg6: core::ffi::c_int,
         ) -> isize,
     >,
     pub get_unmapped_area: ::core::option::Option<
         unsafe extern "C" fn(
             arg1: *mut file,
-            arg2: c_types::c_ulong,
-            arg3: c_types::c_ulong,
-            arg4: c_types::c_ulong,
-            arg5: c_types::c_ulong,
-        ) -> c_types::c_ulong,
+            arg2: core::ffi::c_ulong,
+            arg3: core::ffi::c_ulong,
+            arg4: core::ffi::c_ulong,
+            arg5: core::ffi::c_ulong,
+        ) -> core::ffi::c_ulong,
     >,
     pub check_flags:
-        ::core::option::Option<unsafe extern "C" fn(arg1: c_types::c_int) -> c_types::c_int>,
+        ::core::option::Option<unsafe extern "C" fn(arg1: core::ffi::c_int) -> core::ffi::c_int>,
     pub flock: ::core::option::Option<
         unsafe extern "C" fn(
             arg1: *mut file,
-            arg2: c_types::c_int,
+            arg2: core::ffi::c_int,
             arg3: *mut file_lock,
-        ) -> c_types::c_int,
+        ) -> core::ffi::c_int,
     >,
     pub splice_write: ::core::option::Option<
         unsafe extern "C" fn(
@@ -953,7 +953,7 @@ pub struct file_operations {
             arg2: *mut file,
             arg3: *mut loff_t,
             arg4: usize,
-            arg5: c_types::c_uint,
+            arg5: core::ffi::c_uint,
         ) -> isize,
     >,
     pub splice_read: ::core::option::Option<
@@ -962,24 +962,24 @@ pub struct file_operations {
             arg2: *mut loff_t,
             arg3: *mut pipe_inode_info,
             arg4: usize,
-            arg5: c_types::c_uint,
+            arg5: core::ffi::c_uint,
         ) -> isize,
     >,
     pub setlease: ::core::option::Option<
         unsafe extern "C" fn(
             arg1: *mut file,
-            arg2: c_types::c_long,
+            arg2: core::ffi::c_long,
             arg3: *mut *mut file_lock,
-            arg4: *mut *mut c_types::c_void,
-        ) -> c_types::c_int,
+            arg4: *mut *mut core::ffi::c_void,
+        ) -> core::ffi::c_int,
     >,
     pub fallocate: ::core::option::Option<
         unsafe extern "C" fn(
             file: *mut file,
-            mode: c_types::c_int,
+            mode: core::ffi::c_int,
             offset: loff_t,
             len: loff_t,
-        ) -> c_types::c_long,
+        ) -> core::ffi::c_long,
     >,
     pub show_fdinfo: ::core::option::Option<unsafe extern "C" fn(m: *mut seq_file, f: *mut file)>,
     pub copy_file_range: ::core::option::Option<
@@ -989,7 +989,7 @@ pub struct file_operations {
             arg3: *mut file,
             arg4: loff_t,
             arg5: usize,
-            arg6: c_types::c_uint,
+            arg6: core::ffi::c_uint,
         ) -> isize,
     >,
     pub remap_file_range: ::core::option::Option<
@@ -999,7 +999,7 @@ pub struct file_operations {
             file_out: *mut file,
             pos_out: loff_t,
             len: loff_t,
-            remap_flags: c_types::c_uint,
+            remap_flags: core::ffi::c_uint,
         ) -> loff_t,
     >,
     pub fadvise: ::core::option::Option<
@@ -1007,21 +1007,21 @@ pub struct file_operations {
             arg1: *mut file,
             arg2: loff_t,
             arg3: loff_t,
-            arg4: c_types::c_int,
-        ) -> c_types::c_int,
+            arg4: core::ffi::c_int,
+        ) -> core::ffi::c_int,
     >,
     pub uring_cmd: ::core::option::Option<
         unsafe extern "C" fn(
             ioucmd: *mut io_uring_cmd,
-            issue_flags: c_types::c_uint,
-        ) -> c_types::c_int,
+            issue_flags: core::ffi::c_uint,
+        ) -> core::ffi::c_int,
     >,
     pub uring_cmd_iopoll: ::core::option::Option<
         unsafe extern "C" fn(
             arg1: *mut io_uring_cmd,
             arg2: *mut io_comp_batch,
-            poll_flags: c_types::c_uint,
-        ) -> c_types::c_int,
+            poll_flags: core::ffi::c_uint,
+        ) -> core::ffi::c_int,
     >,
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
@@ -1124,13 +1124,13 @@ const _: () = {
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub struct static_call_key {
-    pub func: *mut c_types::c_void,
+    pub func: *mut core::ffi::c_void,
     pub __bindgen_anon_1: static_call_key__bindgen_ty_1,
 }
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub union static_call_key__bindgen_ty_1 {
-    pub type_: c_types::c_ulong,
+    pub type_: core::ffi::c_ulong,
     pub mods: *mut static_call_mod,
     pub sites: *mut static_call_site,
 }
@@ -1243,7 +1243,7 @@ pub struct static_key {
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub union static_key__bindgen_ty_1 {
-    pub type_: c_types::c_ulong,
+    pub type_: core::ffi::c_ulong,
     pub entries: *mut jump_entry,
     pub next: *mut static_key_mod,
 }
@@ -1289,7 +1289,7 @@ impl Default for static_key {
 pub struct jump_entry {
     pub code: s32,
     pub target: s32,
-    pub key: c_types::c_long,
+    pub key: core::ffi::c_long,
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
 const _: () = {
@@ -1302,10 +1302,10 @@ const _: () = {
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
 pub struct bug_entry {
-    pub bug_addr_disp: c_types::c_int,
-    pub file_disp: c_types::c_int,
-    pub line: c_types::c_ushort,
-    pub flags: c_types::c_ushort,
+    pub bug_addr_disp: core::ffi::c_int,
+    pub file_disp: core::ffi::c_int,
+    pub line: core::ffi::c_ushort,
+    pub flags: core::ffi::c_ushort,
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
 const _: () = {
@@ -1322,7 +1322,7 @@ pub type atomic_long_t = atomic64_t;
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
 pub struct cpumask {
-    pub bits: [c_types::c_ulong; 4usize],
+    pub bits: [core::ffi::c_ulong; 4usize],
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
 const _: () = {
@@ -1382,7 +1382,7 @@ pub struct __call_single_node {
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub union __call_single_node__bindgen_ty_1 {
-    pub u_flags: c_types::c_uint,
+    pub u_flags: core::ffi::c_uint,
     pub a_flags: atomic_t,
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
@@ -1430,7 +1430,7 @@ pub type time64_t = __s64;
 #[derive(Debug, Default, Copy, Clone)]
 pub struct __kernel_timespec {
     pub tv_sec: __kernel_time64_t,
-    pub tv_nsec: c_types::c_longlong,
+    pub tv_nsec: core::ffi::c_longlong,
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
 const _: () = {
@@ -1445,7 +1445,7 @@ const _: () = {
 #[derive(Debug, Default, Copy, Clone)]
 pub struct timespec64 {
     pub tv_sec: time64_t,
-    pub tv_nsec: c_types::c_long,
+    pub tv_nsec: core::ffi::c_long,
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
 const _: () = {
@@ -1462,13 +1462,13 @@ pub struct pollfd {
 pub const timespec_type_TT_NONE: timespec_type = 0;
 pub const timespec_type_TT_NATIVE: timespec_type = 1;
 pub const timespec_type_TT_COMPAT: timespec_type = 2;
-pub type timespec_type = c_types::c_uint;
+pub type timespec_type = core::ffi::c_uint;
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub struct restart_block {
-    pub arch_data: c_types::c_ulong,
+    pub arch_data: core::ffi::c_ulong,
     pub fn_:
-        ::core::option::Option<unsafe extern "C" fn(arg1: *mut restart_block) -> c_types::c_long>,
+        ::core::option::Option<unsafe extern "C" fn(arg1: *mut restart_block) -> core::ffi::c_long>,
     pub __bindgen_anon_1: restart_block__bindgen_ty_1,
 }
 #[repr(C)]
@@ -1583,10 +1583,10 @@ impl Default for restart_block__bindgen_ty_1__bindgen_ty_2 {
 #[derive(Debug, Copy, Clone)]
 pub struct restart_block__bindgen_ty_1__bindgen_ty_3 {
     pub ufds: *mut pollfd,
-    pub nfds: c_types::c_int,
-    pub has_timeout: c_types::c_int,
-    pub tv_sec: c_types::c_ulong,
-    pub tv_nsec: c_types::c_ulong,
+    pub nfds: core::ffi::c_int,
+    pub has_timeout: core::ffi::c_int,
+    pub tv_sec: core::ffi::c_ulong,
+    pub tv_nsec: core::ffi::c_ulong,
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
 const _: () = {
@@ -1661,27 +1661,27 @@ pub struct io_bitmap {
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
 pub struct pt_regs {
-    pub r15: c_types::c_ulong,
-    pub r14: c_types::c_ulong,
-    pub r13: c_types::c_ulong,
-    pub r12: c_types::c_ulong,
-    pub bp: c_types::c_ulong,
-    pub bx: c_types::c_ulong,
-    pub r11: c_types::c_ulong,
-    pub r10: c_types::c_ulong,
-    pub r9: c_types::c_ulong,
-    pub r8: c_types::c_ulong,
-    pub ax: c_types::c_ulong,
-    pub cx: c_types::c_ulong,
-    pub dx: c_types::c_ulong,
-    pub si: c_types::c_ulong,
-    pub di: c_types::c_ulong,
-    pub orig_ax: c_types::c_ulong,
-    pub ip: c_types::c_ulong,
-    pub cs: c_types::c_ulong,
-    pub flags: c_types::c_ulong,
-    pub sp: c_types::c_ulong,
-    pub ss: c_types::c_ulong,
+    pub r15: core::ffi::c_ulong,
+    pub r14: core::ffi::c_ulong,
+    pub r13: core::ffi::c_ulong,
+    pub r12: core::ffi::c_ulong,
+    pub bp: core::ffi::c_ulong,
+    pub bx: core::ffi::c_ulong,
+    pub r11: core::ffi::c_ulong,
+    pub r10: core::ffi::c_ulong,
+    pub r9: core::ffi::c_ulong,
+    pub r8: core::ffi::c_ulong,
+    pub ax: core::ffi::c_ulong,
+    pub cx: core::ffi::c_ulong,
+    pub dx: core::ffi::c_ulong,
+    pub si: core::ffi::c_ulong,
+    pub di: core::ffi::c_ulong,
+    pub orig_ax: core::ffi::c_ulong,
+    pub ip: core::ffi::c_ulong,
+    pub cs: core::ffi::c_ulong,
+    pub flags: core::ffi::c_ulong,
+    pub sp: core::ffi::c_ulong,
+    pub ss: core::ffi::c_ulong,
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
 const _: () = {
@@ -1720,8 +1720,8 @@ const _: () = {
     ["Size of desc_struct"][::core::mem::size_of::<desc_struct>() - 8usize];
     ["Alignment of desc_struct"][::core::mem::align_of::<desc_struct>() - 1usize];
 };
-pub type pgdval_t = c_types::c_ulong;
-pub type pgprotval_t = c_types::c_ulong;
+pub type pgdval_t = core::ffi::c_ulong;
+pub type pgprotval_t = core::ffi::c_ulong;
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
 pub struct pgprot {
@@ -1770,44 +1770,44 @@ const _: () = {
 };
 impl orc_entry {
     #[inline]
-    pub fn sp_reg(&self) -> c_types::c_uint {
+    pub fn sp_reg(&self) -> core::ffi::c_uint {
         unsafe { ::core::mem::transmute(self._bitfield_1.get(0usize, 4u8) as u32) }
     }
     #[inline]
-    pub fn set_sp_reg(&mut self, val: c_types::c_uint) {
+    pub fn set_sp_reg(&mut self, val: core::ffi::c_uint) {
         unsafe {
             let val: u32 = ::core::mem::transmute(val);
             self._bitfield_1.set(0usize, 4u8, val as u64)
         }
     }
     #[inline]
-    pub fn bp_reg(&self) -> c_types::c_uint {
+    pub fn bp_reg(&self) -> core::ffi::c_uint {
         unsafe { ::core::mem::transmute(self._bitfield_1.get(4usize, 4u8) as u32) }
     }
     #[inline]
-    pub fn set_bp_reg(&mut self, val: c_types::c_uint) {
+    pub fn set_bp_reg(&mut self, val: core::ffi::c_uint) {
         unsafe {
             let val: u32 = ::core::mem::transmute(val);
             self._bitfield_1.set(4usize, 4u8, val as u64)
         }
     }
     #[inline]
-    pub fn type_(&self) -> c_types::c_uint {
+    pub fn type_(&self) -> core::ffi::c_uint {
         unsafe { ::core::mem::transmute(self._bitfield_1.get(8usize, 2u8) as u32) }
     }
     #[inline]
-    pub fn set_type(&mut self, val: c_types::c_uint) {
+    pub fn set_type(&mut self, val: core::ffi::c_uint) {
         unsafe {
             let val: u32 = ::core::mem::transmute(val);
             self._bitfield_1.set(8usize, 2u8, val as u64)
         }
     }
     #[inline]
-    pub fn end(&self) -> c_types::c_uint {
+    pub fn end(&self) -> core::ffi::c_uint {
         unsafe { ::core::mem::transmute(self._bitfield_1.get(10usize, 1u8) as u32) }
     }
     #[inline]
-    pub fn set_end(&mut self, val: c_types::c_uint) {
+    pub fn set_end(&mut self, val: core::ffi::c_uint) {
         unsafe {
             let val: u32 = ::core::mem::transmute(val);
             self._bitfield_1.set(10usize, 1u8, val as u64)
@@ -1815,10 +1815,10 @@ impl orc_entry {
     }
     #[inline]
     pub fn new_bitfield_1(
-        sp_reg: c_types::c_uint,
-        bp_reg: c_types::c_uint,
-        type_: c_types::c_uint,
-        end: c_types::c_uint,
+        sp_reg: core::ffi::c_uint,
+        bp_reg: core::ffi::c_uint,
+        type_: core::ffi::c_uint,
+        end: core::ffi::c_uint,
     ) -> __BindgenBitfieldUnit<[u8; 2usize]> {
         let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 2usize]> = Default::default();
         __bindgen_bitfield_unit.set(0usize, 4u8, {
@@ -1843,7 +1843,7 @@ impl orc_entry {
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct math_emu_info {
-    pub ___orig_eip: c_types::c_long,
+    pub ___orig_eip: core::ffi::c_long,
     pub regs: *mut pt_regs,
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
@@ -1866,9 +1866,9 @@ impl Default for math_emu_info {
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct tracepoint_func {
-    pub func: *mut c_types::c_void,
-    pub data: *mut c_types::c_void,
-    pub prio: c_types::c_int,
+    pub func: *mut core::ffi::c_void,
+    pub data: *mut core::ffi::c_void,
+    pub prio: core::ffi::c_int,
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
 const _: () = {
@@ -1893,12 +1893,12 @@ impl Default for tracepoint_func {
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub struct tracepoint {
-    pub name: *const c_types::c_char,
+    pub name: *const core::ffi::c_char,
     pub key: static_key,
     pub static_call_key: *mut static_call_key,
-    pub static_call_tramp: *mut c_types::c_void,
-    pub iterator: *mut c_types::c_void,
-    pub regfunc: ::core::option::Option<unsafe extern "C" fn() -> c_types::c_int>,
+    pub static_call_tramp: *mut core::ffi::c_void,
+    pub iterator: *mut core::ffi::c_void,
+    pub regfunc: ::core::option::Option<unsafe extern "C" fn() -> core::ffi::c_int>,
     pub unregfunc: ::core::option::Option<unsafe extern "C" fn()>,
     pub funcs: *mut tracepoint_func,
 }
@@ -1934,7 +1934,7 @@ impl Default for tracepoint {
 #[derive(Debug, Copy, Clone)]
 pub struct bpf_raw_event_map {
     pub tp: *mut tracepoint,
-    pub bpf_func: *mut c_types::c_void,
+    pub bpf_func: *mut core::ffi::c_void,
     pub num_args: u32_,
     pub writable_size: u32_,
 }
@@ -2230,8 +2230,8 @@ impl Default for fpregs_state {
 #[repr(C)]
 #[repr(align(64))]
 pub struct fpstate {
-    pub size: c_types::c_uint,
-    pub user_size: c_types::c_uint,
+    pub size: core::ffi::c_uint,
+    pub user_size: core::ffi::c_uint,
     pub xfeatures: u64_,
     pub user_xfeatures: u64_,
     pub xfd: u64_,
@@ -2263,44 +2263,44 @@ impl Default for fpstate {
 }
 impl fpstate {
     #[inline]
-    pub fn is_valloc(&self) -> c_types::c_uint {
+    pub fn is_valloc(&self) -> core::ffi::c_uint {
         unsafe { ::core::mem::transmute(self._bitfield_1.get(0usize, 1u8) as u32) }
     }
     #[inline]
-    pub fn set_is_valloc(&mut self, val: c_types::c_uint) {
+    pub fn set_is_valloc(&mut self, val: core::ffi::c_uint) {
         unsafe {
             let val: u32 = ::core::mem::transmute(val);
             self._bitfield_1.set(0usize, 1u8, val as u64)
         }
     }
     #[inline]
-    pub fn is_guest(&self) -> c_types::c_uint {
+    pub fn is_guest(&self) -> core::ffi::c_uint {
         unsafe { ::core::mem::transmute(self._bitfield_1.get(1usize, 1u8) as u32) }
     }
     #[inline]
-    pub fn set_is_guest(&mut self, val: c_types::c_uint) {
+    pub fn set_is_guest(&mut self, val: core::ffi::c_uint) {
         unsafe {
             let val: u32 = ::core::mem::transmute(val);
             self._bitfield_1.set(1usize, 1u8, val as u64)
         }
     }
     #[inline]
-    pub fn is_confidential(&self) -> c_types::c_uint {
+    pub fn is_confidential(&self) -> core::ffi::c_uint {
         unsafe { ::core::mem::transmute(self._bitfield_1.get(2usize, 1u8) as u32) }
     }
     #[inline]
-    pub fn set_is_confidential(&mut self, val: c_types::c_uint) {
+    pub fn set_is_confidential(&mut self, val: core::ffi::c_uint) {
         unsafe {
             let val: u32 = ::core::mem::transmute(val);
             self._bitfield_1.set(2usize, 1u8, val as u64)
         }
     }
     #[inline]
-    pub fn in_use(&self) -> c_types::c_uint {
+    pub fn in_use(&self) -> core::ffi::c_uint {
         unsafe { ::core::mem::transmute(self._bitfield_1.get(3usize, 1u8) as u32) }
     }
     #[inline]
-    pub fn set_in_use(&mut self, val: c_types::c_uint) {
+    pub fn set_in_use(&mut self, val: core::ffi::c_uint) {
         unsafe {
             let val: u32 = ::core::mem::transmute(val);
             self._bitfield_1.set(3usize, 1u8, val as u64)
@@ -2308,10 +2308,10 @@ impl fpstate {
     }
     #[inline]
     pub fn new_bitfield_1(
-        is_valloc: c_types::c_uint,
-        is_guest: c_types::c_uint,
-        is_confidential: c_types::c_uint,
-        in_use: c_types::c_uint,
+        is_valloc: core::ffi::c_uint,
+        is_guest: core::ffi::c_uint,
+        is_confidential: core::ffi::c_uint,
+        in_use: core::ffi::c_uint,
     ) -> __BindgenBitfieldUnit<[u8; 1usize]> {
         let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 1usize]> = Default::default();
         __bindgen_bitfield_unit.set(0usize, 1u8, {
@@ -2337,8 +2337,8 @@ impl fpstate {
 #[derive(Debug, Default, Copy, Clone)]
 pub struct fpu_state_perm {
     pub __state_perm: u64_,
-    pub __state_size: c_types::c_uint,
-    pub __user_state_size: c_types::c_uint,
+    pub __state_size: core::ffi::c_uint,
+    pub __user_state_size: core::ffi::c_uint,
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
 const _: () = {
@@ -2354,8 +2354,8 @@ const _: () = {
 #[repr(C)]
 #[repr(align(64))]
 pub struct fpu {
-    pub last_cpu: c_types::c_uint,
-    pub avx512_timestamp: c_types::c_ulong,
+    pub last_cpu: core::ffi::c_uint,
+    pub avx512_timestamp: core::ffi::c_ulong,
     pub fpstate: *mut fpstate,
     pub __task_fpstate: *mut fpstate,
     pub perm: fpu_state_perm,
@@ -2394,21 +2394,21 @@ pub struct perf_event {
 #[repr(align(64))]
 pub struct thread_struct {
     pub tls_array: [desc_struct; 3usize],
-    pub sp: c_types::c_ulong,
-    pub es: c_types::c_ushort,
-    pub ds: c_types::c_ushort,
-    pub fsindex: c_types::c_ushort,
-    pub gsindex: c_types::c_ushort,
-    pub fsbase: c_types::c_ulong,
-    pub gsbase: c_types::c_ulong,
+    pub sp: core::ffi::c_ulong,
+    pub es: core::ffi::c_ushort,
+    pub ds: core::ffi::c_ushort,
+    pub fsindex: core::ffi::c_ushort,
+    pub gsindex: core::ffi::c_ushort,
+    pub fsbase: core::ffi::c_ulong,
+    pub gsbase: core::ffi::c_ulong,
     pub ptrace_bps: [*mut perf_event; 4usize],
-    pub virtual_dr6: c_types::c_ulong,
-    pub ptrace_dr7: c_types::c_ulong,
-    pub cr2: c_types::c_ulong,
-    pub trap_nr: c_types::c_ulong,
-    pub error_code: c_types::c_ulong,
+    pub virtual_dr6: core::ffi::c_ulong,
+    pub ptrace_dr7: core::ffi::c_ulong,
+    pub cr2: core::ffi::c_ulong,
+    pub trap_nr: core::ffi::c_ulong,
+    pub error_code: core::ffi::c_ulong,
     pub io_bitmap: *mut io_bitmap,
-    pub iopl_emul: c_types::c_ulong,
+    pub iopl_emul: core::ffi::c_ulong,
     pub _bitfield_align_1: [u8; 0],
     pub _bitfield_1: __BindgenBitfieldUnit<[u8; 1usize]>,
     pub pkru: u32_,
@@ -2462,22 +2462,22 @@ impl Default for thread_struct {
 }
 impl thread_struct {
     #[inline]
-    pub fn iopl_warn(&self) -> c_types::c_uint {
+    pub fn iopl_warn(&self) -> core::ffi::c_uint {
         unsafe { ::core::mem::transmute(self._bitfield_1.get(0usize, 1u8) as u32) }
     }
     #[inline]
-    pub fn set_iopl_warn(&mut self, val: c_types::c_uint) {
+    pub fn set_iopl_warn(&mut self, val: core::ffi::c_uint) {
         unsafe {
             let val: u32 = ::core::mem::transmute(val);
             self._bitfield_1.set(0usize, 1u8, val as u64)
         }
     }
     #[inline]
-    pub fn sig_on_uaccess_err(&self) -> c_types::c_uint {
+    pub fn sig_on_uaccess_err(&self) -> core::ffi::c_uint {
         unsafe { ::core::mem::transmute(self._bitfield_1.get(1usize, 1u8) as u32) }
     }
     #[inline]
-    pub fn set_sig_on_uaccess_err(&mut self, val: c_types::c_uint) {
+    pub fn set_sig_on_uaccess_err(&mut self, val: core::ffi::c_uint) {
         unsafe {
             let val: u32 = ::core::mem::transmute(val);
             self._bitfield_1.set(1usize, 1u8, val as u64)
@@ -2485,8 +2485,8 @@ impl thread_struct {
     }
     #[inline]
     pub fn new_bitfield_1(
-        iopl_warn: c_types::c_uint,
-        sig_on_uaccess_err: c_types::c_uint,
+        iopl_warn: core::ffi::c_uint,
+        sig_on_uaccess_err: core::ffi::c_uint,
     ) -> __BindgenBitfieldUnit<[u8; 1usize]> {
         let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 1usize]> = Default::default();
         __bindgen_bitfield_unit.set(0usize, 1u8, {
@@ -2503,8 +2503,8 @@ impl thread_struct {
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
 pub struct thread_info {
-    pub flags: c_types::c_ulong,
-    pub syscall_work: c_types::c_ulong,
+    pub flags: core::ffi::c_ulong,
+    pub syscall_work: core::ffi::c_ulong,
     pub status: u32_,
     pub cpu: u32_,
 }
@@ -2586,7 +2586,7 @@ pub type wait_queue_head_t = wait_queue_head;
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
 pub struct seqcount {
-    pub sequence: c_types::c_uint,
+    pub sequence: core::ffi::c_uint,
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
 const _: () = {
@@ -2645,21 +2645,21 @@ impl Default for seqlock_t {
     }
 }
 extern "C" {
-    pub fn add_device_randomness(buf: *const c_types::c_void, len: usize);
+    pub fn add_device_randomness(buf: *const core::ffi::c_void, len: usize);
 }
 extern "C" {
-    pub fn get_random_bytes(buf: *mut c_types::c_void, len: usize);
+    pub fn get_random_bytes(buf: *mut core::ffi::c_void, len: usize);
 }
 extern "C" {
     pub fn rng_is_initialized() -> bool_;
 }
 extern "C" {
-    pub fn wait_for_random_bytes() -> c_types::c_int;
+    pub fn wait_for_random_bytes() -> core::ffi::c_int;
 }
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
 pub struct nodemask_t {
-    pub bits: [c_types::c_ulong; 1usize],
+    pub bits: [core::ffi::c_ulong; 1usize],
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
 const _: () = {
@@ -2684,8 +2684,8 @@ const _: () = {
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
 pub struct task_rss_stat {
-    pub events: c_types::c_int,
-    pub count: [c_types::c_int; 4usize],
+    pub events: core::ffi::c_int,
+    pub count: [core::ffi::c_int; 4usize],
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
 const _: () = {
@@ -2778,7 +2778,7 @@ const _: () = {
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct rb_node {
-    pub __rb_parent_color: c_types::c_ulong,
+    pub __rb_parent_color: core::ffi::c_ulong,
     pub rb_right: *mut rb_node,
     pub rb_left: *mut rb_node,
 }
@@ -2856,8 +2856,8 @@ const _: () = {
 #[derive(Copy, Clone)]
 pub struct maple_tree {
     pub __bindgen_anon_1: maple_tree__bindgen_ty_1,
-    pub ma_root: *mut c_types::c_void,
-    pub ma_flags: c_types::c_uint,
+    pub ma_root: *mut core::ffi::c_void,
+    pub ma_flags: core::ffi::c_uint,
 }
 #[repr(C)]
 #[derive(Copy, Clone)]
@@ -2959,7 +2959,7 @@ impl Default for swait_queue_head {
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub struct completion {
-    pub done: c_types::c_uint,
+    pub done: core::ffi::c_uint,
     pub wait: swait_queue_head,
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
@@ -2999,7 +2999,7 @@ pub type ktime_t = s64;
 #[derive(Debug, Copy, Clone)]
 pub struct timer_list {
     pub entry: hlist_node,
-    pub expires: c_types::c_ulong,
+    pub expires: core::ffi::c_ulong,
     pub function: ::core::option::Option<unsafe extern "C" fn(arg1: *mut timer_list)>,
     pub flags: u32_,
 }
@@ -3059,7 +3059,7 @@ pub struct delayed_work {
     pub work: work_struct,
     pub timer: timer_list,
     pub wq: *mut workqueue_struct,
-    pub cpu: c_types::c_int,
+    pub cpu: core::ffi::c_int,
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
 const _: () = {
@@ -3085,9 +3085,9 @@ impl Default for delayed_work {
 pub struct rcu_segcblist {
     pub head: *mut callback_head,
     pub tails: [*mut *mut callback_head; 4usize],
-    pub gp_seq: [c_types::c_ulong; 4usize],
-    pub len: c_types::c_long,
-    pub seglen: [c_types::c_long; 4usize],
+    pub gp_seq: [core::ffi::c_ulong; 4usize],
+    pub len: core::ffi::c_long,
+    pub seglen: [core::ffi::c_long; 4usize],
     pub flags: u8_,
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
@@ -3118,20 +3118,20 @@ impl Default for rcu_segcblist {
 #[repr(align(64))]
 #[derive(Copy, Clone)]
 pub struct srcu_data {
-    pub srcu_lock_count: [c_types::c_ulong; 2usize],
-    pub srcu_unlock_count: [c_types::c_ulong; 2usize],
+    pub srcu_lock_count: [core::ffi::c_ulong; 2usize],
+    pub srcu_unlock_count: [core::ffi::c_ulong; 2usize],
     pub __bindgen_padding_0: [u32; 8usize],
     pub lock: spinlock_t,
     pub srcu_cblist: rcu_segcblist,
-    pub srcu_gp_seq_needed: c_types::c_ulong,
-    pub srcu_gp_seq_needed_exp: c_types::c_ulong,
+    pub srcu_gp_seq_needed: core::ffi::c_ulong,
+    pub srcu_gp_seq_needed_exp: core::ffi::c_ulong,
     pub srcu_cblist_invoking: bool_,
     pub delay_work: timer_list,
     pub work: work_struct,
     pub srcu_barrier_head: callback_head,
     pub mynode: *mut srcu_node,
-    pub grpmask: c_types::c_ulong,
-    pub cpu: c_types::c_int,
+    pub grpmask: core::ffi::c_ulong,
+    pub cpu: core::ffi::c_int,
     pub ssp: *mut srcu_struct,
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
@@ -3174,12 +3174,12 @@ impl Default for srcu_data {
 #[derive(Copy, Clone)]
 pub struct srcu_node {
     pub lock: spinlock_t,
-    pub srcu_have_cbs: [c_types::c_ulong; 4usize],
-    pub srcu_data_have_cbs: [c_types::c_ulong; 4usize],
-    pub srcu_gp_seq_needed_exp: c_types::c_ulong,
+    pub srcu_have_cbs: [core::ffi::c_ulong; 4usize],
+    pub srcu_data_have_cbs: [core::ffi::c_ulong; 4usize],
+    pub srcu_gp_seq_needed_exp: core::ffi::c_ulong,
     pub srcu_parent: *mut srcu_node,
-    pub grplo: c_types::c_int,
-    pub grphi: c_types::c_int,
+    pub grplo: core::ffi::c_int,
+    pub grphi: core::ffi::c_int,
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
 const _: () = {
@@ -3211,27 +3211,27 @@ impl Default for srcu_node {
 pub struct srcu_struct {
     pub node: *mut srcu_node,
     pub level: [*mut srcu_node; 3usize],
-    pub srcu_size_state: c_types::c_int,
+    pub srcu_size_state: core::ffi::c_int,
     pub srcu_cb_mutex: mutex,
     pub lock: spinlock_t,
     pub srcu_gp_mutex: mutex,
-    pub srcu_idx: c_types::c_uint,
-    pub srcu_gp_seq: c_types::c_ulong,
-    pub srcu_gp_seq_needed: c_types::c_ulong,
-    pub srcu_gp_seq_needed_exp: c_types::c_ulong,
-    pub srcu_gp_start: c_types::c_ulong,
-    pub srcu_last_gp_end: c_types::c_ulong,
-    pub srcu_size_jiffies: c_types::c_ulong,
-    pub srcu_n_lock_retries: c_types::c_ulong,
-    pub srcu_n_exp_nodelay: c_types::c_ulong,
+    pub srcu_idx: core::ffi::c_uint,
+    pub srcu_gp_seq: core::ffi::c_ulong,
+    pub srcu_gp_seq_needed: core::ffi::c_ulong,
+    pub srcu_gp_seq_needed_exp: core::ffi::c_ulong,
+    pub srcu_gp_start: core::ffi::c_ulong,
+    pub srcu_last_gp_end: core::ffi::c_ulong,
+    pub srcu_size_jiffies: core::ffi::c_ulong,
+    pub srcu_n_lock_retries: core::ffi::c_ulong,
+    pub srcu_n_exp_nodelay: core::ffi::c_ulong,
     pub sda: *mut srcu_data,
     pub sda_is_static: bool_,
-    pub srcu_barrier_seq: c_types::c_ulong,
+    pub srcu_barrier_seq: core::ffi::c_ulong,
     pub srcu_barrier_mutex: mutex,
     pub srcu_barrier_completion: completion,
     pub srcu_barrier_cpu_cnt: atomic_t,
-    pub reschedule_jiffies: c_types::c_ulong,
-    pub reschedule_count: c_types::c_ulong,
+    pub reschedule_jiffies: core::ffi::c_ulong,
+    pub reschedule_count: core::ffi::c_ulong,
     pub work: delayed_work,
     pub dep_map: lockdep_map,
 }
@@ -3297,9 +3297,9 @@ impl Default for srcu_struct {
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
 pub struct arch_uprobe_task {
-    pub saved_scratch_register: c_types::c_ulong,
-    pub saved_trap_nr: c_types::c_uint,
-    pub saved_tf: c_types::c_uint,
+    pub saved_scratch_register: core::ffi::c_ulong,
+    pub saved_trap_nr: core::ffi::c_uint,
+    pub saved_tf: core::ffi::c_uint,
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
 const _: () = {
@@ -3316,16 +3316,16 @@ pub const uprobe_task_state_UTASK_RUNNING: uprobe_task_state = 0;
 pub const uprobe_task_state_UTASK_SSTEP: uprobe_task_state = 1;
 pub const uprobe_task_state_UTASK_SSTEP_ACK: uprobe_task_state = 2;
 pub const uprobe_task_state_UTASK_SSTEP_TRAPPED: uprobe_task_state = 3;
-pub type uprobe_task_state = c_types::c_uint;
+pub type uprobe_task_state = core::ffi::c_uint;
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub struct uprobe_task {
     pub state: uprobe_task_state,
     pub __bindgen_anon_1: uprobe_task__bindgen_ty_1,
     pub active_uprobe: *mut uprobe,
-    pub xol_vaddr: c_types::c_ulong,
+    pub xol_vaddr: core::ffi::c_ulong,
     pub return_instances: *mut return_instance,
-    pub depth: c_types::c_uint,
+    pub depth: core::ffi::c_uint,
 }
 #[repr(C)]
 #[derive(Copy, Clone)]
@@ -3337,7 +3337,7 @@ pub union uprobe_task__bindgen_ty_1 {
 #[derive(Debug, Default, Copy, Clone)]
 pub struct uprobe_task__bindgen_ty_1__bindgen_ty_1 {
     pub autask: arch_uprobe_task,
-    pub vaddr: c_types::c_ulong,
+    pub vaddr: core::ffi::c_ulong,
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
 const _: () = {
@@ -3354,7 +3354,7 @@ const _: () = {
 #[derive(Debug, Copy, Clone)]
 pub struct uprobe_task__bindgen_ty_1__bindgen_ty_2 {
     pub dup_xol_work: callback_head,
-    pub dup_xol_addr: c_types::c_ulong,
+    pub dup_xol_addr: core::ffi::c_ulong,
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
 const _: () = {
@@ -3418,9 +3418,9 @@ impl Default for uprobe_task {
 #[derive(Debug, Copy, Clone)]
 pub struct return_instance {
     pub uprobe: *mut uprobe,
-    pub func: c_types::c_ulong,
-    pub stack: c_types::c_ulong,
-    pub orig_ret_vaddr: c_types::c_ulong,
+    pub func: core::ffi::c_ulong,
+    pub stack: core::ffi::c_ulong,
+    pub orig_ret_vaddr: core::ffi::c_ulong,
     pub chained: bool_,
     pub next: *mut return_instance,
 }
@@ -3483,9 +3483,9 @@ pub struct mm_context_t {
     pub tlb_gen: atomic64_t,
     pub ldt_usr_sem: rw_semaphore,
     pub ldt: *mut ldt_struct,
-    pub flags: c_types::c_ushort,
+    pub flags: core::ffi::c_ushort,
     pub lock: mutex,
-    pub vdso: *mut c_types::c_void,
+    pub vdso: *mut core::ffi::c_void,
     pub vdso_image: *const vdso_image,
     pub perf_rdpmc_allowed: atomic_t,
     pub pkey_allocation_map: u16_,
@@ -3533,11 +3533,11 @@ pub struct mem_cgroup {
 #[repr(align(16))]
 #[derive(Copy, Clone)]
 pub struct page {
-    pub flags: c_types::c_ulong,
+    pub flags: core::ffi::c_ulong,
     pub __bindgen_anon_1: page__bindgen_ty_1,
     pub __bindgen_anon_2: page__bindgen_ty_2,
     pub _refcount: atomic_t,
-    pub memcg_data: c_types::c_ulong,
+    pub memcg_data: core::ffi::c_ulong,
 }
 #[repr(C)]
 #[derive(Copy, Clone)]
@@ -3555,9 +3555,9 @@ pub union page__bindgen_ty_1 {
 pub struct page__bindgen_ty_1__bindgen_ty_1 {
     pub __bindgen_anon_1: page__bindgen_ty_1__bindgen_ty_1__bindgen_ty_1,
     pub mapping: *mut address_space,
-    pub index: c_types::c_ulong,
+    pub index: core::ffi::c_ulong,
     #[doc = " @private: Mapping-private opaque data.\n Usually used for buffer_heads if PagePrivate.\n Used for swp_entry_t if PageSwapCache.\n Indicates order in the buddy system if PageBuddy."]
-    pub private: c_types::c_ulong,
+    pub private: core::ffi::c_ulong,
 }
 #[doc = " @lru: Pageout list, eg. active_list protected by\n lruvec->lru_lock.  Sometimes used as a generic list\n by the page owner."]
 #[repr(C)]
@@ -3571,8 +3571,8 @@ pub union page__bindgen_ty_1__bindgen_ty_1__bindgen_ty_1 {
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct page__bindgen_ty_1__bindgen_ty_1__bindgen_ty_1__bindgen_ty_1 {
-    pub __filler: *mut c_types::c_void,
-    pub mlock_count: c_types::c_uint,
+    pub __filler: *mut core::ffi::c_void,
+    pub mlock_count: core::ffi::c_uint,
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
 const _: () = {
@@ -3650,17 +3650,17 @@ impl Default for page__bindgen_ty_1__bindgen_ty_1 {
 #[derive(Copy, Clone)]
 pub struct page__bindgen_ty_1__bindgen_ty_2 {
     #[doc = " @pp_magic: magic value to avoid recycling non\n page_pool allocated pages."]
-    pub pp_magic: c_types::c_ulong,
+    pub pp_magic: core::ffi::c_ulong,
     pub pp: *mut page_pool,
-    pub _pp_mapping_pad: c_types::c_ulong,
-    pub dma_addr: c_types::c_ulong,
+    pub _pp_mapping_pad: core::ffi::c_ulong,
+    pub dma_addr: core::ffi::c_ulong,
     pub __bindgen_anon_1: page__bindgen_ty_1__bindgen_ty_2__bindgen_ty_1,
 }
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub union page__bindgen_ty_1__bindgen_ty_2__bindgen_ty_1 {
     #[doc = " dma_addr_upper: might require a 64-bit\n value on 32-bit architectures."]
-    pub dma_addr_upper: c_types::c_ulong,
+    pub dma_addr_upper: core::ffi::c_ulong,
     #[doc = " For frag page support, not supported in\n 32-bit architectures with 64-bit DMA."]
     pub pp_frag_count: atomic_long_t,
 }
@@ -3715,12 +3715,12 @@ impl Default for page__bindgen_ty_1__bindgen_ty_2 {
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
 pub struct page__bindgen_ty_1__bindgen_ty_3 {
-    pub compound_head: c_types::c_ulong,
-    pub compound_dtor: c_types::c_uchar,
-    pub compound_order: c_types::c_uchar,
+    pub compound_head: core::ffi::c_ulong,
+    pub compound_dtor: core::ffi::c_uchar,
+    pub compound_order: core::ffi::c_uchar,
     pub compound_mapcount: atomic_t,
     pub compound_pincount: atomic_t,
-    pub compound_nr: c_types::c_uint,
+    pub compound_nr: core::ffi::c_uint,
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
 const _: () = {
@@ -3744,8 +3744,8 @@ const _: () = {
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct page__bindgen_ty_1__bindgen_ty_4 {
-    pub _compound_pad_1: c_types::c_ulong,
-    pub _compound_pad_2: c_types::c_ulong,
+    pub _compound_pad_1: core::ffi::c_ulong,
+    pub _compound_pad_2: core::ffi::c_ulong,
     pub deferred_list: list_head,
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
@@ -3773,9 +3773,9 @@ impl Default for page__bindgen_ty_1__bindgen_ty_4 {
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub struct page__bindgen_ty_1__bindgen_ty_5 {
-    pub _pt_pad_1: c_types::c_ulong,
+    pub _pt_pad_1: core::ffi::c_ulong,
     pub pmd_huge_pte: pgtable_t,
-    pub _pt_pad_2: c_types::c_ulong,
+    pub _pt_pad_2: core::ffi::c_ulong,
     pub __bindgen_anon_1: page__bindgen_ty_1__bindgen_ty_5__bindgen_ty_1,
     pub ptl: spinlock_t,
 }
@@ -3837,7 +3837,7 @@ impl Default for page__bindgen_ty_1__bindgen_ty_5 {
 pub struct page__bindgen_ty_1__bindgen_ty_6 {
     #[doc = " @pgmap: Points to the hosting device page map."]
     pub pgmap: *mut dev_pagemap,
-    pub zone_device_data: *mut c_types::c_void,
+    pub zone_device_data: *mut core::ffi::c_void,
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
 const _: () = {
@@ -3879,7 +3879,7 @@ impl Default for page__bindgen_ty_1 {
 #[derive(Copy, Clone)]
 pub union page__bindgen_ty_2 {
     pub _mapcount: atomic_t,
-    pub page_type: c_types::c_uint,
+    pub page_type: core::ffi::c_uint,
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
 const _: () = {
@@ -3922,13 +3922,13 @@ impl Default for page {
 #[derive(Copy, Clone)]
 pub struct folio {
     pub __bindgen_anon_1: folio__bindgen_ty_1,
-    pub _flags_1: c_types::c_ulong,
-    pub __head: c_types::c_ulong,
-    pub _folio_dtor: c_types::c_uchar,
-    pub _folio_order: c_types::c_uchar,
+    pub _flags_1: core::ffi::c_ulong,
+    pub __head: core::ffi::c_ulong,
+    pub _folio_dtor: core::ffi::c_uchar,
+    pub _folio_order: core::ffi::c_uchar,
     pub _total_mapcount: atomic_t,
     pub _pincount: atomic_t,
-    pub _folio_nr_pages: c_types::c_uint,
+    pub _folio_nr_pages: core::ffi::c_uint,
 }
 #[repr(C)]
 #[repr(align(16))]
@@ -3940,14 +3940,14 @@ pub union folio__bindgen_ty_1 {
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub struct folio__bindgen_ty_1__bindgen_ty_1 {
-    pub flags: c_types::c_ulong,
+    pub flags: core::ffi::c_ulong,
     pub __bindgen_anon_1: folio__bindgen_ty_1__bindgen_ty_1__bindgen_ty_1,
     pub mapping: *mut address_space,
-    pub index: c_types::c_ulong,
-    pub private: *mut c_types::c_void,
+    pub index: core::ffi::c_ulong,
+    pub private: *mut core::ffi::c_void,
     pub _mapcount: atomic_t,
     pub _refcount: atomic_t,
-    pub memcg_data: c_types::c_ulong,
+    pub memcg_data: core::ffi::c_ulong,
 }
 #[repr(C)]
 #[derive(Copy, Clone)]
@@ -3958,8 +3958,8 @@ pub union folio__bindgen_ty_1__bindgen_ty_1__bindgen_ty_1 {
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct folio__bindgen_ty_1__bindgen_ty_1__bindgen_ty_1__bindgen_ty_1 {
-    pub __filler: *mut c_types::c_void,
-    pub mlock_count: c_types::c_uint,
+    pub __filler: *mut core::ffi::c_void,
+    pub mlock_count: core::ffi::c_uint,
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
 const _: () = {
@@ -4098,7 +4098,7 @@ impl Default for vm_userfaultfd_ctx {
 #[derive(Debug, Default)]
 pub struct anon_vma_name {
     pub kref: kref,
-    pub name: __IncompleteArrayField<c_types::c_char>,
+    pub name: __IncompleteArrayField<core::ffi::c_char>,
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
 const _: () = {
@@ -4110,18 +4110,18 @@ const _: () = {
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub struct vm_area_struct {
-    pub vm_start: c_types::c_ulong,
-    pub vm_end: c_types::c_ulong,
+    pub vm_start: core::ffi::c_ulong,
+    pub vm_end: core::ffi::c_ulong,
     pub vm_mm: *mut mm_struct,
     pub vm_page_prot: pgprot_t,
-    pub vm_flags: c_types::c_ulong,
+    pub vm_flags: core::ffi::c_ulong,
     pub __bindgen_anon_1: vm_area_struct__bindgen_ty_1,
     pub anon_vma_chain: list_head,
     pub anon_vma: *mut anon_vma,
     pub vm_ops: *const vm_operations_struct,
-    pub vm_pgoff: c_types::c_ulong,
+    pub vm_pgoff: core::ffi::c_ulong,
     pub vm_file: *mut file,
-    pub vm_private_data: *mut c_types::c_void,
+    pub vm_private_data: *mut core::ffi::c_void,
     pub swap_readahead_info: atomic_long_t,
     pub vm_userfaultfd_ctx: vm_userfaultfd_ctx,
 }
@@ -4135,7 +4135,7 @@ pub union vm_area_struct__bindgen_ty_1 {
 #[derive(Debug, Copy, Clone)]
 pub struct vm_area_struct__bindgen_ty_1__bindgen_ty_1 {
     pub rb: rb_node,
-    pub rb_subtree_last: c_types::c_ulong,
+    pub rb_subtree_last: core::ffi::c_ulong,
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
 const _: () = {
@@ -4227,7 +4227,7 @@ pub struct kioctx_table {
 #[repr(C)]
 pub struct mm_struct {
     pub __bindgen_anon_1: mm_struct__bindgen_ty_1,
-    pub cpu_bitmap: __IncompleteArrayField<c_types::c_ulong>,
+    pub cpu_bitmap: __IncompleteArrayField<core::ffi::c_ulong>,
 }
 #[repr(C)]
 #[derive(Copy, Clone)]
@@ -4236,17 +4236,17 @@ pub struct mm_struct__bindgen_ty_1 {
     pub get_unmapped_area: ::core::option::Option<
         unsafe extern "C" fn(
             filp: *mut file,
-            addr: c_types::c_ulong,
-            len: c_types::c_ulong,
-            pgoff: c_types::c_ulong,
-            flags: c_types::c_ulong,
-        ) -> c_types::c_ulong,
+            addr: core::ffi::c_ulong,
+            len: core::ffi::c_ulong,
+            pgoff: core::ffi::c_ulong,
+            flags: core::ffi::c_ulong,
+        ) -> core::ffi::c_ulong,
     >,
-    pub mmap_base: c_types::c_ulong,
-    pub mmap_legacy_base: c_types::c_ulong,
-    pub mmap_compat_base: c_types::c_ulong,
-    pub mmap_compat_legacy_base: c_types::c_ulong,
-    pub task_size: c_types::c_ulong,
+    pub mmap_base: core::ffi::c_ulong,
+    pub mmap_legacy_base: core::ffi::c_ulong,
+    pub mmap_compat_base: core::ffi::c_ulong,
+    pub mmap_compat_legacy_base: core::ffi::c_ulong,
+    pub task_size: core::ffi::c_ulong,
     pub pgd: *mut pgd_t,
     #[doc = " @membarrier_state: Flags controlling membarrier behavior.\n\n This field is close to @pgd to hopefully fit in the same\n cache-line, which needs to be touched by switch_mm()."]
     pub membarrier_state: atomic_t,
@@ -4255,38 +4255,38 @@ pub struct mm_struct__bindgen_ty_1 {
     #[doc = " @mm_count: The number of references to &struct mm_struct\n (@mm_users count as 1).\n\n Use mmgrab()/mmdrop() to modify. When this drops to 0, the\n &struct mm_struct is freed."]
     pub mm_count: atomic_t,
     pub pgtables_bytes: atomic_long_t,
-    pub map_count: c_types::c_int,
+    pub map_count: core::ffi::c_int,
     pub page_table_lock: spinlock_t,
     pub mmap_lock: rw_semaphore,
     pub mmlist: list_head,
-    pub hiwater_rss: c_types::c_ulong,
-    pub hiwater_vm: c_types::c_ulong,
-    pub total_vm: c_types::c_ulong,
-    pub locked_vm: c_types::c_ulong,
+    pub hiwater_rss: core::ffi::c_ulong,
+    pub hiwater_vm: core::ffi::c_ulong,
+    pub total_vm: core::ffi::c_ulong,
+    pub locked_vm: core::ffi::c_ulong,
     pub pinned_vm: atomic64_t,
-    pub data_vm: c_types::c_ulong,
-    pub exec_vm: c_types::c_ulong,
-    pub stack_vm: c_types::c_ulong,
-    pub def_flags: c_types::c_ulong,
+    pub data_vm: core::ffi::c_ulong,
+    pub exec_vm: core::ffi::c_ulong,
+    pub stack_vm: core::ffi::c_ulong,
+    pub def_flags: core::ffi::c_ulong,
     #[doc = " @write_protect_seq: Locked when any thread is write\n protecting pages mapped by this mm to enforce a later COW,\n for instance during page table copying for fork()."]
     pub write_protect_seq: seqcount_t,
     pub arg_lock: spinlock_t,
-    pub start_code: c_types::c_ulong,
-    pub end_code: c_types::c_ulong,
-    pub start_data: c_types::c_ulong,
-    pub end_data: c_types::c_ulong,
-    pub start_brk: c_types::c_ulong,
-    pub brk: c_types::c_ulong,
-    pub start_stack: c_types::c_ulong,
-    pub arg_start: c_types::c_ulong,
-    pub arg_end: c_types::c_ulong,
-    pub env_start: c_types::c_ulong,
-    pub env_end: c_types::c_ulong,
-    pub saved_auxv: [c_types::c_ulong; 48usize],
+    pub start_code: core::ffi::c_ulong,
+    pub end_code: core::ffi::c_ulong,
+    pub start_data: core::ffi::c_ulong,
+    pub end_data: core::ffi::c_ulong,
+    pub start_brk: core::ffi::c_ulong,
+    pub brk: core::ffi::c_ulong,
+    pub start_stack: core::ffi::c_ulong,
+    pub arg_start: core::ffi::c_ulong,
+    pub arg_end: core::ffi::c_ulong,
+    pub env_start: core::ffi::c_ulong,
+    pub env_end: core::ffi::c_ulong,
+    pub saved_auxv: [core::ffi::c_ulong; 48usize],
     pub rss_stat: mm_rss_stat,
     pub binfmt: *mut linux_binfmt,
     pub context: mm_context_t,
-    pub flags: c_types::c_ulong,
+    pub flags: core::ffi::c_ulong,
     pub ioctx_lock: spinlock_t,
     pub ioctx_table: *mut kioctx_table,
     pub owner: *mut task_struct,
@@ -4298,8 +4298,8 @@ pub struct mm_struct__bindgen_ty_1 {
     pub uprobes_state: uprobes_state,
     pub hugetlb_usage: atomic_long_t,
     pub async_put_work: work_struct,
-    pub ksm_merging_pages: c_types::c_ulong,
-    pub ksm_rmap_items: c_types::c_ulong,
+    pub ksm_merging_pages: core::ffi::c_ulong,
+    pub ksm_rmap_items: core::ffi::c_ulong,
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
 const _: () = {
@@ -4455,11 +4455,11 @@ pub const pid_type_PIDTYPE_TGID: pid_type = 1;
 pub const pid_type_PIDTYPE_PGID: pid_type = 2;
 pub const pid_type_PIDTYPE_SID: pid_type = 3;
 pub const pid_type_PIDTYPE_MAX: pid_type = 4;
-pub type pid_type = c_types::c_uint;
+pub type pid_type = core::ffi::c_uint;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct upid {
-    pub nr: c_types::c_int,
+    pub nr: core::ffi::c_int,
     pub ns: *mut pid_namespace,
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
@@ -4482,7 +4482,7 @@ impl Default for upid {
 #[derive(Copy, Clone)]
 pub struct pid {
     pub count: refcount_t,
-    pub level: c_types::c_uint,
+    pub level: core::ffi::c_uint,
     pub lock: spinlock_t,
     pub tasks: [hlist_head; 4usize],
     pub inodes: hlist_head,
@@ -4592,7 +4592,7 @@ impl Default for sysv_shm {
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct plist_node {
-    pub prio: c_types::c_int,
+    pub prio: core::ffi::c_int,
     pub prio_list: list_head,
     pub node_list: list_head,
 }
@@ -4706,7 +4706,7 @@ impl Default for hrtimer {
 #[derive(Debug, Copy, Clone)]
 pub struct hrtimer_clock_base {
     pub cpu_base: *mut hrtimer_cpu_base,
-    pub index: c_types::c_uint,
+    pub index: core::ffi::c_uint,
     pub clockid: clockid_t,
     pub seq: seqcount_raw_spinlock_t,
     pub running: *mut hrtimer,
@@ -4750,15 +4750,15 @@ impl Default for hrtimer_clock_base {
 #[derive(Copy, Clone)]
 pub struct hrtimer_cpu_base {
     pub lock: raw_spinlock_t,
-    pub cpu: c_types::c_uint,
-    pub active_bases: c_types::c_uint,
-    pub clock_was_set_seq: c_types::c_uint,
+    pub cpu: core::ffi::c_uint,
+    pub active_bases: core::ffi::c_uint,
+    pub clock_was_set_seq: core::ffi::c_uint,
     pub _bitfield_align_1: [u8; 0],
     pub _bitfield_1: __BindgenBitfieldUnit<[u8; 1usize]>,
-    pub nr_events: c_types::c_uint,
-    pub nr_retries: c_types::c_ushort,
-    pub nr_hangs: c_types::c_ushort,
-    pub max_hang_time: c_types::c_uint,
+    pub nr_events: core::ffi::c_uint,
+    pub nr_retries: core::ffi::c_ushort,
+    pub nr_hangs: core::ffi::c_ushort,
+    pub max_hang_time: core::ffi::c_uint,
     pub expires_next: ktime_t,
     pub next_timer: *mut hrtimer,
     pub softirq_expires_next: ktime_t,
@@ -4807,44 +4807,44 @@ impl Default for hrtimer_cpu_base {
 }
 impl hrtimer_cpu_base {
     #[inline]
-    pub fn hres_active(&self) -> c_types::c_uint {
+    pub fn hres_active(&self) -> core::ffi::c_uint {
         unsafe { ::core::mem::transmute(self._bitfield_1.get(0usize, 1u8) as u32) }
     }
     #[inline]
-    pub fn set_hres_active(&mut self, val: c_types::c_uint) {
+    pub fn set_hres_active(&mut self, val: core::ffi::c_uint) {
         unsafe {
             let val: u32 = ::core::mem::transmute(val);
             self._bitfield_1.set(0usize, 1u8, val as u64)
         }
     }
     #[inline]
-    pub fn in_hrtirq(&self) -> c_types::c_uint {
+    pub fn in_hrtirq(&self) -> core::ffi::c_uint {
         unsafe { ::core::mem::transmute(self._bitfield_1.get(1usize, 1u8) as u32) }
     }
     #[inline]
-    pub fn set_in_hrtirq(&mut self, val: c_types::c_uint) {
+    pub fn set_in_hrtirq(&mut self, val: core::ffi::c_uint) {
         unsafe {
             let val: u32 = ::core::mem::transmute(val);
             self._bitfield_1.set(1usize, 1u8, val as u64)
         }
     }
     #[inline]
-    pub fn hang_detected(&self) -> c_types::c_uint {
+    pub fn hang_detected(&self) -> core::ffi::c_uint {
         unsafe { ::core::mem::transmute(self._bitfield_1.get(2usize, 1u8) as u32) }
     }
     #[inline]
-    pub fn set_hang_detected(&mut self, val: c_types::c_uint) {
+    pub fn set_hang_detected(&mut self, val: core::ffi::c_uint) {
         unsafe {
             let val: u32 = ::core::mem::transmute(val);
             self._bitfield_1.set(2usize, 1u8, val as u64)
         }
     }
     #[inline]
-    pub fn softirq_activated(&self) -> c_types::c_uint {
+    pub fn softirq_activated(&self) -> core::ffi::c_uint {
         unsafe { ::core::mem::transmute(self._bitfield_1.get(3usize, 1u8) as u32) }
     }
     #[inline]
-    pub fn set_softirq_activated(&mut self, val: c_types::c_uint) {
+    pub fn set_softirq_activated(&mut self, val: core::ffi::c_uint) {
         unsafe {
             let val: u32 = ::core::mem::transmute(val);
             self._bitfield_1.set(3usize, 1u8, val as u64)
@@ -4852,10 +4852,10 @@ impl hrtimer_cpu_base {
     }
     #[inline]
     pub fn new_bitfield_1(
-        hres_active: c_types::c_uint,
-        in_hrtirq: c_types::c_uint,
-        hang_detected: c_types::c_uint,
-        softirq_activated: c_types::c_uint,
+        hres_active: core::ffi::c_uint,
+        in_hrtirq: core::ffi::c_uint,
+        hang_detected: core::ffi::c_uint,
+        softirq_activated: core::ffi::c_uint,
     ) -> __BindgenBitfieldUnit<[u8; 1usize]> {
         let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 1usize]> = Default::default();
         __bindgen_bitfield_unit.set(0usize, 1u8, {
@@ -4886,7 +4886,7 @@ pub struct seccomp_filter {
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct seccomp {
-    pub mode: c_types::c_int,
+    pub mode: core::ffi::c_int,
     pub filter_count: atomic_t,
     pub filter: *mut seccomp_filter,
 }
@@ -4924,7 +4924,7 @@ const _: () = {
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
 pub struct sigset_t {
-    pub sig: [c_types::c_ulong; 1usize],
+    pub sig: [core::ffi::c_ulong; 1usize],
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
 const _: () = {
@@ -4932,15 +4932,15 @@ const _: () = {
     ["Alignment of sigset_t"][::core::mem::align_of::<sigset_t>() - 8usize];
     ["Offset of field: sigset_t::sig"][::core::mem::offset_of!(sigset_t, sig) - 0usize];
 };
-pub type __signalfn_t = ::core::option::Option<unsafe extern "C" fn(arg1: c_types::c_int)>;
+pub type __signalfn_t = ::core::option::Option<unsafe extern "C" fn(arg1: core::ffi::c_int)>;
 pub type __sighandler_t = __signalfn_t;
 pub type __restorefn_t = ::core::option::Option<unsafe extern "C" fn()>;
 pub type __sigrestore_t = __restorefn_t;
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub union sigval {
-    pub sival_int: c_types::c_int,
-    pub sival_ptr: *mut c_types::c_void,
+    pub sival_int: core::ffi::c_int,
+    pub sival_ptr: *mut core::ffi::c_void,
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
 const _: () = {
@@ -4991,9 +4991,9 @@ const _: () = {
 #[derive(Copy, Clone)]
 pub struct __sifields__bindgen_ty_2 {
     pub _tid: __kernel_timer_t,
-    pub _overrun: c_types::c_int,
+    pub _overrun: core::ffi::c_int,
     pub _sigval: sigval_t,
-    pub _sys_private: c_types::c_int,
+    pub _sys_private: core::ffi::c_int,
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
 const _: () = {
@@ -5053,7 +5053,7 @@ impl Default for __sifields__bindgen_ty_3 {
 pub struct __sifields__bindgen_ty_4 {
     pub _pid: __kernel_pid_t,
     pub _uid: __kernel_uid32_t,
-    pub _status: c_types::c_int,
+    pub _status: core::ffi::c_int,
     pub _utime: __kernel_clock_t,
     pub _stime: __kernel_clock_t,
 }
@@ -5077,14 +5077,14 @@ const _: () = {
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub struct __sifields__bindgen_ty_5 {
-    pub _addr: *mut c_types::c_void,
+    pub _addr: *mut core::ffi::c_void,
     pub __bindgen_anon_1: __sifields__bindgen_ty_5__bindgen_ty_1,
 }
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub union __sifields__bindgen_ty_5__bindgen_ty_1 {
-    pub _trapno: c_types::c_int,
-    pub _addr_lsb: c_types::c_short,
+    pub _trapno: core::ffi::c_int,
+    pub _addr_lsb: core::ffi::c_short,
     pub _addr_bnd: __sifields__bindgen_ty_5__bindgen_ty_1__bindgen_ty_1,
     pub _addr_pkey: __sifields__bindgen_ty_5__bindgen_ty_1__bindgen_ty_2,
     pub _perf: __sifields__bindgen_ty_5__bindgen_ty_1__bindgen_ty_3,
@@ -5092,9 +5092,9 @@ pub union __sifields__bindgen_ty_5__bindgen_ty_1 {
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct __sifields__bindgen_ty_5__bindgen_ty_1__bindgen_ty_1 {
-    pub _dummy_bnd: [c_types::c_char; 8usize],
-    pub _lower: *mut c_types::c_void,
-    pub _upper: *mut c_types::c_void,
+    pub _dummy_bnd: [core::ffi::c_char; 8usize],
+    pub _lower: *mut core::ffi::c_void,
+    pub _upper: *mut core::ffi::c_void,
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
 const _: () = {
@@ -5128,7 +5128,7 @@ impl Default for __sifields__bindgen_ty_5__bindgen_ty_1__bindgen_ty_1 {
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
 pub struct __sifields__bindgen_ty_5__bindgen_ty_1__bindgen_ty_2 {
-    pub _dummy_pkey: [c_types::c_char; 8usize],
+    pub _dummy_pkey: [core::ffi::c_char; 8usize],
     pub _pkey: __u32,
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
@@ -5150,7 +5150,7 @@ const _: () = {
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
 pub struct __sifields__bindgen_ty_5__bindgen_ty_1__bindgen_ty_3 {
-    pub _data: c_types::c_ulong,
+    pub _data: core::ffi::c_ulong,
     pub _type: __u32,
     pub _flags: __u32,
 }
@@ -5220,8 +5220,8 @@ impl Default for __sifields__bindgen_ty_5 {
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
 pub struct __sifields__bindgen_ty_6 {
-    pub _band: c_types::c_long,
-    pub _fd: c_types::c_int,
+    pub _band: core::ffi::c_long,
+    pub _fd: core::ffi::c_int,
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
 const _: () = {
@@ -5237,9 +5237,9 @@ const _: () = {
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct __sifields__bindgen_ty_7 {
-    pub _call_addr: *mut c_types::c_void,
-    pub _syscall: c_types::c_int,
-    pub _arch: c_types::c_uint,
+    pub _call_addr: *mut core::ffi::c_void,
+    pub _syscall: core::ffi::c_int,
+    pub _arch: core::ffi::c_uint,
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
 const _: () = {
@@ -5295,9 +5295,9 @@ pub struct kernel_siginfo {
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub struct kernel_siginfo__bindgen_ty_1 {
-    pub si_signo: c_types::c_int,
-    pub si_errno: c_types::c_int,
-    pub si_code: c_types::c_int,
+    pub si_signo: core::ffi::c_int,
+    pub si_errno: core::ffi::c_int,
+    pub si_code: core::ffi::c_int,
     pub _sifields: __sifields,
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
@@ -5370,7 +5370,7 @@ impl Default for sigpending {
 #[derive(Debug, Default, Copy, Clone)]
 pub struct sigaction {
     pub sa_handler: __sighandler_t,
-    pub sa_flags: c_types::c_ulong,
+    pub sa_flags: core::ffi::c_ulong,
     pub sa_restorer: __sigrestore_t,
     pub sa_mask: sigset_t,
 }
@@ -5399,9 +5399,9 @@ const _: () = {
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct syscall_user_dispatch {
-    pub selector: *mut c_types::c_char,
-    pub offset: c_types::c_ulong,
-    pub len: c_types::c_ulong,
+    pub selector: *mut core::ffi::c_char,
+    pub offset: core::ffi::c_ulong,
+    pub len: core::ffi::c_ulong,
     pub on_dispatch: bool_,
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
@@ -5487,8 +5487,8 @@ impl Default for posix_cputimer_base {
 #[derive(Debug, Copy, Clone)]
 pub struct posix_cputimers {
     pub bases: [posix_cputimer_base; 3usize],
-    pub timers_active: c_types::c_uint,
-    pub expiry_active: c_types::c_uint,
+    pub timers_active: core::ffi::c_uint,
+    pub expiry_active: core::ffi::c_uint,
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
 const _: () = {
@@ -5515,7 +5515,7 @@ impl Default for posix_cputimers {
 #[derive(Debug, Copy, Clone)]
 pub struct posix_cputimers_work {
     pub work: callback_head,
-    pub scheduled: c_types::c_uint,
+    pub scheduled: core::ffi::c_uint,
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
 const _: () = {
@@ -5676,10 +5676,10 @@ impl Default for prev_cputime {
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
 pub struct sched_info {
-    pub pcount: c_types::c_ulong,
-    pub run_delay: c_types::c_ulonglong,
-    pub last_arrival: c_types::c_ulonglong,
-    pub last_queued: c_types::c_ulonglong,
+    pub pcount: core::ffi::c_ulong,
+    pub run_delay: core::ffi::c_ulonglong,
+    pub last_arrival: core::ffi::c_ulonglong,
+    pub last_queued: core::ffi::c_ulonglong,
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
 const _: () = {
@@ -5696,7 +5696,7 @@ const _: () = {
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
 pub struct load_weight {
-    pub weight: c_types::c_ulong,
+    pub weight: core::ffi::c_ulong,
     pub inv_weight: u32_,
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
@@ -5712,8 +5712,8 @@ const _: () = {
 #[repr(align(8))]
 #[derive(Debug, Default, Copy, Clone)]
 pub struct util_est {
-    pub enqueued: c_types::c_uint,
-    pub ewma: c_types::c_uint,
+    pub enqueued: core::ffi::c_uint,
+    pub ewma: core::ffi::c_uint,
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
 const _: () = {
@@ -5731,9 +5731,9 @@ pub struct sched_avg {
     pub runnable_sum: u64_,
     pub util_sum: u32_,
     pub period_contrib: u32_,
-    pub load_avg: c_types::c_ulong,
-    pub runnable_avg: c_types::c_ulong,
-    pub util_avg: c_types::c_ulong,
+    pub load_avg: core::ffi::c_ulong,
+    pub runnable_avg: core::ffi::c_ulong,
+    pub util_avg: core::ffi::c_ulong,
     pub util_est: util_est,
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
@@ -5877,17 +5877,17 @@ pub struct sched_entity {
     pub load: load_weight,
     pub run_node: rb_node,
     pub group_node: list_head,
-    pub on_rq: c_types::c_uint,
+    pub on_rq: core::ffi::c_uint,
     pub exec_start: u64_,
     pub sum_exec_runtime: u64_,
     pub vruntime: u64_,
     pub prev_sum_exec_runtime: u64_,
     pub nr_migrations: u64_,
-    pub depth: c_types::c_int,
+    pub depth: core::ffi::c_int,
     pub parent: *mut sched_entity,
     pub cfs_rq: *mut cfs_rq,
     pub my_q: *mut cfs_rq,
-    pub runnable_weight: c_types::c_ulong,
+    pub runnable_weight: core::ffi::c_ulong,
     pub __bindgen_padding_0: [u64; 6usize],
     pub avg: sched_avg,
 }
@@ -5936,11 +5936,11 @@ impl Default for sched_entity {
 #[derive(Debug, Copy, Clone)]
 pub struct sched_rt_entity {
     pub run_list: list_head,
-    pub timeout: c_types::c_ulong,
-    pub watchdog_stamp: c_types::c_ulong,
-    pub time_slice: c_types::c_uint,
-    pub on_rq: c_types::c_ushort,
-    pub on_list: c_types::c_ushort,
+    pub timeout: core::ffi::c_ulong,
+    pub watchdog_stamp: core::ffi::c_ulong,
+    pub time_slice: core::ffi::c_uint,
+    pub on_rq: core::ffi::c_ushort,
+    pub on_list: core::ffi::c_ushort,
     pub back: *mut sched_rt_entity,
     pub parent: *mut sched_rt_entity,
     pub rt_rq: *mut rt_rq,
@@ -5991,7 +5991,7 @@ pub struct sched_dl_entity {
     pub dl_density: u64_,
     pub runtime: s64,
     pub deadline: u64_,
-    pub flags: c_types::c_uint,
+    pub flags: core::ffi::c_uint,
     pub _bitfield_align_1: [u8; 0],
     pub _bitfield_1: __BindgenBitfieldUnit<[u8; 1usize]>,
     pub dl_timer: hrtimer,
@@ -6038,44 +6038,44 @@ impl Default for sched_dl_entity {
 }
 impl sched_dl_entity {
     #[inline]
-    pub fn dl_throttled(&self) -> c_types::c_uint {
+    pub fn dl_throttled(&self) -> core::ffi::c_uint {
         unsafe { ::core::mem::transmute(self._bitfield_1.get(0usize, 1u8) as u32) }
     }
     #[inline]
-    pub fn set_dl_throttled(&mut self, val: c_types::c_uint) {
+    pub fn set_dl_throttled(&mut self, val: core::ffi::c_uint) {
         unsafe {
             let val: u32 = ::core::mem::transmute(val);
             self._bitfield_1.set(0usize, 1u8, val as u64)
         }
     }
     #[inline]
-    pub fn dl_yielded(&self) -> c_types::c_uint {
+    pub fn dl_yielded(&self) -> core::ffi::c_uint {
         unsafe { ::core::mem::transmute(self._bitfield_1.get(1usize, 1u8) as u32) }
     }
     #[inline]
-    pub fn set_dl_yielded(&mut self, val: c_types::c_uint) {
+    pub fn set_dl_yielded(&mut self, val: core::ffi::c_uint) {
         unsafe {
             let val: u32 = ::core::mem::transmute(val);
             self._bitfield_1.set(1usize, 1u8, val as u64)
         }
     }
     #[inline]
-    pub fn dl_non_contending(&self) -> c_types::c_uint {
+    pub fn dl_non_contending(&self) -> core::ffi::c_uint {
         unsafe { ::core::mem::transmute(self._bitfield_1.get(2usize, 1u8) as u32) }
     }
     #[inline]
-    pub fn set_dl_non_contending(&mut self, val: c_types::c_uint) {
+    pub fn set_dl_non_contending(&mut self, val: core::ffi::c_uint) {
         unsafe {
             let val: u32 = ::core::mem::transmute(val);
             self._bitfield_1.set(2usize, 1u8, val as u64)
         }
     }
     #[inline]
-    pub fn dl_overrun(&self) -> c_types::c_uint {
+    pub fn dl_overrun(&self) -> core::ffi::c_uint {
         unsafe { ::core::mem::transmute(self._bitfield_1.get(3usize, 1u8) as u32) }
     }
     #[inline]
-    pub fn set_dl_overrun(&mut self, val: c_types::c_uint) {
+    pub fn set_dl_overrun(&mut self, val: core::ffi::c_uint) {
         unsafe {
             let val: u32 = ::core::mem::transmute(val);
             self._bitfield_1.set(3usize, 1u8, val as u64)
@@ -6083,10 +6083,10 @@ impl sched_dl_entity {
     }
     #[inline]
     pub fn new_bitfield_1(
-        dl_throttled: c_types::c_uint,
-        dl_yielded: c_types::c_uint,
-        dl_non_contending: c_types::c_uint,
-        dl_overrun: c_types::c_uint,
+        dl_throttled: core::ffi::c_uint,
+        dl_yielded: core::ffi::c_uint,
+        dl_non_contending: core::ffi::c_uint,
+        dl_overrun: core::ffi::c_uint,
     ) -> __BindgenBitfieldUnit<[u8; 1usize]> {
         let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 1usize]> = Default::default();
         __bindgen_bitfield_unit.set(0usize, 1u8, {
@@ -6185,23 +6185,23 @@ const _: () = {
 #[repr(align(64))]
 pub struct task_struct {
     pub thread_info: thread_info,
-    pub __state: c_types::c_uint,
-    pub stack: *mut c_types::c_void,
+    pub __state: core::ffi::c_uint,
+    pub stack: *mut core::ffi::c_void,
     pub usage: refcount_t,
-    pub flags: c_types::c_uint,
-    pub ptrace: c_types::c_uint,
-    pub on_cpu: c_types::c_int,
+    pub flags: core::ffi::c_uint,
+    pub ptrace: core::ffi::c_uint,
+    pub on_cpu: core::ffi::c_int,
     pub wake_entry: __call_single_node,
-    pub wakee_flips: c_types::c_uint,
-    pub wakee_flip_decay_ts: c_types::c_ulong,
+    pub wakee_flips: core::ffi::c_uint,
+    pub wakee_flip_decay_ts: core::ffi::c_ulong,
     pub last_wakee: *mut task_struct,
-    pub recent_used_cpu: c_types::c_int,
-    pub wake_cpu: c_types::c_int,
-    pub on_rq: c_types::c_int,
-    pub prio: c_types::c_int,
-    pub static_prio: c_types::c_int,
-    pub normal_prio: c_types::c_int,
-    pub rt_priority: c_types::c_uint,
+    pub recent_used_cpu: core::ffi::c_int,
+    pub wake_cpu: core::ffi::c_int,
+    pub on_rq: core::ffi::c_int,
+    pub prio: core::ffi::c_int,
+    pub static_prio: core::ffi::c_int,
+    pub normal_prio: core::ffi::c_int,
+    pub rt_priority: core::ffi::c_uint,
     pub __bindgen_padding_0: [u64; 0usize],
     pub se: sched_entity,
     pub rt: sched_rt_entity,
@@ -6211,20 +6211,20 @@ pub struct task_struct {
     pub __bindgen_padding_1: u64,
     pub stats: sched_statistics,
     pub preempt_notifiers: hlist_head,
-    pub policy: c_types::c_uint,
-    pub nr_cpus_allowed: c_types::c_int,
+    pub policy: core::ffi::c_uint,
+    pub nr_cpus_allowed: core::ffi::c_int,
     pub cpus_ptr: *const cpumask_t,
     pub user_cpus_ptr: *mut cpumask_t,
     pub cpus_mask: cpumask_t,
-    pub migration_pending: *mut c_types::c_void,
-    pub migration_disabled: c_types::c_ushort,
-    pub migration_flags: c_types::c_ushort,
-    pub trc_reader_nesting: c_types::c_int,
-    pub trc_ipi_to_cpu: c_types::c_int,
+    pub migration_pending: *mut core::ffi::c_void,
+    pub migration_disabled: core::ffi::c_ushort,
+    pub migration_flags: core::ffi::c_ushort,
+    pub trc_reader_nesting: core::ffi::c_int,
+    pub trc_ipi_to_cpu: core::ffi::c_int,
     pub trc_reader_special: rcu_special,
     pub trc_holdout_list: list_head,
     pub trc_blkd_node: list_head,
-    pub trc_blkd_cpu: c_types::c_int,
+    pub trc_blkd_cpu: core::ffi::c_int,
     pub sched_info: sched_info,
     pub tasks: list_head,
     pub pushable_tasks: plist_node,
@@ -6232,19 +6232,19 @@ pub struct task_struct {
     pub mm: *mut mm_struct,
     pub active_mm: *mut mm_struct,
     pub rss_stat: task_rss_stat,
-    pub exit_state: c_types::c_int,
-    pub exit_code: c_types::c_int,
-    pub exit_signal: c_types::c_int,
-    pub pdeath_signal: c_types::c_int,
-    pub jobctl: c_types::c_ulong,
-    pub personality: c_types::c_uint,
+    pub exit_state: core::ffi::c_int,
+    pub exit_code: core::ffi::c_int,
+    pub exit_signal: core::ffi::c_int,
+    pub pdeath_signal: core::ffi::c_int,
+    pub jobctl: core::ffi::c_ulong,
+    pub personality: core::ffi::c_uint,
     pub _bitfield_align_1: [u8; 0],
     pub _bitfield_1: __BindgenBitfieldUnit<[u8; 6usize]>,
-    pub atomic_flags: c_types::c_ulong,
+    pub atomic_flags: core::ffi::c_ulong,
     pub restart_block: restart_block,
     pub pid: pid_t,
     pub tgid: pid_t,
-    pub stack_canary: c_types::c_ulong,
+    pub stack_canary: core::ffi::c_ulong,
     pub real_parent: *mut task_struct,
     pub parent: *mut task_struct,
     pub children: list_head,
@@ -6257,26 +6257,26 @@ pub struct task_struct {
     pub thread_group: list_head,
     pub thread_node: list_head,
     pub vfork_done: *mut completion,
-    pub set_child_tid: *mut c_types::c_int,
-    pub clear_child_tid: *mut c_types::c_int,
-    pub worker_private: *mut c_types::c_void,
+    pub set_child_tid: *mut core::ffi::c_int,
+    pub clear_child_tid: *mut core::ffi::c_int,
+    pub worker_private: *mut core::ffi::c_void,
     pub utime: u64_,
     pub stime: u64_,
     pub gtime: u64_,
     pub prev_cputime: prev_cputime,
-    pub nvcsw: c_types::c_ulong,
-    pub nivcsw: c_types::c_ulong,
+    pub nvcsw: core::ffi::c_ulong,
+    pub nivcsw: core::ffi::c_ulong,
     pub start_time: u64_,
     pub start_boottime: u64_,
-    pub min_flt: c_types::c_ulong,
-    pub maj_flt: c_types::c_ulong,
+    pub min_flt: core::ffi::c_ulong,
+    pub maj_flt: core::ffi::c_ulong,
     pub posix_cputimers: posix_cputimers,
     pub posix_cputimers_work: posix_cputimers_work,
     pub ptracer_cred: *const cred,
     pub real_cred: *const cred,
     pub cred: *const cred,
     pub cached_requested_key: *mut key,
-    pub comm: [c_types::c_char; 16usize],
+    pub comm: [core::ffi::c_char; 16usize],
     pub nameidata: *mut nameidata,
     pub sysvsem: sysv_sem,
     pub sysvshm: sysv_shm,
@@ -6290,13 +6290,13 @@ pub struct task_struct {
     pub real_blocked: sigset_t,
     pub saved_sigmask: sigset_t,
     pub pending: sigpending,
-    pub sas_ss_sp: c_types::c_ulong,
+    pub sas_ss_sp: core::ffi::c_ulong,
     pub sas_ss_size: usize,
-    pub sas_ss_flags: c_types::c_uint,
+    pub sas_ss_flags: core::ffi::c_uint,
     pub task_works: *mut callback_head,
     pub audit_context: *mut audit_context,
     pub loginuid: kuid_t,
-    pub sessionid: c_types::c_uint,
+    pub sessionid: core::ffi::c_uint,
     pub seccomp: seccomp,
     pub syscall_dispatch: syscall_user_dispatch,
     pub parent_exec_id: u64_,
@@ -6307,14 +6307,14 @@ pub struct task_struct {
     pub pi_waiters: rb_root_cached,
     pub pi_top_task: *mut task_struct,
     pub pi_blocked_on: *mut rt_mutex_waiter,
-    pub journal_info: *mut c_types::c_void,
+    pub journal_info: *mut core::ffi::c_void,
     pub bio_list: *mut bio_list,
     pub plug: *mut blk_plug,
     pub reclaim_state: *mut reclaim_state,
     pub backing_dev_info: *mut backing_dev_info,
     pub io_context: *mut io_context,
     pub capture_control: *mut capture_control,
-    pub ptrace_message: c_types::c_ulong,
+    pub ptrace_message: core::ffi::c_ulong,
     pub last_siginfo: *mut kernel_siginfo_t,
     pub ioac: task_io_accounting,
     pub acct_rss_mem1: u64_,
@@ -6322,8 +6322,8 @@ pub struct task_struct {
     pub acct_timexpd: u64_,
     pub mems_allowed: nodemask_t,
     pub mems_allowed_seq: seqcount_spinlock_t,
-    pub cpuset_mem_spread_rotor: c_types::c_int,
-    pub cpuset_slab_spread_rotor: c_types::c_int,
+    pub cpuset_mem_spread_rotor: core::ffi::c_int,
+    pub cpuset_slab_spread_rotor: core::ffi::c_int,
     pub cgroups: *mut css_set,
     pub cg_list: list_head,
     pub robust_list: *mut robust_list_head,
@@ -6331,53 +6331,53 @@ pub struct task_struct {
     pub pi_state_list: list_head,
     pub pi_state_cache: *mut futex_pi_state,
     pub futex_exit_mutex: mutex,
-    pub futex_state: c_types::c_uint,
+    pub futex_state: core::ffi::c_uint,
     pub perf_event_ctxp: [*mut perf_event_context; 2usize],
     pub perf_event_mutex: mutex,
     pub perf_event_list: list_head,
     pub rseq: *mut rseq,
     pub rseq_sig: u32_,
-    pub rseq_event_mask: c_types::c_ulong,
+    pub rseq_event_mask: core::ffi::c_ulong,
     pub tlb_ubc: tlbflush_unmap_batch,
     pub __bindgen_anon_1: task_struct__bindgen_ty_1,
     pub splice_pipe: *mut pipe_inode_info,
     pub task_frag: page_frag,
     pub delays: *mut task_delay_info,
-    pub nr_dirtied: c_types::c_int,
-    pub nr_dirtied_pause: c_types::c_int,
-    pub dirty_paused_when: c_types::c_ulong,
+    pub nr_dirtied: core::ffi::c_int,
+    pub nr_dirtied_pause: core::ffi::c_int,
+    pub dirty_paused_when: core::ffi::c_ulong,
     pub timer_slack_ns: u64_,
     pub default_timer_slack_ns: u64_,
-    pub curr_ret_stack: c_types::c_int,
-    pub curr_ret_depth: c_types::c_int,
+    pub curr_ret_stack: core::ffi::c_int,
+    pub curr_ret_depth: core::ffi::c_int,
     pub ret_stack: *mut ftrace_ret_stack,
-    pub ftrace_timestamp: c_types::c_ulonglong,
+    pub ftrace_timestamp: core::ffi::c_ulonglong,
     pub trace_overrun: atomic_t,
     pub tracing_graph_pause: atomic_t,
-    pub trace_recursion: c_types::c_ulong,
+    pub trace_recursion: core::ffi::c_ulong,
     pub memcg_in_oom: *mut mem_cgroup,
     pub memcg_oom_gfp_mask: gfp_t,
-    pub memcg_oom_order: c_types::c_int,
-    pub memcg_nr_pages_over_high: c_types::c_uint,
+    pub memcg_oom_order: core::ffi::c_int,
+    pub memcg_nr_pages_over_high: core::ffi::c_uint,
     pub active_memcg: *mut mem_cgroup,
     pub throttle_queue: *mut request_queue,
     pub utask: *mut uprobe_task,
     pub kmap_ctrl: kmap_ctrl,
-    pub pagefault_disabled: c_types::c_int,
+    pub pagefault_disabled: core::ffi::c_int,
     pub oom_reaper_list: *mut task_struct,
     pub oom_reaper_timer: timer_list,
     pub stack_vm_area: *mut vm_struct,
     pub stack_refcount: refcount_t,
-    pub security: *mut c_types::c_void,
+    pub security: *mut core::ffi::c_void,
     pub bpf_storage: *mut bpf_local_storage,
     pub bpf_ctx: *mut bpf_run_ctx,
-    pub mce_vaddr: *mut c_types::c_void,
+    pub mce_vaddr: *mut core::ffi::c_void,
     pub mce_kflags: __u64,
     pub mce_addr: u64_,
     pub _bitfield_align_2: [u64; 0],
     pub _bitfield_2: __BindgenBitfieldUnit<[u8; 8usize]>,
     pub mce_kill_me: callback_head,
-    pub mce_count: c_types::c_int,
+    pub mce_count: core::ffi::c_int,
     pub kretprobe_instances: llist_head,
     pub rethooks: llist_head,
     pub l1d_flush_kill: callback_head,
@@ -6789,154 +6789,154 @@ impl Default for task_struct {
 }
 impl task_struct {
     #[inline]
-    pub fn sched_reset_on_fork(&self) -> c_types::c_uint {
+    pub fn sched_reset_on_fork(&self) -> core::ffi::c_uint {
         unsafe { ::core::mem::transmute(self._bitfield_1.get(0usize, 1u8) as u32) }
     }
     #[inline]
-    pub fn set_sched_reset_on_fork(&mut self, val: c_types::c_uint) {
+    pub fn set_sched_reset_on_fork(&mut self, val: core::ffi::c_uint) {
         unsafe {
             let val: u32 = ::core::mem::transmute(val);
             self._bitfield_1.set(0usize, 1u8, val as u64)
         }
     }
     #[inline]
-    pub fn sched_contributes_to_load(&self) -> c_types::c_uint {
+    pub fn sched_contributes_to_load(&self) -> core::ffi::c_uint {
         unsafe { ::core::mem::transmute(self._bitfield_1.get(1usize, 1u8) as u32) }
     }
     #[inline]
-    pub fn set_sched_contributes_to_load(&mut self, val: c_types::c_uint) {
+    pub fn set_sched_contributes_to_load(&mut self, val: core::ffi::c_uint) {
         unsafe {
             let val: u32 = ::core::mem::transmute(val);
             self._bitfield_1.set(1usize, 1u8, val as u64)
         }
     }
     #[inline]
-    pub fn sched_migrated(&self) -> c_types::c_uint {
+    pub fn sched_migrated(&self) -> core::ffi::c_uint {
         unsafe { ::core::mem::transmute(self._bitfield_1.get(2usize, 1u8) as u32) }
     }
     #[inline]
-    pub fn set_sched_migrated(&mut self, val: c_types::c_uint) {
+    pub fn set_sched_migrated(&mut self, val: core::ffi::c_uint) {
         unsafe {
             let val: u32 = ::core::mem::transmute(val);
             self._bitfield_1.set(2usize, 1u8, val as u64)
         }
     }
     #[inline]
-    pub fn sched_remote_wakeup(&self) -> c_types::c_uint {
+    pub fn sched_remote_wakeup(&self) -> core::ffi::c_uint {
         unsafe { ::core::mem::transmute(self._bitfield_1.get(32usize, 1u8) as u32) }
     }
     #[inline]
-    pub fn set_sched_remote_wakeup(&mut self, val: c_types::c_uint) {
+    pub fn set_sched_remote_wakeup(&mut self, val: core::ffi::c_uint) {
         unsafe {
             let val: u32 = ::core::mem::transmute(val);
             self._bitfield_1.set(32usize, 1u8, val as u64)
         }
     }
     #[inline]
-    pub fn in_execve(&self) -> c_types::c_uint {
+    pub fn in_execve(&self) -> core::ffi::c_uint {
         unsafe { ::core::mem::transmute(self._bitfield_1.get(33usize, 1u8) as u32) }
     }
     #[inline]
-    pub fn set_in_execve(&mut self, val: c_types::c_uint) {
+    pub fn set_in_execve(&mut self, val: core::ffi::c_uint) {
         unsafe {
             let val: u32 = ::core::mem::transmute(val);
             self._bitfield_1.set(33usize, 1u8, val as u64)
         }
     }
     #[inline]
-    pub fn in_iowait(&self) -> c_types::c_uint {
+    pub fn in_iowait(&self) -> core::ffi::c_uint {
         unsafe { ::core::mem::transmute(self._bitfield_1.get(34usize, 1u8) as u32) }
     }
     #[inline]
-    pub fn set_in_iowait(&mut self, val: c_types::c_uint) {
+    pub fn set_in_iowait(&mut self, val: core::ffi::c_uint) {
         unsafe {
             let val: u32 = ::core::mem::transmute(val);
             self._bitfield_1.set(34usize, 1u8, val as u64)
         }
     }
     #[inline]
-    pub fn restore_sigmask(&self) -> c_types::c_uint {
+    pub fn restore_sigmask(&self) -> core::ffi::c_uint {
         unsafe { ::core::mem::transmute(self._bitfield_1.get(35usize, 1u8) as u32) }
     }
     #[inline]
-    pub fn set_restore_sigmask(&mut self, val: c_types::c_uint) {
+    pub fn set_restore_sigmask(&mut self, val: core::ffi::c_uint) {
         unsafe {
             let val: u32 = ::core::mem::transmute(val);
             self._bitfield_1.set(35usize, 1u8, val as u64)
         }
     }
     #[inline]
-    pub fn in_user_fault(&self) -> c_types::c_uint {
+    pub fn in_user_fault(&self) -> core::ffi::c_uint {
         unsafe { ::core::mem::transmute(self._bitfield_1.get(36usize, 1u8) as u32) }
     }
     #[inline]
-    pub fn set_in_user_fault(&mut self, val: c_types::c_uint) {
+    pub fn set_in_user_fault(&mut self, val: core::ffi::c_uint) {
         unsafe {
             let val: u32 = ::core::mem::transmute(val);
             self._bitfield_1.set(36usize, 1u8, val as u64)
         }
     }
     #[inline]
-    pub fn no_cgroup_migration(&self) -> c_types::c_uint {
+    pub fn no_cgroup_migration(&self) -> core::ffi::c_uint {
         unsafe { ::core::mem::transmute(self._bitfield_1.get(37usize, 1u8) as u32) }
     }
     #[inline]
-    pub fn set_no_cgroup_migration(&mut self, val: c_types::c_uint) {
+    pub fn set_no_cgroup_migration(&mut self, val: core::ffi::c_uint) {
         unsafe {
             let val: u32 = ::core::mem::transmute(val);
             self._bitfield_1.set(37usize, 1u8, val as u64)
         }
     }
     #[inline]
-    pub fn frozen(&self) -> c_types::c_uint {
+    pub fn frozen(&self) -> core::ffi::c_uint {
         unsafe { ::core::mem::transmute(self._bitfield_1.get(38usize, 1u8) as u32) }
     }
     #[inline]
-    pub fn set_frozen(&mut self, val: c_types::c_uint) {
+    pub fn set_frozen(&mut self, val: core::ffi::c_uint) {
         unsafe {
             let val: u32 = ::core::mem::transmute(val);
             self._bitfield_1.set(38usize, 1u8, val as u64)
         }
     }
     #[inline]
-    pub fn use_memdelay(&self) -> c_types::c_uint {
+    pub fn use_memdelay(&self) -> core::ffi::c_uint {
         unsafe { ::core::mem::transmute(self._bitfield_1.get(39usize, 1u8) as u32) }
     }
     #[inline]
-    pub fn set_use_memdelay(&mut self, val: c_types::c_uint) {
+    pub fn set_use_memdelay(&mut self, val: core::ffi::c_uint) {
         unsafe {
             let val: u32 = ::core::mem::transmute(val);
             self._bitfield_1.set(39usize, 1u8, val as u64)
         }
     }
     #[inline]
-    pub fn in_eventfd(&self) -> c_types::c_uint {
+    pub fn in_eventfd(&self) -> core::ffi::c_uint {
         unsafe { ::core::mem::transmute(self._bitfield_1.get(40usize, 1u8) as u32) }
     }
     #[inline]
-    pub fn set_in_eventfd(&mut self, val: c_types::c_uint) {
+    pub fn set_in_eventfd(&mut self, val: core::ffi::c_uint) {
         unsafe {
             let val: u32 = ::core::mem::transmute(val);
             self._bitfield_1.set(40usize, 1u8, val as u64)
         }
     }
     #[inline]
-    pub fn reported_split_lock(&self) -> c_types::c_uint {
+    pub fn reported_split_lock(&self) -> core::ffi::c_uint {
         unsafe { ::core::mem::transmute(self._bitfield_1.get(41usize, 1u8) as u32) }
     }
     #[inline]
-    pub fn set_reported_split_lock(&mut self, val: c_types::c_uint) {
+    pub fn set_reported_split_lock(&mut self, val: core::ffi::c_uint) {
         unsafe {
             let val: u32 = ::core::mem::transmute(val);
             self._bitfield_1.set(41usize, 1u8, val as u64)
         }
     }
     #[inline]
-    pub fn in_thrashing(&self) -> c_types::c_uint {
+    pub fn in_thrashing(&self) -> core::ffi::c_uint {
         unsafe { ::core::mem::transmute(self._bitfield_1.get(42usize, 1u8) as u32) }
     }
     #[inline]
-    pub fn set_in_thrashing(&mut self, val: c_types::c_uint) {
+    pub fn set_in_thrashing(&mut self, val: core::ffi::c_uint) {
         unsafe {
             let val: u32 = ::core::mem::transmute(val);
             self._bitfield_1.set(42usize, 1u8, val as u64)
@@ -6944,20 +6944,20 @@ impl task_struct {
     }
     #[inline]
     pub fn new_bitfield_1(
-        sched_reset_on_fork: c_types::c_uint,
-        sched_contributes_to_load: c_types::c_uint,
-        sched_migrated: c_types::c_uint,
-        sched_remote_wakeup: c_types::c_uint,
-        in_execve: c_types::c_uint,
-        in_iowait: c_types::c_uint,
-        restore_sigmask: c_types::c_uint,
-        in_user_fault: c_types::c_uint,
-        no_cgroup_migration: c_types::c_uint,
-        frozen: c_types::c_uint,
-        use_memdelay: c_types::c_uint,
-        in_eventfd: c_types::c_uint,
-        reported_split_lock: c_types::c_uint,
-        in_thrashing: c_types::c_uint,
+        sched_reset_on_fork: core::ffi::c_uint,
+        sched_contributes_to_load: core::ffi::c_uint,
+        sched_migrated: core::ffi::c_uint,
+        sched_remote_wakeup: core::ffi::c_uint,
+        in_execve: core::ffi::c_uint,
+        in_iowait: core::ffi::c_uint,
+        restore_sigmask: core::ffi::c_uint,
+        in_user_fault: core::ffi::c_uint,
+        no_cgroup_migration: core::ffi::c_uint,
+        frozen: core::ffi::c_uint,
+        use_memdelay: core::ffi::c_uint,
+        in_eventfd: core::ffi::c_uint,
+        reported_split_lock: core::ffi::c_uint,
+        in_thrashing: core::ffi::c_uint,
     ) -> __BindgenBitfieldUnit<[u8; 6usize]> {
         let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 6usize]> = Default::default();
         __bindgen_bitfield_unit.set(0usize, 1u8, {
@@ -7079,7 +7079,7 @@ impl task_struct {
 pub struct xarray {
     pub xa_lock: spinlock_t,
     pub xa_flags: gfp_t,
-    pub xa_head: *mut c_types::c_void,
+    pub xa_head: *mut core::ffi::c_void,
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
 const _: () = {
@@ -7126,10 +7126,10 @@ pub struct kernfs_iattrs {
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct kernfs_elem_dir {
-    pub subdirs: c_types::c_ulong,
+    pub subdirs: core::ffi::c_ulong,
     pub children: rb_root,
     pub root: *mut kernfs_root,
-    pub rev: c_types::c_ulong,
+    pub rev: core::ffi::c_ulong,
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
 const _: () = {
@@ -7210,14 +7210,14 @@ pub struct kernfs_node {
     pub count: atomic_t,
     pub active: atomic_t,
     pub parent: *mut kernfs_node,
-    pub name: *const c_types::c_char,
+    pub name: *const core::ffi::c_char,
     pub rb: rb_node,
-    pub ns: *const c_types::c_void,
-    pub hash: c_types::c_uint,
+    pub ns: *const core::ffi::c_void,
+    pub hash: core::ffi::c_uint,
     pub __bindgen_anon_1: kernfs_node__bindgen_ty_1,
-    pub priv_: *mut c_types::c_void,
+    pub priv_: *mut core::ffi::c_void,
     pub id: u64_,
-    pub flags: c_types::c_ushort,
+    pub flags: core::ffi::c_ushort,
     pub mode: umode_t,
     pub iattr: *mut kernfs_iattrs,
 }
@@ -7282,12 +7282,12 @@ pub struct kernfs_open_file {
     pub kn: *mut kernfs_node,
     pub file: *mut file,
     pub seq_file: *mut seq_file,
-    pub priv_: *mut c_types::c_void,
+    pub priv_: *mut core::ffi::c_void,
     pub mutex: mutex,
     pub prealloc_mutex: mutex,
-    pub event: c_types::c_int,
+    pub event: core::ffi::c_int,
     pub list: list_head,
-    pub prealloc_buf: *mut c_types::c_char,
+    pub prealloc_buf: *mut core::ffi::c_char,
     pub atomic_write_len: usize,
     pub _bitfield_align_1: [u8; 0],
     pub _bitfield_1: __BindgenBitfieldUnit<[u8; 1usize]>,
@@ -7370,27 +7370,27 @@ impl kernfs_open_file {
 #[derive(Debug, Default, Copy, Clone)]
 pub struct kernfs_ops {
     pub open:
-        ::core::option::Option<unsafe extern "C" fn(of: *mut kernfs_open_file) -> c_types::c_int>,
+        ::core::option::Option<unsafe extern "C" fn(of: *mut kernfs_open_file) -> core::ffi::c_int>,
     pub release: ::core::option::Option<unsafe extern "C" fn(of: *mut kernfs_open_file)>,
     pub seq_show: ::core::option::Option<
-        unsafe extern "C" fn(sf: *mut seq_file, v: *mut c_types::c_void) -> c_types::c_int,
+        unsafe extern "C" fn(sf: *mut seq_file, v: *mut core::ffi::c_void) -> core::ffi::c_int,
     >,
     pub seq_start: ::core::option::Option<
-        unsafe extern "C" fn(sf: *mut seq_file, ppos: *mut loff_t) -> *mut c_types::c_void,
+        unsafe extern "C" fn(sf: *mut seq_file, ppos: *mut loff_t) -> *mut core::ffi::c_void,
     >,
     pub seq_next: ::core::option::Option<
         unsafe extern "C" fn(
             sf: *mut seq_file,
-            v: *mut c_types::c_void,
+            v: *mut core::ffi::c_void,
             ppos: *mut loff_t,
-        ) -> *mut c_types::c_void,
+        ) -> *mut core::ffi::c_void,
     >,
     pub seq_stop:
-        ::core::option::Option<unsafe extern "C" fn(sf: *mut seq_file, v: *mut c_types::c_void)>,
+        ::core::option::Option<unsafe extern "C" fn(sf: *mut seq_file, v: *mut core::ffi::c_void)>,
     pub read: ::core::option::Option<
         unsafe extern "C" fn(
             of: *mut kernfs_open_file,
-            buf: *mut c_types::c_char,
+            buf: *mut core::ffi::c_char,
             bytes: usize,
             off: loff_t,
         ) -> isize,
@@ -7400,7 +7400,7 @@ pub struct kernfs_ops {
     pub write: ::core::option::Option<
         unsafe extern "C" fn(
             of: *mut kernfs_open_file,
-            buf: *mut c_types::c_char,
+            buf: *mut core::ffi::c_char,
             bytes: usize,
             off: loff_t,
         ) -> isize,
@@ -7409,7 +7409,10 @@ pub struct kernfs_ops {
         unsafe extern "C" fn(of: *mut kernfs_open_file, pt: *mut poll_table_struct) -> __poll_t,
     >,
     pub mmap: ::core::option::Option<
-        unsafe extern "C" fn(of: *mut kernfs_open_file, vma: *mut vm_area_struct) -> c_types::c_int,
+        unsafe extern "C" fn(
+            of: *mut kernfs_open_file,
+            vma: *mut vm_area_struct,
+        ) -> core::ffi::c_int,
     >,
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
@@ -7443,17 +7446,17 @@ pub struct sock {
 pub const kobj_ns_type_KOBJ_NS_TYPE_NONE: kobj_ns_type = 0;
 pub const kobj_ns_type_KOBJ_NS_TYPE_NET: kobj_ns_type = 1;
 pub const kobj_ns_type_KOBJ_NS_TYPES: kobj_ns_type = 2;
-pub type kobj_ns_type = c_types::c_uint;
+pub type kobj_ns_type = core::ffi::c_uint;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct kobj_ns_type_operations {
     pub type_: kobj_ns_type,
     pub current_may_mount: ::core::option::Option<unsafe extern "C" fn() -> bool_>,
-    pub grab_current_ns: ::core::option::Option<unsafe extern "C" fn() -> *mut c_types::c_void>,
+    pub grab_current_ns: ::core::option::Option<unsafe extern "C" fn() -> *mut core::ffi::c_void>,
     pub netlink_ns:
-        ::core::option::Option<unsafe extern "C" fn(sk: *mut sock) -> *const c_types::c_void>,
-    pub initial_ns: ::core::option::Option<unsafe extern "C" fn() -> *const c_types::c_void>,
-    pub drop_ns: ::core::option::Option<unsafe extern "C" fn(arg1: *mut c_types::c_void)>,
+        ::core::option::Option<unsafe extern "C" fn(sk: *mut sock) -> *const core::ffi::c_void>,
+    pub initial_ns: ::core::option::Option<unsafe extern "C" fn() -> *const core::ffi::c_void>,
+    pub drop_ns: ::core::option::Option<unsafe extern "C" fn(arg1: *mut core::ffi::c_void)>,
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
 const _: () = {
@@ -7488,7 +7491,7 @@ impl Default for kobj_ns_type_operations {
 pub struct kstat {
     pub result_mask: u32_,
     pub mode: umode_t,
-    pub nlink: c_types::c_uint,
+    pub nlink: core::ffi::c_uint,
     pub blksize: u32,
     pub attributes: u64_,
     pub attributes_mask: u64_,
@@ -7538,7 +7541,7 @@ const _: () = {
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct attribute {
-    pub name: *const c_types::c_char,
+    pub name: *const core::ffi::c_char,
     pub mode: umode_t,
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
@@ -7561,19 +7564,19 @@ impl Default for attribute {
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct attribute_group {
-    pub name: *const c_types::c_char,
+    pub name: *const core::ffi::c_char,
     pub is_visible: ::core::option::Option<
         unsafe extern "C" fn(
             arg1: *mut kobject,
             arg2: *mut attribute,
-            arg3: c_types::c_int,
+            arg3: core::ffi::c_int,
         ) -> umode_t,
     >,
     pub is_bin_visible: ::core::option::Option<
         unsafe extern "C" fn(
             arg1: *mut kobject,
             arg2: *mut bin_attribute,
-            arg3: c_types::c_int,
+            arg3: core::ffi::c_int,
         ) -> umode_t,
     >,
     pub attrs: *mut *mut attribute,
@@ -7608,14 +7611,14 @@ impl Default for attribute_group {
 pub struct bin_attribute {
     pub attr: attribute,
     pub size: usize,
-    pub private: *mut c_types::c_void,
+    pub private: *mut core::ffi::c_void,
     pub f_mapping: ::core::option::Option<unsafe extern "C" fn() -> *mut address_space>,
     pub read: ::core::option::Option<
         unsafe extern "C" fn(
             arg1: *mut file,
             arg2: *mut kobject,
             arg3: *mut bin_attribute,
-            arg4: *mut c_types::c_char,
+            arg4: *mut core::ffi::c_char,
             arg5: loff_t,
             arg6: usize,
         ) -> isize,
@@ -7625,7 +7628,7 @@ pub struct bin_attribute {
             arg1: *mut file,
             arg2: *mut kobject,
             arg3: *mut bin_attribute,
-            arg4: *mut c_types::c_char,
+            arg4: *mut core::ffi::c_char,
             arg5: loff_t,
             arg6: usize,
         ) -> isize,
@@ -7636,7 +7639,7 @@ pub struct bin_attribute {
             arg2: *mut kobject,
             attr: *mut bin_attribute,
             vma: *mut vm_area_struct,
-        ) -> c_types::c_int,
+        ) -> core::ffi::c_int,
     >,
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
@@ -7673,14 +7676,14 @@ pub struct sysfs_ops {
         unsafe extern "C" fn(
             arg1: *mut kobject,
             arg2: *mut attribute,
-            arg3: *mut c_types::c_char,
+            arg3: *mut core::ffi::c_char,
         ) -> isize,
     >,
     pub store: ::core::option::Option<
         unsafe extern "C" fn(
             arg1: *mut kobject,
             arg2: *mut attribute,
-            arg3: *const c_types::c_char,
+            arg3: *const core::ffi::c_char,
             arg4: usize,
         ) -> isize,
     >,
@@ -7695,7 +7698,7 @@ const _: () = {
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct kobject {
-    pub name: *const c_types::c_char,
+    pub name: *const core::ffi::c_char,
     pub entry: list_head,
     pub parent: *mut kobject,
     pub kset: *mut kset,
@@ -7729,55 +7732,55 @@ impl Default for kobject {
 }
 impl kobject {
     #[inline]
-    pub fn state_initialized(&self) -> c_types::c_uint {
+    pub fn state_initialized(&self) -> core::ffi::c_uint {
         unsafe { ::core::mem::transmute(self._bitfield_1.get(0usize, 1u8) as u32) }
     }
     #[inline]
-    pub fn set_state_initialized(&mut self, val: c_types::c_uint) {
+    pub fn set_state_initialized(&mut self, val: core::ffi::c_uint) {
         unsafe {
             let val: u32 = ::core::mem::transmute(val);
             self._bitfield_1.set(0usize, 1u8, val as u64)
         }
     }
     #[inline]
-    pub fn state_in_sysfs(&self) -> c_types::c_uint {
+    pub fn state_in_sysfs(&self) -> core::ffi::c_uint {
         unsafe { ::core::mem::transmute(self._bitfield_1.get(1usize, 1u8) as u32) }
     }
     #[inline]
-    pub fn set_state_in_sysfs(&mut self, val: c_types::c_uint) {
+    pub fn set_state_in_sysfs(&mut self, val: core::ffi::c_uint) {
         unsafe {
             let val: u32 = ::core::mem::transmute(val);
             self._bitfield_1.set(1usize, 1u8, val as u64)
         }
     }
     #[inline]
-    pub fn state_add_uevent_sent(&self) -> c_types::c_uint {
+    pub fn state_add_uevent_sent(&self) -> core::ffi::c_uint {
         unsafe { ::core::mem::transmute(self._bitfield_1.get(2usize, 1u8) as u32) }
     }
     #[inline]
-    pub fn set_state_add_uevent_sent(&mut self, val: c_types::c_uint) {
+    pub fn set_state_add_uevent_sent(&mut self, val: core::ffi::c_uint) {
         unsafe {
             let val: u32 = ::core::mem::transmute(val);
             self._bitfield_1.set(2usize, 1u8, val as u64)
         }
     }
     #[inline]
-    pub fn state_remove_uevent_sent(&self) -> c_types::c_uint {
+    pub fn state_remove_uevent_sent(&self) -> core::ffi::c_uint {
         unsafe { ::core::mem::transmute(self._bitfield_1.get(3usize, 1u8) as u32) }
     }
     #[inline]
-    pub fn set_state_remove_uevent_sent(&mut self, val: c_types::c_uint) {
+    pub fn set_state_remove_uevent_sent(&mut self, val: core::ffi::c_uint) {
         unsafe {
             let val: u32 = ::core::mem::transmute(val);
             self._bitfield_1.set(3usize, 1u8, val as u64)
         }
     }
     #[inline]
-    pub fn uevent_suppress(&self) -> c_types::c_uint {
+    pub fn uevent_suppress(&self) -> core::ffi::c_uint {
         unsafe { ::core::mem::transmute(self._bitfield_1.get(4usize, 1u8) as u32) }
     }
     #[inline]
-    pub fn set_uevent_suppress(&mut self, val: c_types::c_uint) {
+    pub fn set_uevent_suppress(&mut self, val: core::ffi::c_uint) {
         unsafe {
             let val: u32 = ::core::mem::transmute(val);
             self._bitfield_1.set(4usize, 1u8, val as u64)
@@ -7785,11 +7788,11 @@ impl kobject {
     }
     #[inline]
     pub fn new_bitfield_1(
-        state_initialized: c_types::c_uint,
-        state_in_sysfs: c_types::c_uint,
-        state_add_uevent_sent: c_types::c_uint,
-        state_remove_uevent_sent: c_types::c_uint,
-        uevent_suppress: c_types::c_uint,
+        state_initialized: core::ffi::c_uint,
+        state_in_sysfs: core::ffi::c_uint,
+        state_add_uevent_sent: core::ffi::c_uint,
+        state_remove_uevent_sent: core::ffi::c_uint,
+        uevent_suppress: core::ffi::c_uint,
     ) -> __BindgenBitfieldUnit<[u8; 1usize]> {
         let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 1usize]> = Default::default();
         __bindgen_bitfield_unit.set(0usize, 1u8, {
@@ -7826,8 +7829,9 @@ pub struct kobj_type {
     pub child_ns_type: ::core::option::Option<
         unsafe extern "C" fn(kobj: *mut kobject) -> *const kobj_ns_type_operations,
     >,
-    pub namespace:
-        ::core::option::Option<unsafe extern "C" fn(kobj: *mut kobject) -> *const c_types::c_void>,
+    pub namespace: ::core::option::Option<
+        unsafe extern "C" fn(kobj: *mut kobject) -> *const core::ffi::c_void,
+    >,
     pub get_ownership: ::core::option::Option<
         unsafe extern "C" fn(kobj: *mut kobject, uid: *mut kuid_t, gid: *mut kgid_t),
     >,
@@ -7860,11 +7864,11 @@ impl Default for kobj_type {
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct kobj_uevent_env {
-    pub argv: [*mut c_types::c_char; 3usize],
-    pub envp: [*mut c_types::c_char; 64usize],
-    pub envp_idx: c_types::c_int,
-    pub buf: [c_types::c_char; 2048usize],
-    pub buflen: c_types::c_int,
+    pub argv: [*mut core::ffi::c_char; 3usize],
+    pub envp: [*mut core::ffi::c_char; 64usize],
+    pub envp_idx: core::ffi::c_int,
+    pub buf: [core::ffi::c_char; 2048usize],
+    pub buflen: core::ffi::c_int,
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
 const _: () = {
@@ -7893,11 +7897,13 @@ impl Default for kobj_uevent_env {
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
 pub struct kset_uevent_ops {
-    pub filter: ::core::option::Option<unsafe extern "C" fn(kobj: *mut kobject) -> c_types::c_int>,
-    pub name:
-        ::core::option::Option<unsafe extern "C" fn(kobj: *mut kobject) -> *const c_types::c_char>,
+    pub filter:
+        ::core::option::Option<unsafe extern "C" fn(kobj: *mut kobject) -> core::ffi::c_int>,
+    pub name: ::core::option::Option<
+        unsafe extern "C" fn(kobj: *mut kobject) -> *const core::ffi::c_char,
+    >,
     pub uevent: ::core::option::Option<
-        unsafe extern "C" fn(kobj: *mut kobject, env: *mut kobj_uevent_env) -> c_types::c_int,
+        unsafe extern "C" fn(kobj: *mut kobject, env: *mut kobj_uevent_env) -> core::ffi::c_int,
     >,
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
@@ -7941,11 +7947,11 @@ impl Default for kset {
 pub type proc_handler = ::core::option::Option<
     unsafe extern "C" fn(
         ctl: *mut ctl_table,
-        write: c_types::c_int,
-        buffer: *mut c_types::c_void,
+        write: core::ffi::c_int,
+        buffer: *mut core::ffi::c_void,
         lenp: *mut usize,
         ppos: *mut loff_t,
-    ) -> c_types::c_int,
+    ) -> core::ffi::c_int,
 >;
 #[repr(C)]
 #[derive(Copy, Clone)]
@@ -7974,15 +7980,15 @@ impl Default for ctl_table_poll {
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct ctl_table {
-    pub procname: *const c_types::c_char,
-    pub data: *mut c_types::c_void,
-    pub maxlen: c_types::c_int,
+    pub procname: *const core::ffi::c_char,
+    pub data: *mut core::ffi::c_void,
+    pub maxlen: core::ffi::c_int,
     pub mode: umode_t,
     pub child: *mut ctl_table,
     pub proc_handler: proc_handler,
     pub poll: *mut ctl_table_poll,
-    pub extra1: *mut c_types::c_void,
-    pub extra2: *mut c_types::c_void,
+    pub extra1: *mut core::ffi::c_void,
+    pub extra2: *mut core::ffi::c_void,
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
 const _: () = {
@@ -8052,9 +8058,9 @@ pub union ctl_table_header__bindgen_ty_1 {
 #[derive(Debug, Copy, Clone)]
 pub struct ctl_table_header__bindgen_ty_1__bindgen_ty_1 {
     pub ctl_table: *mut ctl_table,
-    pub used: c_types::c_int,
-    pub count: c_types::c_int,
-    pub nreg: c_types::c_int,
+    pub used: core::ffi::c_int,
+    pub count: core::ffi::c_int,
+    pub nreg: core::ffi::c_int,
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
 const _: () = {
@@ -8152,7 +8158,7 @@ impl Default for ctl_dir {
 #[derive(Copy, Clone)]
 pub struct ctl_table_set {
     pub is_seen:
-        ::core::option::Option<unsafe extern "C" fn(arg1: *mut ctl_table_set) -> c_types::c_int>,
+        ::core::option::Option<unsafe extern "C" fn(arg1: *mut ctl_table_set) -> core::ffi::c_int>,
     pub dir: ctl_dir,
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
@@ -8188,7 +8194,10 @@ pub struct ctl_table_root {
         ),
     >,
     pub permissions: ::core::option::Option<
-        unsafe extern "C" fn(head: *mut ctl_table_header, table: *mut ctl_table) -> c_types::c_int,
+        unsafe extern "C" fn(
+            head: *mut ctl_table_header,
+            table: *mut ctl_table,
+        ) -> core::ffi::c_int,
     >,
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
@@ -8215,7 +8224,7 @@ impl Default for ctl_table_root {
 }
 extern "C" {
     pub fn register_sysctl(
-        path: *const c_types::c_char,
+        path: *const core::ffi::c_char,
         table: *mut ctl_table,
     ) -> *mut ctl_table_header;
 }
@@ -8225,25 +8234,25 @@ extern "C" {
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct vdso_image {
-    pub data: *mut c_types::c_void,
-    pub size: c_types::c_ulong,
-    pub alt: c_types::c_ulong,
-    pub alt_len: c_types::c_ulong,
-    pub extable_base: c_types::c_ulong,
-    pub extable_len: c_types::c_ulong,
-    pub extable: *const c_types::c_void,
-    pub sym_vvar_start: c_types::c_long,
-    pub sym_vvar_page: c_types::c_long,
-    pub sym_pvclock_page: c_types::c_long,
-    pub sym_hvclock_page: c_types::c_long,
-    pub sym_timens_page: c_types::c_long,
-    pub sym_VDSO32_NOTE_MASK: c_types::c_long,
-    pub sym___kernel_sigreturn: c_types::c_long,
-    pub sym___kernel_rt_sigreturn: c_types::c_long,
-    pub sym___kernel_vsyscall: c_types::c_long,
-    pub sym_int80_landing_pad: c_types::c_long,
-    pub sym_vdso32_sigreturn_landing_pad: c_types::c_long,
-    pub sym_vdso32_rt_sigreturn_landing_pad: c_types::c_long,
+    pub data: *mut core::ffi::c_void,
+    pub size: core::ffi::c_ulong,
+    pub alt: core::ffi::c_ulong,
+    pub alt_len: core::ffi::c_ulong,
+    pub extable_base: core::ffi::c_ulong,
+    pub extable_len: core::ffi::c_ulong,
+    pub extable: *const core::ffi::c_void,
+    pub sym_vvar_start: core::ffi::c_long,
+    pub sym_vvar_page: core::ffi::c_long,
+    pub sym_pvclock_page: core::ffi::c_long,
+    pub sym_hvclock_page: core::ffi::c_long,
+    pub sym_timens_page: core::ffi::c_long,
+    pub sym_VDSO32_NOTE_MASK: core::ffi::c_long,
+    pub sym___kernel_sigreturn: core::ffi::c_long,
+    pub sym___kernel_rt_sigreturn: core::ffi::c_long,
+    pub sym___kernel_vsyscall: core::ffi::c_long,
+    pub sym_int80_landing_pad: core::ffi::c_long,
+    pub sym_vdso32_sigreturn_landing_pad: core::ffi::c_long,
+    pub sym_vdso32_rt_sigreturn_landing_pad: core::ffi::c_long,
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
 const _: () = {
@@ -8302,8 +8311,8 @@ pub type Elf64_Xword = __u64;
 #[derive(Debug, Default, Copy, Clone)]
 pub struct elf64_sym {
     pub st_name: Elf64_Word,
-    pub st_info: c_types::c_uchar,
-    pub st_other: c_types::c_uchar,
+    pub st_info: core::ffi::c_uchar,
+    pub st_other: core::ffi::c_uchar,
     pub st_shndx: Elf64_Half,
     pub st_value: Elf64_Addr,
     pub st_size: Elf64_Xword,
@@ -8323,20 +8332,20 @@ pub type Elf64_Sym = elf64_sym;
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
 pub struct kernel_param_ops {
-    pub flags: c_types::c_uint,
+    pub flags: core::ffi::c_uint,
     pub set: ::core::option::Option<
         unsafe extern "C" fn(
-            val: *const c_types::c_char,
+            val: *const core::ffi::c_char,
             kp: *const kernel_param,
-        ) -> c_types::c_int,
+        ) -> core::ffi::c_int,
     >,
     pub get: ::core::option::Option<
         unsafe extern "C" fn(
-            buffer: *mut c_types::c_char,
+            buffer: *mut core::ffi::c_char,
             kp: *const kernel_param,
-        ) -> c_types::c_int,
+        ) -> core::ffi::c_int,
     >,
-    pub free: ::core::option::Option<unsafe extern "C" fn(arg: *mut c_types::c_void)>,
+    pub free: ::core::option::Option<unsafe extern "C" fn(arg: *mut core::ffi::c_void)>,
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
 const _: () = {
@@ -8354,7 +8363,7 @@ const _: () = {
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub struct kernel_param {
-    pub name: *const c_types::c_char,
+    pub name: *const core::ffi::c_char,
     pub mod_: *mut module,
     pub ops: *const kernel_param_ops,
     pub perm: u16_,
@@ -8365,7 +8374,7 @@ pub struct kernel_param {
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub union kernel_param__bindgen_ty_1 {
-    pub arg: *mut c_types::c_void,
+    pub arg: *mut core::ffi::c_void,
     pub str_: *const kparam_string,
     pub arr: *const kparam_array,
 }
@@ -8416,8 +8425,8 @@ impl Default for kernel_param {
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct kparam_string {
-    pub maxlen: c_types::c_uint,
-    pub string: *mut c_types::c_char,
+    pub maxlen: core::ffi::c_uint,
+    pub string: *mut core::ffi::c_char,
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
 const _: () = {
@@ -8440,11 +8449,11 @@ impl Default for kparam_string {
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct kparam_array {
-    pub max: c_types::c_uint,
-    pub elemsize: c_types::c_uint,
-    pub num: *mut c_types::c_uint,
+    pub max: core::ffi::c_uint,
+    pub elemsize: core::ffi::c_uint,
+    pub num: *mut core::ffi::c_uint,
     pub ops: *const kernel_param_ops,
-    pub elem: *mut c_types::c_void,
+    pub elem: *mut core::ffi::c_void,
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
 const _: () = {
@@ -8490,8 +8499,8 @@ impl Default for latch_tree_node {
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct mod_arch_specific {
-    pub num_orcs: c_types::c_uint,
-    pub orc_unwind_ip: *mut c_types::c_int,
+    pub num_orcs: core::ffi::c_uint,
+    pub orc_unwind_ip: *mut core::ffi::c_int,
     pub orc_unwind: *mut orc_entry,
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
@@ -8554,21 +8563,21 @@ pub struct module_attribute {
         unsafe extern "C" fn(
             arg1: *mut module_attribute,
             arg2: *mut module_kobject,
-            arg3: *mut c_types::c_char,
+            arg3: *mut core::ffi::c_char,
         ) -> isize,
     >,
     pub store: ::core::option::Option<
         unsafe extern "C" fn(
             arg1: *mut module_attribute,
             arg2: *mut module_kobject,
-            arg3: *const c_types::c_char,
+            arg3: *const core::ffi::c_char,
             count: usize,
         ) -> isize,
     >,
     pub setup: ::core::option::Option<
-        unsafe extern "C" fn(arg1: *mut module, arg2: *const c_types::c_char),
+        unsafe extern "C" fn(arg1: *mut module, arg2: *const core::ffi::c_char),
     >,
-    pub test: ::core::option::Option<unsafe extern "C" fn(arg1: *mut module) -> c_types::c_int>,
+    pub test: ::core::option::Option<unsafe extern "C" fn(arg1: *mut module) -> core::ffi::c_int>,
     pub free: ::core::option::Option<unsafe extern "C" fn(arg1: *mut module)>,
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
@@ -8601,7 +8610,7 @@ pub const module_state_MODULE_STATE_LIVE: module_state = 0;
 pub const module_state_MODULE_STATE_COMING: module_state = 1;
 pub const module_state_MODULE_STATE_GOING: module_state = 2;
 pub const module_state_MODULE_STATE_UNFORMED: module_state = 3;
-pub type module_state = c_types::c_uint;
+pub type module_state = core::ffi::c_uint;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct mod_tree_node {
@@ -8627,11 +8636,11 @@ impl Default for mod_tree_node {
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct module_layout {
-    pub base: *mut c_types::c_void,
-    pub size: c_types::c_uint,
-    pub text_size: c_types::c_uint,
-    pub ro_size: c_types::c_uint,
-    pub ro_after_init_size: c_types::c_uint,
+    pub base: *mut core::ffi::c_void,
+    pub size: core::ffi::c_uint,
+    pub text_size: core::ffi::c_uint,
+    pub ro_size: core::ffi::c_uint,
+    pub ro_after_init_size: core::ffi::c_uint,
     pub mtn: mod_tree_node,
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
@@ -8661,9 +8670,9 @@ impl Default for module_layout {
 #[derive(Debug, Copy, Clone)]
 pub struct mod_kallsyms {
     pub symtab: *mut Elf64_Sym,
-    pub num_symtab: c_types::c_uint,
-    pub strtab: *mut c_types::c_char,
-    pub typetab: *mut c_types::c_char,
+    pub num_symtab: core::ffi::c_uint,
+    pub strtab: *mut core::ffi::c_char,
+    pub typetab: *mut core::ffi::c_char,
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
 const _: () = {
@@ -8695,7 +8704,7 @@ pub struct cdev {
     pub ops: *const file_operations,
     pub list: list_head,
     pub dev: dev_t,
-    pub count: c_types::c_uint,
+    pub count: core::ffi::c_uint,
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
 const _: () = {
@@ -8721,7 +8730,7 @@ extern "C" {
     pub fn cdev_init(arg1: *mut cdev, arg2: *const file_operations);
 }
 extern "C" {
-    pub fn cdev_add(arg1: *mut cdev, arg2: dev_t, arg3: c_types::c_uint) -> c_types::c_int;
+    pub fn cdev_add(arg1: *mut cdev, arg2: dev_t, arg3: core::ffi::c_uint) -> core::ffi::c_int;
 }
 extern "C" {
     pub fn cdev_del(arg1: *mut cdev);
@@ -8785,7 +8794,7 @@ pub union lockref__bindgen_ty_1 {
 #[derive(Copy, Clone)]
 pub struct lockref__bindgen_ty_1__bindgen_ty_1 {
     pub lock: spinlock_t,
-    pub count: c_types::c_int,
+    pub count: core::ffi::c_int,
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
 const _: () = {
@@ -8842,7 +8851,7 @@ impl Default for lockref {
 #[derive(Copy, Clone)]
 pub struct qstr {
     pub __bindgen_anon_1: qstr__bindgen_ty_1,
-    pub name: *const c_types::c_uchar,
+    pub name: *const core::ffi::c_uchar,
 }
 #[repr(C)]
 #[derive(Copy, Clone)]
@@ -8901,18 +8910,18 @@ impl Default for qstr {
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub struct dentry {
-    pub d_flags: c_types::c_uint,
+    pub d_flags: core::ffi::c_uint,
     pub d_seq: seqcount_spinlock_t,
     pub d_hash: hlist_bl_node,
     pub d_parent: *mut dentry,
     pub d_name: qstr,
     pub d_inode: *mut inode,
-    pub d_iname: [c_types::c_uchar; 32usize],
+    pub d_iname: [core::ffi::c_uchar; 32usize],
     pub d_lockref: lockref,
     pub d_op: *const dentry_operations,
     pub d_sb: *mut super_block,
-    pub d_time: c_types::c_ulong,
-    pub d_fsdata: *mut c_types::c_void,
+    pub d_time: core::ffi::c_ulong,
+    pub d_fsdata: *mut core::ffi::c_void,
     pub __bindgen_anon_1: dentry__bindgen_ty_1,
     pub d_child: list_head,
     pub d_subdirs: list_head,
@@ -9003,38 +9012,38 @@ impl Default for dentry {
 #[derive(Debug, Copy, Clone)]
 pub struct dentry_operations {
     pub d_revalidate: ::core::option::Option<
-        unsafe extern "C" fn(arg1: *mut dentry, arg2: c_types::c_uint) -> c_types::c_int,
+        unsafe extern "C" fn(arg1: *mut dentry, arg2: core::ffi::c_uint) -> core::ffi::c_int,
     >,
     pub d_weak_revalidate: ::core::option::Option<
-        unsafe extern "C" fn(arg1: *mut dentry, arg2: c_types::c_uint) -> c_types::c_int,
+        unsafe extern "C" fn(arg1: *mut dentry, arg2: core::ffi::c_uint) -> core::ffi::c_int,
     >,
     pub d_hash: ::core::option::Option<
-        unsafe extern "C" fn(arg1: *const dentry, arg2: *mut qstr) -> c_types::c_int,
+        unsafe extern "C" fn(arg1: *const dentry, arg2: *mut qstr) -> core::ffi::c_int,
     >,
     pub d_compare: ::core::option::Option<
         unsafe extern "C" fn(
             arg1: *const dentry,
-            arg2: c_types::c_uint,
-            arg3: *const c_types::c_char,
+            arg2: core::ffi::c_uint,
+            arg3: *const core::ffi::c_char,
             arg4: *const qstr,
-        ) -> c_types::c_int,
+        ) -> core::ffi::c_int,
     >,
     pub d_delete:
-        ::core::option::Option<unsafe extern "C" fn(arg1: *const dentry) -> c_types::c_int>,
-    pub d_init: ::core::option::Option<unsafe extern "C" fn(arg1: *mut dentry) -> c_types::c_int>,
+        ::core::option::Option<unsafe extern "C" fn(arg1: *const dentry) -> core::ffi::c_int>,
+    pub d_init: ::core::option::Option<unsafe extern "C" fn(arg1: *mut dentry) -> core::ffi::c_int>,
     pub d_release: ::core::option::Option<unsafe extern "C" fn(arg1: *mut dentry)>,
     pub d_prune: ::core::option::Option<unsafe extern "C" fn(arg1: *mut dentry)>,
     pub d_iput: ::core::option::Option<unsafe extern "C" fn(arg1: *mut dentry, arg2: *mut inode)>,
     pub d_dname: ::core::option::Option<
         unsafe extern "C" fn(
             arg1: *mut dentry,
-            arg2: *mut c_types::c_char,
-            arg3: c_types::c_int,
-        ) -> *mut c_types::c_char,
+            arg2: *mut core::ffi::c_char,
+            arg3: core::ffi::c_int,
+        ) -> *mut core::ffi::c_char,
     >,
     pub d_automount: ::core::option::Option<unsafe extern "C" fn(arg1: *mut path) -> *mut vfsmount>,
     pub d_manage: ::core::option::Option<
-        unsafe extern "C" fn(arg1: *const path, arg2: bool_) -> c_types::c_int,
+        unsafe extern "C" fn(arg1: *const path, arg2: bool_) -> core::ffi::c_int,
     >,
     pub d_real: ::core::option::Option<
         unsafe extern "C" fn(arg1: *mut dentry, arg2: *const inode) -> *mut dentry,
@@ -9106,9 +9115,9 @@ impl Default for path {
 #[derive(Debug, Copy, Clone)]
 pub struct shrink_control {
     pub gfp_mask: gfp_t,
-    pub nid: c_types::c_int,
-    pub nr_to_scan: c_types::c_ulong,
-    pub nr_scanned: c_types::c_ulong,
+    pub nid: core::ffi::c_int,
+    pub nr_to_scan: core::ffi::c_ulong,
+    pub nr_scanned: core::ffi::c_ulong,
     pub memcg: *mut mem_cgroup,
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
@@ -9138,16 +9147,16 @@ impl Default for shrink_control {
 #[derive(Debug, Copy, Clone)]
 pub struct shrinker {
     pub count_objects: ::core::option::Option<
-        unsafe extern "C" fn(arg1: *mut shrinker, sc: *mut shrink_control) -> c_types::c_ulong,
+        unsafe extern "C" fn(arg1: *mut shrinker, sc: *mut shrink_control) -> core::ffi::c_ulong,
     >,
     pub scan_objects: ::core::option::Option<
-        unsafe extern "C" fn(arg1: *mut shrinker, sc: *mut shrink_control) -> c_types::c_ulong,
+        unsafe extern "C" fn(arg1: *mut shrinker, sc: *mut shrink_control) -> core::ffi::c_ulong,
     >,
-    pub batch: c_types::c_long,
-    pub seeks: c_types::c_int,
-    pub flags: c_types::c_uint,
+    pub batch: core::ffi::c_long,
+    pub seeks: core::ffi::c_int,
+    pub flags: core::ffi::c_uint,
     pub list: list_head,
-    pub id: c_types::c_int,
+    pub id: core::ffi::c_int,
     pub nr_deferred: *mut atomic_long_t,
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
@@ -9179,7 +9188,7 @@ impl Default for shrinker {
 #[derive(Debug, Copy, Clone)]
 pub struct list_lru_one {
     pub list: list_head,
-    pub nr_items: c_types::c_long,
+    pub nr_items: core::ffi::c_long,
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
 const _: () = {
@@ -9204,7 +9213,7 @@ impl Default for list_lru_one {
 pub struct list_lru_node {
     pub lock: spinlock_t,
     pub lru: list_lru_one,
-    pub nr_items: c_types::c_long,
+    pub nr_items: core::ffi::c_long,
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
 const _: () = {
@@ -9229,7 +9238,7 @@ impl Default for list_lru_node {
 pub struct list_lru {
     pub node: *mut list_lru_node,
     pub list: list_head,
-    pub shrinker_id: c_types::c_int,
+    pub shrinker_id: core::ffi::c_int,
     pub memcg_aware: bool_,
     pub xa: xarray,
 }
@@ -9271,13 +9280,13 @@ pub const migrate_mode_MIGRATE_ASYNC: migrate_mode = 0;
 pub const migrate_mode_MIGRATE_SYNC_LIGHT: migrate_mode = 1;
 pub const migrate_mode_MIGRATE_SYNC: migrate_mode = 2;
 pub const migrate_mode_MIGRATE_SYNC_NO_COPY: migrate_mode = 3;
-pub type migrate_mode = c_types::c_uint;
+pub type migrate_mode = core::ffi::c_uint;
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
 pub struct exception_table_entry {
-    pub insn: c_types::c_int,
-    pub fixup: c_types::c_int,
-    pub data: c_types::c_int,
+    pub insn: core::ffi::c_int,
+    pub fixup: core::ffi::c_int,
+    pub data: core::ffi::c_int,
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
 const _: () = {
@@ -9293,17 +9302,17 @@ const _: () = {
 };
 extern "C" {
     pub fn _copy_from_user(
-        arg1: *mut c_types::c_void,
-        arg2: *const c_types::c_void,
-        arg3: c_types::c_ulong,
-    ) -> c_types::c_ulong;
+        arg1: *mut core::ffi::c_void,
+        arg2: *const core::ffi::c_void,
+        arg3: core::ffi::c_ulong,
+    ) -> core::ffi::c_ulong;
 }
 extern "C" {
     pub fn _copy_to_user(
-        arg1: *mut c_types::c_void,
-        arg2: *const c_types::c_void,
-        arg3: c_types::c_ulong,
-    ) -> c_types::c_ulong;
+        arg1: *mut core::ffi::c_void,
+        arg2: *const core::ffi::c_void,
+        arg3: core::ffi::c_ulong,
+    ) -> core::ffi::c_ulong;
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -9314,7 +9323,7 @@ pub struct css_set {
 #[derive(Debug, Copy, Clone)]
 pub struct assoc_array {
     pub root: *mut assoc_array_ptr,
-    pub nr_leaves_on_tree: c_types::c_ulong,
+    pub nr_leaves_on_tree: core::ffi::c_ulong,
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
 const _: () = {
@@ -9367,23 +9376,23 @@ impl Default for key_tag {
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub struct keyring_index_key {
-    pub hash: c_types::c_ulong,
+    pub hash: core::ffi::c_ulong,
     pub __bindgen_anon_1: keyring_index_key__bindgen_ty_1,
     pub type_: *mut key_type,
     pub domain_tag: *mut key_tag,
-    pub description: *const c_types::c_char,
+    pub description: *const core::ffi::c_char,
 }
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub union keyring_index_key__bindgen_ty_1 {
     pub __bindgen_anon_1: keyring_index_key__bindgen_ty_1__bindgen_ty_1,
-    pub x: c_types::c_ulong,
+    pub x: core::ffi::c_ulong,
 }
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
 pub struct keyring_index_key__bindgen_ty_1__bindgen_ty_1 {
     pub desc_len: u16_,
-    pub desc: [c_types::c_char; 6usize],
+    pub desc: [core::ffi::c_char; 6usize],
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
 const _: () = {
@@ -9439,8 +9448,8 @@ impl Default for keyring_index_key {
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub union key_payload {
-    pub rcu_data0: *mut c_types::c_void,
-    pub data: [*mut c_types::c_void; 4usize],
+    pub rcu_data0: *mut core::ffi::c_void,
+    pub data: [*mut core::ffi::c_void; 4usize],
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
 const _: () = {
@@ -9465,7 +9474,7 @@ pub type key_restrict_link_func_t = ::core::option::Option<
         type_: *const key_type,
         payload: *const key_payload,
         restriction_key: *mut key,
-    ) -> c_types::c_int,
+    ) -> core::ffi::c_int,
 >;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -9502,16 +9511,16 @@ pub struct key {
     pub __bindgen_anon_1: key__bindgen_ty_1,
     pub sem: rw_semaphore,
     pub user: *mut key_user,
-    pub security: *mut c_types::c_void,
+    pub security: *mut core::ffi::c_void,
     pub __bindgen_anon_2: key__bindgen_ty_2,
     pub last_used_at: time64_t,
     pub uid: kuid_t,
     pub gid: kgid_t,
     pub perm: key_perm_t,
-    pub quotalen: c_types::c_ushort,
-    pub datalen: c_types::c_ushort,
-    pub state: c_types::c_short,
-    pub flags: c_types::c_ulong,
+    pub quotalen: core::ffi::c_ushort,
+    pub datalen: core::ffi::c_ushort,
+    pub state: core::ffi::c_short,
+    pub flags: core::ffi::c_ulong,
     pub __bindgen_anon_3: key__bindgen_ty_3,
     pub __bindgen_anon_4: key__bindgen_ty_4,
     pub restrict_link: *mut key_restriction,
@@ -9573,11 +9582,11 @@ pub union key__bindgen_ty_3 {
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct key__bindgen_ty_3__bindgen_ty_1 {
-    pub hash: c_types::c_ulong,
-    pub len_desc: c_types::c_ulong,
+    pub hash: core::ffi::c_ulong,
+    pub len_desc: core::ffi::c_ulong,
     pub type_: *mut key_type,
     pub domain_tag: *mut key_tag,
-    pub description: *mut c_types::c_char,
+    pub description: *mut core::ffi::c_char,
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
 const _: () = {
@@ -9732,7 +9741,7 @@ impl Default for percpu_counter {
 pub struct user_struct {
     pub __count: refcount_t,
     pub epoll_watches: percpu_counter,
-    pub unix_inflight: c_types::c_ulong,
+    pub unix_inflight: core::ffi::c_ulong,
     pub pipe_bufs: atomic_long_t,
     pub uidhash_node: hlist_node,
     pub uid: kuid_t,
@@ -9772,7 +9781,7 @@ impl Default for user_struct {
 #[derive(Debug, Default)]
 pub struct group_info {
     pub usage: atomic_t,
-    pub ngroups: c_types::c_int,
+    pub ngroups: core::ffi::c_int,
     pub gid: __IncompleteArrayField<kgid_t>,
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
@@ -9788,8 +9797,8 @@ const _: () = {
 pub struct cred {
     pub usage: atomic_t,
     pub subscribers: atomic_t,
-    pub put_addr: *mut c_types::c_void,
-    pub magic: c_types::c_uint,
+    pub put_addr: *mut core::ffi::c_void,
+    pub magic: core::ffi::c_uint,
     pub uid: kuid_t,
     pub gid: kgid_t,
     pub suid: kuid_t,
@@ -9798,18 +9807,18 @@ pub struct cred {
     pub egid: kgid_t,
     pub fsuid: kuid_t,
     pub fsgid: kgid_t,
-    pub securebits: c_types::c_uint,
+    pub securebits: core::ffi::c_uint,
     pub cap_inheritable: kernel_cap_t,
     pub cap_permitted: kernel_cap_t,
     pub cap_effective: kernel_cap_t,
     pub cap_bset: kernel_cap_t,
     pub cap_ambient: kernel_cap_t,
-    pub jit_keyring: c_types::c_uchar,
+    pub jit_keyring: core::ffi::c_uchar,
     pub session_keyring: *mut key,
     pub process_keyring: *mut key,
     pub thread_keyring: *mut key,
     pub request_key_auth: *mut key,
-    pub security: *mut c_types::c_void,
+    pub security: *mut core::ffi::c_void,
     pub user: *mut user_struct,
     pub user_ns: *mut user_namespace,
     pub ucounts: *mut ucounts,
@@ -9819,7 +9828,7 @@ pub struct cred {
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub union cred__bindgen_ty_1 {
-    pub non_rcu: c_types::c_int,
+    pub non_rcu: core::ffi::c_int,
     pub rcu: callback_head,
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
@@ -9922,13 +9931,13 @@ impl Default for sighand_struct {
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
 pub struct pacct_struct {
-    pub ac_flag: c_types::c_int,
-    pub ac_exitcode: c_types::c_long,
-    pub ac_mem: c_types::c_ulong,
+    pub ac_flag: core::ffi::c_int,
+    pub ac_exitcode: core::ffi::c_long,
+    pub ac_mem: core::ffi::c_ulong,
     pub ac_utime: u64_,
     pub ac_stime: u64_,
-    pub ac_minflt: c_types::c_ulong,
-    pub ac_majflt: c_types::c_ulong,
+    pub ac_minflt: core::ffi::c_ulong,
+    pub ac_majflt: core::ffi::c_ulong,
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
 const _: () = {
@@ -10047,22 +10056,22 @@ impl Default for core_state {
 pub struct signal_struct {
     pub sigcnt: refcount_t,
     pub live: atomic_t,
-    pub nr_threads: c_types::c_int,
-    pub quick_threads: c_types::c_int,
+    pub nr_threads: core::ffi::c_int,
+    pub quick_threads: core::ffi::c_int,
     pub thread_head: list_head,
     pub wait_chldexit: wait_queue_head_t,
     pub curr_target: *mut task_struct,
     pub shared_pending: sigpending,
     pub multiprocess: hlist_head,
-    pub group_exit_code: c_types::c_int,
-    pub notify_count: c_types::c_int,
+    pub group_exit_code: core::ffi::c_int,
+    pub notify_count: core::ffi::c_int,
     pub group_exec_task: *mut task_struct,
-    pub group_stop_count: c_types::c_int,
-    pub flags: c_types::c_uint,
+    pub group_stop_count: core::ffi::c_int,
+    pub flags: core::ffi::c_uint,
     pub core_state: *mut core_state,
     pub _bitfield_align_1: [u8; 0],
     pub _bitfield_1: __BindgenBitfieldUnit<[u8; 1usize]>,
-    pub posix_timer_id: c_types::c_int,
+    pub posix_timer_id: core::ffi::c_int,
     pub posix_timers: list_head,
     pub real_timer: hrtimer,
     pub it_real_incr: ktime_t,
@@ -10071,7 +10080,7 @@ pub struct signal_struct {
     pub posix_cputimers: posix_cputimers,
     pub pids: [*mut pid; 4usize],
     pub tty_old_pgrp: *mut pid,
-    pub leader: c_types::c_int,
+    pub leader: core::ffi::c_int,
     pub tty: *mut tty_struct,
     pub stats_lock: seqlock_t,
     pub utime: u64_,
@@ -10081,30 +10090,30 @@ pub struct signal_struct {
     pub gtime: u64_,
     pub cgtime: u64_,
     pub prev_cputime: prev_cputime,
-    pub nvcsw: c_types::c_ulong,
-    pub nivcsw: c_types::c_ulong,
-    pub cnvcsw: c_types::c_ulong,
-    pub cnivcsw: c_types::c_ulong,
-    pub min_flt: c_types::c_ulong,
-    pub maj_flt: c_types::c_ulong,
-    pub cmin_flt: c_types::c_ulong,
-    pub cmaj_flt: c_types::c_ulong,
-    pub inblock: c_types::c_ulong,
-    pub oublock: c_types::c_ulong,
-    pub cinblock: c_types::c_ulong,
-    pub coublock: c_types::c_ulong,
-    pub maxrss: c_types::c_ulong,
-    pub cmaxrss: c_types::c_ulong,
+    pub nvcsw: core::ffi::c_ulong,
+    pub nivcsw: core::ffi::c_ulong,
+    pub cnvcsw: core::ffi::c_ulong,
+    pub cnivcsw: core::ffi::c_ulong,
+    pub min_flt: core::ffi::c_ulong,
+    pub maj_flt: core::ffi::c_ulong,
+    pub cmin_flt: core::ffi::c_ulong,
+    pub cmaj_flt: core::ffi::c_ulong,
+    pub inblock: core::ffi::c_ulong,
+    pub oublock: core::ffi::c_ulong,
+    pub cinblock: core::ffi::c_ulong,
+    pub coublock: core::ffi::c_ulong,
+    pub maxrss: core::ffi::c_ulong,
+    pub cmaxrss: core::ffi::c_ulong,
     pub ioac: task_io_accounting,
-    pub sum_sched_runtime: c_types::c_ulonglong,
+    pub sum_sched_runtime: core::ffi::c_ulonglong,
     pub rlim: [rlimit; 16usize],
     pub pacct: pacct_struct,
     pub stats: *mut taskstats,
-    pub audit_tty: c_types::c_uint,
+    pub audit_tty: core::ffi::c_uint,
     pub tty_audit_buf: *mut tty_audit_buf,
     pub oom_flag_origin: bool_,
-    pub oom_score_adj: c_types::c_short,
-    pub oom_score_adj_min: c_types::c_short,
+    pub oom_score_adj: core::ffi::c_short,
+    pub oom_score_adj_min: core::ffi::c_short,
     pub oom_mm: *mut mm_struct,
     pub cred_guard_mutex: mutex,
     pub exec_update_lock: rw_semaphore,
@@ -10244,22 +10253,22 @@ impl Default for signal_struct {
 }
 impl signal_struct {
     #[inline]
-    pub fn is_child_subreaper(&self) -> c_types::c_uint {
+    pub fn is_child_subreaper(&self) -> core::ffi::c_uint {
         unsafe { ::core::mem::transmute(self._bitfield_1.get(0usize, 1u8) as u32) }
     }
     #[inline]
-    pub fn set_is_child_subreaper(&mut self, val: c_types::c_uint) {
+    pub fn set_is_child_subreaper(&mut self, val: core::ffi::c_uint) {
         unsafe {
             let val: u32 = ::core::mem::transmute(val);
             self._bitfield_1.set(0usize, 1u8, val as u64)
         }
     }
     #[inline]
-    pub fn has_child_subreaper(&self) -> c_types::c_uint {
+    pub fn has_child_subreaper(&self) -> core::ffi::c_uint {
         unsafe { ::core::mem::transmute(self._bitfield_1.get(1usize, 1u8) as u32) }
     }
     #[inline]
-    pub fn set_has_child_subreaper(&mut self, val: c_types::c_uint) {
+    pub fn set_has_child_subreaper(&mut self, val: core::ffi::c_uint) {
         unsafe {
             let val: u32 = ::core::mem::transmute(val);
             self._bitfield_1.set(1usize, 1u8, val as u64)
@@ -10267,8 +10276,8 @@ impl signal_struct {
     }
     #[inline]
     pub fn new_bitfield_1(
-        is_child_subreaper: c_types::c_uint,
-        has_child_subreaper: c_types::c_uint,
+        is_child_subreaper: core::ffi::c_uint,
+        has_child_subreaper: core::ffi::c_uint,
     ) -> __BindgenBitfieldUnit<[u8; 1usize]> {
         let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 1usize]> = Default::default();
         __bindgen_bitfield_unit.set(0usize, 1u8, {
@@ -10305,8 +10314,8 @@ impl Default for rcuwait {
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub struct rcu_sync {
-    pub gp_state: c_types::c_int,
-    pub gp_count: c_types::c_int,
+    pub gp_state: core::ffi::c_int,
+    pub gp_count: core::ffi::c_int,
     pub gp_wait: wait_queue_head_t,
     pub cb_head: callback_head,
 }
@@ -10332,7 +10341,7 @@ impl Default for rcu_sync {
 #[derive(Copy, Clone)]
 pub struct percpu_rw_semaphore {
     pub rss: rcu_sync,
-    pub read_count: *mut c_types::c_uint,
+    pub read_count: *mut core::ffi::c_uint,
     pub writer: rcuwait,
     pub waiters: wait_queue_head_t,
     pub block: atomic_t,
@@ -10364,8 +10373,8 @@ impl Default for percpu_rw_semaphore {
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct delayed_call {
-    pub fn_: ::core::option::Option<unsafe extern "C" fn(arg1: *mut c_types::c_void)>,
-    pub arg: *mut c_types::c_void,
+    pub fn_: ::core::option::Option<unsafe extern "C" fn(arg1: *mut core::ffi::c_void)>,
+    pub arg: *mut core::ffi::c_void,
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
 const _: () = {
@@ -10400,7 +10409,7 @@ pub type errseq_t = u32_;
 pub struct io_context {
     pub refcount: atomic_long_t,
     pub active_ref: atomic_t,
-    pub ioprio: c_types::c_ushort,
+    pub ioprio: core::ffi::c_ushort,
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
 const _: () = {
@@ -10417,7 +10426,7 @@ const _: () = {
 pub struct vfsmount {
     pub mnt_root: *mut dentry,
     pub mnt_sb: *mut super_block,
-    pub mnt_flags: c_types::c_int,
+    pub mnt_flags: core::ffi::c_int,
     pub mnt_userns: *mut user_namespace,
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
@@ -10469,13 +10478,13 @@ pub struct vm_struct {
 }
 extern "C" {
     pub fn krealloc(
-        objp: *const c_types::c_void,
+        objp: *const core::ffi::c_void,
         new_size: usize,
         flags: gfp_t,
-    ) -> *mut c_types::c_void;
+    ) -> *mut core::ffi::c_void;
 }
 extern "C" {
-    pub fn kfree(objp: *const c_types::c_void);
+    pub fn kfree(objp: *const core::ffi::c_void);
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -10525,7 +10534,7 @@ pub struct fileattr {
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub struct iattr {
-    pub ia_valid: c_types::c_uint,
+    pub ia_valid: core::ffi::c_uint,
     pub ia_mode: umode_t,
     pub __bindgen_anon_1: iattr__bindgen_ty_1,
     pub __bindgen_anon_2: iattr__bindgen_ty_2,
@@ -10619,8 +10628,8 @@ const _: () = {
 pub const quota_type_USRQUOTA: quota_type = 0;
 pub const quota_type_GRPQUOTA: quota_type = 1;
 pub const quota_type_PRJQUOTA: quota_type = 2;
-pub type quota_type = c_types::c_uint;
-pub type qsize_t = c_types::c_longlong;
+pub type quota_type = core::ffi::c_uint;
+pub type qsize_t = core::ffi::c_longlong;
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub struct kqid {
@@ -10709,14 +10718,14 @@ const _: () = {
 #[derive(Debug, Copy, Clone)]
 pub struct mem_dqinfo {
     pub dqi_format: *mut quota_format_type,
-    pub dqi_fmt_id: c_types::c_int,
+    pub dqi_fmt_id: core::ffi::c_int,
     pub dqi_dirty_list: list_head,
-    pub dqi_flags: c_types::c_ulong,
-    pub dqi_bgrace: c_types::c_uint,
-    pub dqi_igrace: c_types::c_uint,
+    pub dqi_flags: core::ffi::c_ulong,
+    pub dqi_bgrace: core::ffi::c_uint,
+    pub dqi_igrace: core::ffi::c_uint,
     pub dqi_max_spc_limit: qsize_t,
     pub dqi_max_ino_limit: qsize_t,
-    pub dqi_priv: *mut c_types::c_void,
+    pub dqi_priv: *mut core::ffi::c_void,
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
 const _: () = {
@@ -10763,7 +10772,7 @@ pub struct dquot {
     pub dq_sb: *mut super_block,
     pub dq_id: kqid,
     pub dq_off: loff_t,
-    pub dq_flags: c_types::c_ulong,
+    pub dq_flags: core::ffi::c_ulong,
     pub dq_dqb: mem_dqblk,
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
@@ -10796,25 +10805,25 @@ impl Default for dquot {
 #[derive(Debug, Default, Copy, Clone)]
 pub struct quota_format_ops {
     pub check_quota_file: ::core::option::Option<
-        unsafe extern "C" fn(sb: *mut super_block, type_: c_types::c_int) -> c_types::c_int,
+        unsafe extern "C" fn(sb: *mut super_block, type_: core::ffi::c_int) -> core::ffi::c_int,
     >,
     pub read_file_info: ::core::option::Option<
-        unsafe extern "C" fn(sb: *mut super_block, type_: c_types::c_int) -> c_types::c_int,
+        unsafe extern "C" fn(sb: *mut super_block, type_: core::ffi::c_int) -> core::ffi::c_int,
     >,
     pub write_file_info: ::core::option::Option<
-        unsafe extern "C" fn(sb: *mut super_block, type_: c_types::c_int) -> c_types::c_int,
+        unsafe extern "C" fn(sb: *mut super_block, type_: core::ffi::c_int) -> core::ffi::c_int,
     >,
     pub free_file_info: ::core::option::Option<
-        unsafe extern "C" fn(sb: *mut super_block, type_: c_types::c_int) -> c_types::c_int,
+        unsafe extern "C" fn(sb: *mut super_block, type_: core::ffi::c_int) -> core::ffi::c_int,
     >,
     pub read_dqblk:
-        ::core::option::Option<unsafe extern "C" fn(dquot: *mut dquot) -> c_types::c_int>,
+        ::core::option::Option<unsafe extern "C" fn(dquot: *mut dquot) -> core::ffi::c_int>,
     pub commit_dqblk:
-        ::core::option::Option<unsafe extern "C" fn(dquot: *mut dquot) -> c_types::c_int>,
+        ::core::option::Option<unsafe extern "C" fn(dquot: *mut dquot) -> core::ffi::c_int>,
     pub release_dqblk:
-        ::core::option::Option<unsafe extern "C" fn(dquot: *mut dquot) -> c_types::c_int>,
+        ::core::option::Option<unsafe extern "C" fn(dquot: *mut dquot) -> core::ffi::c_int>,
     pub get_next_id: ::core::option::Option<
-        unsafe extern "C" fn(sb: *mut super_block, qid: *mut kqid) -> c_types::c_int,
+        unsafe extern "C" fn(sb: *mut super_block, qid: *mut kqid) -> core::ffi::c_int,
     >,
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
@@ -10842,30 +10851,30 @@ const _: () = {
 #[derive(Debug, Default, Copy, Clone)]
 pub struct dquot_operations {
     pub write_dquot:
-        ::core::option::Option<unsafe extern "C" fn(arg1: *mut dquot) -> c_types::c_int>,
+        ::core::option::Option<unsafe extern "C" fn(arg1: *mut dquot) -> core::ffi::c_int>,
     pub alloc_dquot: ::core::option::Option<
-        unsafe extern "C" fn(arg1: *mut super_block, arg2: c_types::c_int) -> *mut dquot,
+        unsafe extern "C" fn(arg1: *mut super_block, arg2: core::ffi::c_int) -> *mut dquot,
     >,
     pub destroy_dquot: ::core::option::Option<unsafe extern "C" fn(arg1: *mut dquot)>,
     pub acquire_dquot:
-        ::core::option::Option<unsafe extern "C" fn(arg1: *mut dquot) -> c_types::c_int>,
+        ::core::option::Option<unsafe extern "C" fn(arg1: *mut dquot) -> core::ffi::c_int>,
     pub release_dquot:
-        ::core::option::Option<unsafe extern "C" fn(arg1: *mut dquot) -> c_types::c_int>,
+        ::core::option::Option<unsafe extern "C" fn(arg1: *mut dquot) -> core::ffi::c_int>,
     pub mark_dirty:
-        ::core::option::Option<unsafe extern "C" fn(arg1: *mut dquot) -> c_types::c_int>,
+        ::core::option::Option<unsafe extern "C" fn(arg1: *mut dquot) -> core::ffi::c_int>,
     pub write_info: ::core::option::Option<
-        unsafe extern "C" fn(arg1: *mut super_block, arg2: c_types::c_int) -> c_types::c_int,
+        unsafe extern "C" fn(arg1: *mut super_block, arg2: core::ffi::c_int) -> core::ffi::c_int,
     >,
     pub get_reserved_space:
         ::core::option::Option<unsafe extern "C" fn(arg1: *mut inode) -> *mut qsize_t>,
     pub get_projid: ::core::option::Option<
-        unsafe extern "C" fn(arg1: *mut inode, arg2: *mut kprojid_t) -> c_types::c_int,
+        unsafe extern "C" fn(arg1: *mut inode, arg2: *mut kprojid_t) -> core::ffi::c_int,
     >,
     pub get_inode_usage: ::core::option::Option<
-        unsafe extern "C" fn(arg1: *mut inode, arg2: *mut qsize_t) -> c_types::c_int,
+        unsafe extern "C" fn(arg1: *mut inode, arg2: *mut qsize_t) -> core::ffi::c_int,
     >,
     pub get_next_id: ::core::option::Option<
-        unsafe extern "C" fn(sb: *mut super_block, qid: *mut kqid) -> c_types::c_int,
+        unsafe extern "C" fn(sb: *mut super_block, qid: *mut kqid) -> core::ffi::c_int,
     >,
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
@@ -10898,7 +10907,7 @@ const _: () = {
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
 pub struct qc_dqblk {
-    pub d_fieldmask: c_types::c_int,
+    pub d_fieldmask: core::ffi::c_int,
     pub d_spc_hardlimit: u64_,
     pub d_spc_softlimit: u64_,
     pub d_ino_hardlimit: u64_,
@@ -10907,13 +10916,13 @@ pub struct qc_dqblk {
     pub d_ino_count: u64_,
     pub d_ino_timer: s64,
     pub d_spc_timer: s64,
-    pub d_ino_warns: c_types::c_int,
-    pub d_spc_warns: c_types::c_int,
+    pub d_ino_warns: core::ffi::c_int,
+    pub d_spc_warns: core::ffi::c_int,
     pub d_rt_spc_hardlimit: u64_,
     pub d_rt_spc_softlimit: u64_,
     pub d_rt_space: u64_,
     pub d_rt_spc_timer: s64,
-    pub d_rt_spc_warns: c_types::c_int,
+    pub d_rt_spc_warns: core::ffi::c_int,
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
 const _: () = {
@@ -10954,14 +10963,14 @@ const _: () = {
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
 pub struct qc_type_state {
-    pub flags: c_types::c_uint,
-    pub spc_timelimit: c_types::c_uint,
-    pub ino_timelimit: c_types::c_uint,
-    pub rt_spc_timelimit: c_types::c_uint,
-    pub spc_warnlimit: c_types::c_uint,
-    pub ino_warnlimit: c_types::c_uint,
-    pub rt_spc_warnlimit: c_types::c_uint,
-    pub ino: c_types::c_ulonglong,
+    pub flags: core::ffi::c_uint,
+    pub spc_timelimit: core::ffi::c_uint,
+    pub ino_timelimit: core::ffi::c_uint,
+    pub rt_spc_timelimit: core::ffi::c_uint,
+    pub spc_warnlimit: core::ffi::c_uint,
+    pub ino_warnlimit: core::ffi::c_uint,
+    pub rt_spc_warnlimit: core::ffi::c_uint,
+    pub ino: core::ffi::c_ulonglong,
     pub blocks: blkcnt_t,
     pub nextents: blkcnt_t,
 }
@@ -10992,7 +11001,7 @@ const _: () = {
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
 pub struct qc_state {
-    pub s_incoredqs: c_types::c_uint,
+    pub s_incoredqs: core::ffi::c_uint,
     pub s_state: [qc_type_state; 3usize],
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
@@ -11006,14 +11015,14 @@ const _: () = {
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
 pub struct qc_info {
-    pub i_fieldmask: c_types::c_int,
-    pub i_flags: c_types::c_uint,
-    pub i_spc_timelimit: c_types::c_uint,
-    pub i_ino_timelimit: c_types::c_uint,
-    pub i_rt_spc_timelimit: c_types::c_uint,
-    pub i_spc_warnlimit: c_types::c_uint,
-    pub i_ino_warnlimit: c_types::c_uint,
-    pub i_rt_spc_warnlimit: c_types::c_uint,
+    pub i_fieldmask: core::ffi::c_int,
+    pub i_flags: core::ffi::c_uint,
+    pub i_spc_timelimit: core::ffi::c_uint,
+    pub i_ino_timelimit: core::ffi::c_uint,
+    pub i_rt_spc_timelimit: core::ffi::c_uint,
+    pub i_spc_warnlimit: core::ffi::c_uint,
+    pub i_ino_warnlimit: core::ffi::c_uint,
+    pub i_rt_spc_warnlimit: core::ffi::c_uint,
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
 const _: () = {
@@ -11041,56 +11050,56 @@ pub struct quotactl_ops {
     pub quota_on: ::core::option::Option<
         unsafe extern "C" fn(
             arg1: *mut super_block,
-            arg2: c_types::c_int,
-            arg3: c_types::c_int,
+            arg2: core::ffi::c_int,
+            arg3: core::ffi::c_int,
             arg4: *const path,
-        ) -> c_types::c_int,
+        ) -> core::ffi::c_int,
     >,
     pub quota_off: ::core::option::Option<
-        unsafe extern "C" fn(arg1: *mut super_block, arg2: c_types::c_int) -> c_types::c_int,
+        unsafe extern "C" fn(arg1: *mut super_block, arg2: core::ffi::c_int) -> core::ffi::c_int,
     >,
     pub quota_enable: ::core::option::Option<
-        unsafe extern "C" fn(arg1: *mut super_block, arg2: c_types::c_uint) -> c_types::c_int,
+        unsafe extern "C" fn(arg1: *mut super_block, arg2: core::ffi::c_uint) -> core::ffi::c_int,
     >,
     pub quota_disable: ::core::option::Option<
-        unsafe extern "C" fn(arg1: *mut super_block, arg2: c_types::c_uint) -> c_types::c_int,
+        unsafe extern "C" fn(arg1: *mut super_block, arg2: core::ffi::c_uint) -> core::ffi::c_int,
     >,
     pub quota_sync: ::core::option::Option<
-        unsafe extern "C" fn(arg1: *mut super_block, arg2: c_types::c_int) -> c_types::c_int,
+        unsafe extern "C" fn(arg1: *mut super_block, arg2: core::ffi::c_int) -> core::ffi::c_int,
     >,
     pub set_info: ::core::option::Option<
         unsafe extern "C" fn(
             arg1: *mut super_block,
-            arg2: c_types::c_int,
+            arg2: core::ffi::c_int,
             arg3: *mut qc_info,
-        ) -> c_types::c_int,
+        ) -> core::ffi::c_int,
     >,
     pub get_dqblk: ::core::option::Option<
         unsafe extern "C" fn(
             arg1: *mut super_block,
             arg2: kqid,
             arg3: *mut qc_dqblk,
-        ) -> c_types::c_int,
+        ) -> core::ffi::c_int,
     >,
     pub get_nextdqblk: ::core::option::Option<
         unsafe extern "C" fn(
             arg1: *mut super_block,
             arg2: *mut kqid,
             arg3: *mut qc_dqblk,
-        ) -> c_types::c_int,
+        ) -> core::ffi::c_int,
     >,
     pub set_dqblk: ::core::option::Option<
         unsafe extern "C" fn(
             arg1: *mut super_block,
             arg2: kqid,
             arg3: *mut qc_dqblk,
-        ) -> c_types::c_int,
+        ) -> core::ffi::c_int,
     >,
     pub get_state: ::core::option::Option<
-        unsafe extern "C" fn(arg1: *mut super_block, arg2: *mut qc_state) -> c_types::c_int,
+        unsafe extern "C" fn(arg1: *mut super_block, arg2: *mut qc_state) -> core::ffi::c_int,
     >,
     pub rm_xquota: ::core::option::Option<
-        unsafe extern "C" fn(arg1: *mut super_block, arg2: c_types::c_uint) -> c_types::c_int,
+        unsafe extern "C" fn(arg1: *mut super_block, arg2: core::ffi::c_uint) -> core::ffi::c_int,
     >,
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
@@ -11123,7 +11132,7 @@ const _: () = {
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct quota_format_type {
-    pub qf_fmt_id: c_types::c_int,
+    pub qf_fmt_id: core::ffi::c_int,
     pub qf_ops: *const quota_format_ops,
     pub qf_owner: *mut module,
     pub qf_next: *mut quota_format_type,
@@ -11153,7 +11162,7 @@ impl Default for quota_format_type {
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub struct quota_info {
-    pub flags: c_types::c_uint,
+    pub flags: core::ffi::c_uint,
     pub dqio_sem: rw_semaphore,
     pub files: [*mut inode; 3usize],
     pub info: [mem_dqinfo; 3usize],
@@ -11195,9 +11204,9 @@ pub struct kiocb {
     pub ki_filp: *mut file,
     pub ki_pos: loff_t,
     pub ki_complete:
-        ::core::option::Option<unsafe extern "C" fn(iocb: *mut kiocb, ret: c_types::c_long)>,
-    pub private: *mut c_types::c_void,
-    pub ki_flags: c_types::c_int,
+        ::core::option::Option<unsafe extern "C" fn(iocb: *mut kiocb, ret: core::ffi::c_long)>,
+    pub private: *mut core::ffi::c_void,
+    pub ki_flags: core::ffi::c_int,
     pub ki_ioprio: u16_,
     pub ki_waitq: *mut wait_page_queue,
 }
@@ -11226,16 +11235,16 @@ impl Default for kiocb {
 #[derive(Debug, Default, Copy, Clone)]
 pub struct address_space_operations {
     pub writepage: ::core::option::Option<
-        unsafe extern "C" fn(page: *mut page, wbc: *mut writeback_control) -> c_types::c_int,
+        unsafe extern "C" fn(page: *mut page, wbc: *mut writeback_control) -> core::ffi::c_int,
     >,
     pub read_folio: ::core::option::Option<
-        unsafe extern "C" fn(arg1: *mut file, arg2: *mut folio) -> c_types::c_int,
+        unsafe extern "C" fn(arg1: *mut file, arg2: *mut folio) -> core::ffi::c_int,
     >,
     pub writepages: ::core::option::Option<
         unsafe extern "C" fn(
             arg1: *mut address_space,
             arg2: *mut writeback_control,
-        ) -> c_types::c_int,
+        ) -> core::ffi::c_int,
     >,
     pub dirty_folio: ::core::option::Option<
         unsafe extern "C" fn(arg1: *mut address_space, arg2: *mut folio) -> bool_,
@@ -11246,21 +11255,21 @@ pub struct address_space_operations {
             arg1: *mut file,
             mapping: *mut address_space,
             pos: loff_t,
-            len: c_types::c_uint,
+            len: core::ffi::c_uint,
             pagep: *mut *mut page,
-            fsdata: *mut *mut c_types::c_void,
-        ) -> c_types::c_int,
+            fsdata: *mut *mut core::ffi::c_void,
+        ) -> core::ffi::c_int,
     >,
     pub write_end: ::core::option::Option<
         unsafe extern "C" fn(
             arg1: *mut file,
             mapping: *mut address_space,
             pos: loff_t,
-            len: c_types::c_uint,
-            copied: c_types::c_uint,
+            len: core::ffi::c_uint,
+            copied: core::ffi::c_uint,
             page: *mut page,
-            fsdata: *mut c_types::c_void,
-        ) -> c_types::c_int,
+            fsdata: *mut core::ffi::c_void,
+        ) -> core::ffi::c_int,
     >,
     pub bmap: ::core::option::Option<
         unsafe extern "C" fn(arg1: *mut address_space, arg2: sector_t) -> sector_t,
@@ -11279,10 +11288,10 @@ pub struct address_space_operations {
             dst: *mut folio,
             src: *mut folio,
             arg2: migrate_mode,
-        ) -> c_types::c_int,
+        ) -> core::ffi::c_int,
     >,
     pub launder_folio:
-        ::core::option::Option<unsafe extern "C" fn(arg1: *mut folio) -> c_types::c_int>,
+        ::core::option::Option<unsafe extern "C" fn(arg1: *mut folio) -> core::ffi::c_int>,
     pub is_partially_uptodate: ::core::option::Option<
         unsafe extern "C" fn(arg1: *mut folio, from: usize, count: usize) -> bool_,
     >,
@@ -11290,18 +11299,18 @@ pub struct address_space_operations {
         unsafe extern "C" fn(arg1: *mut folio, dirty: *mut bool_, wb: *mut bool_),
     >,
     pub error_remove_page: ::core::option::Option<
-        unsafe extern "C" fn(arg1: *mut address_space, arg2: *mut page) -> c_types::c_int,
+        unsafe extern "C" fn(arg1: *mut address_space, arg2: *mut page) -> core::ffi::c_int,
     >,
     pub swap_activate: ::core::option::Option<
         unsafe extern "C" fn(
             sis: *mut swap_info_struct,
             file: *mut file,
             span: *mut sector_t,
-        ) -> c_types::c_int,
+        ) -> core::ffi::c_int,
     >,
     pub swap_deactivate: ::core::option::Option<unsafe extern "C" fn(file: *mut file)>,
     pub swap_rw: ::core::option::Option<
-        unsafe extern "C" fn(iocb: *mut kiocb, iter: *mut iov_iter) -> c_types::c_int,
+        unsafe extern "C" fn(iocb: *mut kiocb, iter: *mut iov_iter) -> core::ffi::c_int,
     >,
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
@@ -11362,14 +11371,14 @@ pub struct address_space {
     pub i_mmap_writable: atomic_t,
     pub i_mmap: rb_root_cached,
     pub i_mmap_rwsem: rw_semaphore,
-    pub nrpages: c_types::c_ulong,
-    pub writeback_index: c_types::c_ulong,
+    pub nrpages: core::ffi::c_ulong,
+    pub writeback_index: core::ffi::c_ulong,
     pub a_ops: *const address_space_operations,
-    pub flags: c_types::c_ulong,
+    pub flags: core::ffi::c_ulong,
     pub wb_err: errseq_t,
     pub private_lock: spinlock_t,
     pub private_list: list_head,
-    pub private_data: *mut c_types::c_void,
+    pub private_data: *mut core::ffi::c_void,
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
 const _: () = {
@@ -11428,17 +11437,17 @@ pub struct fsnotify_mark_connector {
 #[derive(Copy, Clone)]
 pub struct inode {
     pub i_mode: umode_t,
-    pub i_opflags: c_types::c_ushort,
+    pub i_opflags: core::ffi::c_ushort,
     pub i_uid: kuid_t,
     pub i_gid: kgid_t,
-    pub i_flags: c_types::c_uint,
+    pub i_flags: core::ffi::c_uint,
     pub i_acl: *mut posix_acl,
     pub i_default_acl: *mut posix_acl,
     pub i_op: *const inode_operations,
     pub i_sb: *mut super_block,
     pub i_mapping: *mut address_space,
-    pub i_security: *mut c_types::c_void,
-    pub i_ino: c_types::c_ulong,
+    pub i_security: *mut core::ffi::c_void,
+    pub i_ino: core::ffi::c_ulong,
     pub __bindgen_anon_1: inode__bindgen_ty_1,
     pub i_rdev: dev_t,
     pub i_size: loff_t,
@@ -11446,18 +11455,18 @@ pub struct inode {
     pub i_mtime: timespec64,
     pub i_ctime: timespec64,
     pub i_lock: spinlock_t,
-    pub i_bytes: c_types::c_ushort,
+    pub i_bytes: core::ffi::c_ushort,
     pub i_blkbits: u8_,
     pub i_write_hint: u8_,
     pub i_blocks: blkcnt_t,
-    pub i_state: c_types::c_ulong,
+    pub i_state: core::ffi::c_ulong,
     pub i_rwsem: rw_semaphore,
-    pub dirtied_when: c_types::c_ulong,
-    pub dirtied_time_when: c_types::c_ulong,
+    pub dirtied_when: core::ffi::c_ulong,
+    pub dirtied_time_when: core::ffi::c_ulong,
     pub i_hash: hlist_node,
     pub i_io_list: list_head,
     pub i_wb: *mut bdi_writeback,
-    pub i_wb_frn_winner: c_types::c_int,
+    pub i_wb_frn_winner: core::ffi::c_int,
     pub i_wb_frn_avg_time: u16_,
     pub i_wb_frn_history: u16_,
     pub i_lru: list_head,
@@ -11478,13 +11487,13 @@ pub struct inode {
     pub i_generation: __u32,
     pub i_fsnotify_mask: __u32,
     pub i_fsnotify_marks: *mut fsnotify_mark_connector,
-    pub i_private: *mut c_types::c_void,
+    pub i_private: *mut core::ffi::c_void,
 }
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub union inode__bindgen_ty_1 {
-    pub i_nlink: c_types::c_uint,
-    pub __i_nlink: c_types::c_uint,
+    pub i_nlink: core::ffi::c_uint,
+    pub __i_nlink: core::ffi::c_uint,
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
 const _: () = {
@@ -11557,8 +11566,8 @@ impl Default for inode__bindgen_ty_3 {
 pub union inode__bindgen_ty_4 {
     pub i_pipe: *mut pipe_inode_info,
     pub i_cdev: *mut cdev,
-    pub i_link: *mut c_types::c_char,
-    pub i_dir_seq: c_types::c_uint,
+    pub i_link: *mut core::ffi::c_char,
+    pub i_dir_seq: core::ffi::c_uint,
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
 const _: () = {
@@ -11663,7 +11672,7 @@ pub struct fown_struct {
     pub pid_type: pid_type,
     pub uid: kuid_t,
     pub euid: kuid_t,
-    pub signum: c_types::c_int,
+    pub signum: core::ffi::c_int,
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
 const _: () = {
@@ -11691,11 +11700,11 @@ impl Default for fown_struct {
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
 pub struct file_ra_state {
-    pub start: c_types::c_ulong,
-    pub size: c_types::c_uint,
-    pub async_size: c_types::c_uint,
-    pub ra_pages: c_types::c_uint,
-    pub mmap_miss: c_types::c_uint,
+    pub start: core::ffi::c_ulong,
+    pub size: core::ffi::c_uint,
+    pub async_size: core::ffi::c_uint,
+    pub ra_pages: core::ffi::c_uint,
+    pub mmap_miss: core::ffi::c_uint,
     pub prev_pos: loff_t,
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
@@ -11723,7 +11732,7 @@ pub struct file {
     pub f_op: *const file_operations,
     pub f_lock: spinlock_t,
     pub f_count: atomic_long_t,
-    pub f_flags: c_types::c_uint,
+    pub f_flags: core::ffi::c_uint,
     pub f_mode: fmode_t,
     pub f_pos_lock: mutex,
     pub f_pos: loff_t,
@@ -11731,8 +11740,8 @@ pub struct file {
     pub f_cred: *const cred,
     pub f_ra: file_ra_state,
     pub f_version: u64_,
-    pub f_security: *mut c_types::c_void,
-    pub private_data: *mut c_types::c_void,
+    pub f_security: *mut core::ffi::c_void,
+    pub private_data: *mut core::ffi::c_void,
     pub f_ep: *mut hlist_head,
     pub f_mapping: *mut address_space,
     pub f_wb_err: errseq_t,
@@ -11743,7 +11752,7 @@ pub struct file {
 pub union file__bindgen_ty_1 {
     pub f_llist: llist_node,
     pub f_rcuhead: callback_head,
-    pub f_iocb_flags: c_types::c_uint,
+    pub f_iocb_flags: core::ffi::c_uint,
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
 const _: () = {
@@ -11798,7 +11807,7 @@ impl Default for file {
         }
     }
 }
-pub type fl_owner_t = *mut c_types::c_void;
+pub type fl_owner_t = *mut core::ffi::c_void;
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
 pub struct file_lock_operations {
@@ -11818,23 +11827,23 @@ const _: () = {
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct lock_manager_operations {
-    pub lm_mod_owner: *mut c_types::c_void,
+    pub lm_mod_owner: *mut core::ffi::c_void,
     pub lm_get_owner: ::core::option::Option<unsafe extern "C" fn(arg1: fl_owner_t) -> fl_owner_t>,
     pub lm_put_owner: ::core::option::Option<unsafe extern "C" fn(arg1: fl_owner_t)>,
     pub lm_notify: ::core::option::Option<unsafe extern "C" fn(arg1: *mut file_lock)>,
     pub lm_grant: ::core::option::Option<
-        unsafe extern "C" fn(arg1: *mut file_lock, arg2: c_types::c_int) -> c_types::c_int,
+        unsafe extern "C" fn(arg1: *mut file_lock, arg2: core::ffi::c_int) -> core::ffi::c_int,
     >,
     pub lm_break: ::core::option::Option<unsafe extern "C" fn(arg1: *mut file_lock) -> bool_>,
     pub lm_change: ::core::option::Option<
         unsafe extern "C" fn(
             arg1: *mut file_lock,
-            arg2: c_types::c_int,
+            arg2: core::ffi::c_int,
             arg3: *mut list_head,
-        ) -> c_types::c_int,
+        ) -> core::ffi::c_int,
     >,
     pub lm_setup: ::core::option::Option<
-        unsafe extern "C" fn(arg1: *mut file_lock, arg2: *mut *mut c_types::c_void),
+        unsafe extern "C" fn(arg1: *mut file_lock, arg2: *mut *mut core::ffi::c_void),
     >,
     pub lm_breaker_owns_lease:
         ::core::option::Option<unsafe extern "C" fn(arg1: *mut file_lock) -> bool_>,
@@ -11947,17 +11956,17 @@ pub struct file_lock {
     pub fl_blocked_requests: list_head,
     pub fl_blocked_member: list_head,
     pub fl_owner: fl_owner_t,
-    pub fl_flags: c_types::c_uint,
-    pub fl_type: c_types::c_uchar,
-    pub fl_pid: c_types::c_uint,
-    pub fl_link_cpu: c_types::c_int,
+    pub fl_flags: core::ffi::c_uint,
+    pub fl_type: core::ffi::c_uchar,
+    pub fl_pid: core::ffi::c_uint,
+    pub fl_link_cpu: core::ffi::c_int,
     pub fl_wait: wait_queue_head_t,
     pub fl_file: *mut file,
     pub fl_start: loff_t,
     pub fl_end: loff_t,
     pub fl_fasync: *mut fasync_struct,
-    pub fl_break_time: c_types::c_ulong,
-    pub fl_downgrade_time: c_types::c_ulong,
+    pub fl_break_time: core::ffi::c_ulong,
+    pub fl_downgrade_time: core::ffi::c_ulong,
     pub fl_ops: *const file_lock_operations,
     pub fl_lmops: *const lock_manager_operations,
     pub fl_u: file_lock__bindgen_ty_1,
@@ -11973,8 +11982,8 @@ pub union file_lock__bindgen_ty_1 {
 #[derive(Debug, Copy, Clone)]
 pub struct file_lock__bindgen_ty_1__bindgen_ty_1 {
     pub link: list_head,
-    pub state: c_types::c_int,
-    pub debug_id: c_types::c_uint,
+    pub state: core::ffi::c_int,
+    pub debug_id: core::ffi::c_uint,
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
 const _: () = {
@@ -12104,8 +12113,8 @@ pub struct files_struct {
 #[derive(Copy, Clone)]
 pub struct fasync_struct {
     pub fa_lock: rwlock_t,
-    pub magic: c_types::c_int,
-    pub fa_fd: c_types::c_int,
+    pub magic: core::ffi::c_int,
+    pub fa_fd: core::ffi::c_int,
     pub fa_next: *mut fasync_struct,
     pub fa_file: *mut file,
     pub fa_rcu: callback_head,
@@ -12139,7 +12148,7 @@ impl Default for fasync_struct {
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub struct sb_writers {
-    pub frozen: c_types::c_int,
+    pub frozen: core::ffi::c_int,
     pub wait_unfrozen: wait_queue_head_t,
     pub rw_sem: [percpu_rw_semaphore; 3usize],
 }
@@ -12167,22 +12176,22 @@ impl Default for sb_writers {
 pub struct super_block {
     pub s_list: list_head,
     pub s_dev: dev_t,
-    pub s_blocksize_bits: c_types::c_uchar,
-    pub s_blocksize: c_types::c_ulong,
+    pub s_blocksize_bits: core::ffi::c_uchar,
+    pub s_blocksize: core::ffi::c_ulong,
     pub s_maxbytes: loff_t,
     pub s_type: *mut file_system_type,
     pub s_op: *const super_operations,
     pub dq_op: *const dquot_operations,
     pub s_qcop: *const quotactl_ops,
     pub s_export_op: *const export_operations,
-    pub s_flags: c_types::c_ulong,
-    pub s_iflags: c_types::c_ulong,
-    pub s_magic: c_types::c_ulong,
+    pub s_flags: core::ffi::c_ulong,
+    pub s_iflags: core::ffi::c_ulong,
+    pub s_magic: core::ffi::c_ulong,
     pub s_root: *mut dentry,
     pub s_umount: rw_semaphore,
-    pub s_count: c_types::c_int,
+    pub s_count: core::ffi::c_int,
     pub s_active: atomic_t,
-    pub s_security: *mut c_types::c_void,
+    pub s_security: *mut core::ffi::c_void,
     pub s_xattr: *mut *mut xattr_handler,
     pub s_roots: hlist_bl_head,
     pub s_mounts: list_head,
@@ -12190,26 +12199,26 @@ pub struct super_block {
     pub s_bdi: *mut backing_dev_info,
     pub s_mtd: *mut mtd_info,
     pub s_instances: hlist_node,
-    pub s_quota_types: c_types::c_uint,
+    pub s_quota_types: core::ffi::c_uint,
     pub s_dquot: quota_info,
     pub s_writers: sb_writers,
-    pub s_fs_info: *mut c_types::c_void,
+    pub s_fs_info: *mut core::ffi::c_void,
     pub s_time_gran: u32_,
     pub s_time_min: time64_t,
     pub s_time_max: time64_t,
     pub s_fsnotify_mask: __u32,
     pub s_fsnotify_marks: *mut fsnotify_mark_connector,
-    pub s_id: [c_types::c_char; 32usize],
+    pub s_id: [core::ffi::c_char; 32usize],
     pub s_uuid: uuid_t,
-    pub s_max_links: c_types::c_uint,
+    pub s_max_links: core::ffi::c_uint,
     pub s_mode: fmode_t,
     pub s_vfs_rename_mutex: mutex,
-    pub s_subtype: *const c_types::c_char,
+    pub s_subtype: *const core::ffi::c_char,
     pub s_d_op: *const dentry_operations,
     pub s_shrink: shrinker,
     pub s_remove_count: atomic_long_t,
     pub s_fsnotify_connectors: atomic_long_t,
-    pub s_readonly_remount: c_types::c_int,
+    pub s_readonly_remount: core::ffi::c_int,
     pub s_wb_err: errseq_t,
     pub s_dio_done_wq: *mut workqueue_struct,
     pub s_pins: hlist_head,
@@ -12219,7 +12228,7 @@ pub struct super_block {
     pub rcu: callback_head,
     pub destroy_work: work_struct,
     pub s_sync_lock: mutex,
-    pub s_stack_depth: c_types::c_int,
+    pub s_stack_depth: core::ffi::c_int,
     pub __bindgen_padding_0: [u32; 5usize],
     pub s_inode_list_lock: spinlock_t,
     pub s_inodes: list_head,
@@ -12353,11 +12362,11 @@ impl Default for super_block {
 pub type filldir_t = ::core::option::Option<
     unsafe extern "C" fn(
         arg1: *mut dir_context,
-        arg2: *const c_types::c_char,
-        arg3: c_types::c_int,
+        arg2: *const core::ffi::c_char,
+        arg3: core::ffi::c_int,
         arg4: loff_t,
         arg5: u64_,
-        arg6: c_types::c_uint,
+        arg6: core::ffi::c_uint,
     ) -> bool_,
 >;
 #[repr(C)]
@@ -12386,7 +12395,7 @@ pub struct inode_operations {
         unsafe extern "C" fn(
             arg1: *mut inode,
             arg2: *mut dentry,
-            arg3: c_types::c_uint,
+            arg3: core::ffi::c_uint,
         ) -> *mut dentry,
     >,
     pub get_link: ::core::option::Option<
@@ -12394,24 +12403,28 @@ pub struct inode_operations {
             arg1: *mut dentry,
             arg2: *mut inode,
             arg3: *mut delayed_call,
-        ) -> *const c_types::c_char,
+        ) -> *const core::ffi::c_char,
     >,
     pub permission: ::core::option::Option<
         unsafe extern "C" fn(
             arg1: *mut user_namespace,
             arg2: *mut inode,
-            arg3: c_types::c_int,
-        ) -> c_types::c_int,
+            arg3: core::ffi::c_int,
+        ) -> core::ffi::c_int,
     >,
     pub get_acl: ::core::option::Option<
-        unsafe extern "C" fn(arg1: *mut inode, arg2: c_types::c_int, arg3: bool_) -> *mut posix_acl,
+        unsafe extern "C" fn(
+            arg1: *mut inode,
+            arg2: core::ffi::c_int,
+            arg3: bool_,
+        ) -> *mut posix_acl,
     >,
     pub readlink: ::core::option::Option<
         unsafe extern "C" fn(
             arg1: *mut dentry,
-            arg2: *mut c_types::c_char,
-            arg3: c_types::c_int,
-        ) -> c_types::c_int,
+            arg2: *mut core::ffi::c_char,
+            arg3: core::ffi::c_int,
+        ) -> core::ffi::c_int,
     >,
     pub create: ::core::option::Option<
         unsafe extern "C" fn(
@@ -12420,25 +12433,25 @@ pub struct inode_operations {
             arg3: *mut dentry,
             arg4: umode_t,
             arg5: bool_,
-        ) -> c_types::c_int,
+        ) -> core::ffi::c_int,
     >,
     pub link: ::core::option::Option<
         unsafe extern "C" fn(
             arg1: *mut dentry,
             arg2: *mut inode,
             arg3: *mut dentry,
-        ) -> c_types::c_int,
+        ) -> core::ffi::c_int,
     >,
     pub unlink: ::core::option::Option<
-        unsafe extern "C" fn(arg1: *mut inode, arg2: *mut dentry) -> c_types::c_int,
+        unsafe extern "C" fn(arg1: *mut inode, arg2: *mut dentry) -> core::ffi::c_int,
     >,
     pub symlink: ::core::option::Option<
         unsafe extern "C" fn(
             arg1: *mut user_namespace,
             arg2: *mut inode,
             arg3: *mut dentry,
-            arg4: *const c_types::c_char,
-        ) -> c_types::c_int,
+            arg4: *const core::ffi::c_char,
+        ) -> core::ffi::c_int,
     >,
     pub mkdir: ::core::option::Option<
         unsafe extern "C" fn(
@@ -12446,10 +12459,10 @@ pub struct inode_operations {
             arg2: *mut inode,
             arg3: *mut dentry,
             arg4: umode_t,
-        ) -> c_types::c_int,
+        ) -> core::ffi::c_int,
     >,
     pub rmdir: ::core::option::Option<
-        unsafe extern "C" fn(arg1: *mut inode, arg2: *mut dentry) -> c_types::c_int,
+        unsafe extern "C" fn(arg1: *mut inode, arg2: *mut dentry) -> core::ffi::c_int,
     >,
     pub mknod: ::core::option::Option<
         unsafe extern "C" fn(
@@ -12458,7 +12471,7 @@ pub struct inode_operations {
             arg3: *mut dentry,
             arg4: umode_t,
             arg5: dev_t,
-        ) -> c_types::c_int,
+        ) -> core::ffi::c_int,
     >,
     pub rename: ::core::option::Option<
         unsafe extern "C" fn(
@@ -12467,15 +12480,15 @@ pub struct inode_operations {
             arg3: *mut dentry,
             arg4: *mut inode,
             arg5: *mut dentry,
-            arg6: c_types::c_uint,
-        ) -> c_types::c_int,
+            arg6: core::ffi::c_uint,
+        ) -> core::ffi::c_int,
     >,
     pub setattr: ::core::option::Option<
         unsafe extern "C" fn(
             arg1: *mut user_namespace,
             arg2: *mut dentry,
             arg3: *mut iattr,
-        ) -> c_types::c_int,
+        ) -> core::ffi::c_int,
     >,
     pub getattr: ::core::option::Option<
         unsafe extern "C" fn(
@@ -12483,11 +12496,11 @@ pub struct inode_operations {
             arg2: *const path,
             arg3: *mut kstat,
             arg4: u32_,
-            arg5: c_types::c_uint,
-        ) -> c_types::c_int,
+            arg5: core::ffi::c_uint,
+        ) -> core::ffi::c_int,
     >,
     pub listxattr: ::core::option::Option<
-        unsafe extern "C" fn(arg1: *mut dentry, arg2: *mut c_types::c_char, arg3: usize) -> isize,
+        unsafe extern "C" fn(arg1: *mut dentry, arg2: *mut core::ffi::c_char, arg3: usize) -> isize,
     >,
     pub fiemap: ::core::option::Option<
         unsafe extern "C" fn(
@@ -12495,23 +12508,23 @@ pub struct inode_operations {
             arg2: *mut fiemap_extent_info,
             start: u64_,
             len: u64_,
-        ) -> c_types::c_int,
+        ) -> core::ffi::c_int,
     >,
     pub update_time: ::core::option::Option<
         unsafe extern "C" fn(
             arg1: *mut inode,
             arg2: *mut timespec64,
-            arg3: c_types::c_int,
-        ) -> c_types::c_int,
+            arg3: core::ffi::c_int,
+        ) -> core::ffi::c_int,
     >,
     pub atomic_open: ::core::option::Option<
         unsafe extern "C" fn(
             arg1: *mut inode,
             arg2: *mut dentry,
             arg3: *mut file,
-            open_flag: c_types::c_uint,
+            open_flag: core::ffi::c_uint,
             create_mode: umode_t,
-        ) -> c_types::c_int,
+        ) -> core::ffi::c_int,
     >,
     pub tmpfile: ::core::option::Option<
         unsafe extern "C" fn(
@@ -12519,25 +12532,25 @@ pub struct inode_operations {
             arg2: *mut inode,
             arg3: *mut file,
             arg4: umode_t,
-        ) -> c_types::c_int,
+        ) -> core::ffi::c_int,
     >,
     pub set_acl: ::core::option::Option<
         unsafe extern "C" fn(
             arg1: *mut user_namespace,
             arg2: *mut inode,
             arg3: *mut posix_acl,
-            arg4: c_types::c_int,
-        ) -> c_types::c_int,
+            arg4: core::ffi::c_int,
+        ) -> core::ffi::c_int,
     >,
     pub fileattr_set: ::core::option::Option<
         unsafe extern "C" fn(
             mnt_userns: *mut user_namespace,
             dentry: *mut dentry,
             fa: *mut fileattr,
-        ) -> c_types::c_int,
+        ) -> core::ffi::c_int,
     >,
     pub fileattr_get: ::core::option::Option<
-        unsafe extern "C" fn(dentry: *mut dentry, fa: *mut fileattr) -> c_types::c_int,
+        unsafe extern "C" fn(dentry: *mut dentry, fa: *mut fileattr) -> core::ffi::c_int,
     >,
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
@@ -12608,53 +12621,53 @@ pub struct super_operations {
     pub destroy_inode: ::core::option::Option<unsafe extern "C" fn(arg1: *mut inode)>,
     pub free_inode: ::core::option::Option<unsafe extern "C" fn(arg1: *mut inode)>,
     pub dirty_inode:
-        ::core::option::Option<unsafe extern "C" fn(arg1: *mut inode, flags: c_types::c_int)>,
+        ::core::option::Option<unsafe extern "C" fn(arg1: *mut inode, flags: core::ffi::c_int)>,
     pub write_inode: ::core::option::Option<
-        unsafe extern "C" fn(arg1: *mut inode, wbc: *mut writeback_control) -> c_types::c_int,
+        unsafe extern "C" fn(arg1: *mut inode, wbc: *mut writeback_control) -> core::ffi::c_int,
     >,
     pub drop_inode:
-        ::core::option::Option<unsafe extern "C" fn(arg1: *mut inode) -> c_types::c_int>,
+        ::core::option::Option<unsafe extern "C" fn(arg1: *mut inode) -> core::ffi::c_int>,
     pub evict_inode: ::core::option::Option<unsafe extern "C" fn(arg1: *mut inode)>,
     pub put_super: ::core::option::Option<unsafe extern "C" fn(arg1: *mut super_block)>,
     pub sync_fs: ::core::option::Option<
-        unsafe extern "C" fn(sb: *mut super_block, wait: c_types::c_int) -> c_types::c_int,
+        unsafe extern "C" fn(sb: *mut super_block, wait: core::ffi::c_int) -> core::ffi::c_int,
     >,
     pub freeze_super:
-        ::core::option::Option<unsafe extern "C" fn(arg1: *mut super_block) -> c_types::c_int>,
+        ::core::option::Option<unsafe extern "C" fn(arg1: *mut super_block) -> core::ffi::c_int>,
     pub freeze_fs:
-        ::core::option::Option<unsafe extern "C" fn(arg1: *mut super_block) -> c_types::c_int>,
+        ::core::option::Option<unsafe extern "C" fn(arg1: *mut super_block) -> core::ffi::c_int>,
     pub thaw_super:
-        ::core::option::Option<unsafe extern "C" fn(arg1: *mut super_block) -> c_types::c_int>,
+        ::core::option::Option<unsafe extern "C" fn(arg1: *mut super_block) -> core::ffi::c_int>,
     pub unfreeze_fs:
-        ::core::option::Option<unsafe extern "C" fn(arg1: *mut super_block) -> c_types::c_int>,
+        ::core::option::Option<unsafe extern "C" fn(arg1: *mut super_block) -> core::ffi::c_int>,
     pub statfs: ::core::option::Option<
-        unsafe extern "C" fn(arg1: *mut dentry, arg2: *mut kstatfs) -> c_types::c_int,
+        unsafe extern "C" fn(arg1: *mut dentry, arg2: *mut kstatfs) -> core::ffi::c_int,
     >,
     pub remount_fs: ::core::option::Option<
         unsafe extern "C" fn(
             arg1: *mut super_block,
-            arg2: *mut c_types::c_int,
-            arg3: *mut c_types::c_char,
-        ) -> c_types::c_int,
+            arg2: *mut core::ffi::c_int,
+            arg3: *mut core::ffi::c_char,
+        ) -> core::ffi::c_int,
     >,
     pub umount_begin: ::core::option::Option<unsafe extern "C" fn(arg1: *mut super_block)>,
     pub show_options: ::core::option::Option<
-        unsafe extern "C" fn(arg1: *mut seq_file, arg2: *mut dentry) -> c_types::c_int,
+        unsafe extern "C" fn(arg1: *mut seq_file, arg2: *mut dentry) -> core::ffi::c_int,
     >,
     pub show_devname: ::core::option::Option<
-        unsafe extern "C" fn(arg1: *mut seq_file, arg2: *mut dentry) -> c_types::c_int,
+        unsafe extern "C" fn(arg1: *mut seq_file, arg2: *mut dentry) -> core::ffi::c_int,
     >,
     pub show_path: ::core::option::Option<
-        unsafe extern "C" fn(arg1: *mut seq_file, arg2: *mut dentry) -> c_types::c_int,
+        unsafe extern "C" fn(arg1: *mut seq_file, arg2: *mut dentry) -> core::ffi::c_int,
     >,
     pub show_stats: ::core::option::Option<
-        unsafe extern "C" fn(arg1: *mut seq_file, arg2: *mut dentry) -> c_types::c_int,
+        unsafe extern "C" fn(arg1: *mut seq_file, arg2: *mut dentry) -> core::ffi::c_int,
     >,
     pub quota_read: ::core::option::Option<
         unsafe extern "C" fn(
             arg1: *mut super_block,
-            arg2: c_types::c_int,
-            arg3: *mut c_types::c_char,
+            arg2: core::ffi::c_int,
+            arg3: *mut core::ffi::c_char,
             arg4: usize,
             arg5: loff_t,
         ) -> isize,
@@ -12662,8 +12675,8 @@ pub struct super_operations {
     pub quota_write: ::core::option::Option<
         unsafe extern "C" fn(
             arg1: *mut super_block,
-            arg2: c_types::c_int,
-            arg3: *const c_types::c_char,
+            arg2: core::ffi::c_int,
+            arg3: *const core::ffi::c_char,
             arg4: usize,
             arg5: loff_t,
         ) -> isize,
@@ -12671,10 +12684,16 @@ pub struct super_operations {
     pub get_dquots:
         ::core::option::Option<unsafe extern "C" fn(arg1: *mut inode) -> *mut *mut dquot>,
     pub nr_cached_objects: ::core::option::Option<
-        unsafe extern "C" fn(arg1: *mut super_block, arg2: *mut shrink_control) -> c_types::c_long,
+        unsafe extern "C" fn(
+            arg1: *mut super_block,
+            arg2: *mut shrink_control,
+        ) -> core::ffi::c_long,
     >,
     pub free_cached_objects: ::core::option::Option<
-        unsafe extern "C" fn(arg1: *mut super_block, arg2: *mut shrink_control) -> c_types::c_long,
+        unsafe extern "C" fn(
+            arg1: *mut super_block,
+            arg2: *mut shrink_control,
+        ) -> core::ffi::c_long,
     >,
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
@@ -12735,14 +12754,14 @@ const _: () = {
 extern "C" {
     pub fn mount_nodev(
         fs_type: *mut file_system_type,
-        flags: c_types::c_int,
-        data: *mut c_types::c_void,
+        flags: core::ffi::c_int,
+        data: *mut core::ffi::c_void,
         fill_super: ::core::option::Option<
             unsafe extern "C" fn(
                 arg1: *mut super_block,
-                arg2: *mut c_types::c_void,
-                arg3: c_types::c_int,
-            ) -> c_types::c_int,
+                arg2: *mut core::ffi::c_void,
+                arg3: core::ffi::c_int,
+            ) -> core::ffi::c_int,
         >,
     ) -> *mut dentry;
 }
@@ -12750,21 +12769,21 @@ extern "C" {
     pub fn kill_litter_super(sb: *mut super_block);
 }
 extern "C" {
-    pub fn register_filesystem(arg1: *mut file_system_type) -> c_types::c_int;
+    pub fn register_filesystem(arg1: *mut file_system_type) -> core::ffi::c_int;
 }
 extern "C" {
-    pub fn unregister_filesystem(arg1: *mut file_system_type) -> c_types::c_int;
+    pub fn unregister_filesystem(arg1: *mut file_system_type) -> core::ffi::c_int;
 }
 extern "C" {
     pub fn alloc_chrdev_region(
         arg1: *mut dev_t,
-        arg2: c_types::c_uint,
-        arg3: c_types::c_uint,
-        arg4: *const c_types::c_char,
-    ) -> c_types::c_int;
+        arg2: core::ffi::c_uint,
+        arg3: core::ffi::c_uint,
+        arg4: *const core::ffi::c_char,
+    ) -> core::ffi::c_int;
 }
 extern "C" {
-    pub fn unregister_chrdev_region(arg1: dev_t, arg2: c_types::c_uint);
+    pub fn unregister_chrdev_region(arg1: dev_t, arg2: core::ffi::c_uint);
 }
 pub const BINDINGS_GFP_KERNEL: gfp_t = 3264;
 #[repr(C)]

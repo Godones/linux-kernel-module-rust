@@ -1,9 +1,7 @@
 #![no_std]
 #![feature(allocator_api, alloc_error_handler)]
-
+#![feature(c_size_t)]
 extern crate alloc;
-
-use core::panic::PanicInfo;
 
 mod allocator;
 pub mod bindings;
@@ -14,7 +12,6 @@ pub mod file_operations;
 pub mod filesystem;
 pub mod kernel_ptr;
 pub mod printk;
-// #[cfg(kernel_4_13_0_or_greater)]
 pub mod random;
 pub mod sysctl;
 mod types;
@@ -49,7 +46,7 @@ macro_rules! kernel_module {
     ($module:ty, $($name:ident : $value:expr),*) => {
         static mut __MOD: Option<$module> = None;
         #[no_mangle]
-        pub extern "C" fn init_module() -> $crate::c_types::c_int {
+        pub extern "C" fn init_module() -> core::ffi::c_int {
             match <$module as $crate::KernelModule>::init() {
                 Ok(m) => {
                     unsafe {
@@ -140,7 +137,7 @@ extern "C" {
 }
 
 #[panic_handler]
-fn panic(_info: &PanicInfo) -> ! {
+fn panic(_info: &core::panic::PanicInfo) -> ! {
     unsafe {
         bug_helper();
     }

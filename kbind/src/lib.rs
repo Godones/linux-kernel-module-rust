@@ -3,19 +3,21 @@
 #![feature(c_size_t)]
 extern crate alloc;
 
-mod allocator;
 pub mod bindings;
-pub mod c_types;
 pub mod chrdev;
 mod error;
 pub mod file_operations;
 pub mod filesystem;
+mod kalloc;
 pub mod kernel_ptr;
 pub mod printk;
 pub mod random;
+mod str;
 pub mod sysctl;
 mod types;
 pub mod user_ptr;
+
+use kalloc::allocator;
 
 pub use crate::{
     error::{Error, KernelResult},

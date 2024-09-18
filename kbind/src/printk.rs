@@ -1,17 +1,29 @@
 use core::{cmp, ffi::c_int, fmt};
 
 use crate::bindings;
-#[doc(hidden)]
-pub fn printk(s: &[u8]) {
-    // Don't copy the trailing NUL from `KERN_INFO`.
-    let mut fmt_str = [0; bindings::KERN_INFO.len() - 1 + b"%.*s\0".len()];
-    fmt_str[..bindings::KERN_INFO.len() - 1]
-        .copy_from_slice(&bindings::KERN_INFO[..bindings::KERN_INFO.len() - 1]);
-    fmt_str[bindings::KERN_INFO.len() - 1..].copy_from_slice(b"%.*s\0");
 
-    // TODO: I believe printk never fails
-    unsafe { bindings::_printk(fmt_str.as_ptr() as _, s.len() as c_int, s.as_ptr()) };
+macro_rules! printk_define {
+    ($name:ident, $level:expr) => {
+        pub fn $name(s: &[u8]) {
+            let mut fmt_str = [0; $level.len() - 1 + b"%.*s\0".len()];
+            fmt_str[..$level.len() - 1].copy_from_slice(&$level[..$level.len() - 1]);
+            fmt_str[$level.len() - 1..].copy_from_slice(b"%.*s\0");
+            unsafe {
+                bindings::_printk(fmt_str.as_ptr() as _, s.len() as c_int, s.as_ptr());
+            }
+        }
+    };
 }
+
+printk_define!(printk_debug, bindings::KERN_DEBUG);
+printk_define!(printk_info, bindings::KERN_INFO);
+printk_define!(printk_notice, bindings::KERN_NOTICE);
+printk_define!(printk_warning, bindings::KERN_WARNING);
+printk_define!(printk_err, bindings::KERN_ERR);
+printk_define!(printk_crit, bindings::KERN_CRIT);
+printk_define!(printk_alert, bindings::KERN_ALERT);
+printk_define!(printk_emerg, bindings::KERN_EMERG);
+printk_define!(printk_cont, bindings::KERN_CONT);
 
 // From kernel/print/printk.c
 const LOG_LINE_MAX: usize = 1024 - 32;
@@ -49,20 +61,23 @@ impl fmt::Write for LogLineWriter {
 /// printing to `stdout`, it writes to the kernel console at the `KERN_INFO`
 /// level.
 ///
+/// It's equivalent to calling [`pr_info`] with the format string and
+/// arguments.
+///
 /// [`println!`]: https://doc.rust-lang.org/stable/std/macro.println.html
 #[macro_export]
 macro_rules! println {
     () => ({
-        $crate::printk::printk("\n".as_bytes());
+        $crate::printk::printk_info("\n".as_bytes());
     });
     ($fmt:expr) => ({
-        $crate::printk::printk(concat!($fmt, "\n").as_bytes());
+        $crate::printk::printk_info(concat!("[LKM] " ,$fmt, "\n").as_bytes());
     });
     ($fmt:expr, $($arg:tt)*) => ({
         use ::core::fmt;
         let mut writer = $crate::printk::LogLineWriter::new();
-        let _ = fmt::write(&mut writer, format_args!(concat!($fmt, "\n"), $($arg)*)).unwrap();
-        $crate::printk::printk(writer.as_bytes());
+        let _ = fmt::write(&mut writer, format_args!(concat!("[LKM] ",$fmt, "\n"), $($arg)*)).unwrap();
+        $crate::printk::printk_info(writer.as_bytes());
     });
 }
 
@@ -70,8 +85,88 @@ macro_rules! println {
 macro_rules! print {
     ($($arg:tt)*) => {
         let mut writer = $crate::printk::LogLineWriter::new();
-        let _ = core::fmt::write(&mut writer, format_args!($($arg)*)).unwrap();
-        $crate::printk::printk(writer.as_bytes());
+        let _ = core::fmt::write(&mut writer, format_args!("[LKM] {}",format_args!($($arg)*))).unwrap();
+        $crate::printk::printk_info(writer.as_bytes());
+    };
+}
+
+#[macro_export]
+macro_rules! pr_debug {
+    ($($arg:tt)*) => {
+        let mut writer = $crate::printk::LogLineWriter::new();
+      let _ = core::fmt::write(&mut writer, format_args!("[LKM] {}",format_args!($($arg)*))).unwrap();
+        $crate::printk::printk_debug(writer.as_bytes());
+    };
+}
+#[macro_export]
+macro_rules! pr_info {
+    ($($arg:tt)*) => {
+        let mut writer = $crate::printk::LogLineWriter::new();
+        let _ = core::fmt::write(&mut writer, format_args!("[LKM] {}",format_args!($($arg)*))).unwrap();
+        $crate::printk::printk_info(writer.as_bytes());
+    };
+}
+
+#[macro_export]
+macro_rules! pr_notice {
+    ($($arg:tt)*) => {
+        let mut writer = $crate::printk::LogLineWriter::new();
+        let _ = core::fmt::write(&mut writer, format_args!("[LKM] {}",format_args!($($arg)*))).unwrap();
+        $crate::printk::printk_notice(writer.as_bytes());
+    };
+}
+
+#[macro_export]
+macro_rules! pr_warning {
+    ($($arg:tt)*) => {
+        let mut writer = $crate::printk::LogLineWriter::new();
+        let _ = core::fmt::write(&mut writer, format_args!("[LKM] {}",format_args!($($arg)*))).unwrap();
+        $crate::printk::printk_warning(writer.as_bytes());
+    };
+}
+
+#[macro_export]
+macro_rules! pr_err {
+    ($($arg:tt)*) => {
+        let mut writer = $crate::printk::LogLineWriter::new();
+        let _ = core::fmt::write(&mut writer, format_args!("[LKM] {}",format_args!($($arg)*))).unwrap();
+        $crate::printk::printk_err(writer.as_bytes());
+    };
+}
+
+#[macro_export]
+macro_rules! pr_crit {
+    ($($arg:tt)*) => {
+        let mut writer = $crate::printk::LogLineWriter::new();
+        let _ = core::fmt::write(&mut writer, format_args!("[LKM] {}",format_args!($($arg)*))).unwrap();
+        $crate::printk::printk_crit(writer.as_bytes());
+    };
+}
+
+#[macro_export]
+macro_rules! pr_alert {
+    ($($arg:tt)*) => {
+        let mut writer = $crate::printk::LogLineWriter::new();
+        let _ = core::fmt::write(&mut writer, format_args!("[LKM] {}",format_args!($($arg)*))).unwrap();
+        $crate::printk::printk_alert(writer.as_bytes());
+    };
+}
+
+#[macro_export]
+macro_rules! pr_emerg {
+    ($($arg:tt)*) => {
+        let mut writer = $crate::printk::LogLineWriter::new();
+        let _ = core::fmt::write(&mut writer, format_args!("[LKM] {}",format_args!($($arg)*))).unwrap();
+        $crate::printk::printk_emerg(writer.as_bytes());
+    };
+}
+
+#[macro_export]
+macro_rules! pr_cont {
+    ($($arg:tt)*) => {
+        let mut writer = $crate::printk::LogLineWriter::new();
+        let _ = core::fmt::write(&mut writer, format_args!("[LKM] {}",format_args!($($arg)*))).unwrap();
+        $crate::printk::printk_cont(writer.as_bytes());
     };
 }
 

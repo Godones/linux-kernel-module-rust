@@ -26,7 +26,6 @@ struct TcbModule {
 impl linux_kernel_module::KernelModule for TcbModule {
     fn init() -> linux_kernel_module::KernelResult<Self> {
         println!("TCB kernel module!");
-        println_color!(32, "Hello kernel module!");
         Ok(TcbModule {
             message: "on the heap!".to_owned(),
         })

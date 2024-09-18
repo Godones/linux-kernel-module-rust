@@ -22,6 +22,9 @@ const INCLUDED_FUNCTIONS: &[&str] = &[
     "get_random_bytes",
     "rng_is_initialized",
     "printk",
+    "_printk",
+    "module_alloc",
+    "module_memfree",
     "add_device_randomness",
 ];
 const INCLUDED_VARS: &[&str] = &[
@@ -38,6 +41,16 @@ const INCLUDED_VARS: &[&str] = &[
     "FS_RENAME_DOES_D_MOVE",
     "BINDINGS_GFP_KERNEL",
     "KERN_INFO",
+    "KERN_EMERG",
+    "KERN_ALERT",
+    "KERN_CRIT",
+    "KERN_ERR",
+    "KERN_WARNING",
+    "KERN_NOTICE",
+    "KERN_INFO",
+    "KERN_DEBUG",
+    "KERN_DEFAULT",
+    "KERN_CONT",
     "VERIFY_WRITE",
     "LINUX_VERSION_CODE",
     "SEEK_SET",
@@ -108,7 +121,9 @@ fn main() {
         .use_core()
         .ctypes_prefix("core::ffi")
         .derive_default(true)
-        .size_t_is_usize(true);
+        .size_t_is_usize(true)
+        .layout_tests(false)
+        .enable_function_attribute_detection();
 
     builder = builder.clang_arg(format!("--target={}", target));
     for arg in kernel_args.iter() {

@@ -94,7 +94,7 @@ macro_rules! print {
 macro_rules! pr_debug {
     ($($arg:tt)*) => {
         let mut writer = $crate::printk::LogLineWriter::new();
-      let _ = core::fmt::write(&mut writer, format_args!("[LKM] {}",format_args!($($arg)*))).unwrap();
+      let _ = core::fmt::write(&mut writer, format_args!("[LKM] {}\n",format_args!($($arg)*))).unwrap();
         $crate::printk::printk_debug(writer.as_bytes());
     };
 }
@@ -102,7 +102,7 @@ macro_rules! pr_debug {
 macro_rules! pr_info {
     ($($arg:tt)*) => {
         let mut writer = $crate::printk::LogLineWriter::new();
-        let _ = core::fmt::write(&mut writer, format_args!("[LKM] {}",format_args!($($arg)*))).unwrap();
+        let _ = core::fmt::write(&mut writer, format_args!("[LKM] {}\n",format_args!($($arg)*))).unwrap();
         $crate::printk::printk_info(writer.as_bytes());
     };
 }
@@ -111,7 +111,7 @@ macro_rules! pr_info {
 macro_rules! pr_notice {
     ($($arg:tt)*) => {
         let mut writer = $crate::printk::LogLineWriter::new();
-        let _ = core::fmt::write(&mut writer, format_args!("[LKM] {}",format_args!($($arg)*))).unwrap();
+        let _ = core::fmt::write(&mut writer, format_args!("[LKM] {}\n",format_args!($($arg)*))).unwrap();
         $crate::printk::printk_notice(writer.as_bytes());
     };
 }
@@ -120,7 +120,7 @@ macro_rules! pr_notice {
 macro_rules! pr_warning {
     ($($arg:tt)*) => {
         let mut writer = $crate::printk::LogLineWriter::new();
-        let _ = core::fmt::write(&mut writer, format_args!("[LKM] {}",format_args!($($arg)*))).unwrap();
+        let _ = core::fmt::write(&mut writer, format_args!("[LKM] {}\n",format_args!($($arg)*))).unwrap();
         $crate::printk::printk_warning(writer.as_bytes());
     };
 }
@@ -129,7 +129,7 @@ macro_rules! pr_warning {
 macro_rules! pr_err {
     ($($arg:tt)*) => {
         let mut writer = $crate::printk::LogLineWriter::new();
-        let _ = core::fmt::write(&mut writer, format_args!("[LKM] {}",format_args!($($arg)*))).unwrap();
+        let _ = core::fmt::write(&mut writer, format_args!("[LKM] {}\n",format_args!($($arg)*))).unwrap();
         $crate::printk::printk_err(writer.as_bytes());
     };
 }
@@ -138,7 +138,7 @@ macro_rules! pr_err {
 macro_rules! pr_crit {
     ($($arg:tt)*) => {
         let mut writer = $crate::printk::LogLineWriter::new();
-        let _ = core::fmt::write(&mut writer, format_args!("[LKM] {}",format_args!($($arg)*))).unwrap();
+        let _ = core::fmt::write(&mut writer, format_args!("[LKM] {}\n",format_args!($($arg)*))).unwrap();
         $crate::printk::printk_crit(writer.as_bytes());
     };
 }
@@ -147,7 +147,7 @@ macro_rules! pr_crit {
 macro_rules! pr_alert {
     ($($arg:tt)*) => {
         let mut writer = $crate::printk::LogLineWriter::new();
-        let _ = core::fmt::write(&mut writer, format_args!("[LKM] {}",format_args!($($arg)*))).unwrap();
+        let _ = core::fmt::write(&mut writer, format_args!("[LKM] {}\n",format_args!($($arg)*))).unwrap();
         $crate::printk::printk_alert(writer.as_bytes());
     };
 }
@@ -156,7 +156,7 @@ macro_rules! pr_alert {
 macro_rules! pr_emerg {
     ($($arg:tt)*) => {
         let mut writer = $crate::printk::LogLineWriter::new();
-        let _ = core::fmt::write(&mut writer, format_args!("[LKM] {}",format_args!($($arg)*))).unwrap();
+        let _ = core::fmt::write(&mut writer, format_args!("[LKM] {}\n",format_args!($($arg)*))).unwrap();
         $crate::printk::printk_emerg(writer.as_bytes());
     };
 }
@@ -165,7 +165,7 @@ macro_rules! pr_emerg {
 macro_rules! pr_cont {
     ($($arg:tt)*) => {
         let mut writer = $crate::printk::LogLineWriter::new();
-        let _ = core::fmt::write(&mut writer, format_args!("[LKM] {}",format_args!($($arg)*))).unwrap();
+        let _ = core::fmt::write(&mut writer, format_args!("[LKM] {}\n",format_args!($($arg)*))).unwrap();
         $crate::printk::printk_cont(writer.as_bytes());
     };
 }

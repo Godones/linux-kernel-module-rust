@@ -8,8 +8,9 @@ pub mod chrdev;
 mod error;
 pub mod file_operations;
 pub mod filesystem;
-mod kalloc;
+pub mod kalloc;
 pub mod kernel_ptr;
+pub mod logger;
 pub mod printk;
 pub mod random;
 mod str;
@@ -17,12 +18,12 @@ pub mod sysctl;
 mod types;
 pub mod user_ptr;
 
-use kalloc::allocator;
-
 pub use crate::{
-    error::{Error, KernelResult},
+    error::{code, Error, KernelResult},
     types::{CStr, Mode},
 };
+pub mod env;
+pub mod mm;
 
 /// Declares the entrypoint for a kernel module. The first argument should be a type which
 /// implements the [`KernelModule`] trait. Also accepts various forms of kernel metadata.
@@ -57,7 +58,7 @@ macro_rules! kernel_module {
                     return 0;
                 }
                 Err(e) => {
-                    return e.to_kernel_errno();
+                    return e.to_errno();
                 }
             }
         }
@@ -139,11 +140,10 @@ extern "C" {
 }
 
 #[panic_handler]
-fn panic(_info: &core::panic::PanicInfo) -> ! {
+fn panic(info: &core::panic::PanicInfo) -> ! {
+    pr_err!("Kernel panic!");
+    pr_err!("{:?}", info);
     unsafe {
         bug_helper();
     }
 }
-
-#[global_allocator]
-static ALLOCATOR: allocator::KernelAllocator = allocator::KernelAllocator;

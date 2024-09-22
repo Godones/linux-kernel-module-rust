@@ -43,7 +43,7 @@ impl Builder {
             )
         };
         if res != 0 {
-            return Err(Error::from_kernel_errno(res));
+            return Err(Error::from_errno(res));
         }
 
         // Turn this into a boxed slice immediately because the kernel stores pointers into it, and
@@ -60,7 +60,7 @@ impl Builder {
                         bindings::cdev_del(&mut cdevs[j]);
                     }
                     bindings::unregister_chrdev_region(dev, self.minors.len() as _);
-                    return Err(Error::from_kernel_errno(rc));
+                    return Err(Error::from_errno(rc));
                 }
             }
         }

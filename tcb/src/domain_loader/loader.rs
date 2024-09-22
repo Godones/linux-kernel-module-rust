@@ -212,39 +212,6 @@ impl DomainLoader {
             });
         Ok(())
     }
-
-    fn reload_program(&self, elf: &ElfFile) -> LinuxResult<()> {
-        for meta in &self.regions {
-            // reload region which has write permission
-            if meta.vm.permission().contains(MappingFlags::WRITE) {
-                trace!(
-                    "reload region: {:#x}-{:#x}, perm:{:?}",
-                    meta.vm.range().start,
-                    meta.vm.range().end,
-                    meta.vm.permission()
-                );
-                let data = &elf.input[meta.data_offset..(meta.data_offset + meta.data_size)];
-                let mut page_offset = meta.vm_start & (FRAME_SIZE - 1);
-                let mut count = 0;
-                let mut vaddr = meta.vm.range().start;
-                while count < data.len() {
-                    let paddr = vaddr;
-                    let len = min(FRAME_SIZE - page_offset, data.len() - count);
-                    let dst_buf =
-                        unsafe { core::slice::from_raw_parts_mut(paddr as *mut u8, FRAME_SIZE) };
-                    dst_buf[page_offset..page_offset + len]
-                        .copy_from_slice(&data[count..count + len]);
-                    trace!("copy data to {:#x}-{:#x}", paddr, paddr + len);
-                    vaddr += len;
-                    page_offset = 0;
-                    count += len;
-                }
-                assert_eq!(count, data.len());
-            }
-        }
-        Ok(())
-    }
-
     fn relocate_dyn(&self, elf: &ElfFile) -> LinuxResult<()> {
         if let Ok(res) = relocate_dyn(elf, self.phy_start) {
             trace!("Relocate_dyn {} entries", res.len());
@@ -297,21 +264,6 @@ impl DomainLoader {
         let entry = elf.header.pt2.entry_point() as usize + region_start;
         debug!("entry: {:#x}", entry);
         self.entry = entry;
-        Ok(())
-    }
-
-    #[allow(unused)]
-    pub fn reload(&self) -> LinuxResult<()> {
-        info!("reload domain");
-        let elf_binary = self.data.as_slice();
-        const ELF_MAGIC: [u8; 4] = [0x7f, b'E', b'L', b'F'];
-        if elf_binary[0..4] != ELF_MAGIC {
-            return Err(LinuxError::EINVAL);
-        }
-        let elf = ElfFile::new(elf_binary).unwrap();
-        self.reload_program(&elf)?;
-        self.relocate_dyn(&elf)?;
-        info!("reload domain done");
         Ok(())
     }
 }
@@ -427,19 +379,3 @@ fn relocate_plt(elf: &ElfFile, region_start: usize) -> Result<Vec<(usize, usize)
 const R_RISCV_64: u32 = 2;
 const R_RISCV_RELATIVE: u32 = 3;
 const R_RISCV_JUMP_SLOT: u32 = 5;
-
-// /* RISC-V relocations.  */
-// #define R_RISCV_NONE             0
-// #define R_RISCV_32               1
-// #define R_RISCV_64               2
-// #define R_RISCV_RELATIVE         3
-// #define R_RISCV_COPY             4
-// #define R_RISCV_JUMP_SLOT        5
-// #define R_RISCV_TLS_DTPMOD32     6
-// #define R_RISCV_TLS_DTPMOD64     7
-// #define R_RISCV_TLS_DTPREL32     8
-// #define R_RISCV_TLS_DTPREL64     9
-// #define R_RISCV_TLS_TPREL32     10
-// #define R_RISCV_TLS_TPREL64     11
-// #define R_RISCV_BRANCH          16
-// #define R_RISCV_JAL             17

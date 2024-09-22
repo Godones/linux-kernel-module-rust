@@ -11,3 +11,8 @@ mod bindings {
 pub use bindings::*;
 
 pub const GFP_KERNEL: gfp_t = BINDINGS_GFP_KERNEL;
+
+extern "C" {
+    #[link_name = "rust_helper_errname"]
+    pub fn errname(err: core::ffi::c_int) -> *const core::ffi::c_char;
+}

@@ -50,7 +50,7 @@ impl SysctlStorage for atomic::AtomicBool {
                 self.store(true, atomic::Ordering::Relaxed);
                 Ok(())
             }
-            _ => Err(error::Error::EINVAL),
+            _ => Err(error::code::EINVAL),
         };
         (data.len(), result)
     }
@@ -98,14 +98,14 @@ unsafe extern "C" fn proc_handler<T: SysctlStorage>(
         Ok(ptr) => ptr,
         Err(e) => {
             println!("proc_handler: UserSlicePtr::new failed: {:?}", e);
-            return e.to_kernel_errno();
+            return e.to_errno();
         }
     };
     let storage = &*((*ctl).data as *const T);
     let (bytes_processed, result) = if write != 0 {
         let data = match data.read_all() {
             Ok(r) => r,
-            Err(e) => return e.to_kernel_errno(),
+            Err(e) => return e.to_errno(),
         };
         storage.store_value(&data)
     } else {
@@ -116,7 +116,7 @@ unsafe extern "C" fn proc_handler<T: SysctlStorage>(
     *ppos += *len as bindings::loff_t;
     match result {
         Ok(()) => 0,
-        Err(e) => e.to_kernel_errno(),
+        Err(e) => e.to_errno(),
     }
 }
 
@@ -128,7 +128,7 @@ impl<T: SysctlStorage> Sysctl<T> {
         mode: types::Mode,
     ) -> error::KernelResult<Sysctl<T>> {
         if name.contains('/') {
-            return Err(error::Error::EINVAL);
+            return Err(error::code::EINVAL);
         }
 
         let storage = Box::new(storage);
@@ -152,7 +152,7 @@ impl<T: SysctlStorage> Sysctl<T> {
         let result =
             unsafe { bindings::register_sysctl(path.as_ptr() as *const i8, table.as_mut_ptr()) };
         if result.is_null() {
-            return Err(error::Error::ENOMEM);
+            return Err(error::code::ENOMEM);
         }
 
         Ok(Sysctl {

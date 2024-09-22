@@ -1,10 +1,18 @@
 [target.riscv64]
 rustflags = [
-    "-Clink-arg=-T../../domain.ld",
+    "-Clink-arg=-T../../domain-riscv64.ld",
     "-Clink-arg=-pie",
     "-A", "unused_imports",
 ]
 linker = "riscv64-linux-gnu-gcc"
+
+[target.x86_64]
+rustflags = [
+    "-Clink-arg=-T../../domain-x86_64.ld",
+    "-Clink-arg=-pie",
+    "-Clink-arg=--no-dynamic-linker",
+    "-A", "unused_imports",
+]
 
 [unstable]
 build-std = ["core", "alloc"]

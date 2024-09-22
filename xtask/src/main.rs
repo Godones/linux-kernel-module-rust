@@ -22,13 +22,19 @@ enum Commands {
         #[arg(short, long, value_name = "NAME")]
         name: String,
         /// The log level, default is INFO
-        #[arg(short, long, value_name = "LOG", default_value = "INFO")]
+        #[arg(short, long, value_name = "LOG", default_value = "")]
         log: String,
+        /// The target architecture, default is riscv64
+        #[arg(short, long, value_name = "ARCH")]
+        arch: Option<String>,
     },
     BuildAll {
         /// The log level, default is INFO
-        #[arg(short, long, value_name = "LOG", default_value = "INFO")]
+        #[arg(short, long, value_name = "LOG", default_value = "")]
         log: String,
+        /// The target architecture, default is riscv64
+        #[arg(short, long, value_name = "ARCH")]
+        arch: Option<String>,
     },
     Move {
         /// The name of the domain project
@@ -57,13 +63,16 @@ fn main() {
             println!("Creating new domain project: {}", name);
             subcommand::new::create_domain(name);
         }
-        Some(Commands::BuildAll { log }) => {
-            println!("Building all domain projects, LOG: {log}");
-            subcommand::build::build_all(log.to_string());
+        Some(Commands::BuildAll { log, arch }) => {
+            println!("Building all domain projects, LOG: {log}, ARCH: {:?}", arch);
+            subcommand::build::build_all(log.to_string(), arch.clone());
         }
-        Some(Commands::Build { name, log }) => {
-            println!("Building domain project: {}, LOG: {}", name, log);
-            subcommand::build::build_single(name, log);
+        Some(Commands::Build { name, log, arch }) => {
+            println!(
+                "Building domain project: {}, LOG: {}, ARCH: {:?}",
+                name, log, arch
+            );
+            subcommand::build::build_single(name, log, arch.clone());
         }
         Some(Commands::Move { name }) => {
             println!("Moving domain project: {}", name);

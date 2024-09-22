@@ -68,7 +68,7 @@ pub fn register<T: FileSystem>() -> error::KernelResult<Registration<T>> {
     };
     let result = unsafe { bindings::register_filesystem(&mut *fs_registration.ptr) };
     if result != 0 {
-        return Err(error::Error::from_kernel_errno(result));
+        return Err(error::Error::from_errno(result));
     }
 
     Ok(fs_registration)

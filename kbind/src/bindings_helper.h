@@ -6,6 +6,11 @@
 #include <linux/slab.h>
 #include <linux/uaccess.h>
 #include <linux/version.h>
+#include <linux/vmalloc.h>
+#include <linux/errname.h>
+#include <linux/errno.h>
+#include <linux/set_memory.h>
+
 
 // Bindgen gets confused at certain things
 //

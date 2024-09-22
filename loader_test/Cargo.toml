@@ -1,0 +1,22 @@
+[package]
+name = "loader_test"
+version = "0.1.0"
+edition = "2021"
+
+
+
+[lib]
+crate-type = ["staticlib"]
+
+
+
+
+[dependencies]
+log = "0"
+xmas-elf = "0.9"
+bitflags = "2.6.0"
+memory_addr = { git ="https://github.com/os-module/memory_addr" }
+
+
+
+linux-kernel-module = { path = "../kbind", package = "kbind" }

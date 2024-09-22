@@ -8,7 +8,7 @@ use crate::{bindings, error};
 pub fn getrandom(dest: &mut [u8]) -> error::KernelResult<()> {
     let res = unsafe { bindings::wait_for_random_bytes() };
     if res != 0 {
-        return Err(error::Error::from_kernel_errno(res));
+        return Err(error::Error::from_errno(res));
     }
 
     unsafe {
@@ -25,7 +25,7 @@ pub fn getrandom(dest: &mut [u8]) -> error::KernelResult<()> {
 /// available on 4.19 and later kernels.
 pub fn getrandom_nonblock(dest: &mut [u8]) -> error::KernelResult<()> {
     if !unsafe { bindings::rng_is_initialized() } {
-        return Err(error::Error::EAGAIN);
+        return Err(error::code::EAGAIN);
     }
     getrandom(dest)
 }

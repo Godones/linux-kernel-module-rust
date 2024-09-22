@@ -1,63 +1,6 @@
-use std::{env, path::PathBuf};
+use std::{env, fs::OpenOptions, io::Write, path::PathBuf, process::Command};
 
-const INCLUDED_TYPES: &[&str] = &["file_system_type", "mode_t", "umode_t", "ctl_table"];
-const INCLUDED_FUNCTIONS: &[&str] = &[
-    "cdev_add",
-    "cdev_init",
-    "cdev_del",
-    "register_filesystem",
-    "unregister_filesystem",
-    "krealloc",
-    "kfree",
-    "mount_nodev",
-    "kill_litter_super",
-    "register_sysctl",
-    "unregister_sysctl_table",
-    "access_ok",
-    "_copy_to_user",
-    "_copy_from_user",
-    "alloc_chrdev_region",
-    "unregister_chrdev_region",
-    "wait_for_random_bytes",
-    "get_random_bytes",
-    "rng_is_initialized",
-    "printk",
-    "_printk",
-    "module_alloc",
-    "module_memfree",
-    "add_device_randomness",
-];
-const INCLUDED_VARS: &[&str] = &[
-    "EINVAL",
-    "ENOMEM",
-    "ESPIPE",
-    "EFAULT",
-    "EAGAIN",
-    "__this_module",
-    "FS_REQUIRES_DEV",
-    "FS_BINARY_MOUNTDATA",
-    "FS_HAS_SUBTYPE",
-    "FS_USERNS_MOUNT",
-    "FS_RENAME_DOES_D_MOVE",
-    "BINDINGS_GFP_KERNEL",
-    "KERN_INFO",
-    "KERN_EMERG",
-    "KERN_ALERT",
-    "KERN_CRIT",
-    "KERN_ERR",
-    "KERN_WARNING",
-    "KERN_NOTICE",
-    "KERN_INFO",
-    "KERN_DEBUG",
-    "KERN_DEFAULT",
-    "KERN_CONT",
-    "VERIFY_WRITE",
-    "LINUX_VERSION_CODE",
-    "SEEK_SET",
-    "SEEK_CUR",
-    "SEEK_END",
-    "O_NONBLOCK",
-];
+#[allow(unused)]
 const OPAQUE_TYPES: &[&str] = &[
     // These need to be opaque because they're both packed and aligned, which rustc
     // doesn't support yet. See https://github.com/rust-lang/rust/issues/59154
@@ -99,6 +42,9 @@ fn main() {
     if kernel_dir.is_err() {
         return;
     }
+
+    kallsyms_lookup_name();
+
     let kernel_dir = kernel_dir.unwrap();
     let mut kernel_cflags = env::var("c_flags").expect("Add 'export c_flags' to Kbuild");
     kernel_cflags = kernel_cflags.replace("-mfunction-return=thunk-extern", "");
@@ -132,19 +78,6 @@ fn main() {
 
     println!("cargo:rerun-if-changed=src/bindings_helper.h");
     builder = builder.header("src/bindings_helper.h");
-
-    for t in INCLUDED_TYPES {
-        builder = builder.allowlist_type(t);
-    }
-    for f in INCLUDED_FUNCTIONS {
-        builder = builder.allowlist_function(f);
-    }
-    for v in INCLUDED_VARS {
-        builder = builder.allowlist_var(v);
-    }
-    for t in OPAQUE_TYPES {
-        builder = builder.opaque_type(t);
-    }
     let bindings = builder.generate().expect("Unable to generate bindings");
 
     // let out_path = PathBuf::from(env::var("OUT_DIR").unwrap());
@@ -164,4 +97,56 @@ fn main() {
     }
     builder.remove_flag("-pg");
     builder.compile("helpers");
+}
+
+const INCLUDE_FUNCS: &[&str] = &["module_alloc", "module_memfree", "set_memory_x"];
+pub fn kallsyms_lookup_name() {
+    let mut env_file = OpenOptions::new()
+        .write(true)
+        .create(true)
+        .open("./src/env.rs")
+        .unwrap();
+    let ret = exec(
+        "sh",
+        &[
+            "-c",
+            "sudo cat /proc/kallsyms | grep -E 'module_alloc|module_memfree|set_memory_x'",
+        ],
+    );
+    let lines = ret.split("\n");
+    for line in lines {
+        if line.is_empty() {
+            continue;
+        }
+        let mut parts = line.split(" ");
+        let addr = parts.next().unwrap();
+        let name = parts.last().unwrap();
+        if INCLUDE_FUNCS.contains(&name) {
+            let addr = usize::from_str_radix(addr, 16).unwrap();
+            println!("{}: {:#x}", name.to_uppercase(), addr);
+            // env::set_var(format!("{}_ADDR", name.to_uppercase()), format!("{:#x}", addr));
+            // println!("cargo:rustc-env={}={:#x}", name.to_uppercase(), addr);
+            env_file
+                .write(
+                    format!(
+                        "pub const {}_ADDR: usize = {:#x};\n",
+                        name.to_uppercase(),
+                        addr
+                    )
+                    .as_bytes(),
+                )
+                .unwrap();
+        } else {
+            println!("skip: {}", name);
+        }
+    }
+}
+
+fn exec(cmd: &str, args: &[&str]) -> String {
+    let output = Command::new(cmd)
+        .args(args)
+        .output()
+        .expect("failed to execute cmd");
+
+    String::from_utf8(output.stdout).unwrap()
 }

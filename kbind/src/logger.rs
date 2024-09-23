@@ -1,6 +1,6 @@
 use log::{Level, LevelFilter, Log, Metadata, Record};
 
-use crate::{pr_err, println};
+use crate::{pr_cont, pr_debug, pr_err, pr_info, pr_warning, println};
 
 struct SimpleLogger;
 
@@ -12,21 +12,22 @@ impl Log for SimpleLogger {
         if !self.enabled(record.metadata()) {
             return;
         }
+        let module_path = record.module_path().unwrap_or_default();
         match record.level() {
             Level::Error => {
-                pr_err!("[ERROR] {}", record.args());
+                pr_err!("[ERROR] [{}] {}", module_path, record.args());
             }
             Level::Warn => {
-                println!("[WARN] {}", record.args());
+                pr_warning!("[ WARN] [{}] {}", module_path, record.args());
             }
             Level::Info => {
-                println!("[INFO] {}", record.args());
+                pr_info!("[ INFO] [{}] {}", module_path, record.args());
             }
             Level::Debug => {
-                println!("[DEBUG] {}", record.args());
+                pr_debug!("[DEBUG] [{}] {}", module_path, record.args());
             }
             Level::Trace => {
-                println!("[TRACE] {}", record.args());
+                pr_cont!("[TRACE] [{}] {}", module_path, record.args());
             }
         };
     }

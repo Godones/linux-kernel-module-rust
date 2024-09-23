@@ -1,5 +1,7 @@
 use crate::{code, env, KernelResult};
 
+pub mod vm;
+
 type SetMemoryX = extern "C" fn(*mut core::ffi::c_void, core::ffi::c_int) -> core::ffi::c_int;
 
 pub fn set_memory_x(virt_addr: usize, numpages: usize) -> KernelResult<()> {

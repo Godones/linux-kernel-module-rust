@@ -89,6 +89,14 @@ macro_rules! print {
         $crate::printk::printk_info(writer.as_bytes());
     };
 }
+#[macro_export]
+macro_rules! print_raw {
+    ($($arg:tt)*) => {
+        let mut writer = $crate::printk::LogLineWriter::new();
+        let _ = core::fmt::write(&mut writer, format_args!("{}",format_args!($($arg)*))).unwrap();
+        $crate::printk::printk_info(writer.as_bytes());
+    };
+}
 
 #[macro_export]
 macro_rules! pr_debug {
@@ -190,9 +198,23 @@ macro_rules! pr_cont {
 #[macro_export]
 macro_rules! println_color {
     ($color:expr, $fmt:expr) => {
-        $crate::print!(concat!("\x1b[", $color, "m", $fmt, "\x1b[0m\n"));
+        match $color {
+            31 => $crate::printk::printk_err(concat!("[LKM] ", $fmt, "\n").as_bytes()),
+            32 => $crate::printk::printk_info(concat!("[LKM] ", $fmt, "\n").as_bytes()),
+            33 => $crate::printk::printk_warning(concat!("[LKM] ", $fmt, "\n").as_bytes()),
+            34 => $crate::printk::printk_debug(concat!("[LKM] ", $fmt, "\n").as_bytes()),
+            _ => $crate::printk::printk_info(concat!("[LKM] ", $fmt, "\n").as_bytes()),
+        }
     };
     ($color:expr, $fmt:expr, $($arg:tt)*) => {
-        $crate::print!(concat!("\x1b[", $color, "m", $fmt, "\x1b[0m\n"), $($arg)*);
+        let mut writer = $crate::printk::LogLineWriter::new();
+        let _ = core::fmt::write(&mut writer, format_args!(concat!("[LKM] ", $fmt, "\n"), $($arg)*)).unwrap();
+        match $color {
+            31 => $crate::printk::printk_err(writer.as_bytes()),
+            32 => $crate::printk::printk_info(writer.as_bytes()),
+            33 => $crate::printk::printk_warning(writer.as_bytes()),
+            34 => $crate::printk::printk_debug(writer.as_bytes()),
+            _ => $crate::printk::printk_info(writer.as_bytes()),
+        }
     };
 }

@@ -7,7 +7,7 @@ use interface::*;
 use crate::{
     config::FRAME_BITS,
     domain_helper::{resource::DOMAIN_RESOURCE, DOMAIN_CREATE, DOMAIN_INFO},
-    domain_proxy::*,
+    domain_proxy::{logger::LogDomainProxy, *},
 };
 
 pub static DOMAIN_SYS: &'static dyn CoreFunction = &DomainSyscall;
@@ -41,7 +41,7 @@ impl CoreFunction for DomainSyscall {
     }
 
     fn sys_write_console(&self, s: &str) {
-        print!("{}", s);
+        print_raw!("{}", s);
     }
 
     fn sys_backtrace(&self, domain_id: u64) {
@@ -147,9 +147,6 @@ impl CoreFunction for DomainSyscall {
     }
 }
 
-extern "C" {
-    fn strampoline();
-}
 static BLK_CRASH: AtomicBool = AtomicBool::new(true);
 fn unwind() {
     BLK_CRASH.store(false, core::sync::atomic::Ordering::Relaxed);

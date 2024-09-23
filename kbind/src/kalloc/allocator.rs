@@ -27,8 +27,3 @@ unsafe impl GlobalAlloc for KernelAllocator {
         }
     }
 }
-
-#[alloc_error_handler]
-fn oom(_layout: Layout) -> ! {
-    panic!("Out of memory!");
-}

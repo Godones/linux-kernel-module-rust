@@ -1,10 +1,51 @@
-use core::fmt::{Arguments, Write};
+use core::{
+    cmp, fmt,
+    fmt::{Arguments, Write},
+};
+
+const LOG_LINE_MAX: usize = 1024 - 32;
+
+#[doc(hidden)]
+pub struct LogLineWriter {
+    data: [u8; LOG_LINE_MAX],
+    pos: usize,
+}
+
+#[allow(clippy::new_without_default)]
+impl LogLineWriter {
+    pub fn new() -> LogLineWriter {
+        LogLineWriter {
+            data: [0u8; LOG_LINE_MAX],
+            pos: 0,
+        }
+    }
+
+    pub fn as_bytes(&self) -> &[u8] {
+        &self.data[..self.pos]
+    }
+
+    pub fn as_str(&self) -> &str {
+        core::str::from_utf8(&self.data[..self.pos]).unwrap()
+    }
+}
+
+impl fmt::Write for LogLineWriter {
+    fn write_str(&mut self, s: &str) -> fmt::Result {
+        let copy_len = cmp::min(LOG_LINE_MAX - self.pos, s.as_bytes().len());
+        self.data[self.pos..self.pos + copy_len].copy_from_slice(&s.as_bytes()[..copy_len]);
+        self.pos += copy_len;
+        Ok(())
+    }
+}
+
 #[macro_export]
 macro_rules! print {
     ($($arg:tt)*) => {
         let domain_id = rref::domain_id();
         let id = 0;
-        $crate::console::__print(format_args!("[{}][Domain:{}] {}", id,domain_id, format_args!($($arg)*)))
+        let mut writer = $crate::console::LogLineWriter::new();
+        let _ = core::fmt::write(&mut writer, format_args!("[{}][Domain:{}] {}", id,domain_id, format_args!($($arg)*))).unwrap();
+        $crate::console::__print(format_args!("{}", writer.as_str()));
     };
 }
 

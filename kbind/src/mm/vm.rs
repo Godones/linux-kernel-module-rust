@@ -67,8 +67,23 @@ impl VSpace {
         VSpace { start, size }
     }
 
+    pub unsafe fn from_raw(start: usize, size: usize) -> Self {
+        VSpace { start, size }
+    }
+
     pub fn len(&self) -> usize {
         self.size
+    }
+
+    pub fn as_ptr(&self) -> *mut u8 {
+        self.start as *mut u8
+    }
+
+    pub fn as_slice(&self) -> &[u8] {
+        unsafe { core::slice::from_raw_parts(self.start as *const u8, self.size) }
+    }
+    pub fn as_mut_slice(&self) -> &mut [u8] {
+        unsafe { core::slice::from_raw_parts_mut(self.start as *mut u8, self.size) }
     }
 }
 

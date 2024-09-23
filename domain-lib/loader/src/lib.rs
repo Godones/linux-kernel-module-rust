@@ -1,4 +1,12 @@
+#![no_std]
+
+mod vm;
+
+extern crate alloc;
+#[macro_use]
+extern crate log;
 use alloc::{
+    boxed::Box,
     string::{String, ToString},
     sync::Arc,
     vec,
@@ -9,32 +17,39 @@ use core::{
     ops::Range,
 };
 
-use linux_kernel_module::{code, kalloc::vm::ModuleArea, println, KernelResult};
+use corelib::domain_info::DomainFileInfo;
+use log::{debug, trace};
 use memory_addr::VirtAddr;
+use storage::StorageArg;
+pub use vm::{DomainArea, DomainVmOps};
 use xmas_elf::{program::Type, sections::SectionData, ElfFile};
 
-use crate::mm::{MappingFlags, PAGE_SIZE};
+use crate::vm::DomainMappingFlags;
+const FRAME_SIZE: usize = 4096;
+type Result<T> = core::result::Result<T, &'static str>;
 
-pub struct DomainLoader {
+pub struct DomainLoader<V: DomainVmOps> {
     entry_point: usize,
     data: Arc<Vec<u8>>,
     virt_start: usize,
+    module_area: Option<Box<dyn DomainArea>>,
     ident: String,
-    module_area: Option<ModuleArea>,
     text_section: Range<usize>,
+    _phantom: core::marker::PhantomData<V>,
 }
 
-impl Debug for DomainLoader {
+impl<V: DomainVmOps> Debug for DomainLoader<V> {
     fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
         f.debug_struct("DomainLoader")
             .field("entry", &self.entry_point)
             .field("phy_start", &self.virt_start)
             .field("ident", &self.ident)
+            .field("text_section", &self.text_section)
             .finish()
     }
 }
 
-impl Clone for DomainLoader {
+impl<V: DomainVmOps> Clone for DomainLoader<V> {
     fn clone(&self) -> Self {
         Self {
             entry_point: 0,
@@ -43,11 +58,12 @@ impl Clone for DomainLoader {
             ident: self.ident.to_string(),
             module_area: None,
             text_section: self.text_section.clone(),
+            _phantom: core::marker::PhantomData,
         }
     }
 }
 
-impl DomainLoader {
+impl<V: DomainVmOps> DomainLoader<V> {
     pub fn new(data: Arc<Vec<u8>>, ident: &str) -> Self {
         Self {
             entry_point: 0,
@@ -56,43 +72,67 @@ impl DomainLoader {
             ident: ident.to_string(),
             module_area: None,
             text_section: 0..0,
+            _phantom: core::marker::PhantomData,
         }
     }
+
+    pub fn domain_file_info(&self) -> DomainFileInfo {
+        DomainFileInfo {
+            name: self.ident.clone(),
+            size: self.data.len(),
+        }
+    }
+
     pub fn empty() -> Self {
         Self::new(Arc::new(vec![]), "empty_loader")
     }
 
-    fn entry_point(&self) -> usize {
+    pub fn entry_point(&self) -> usize {
         self.entry_point
     }
 
-    pub fn call(&self) {
-        type F = fn() -> usize;
-        let main = unsafe { core::mem::transmute::<*const (), F>(self.entry_point() as *const ()) };
-        let res = main();
-        println!("call domain res: {}", res);
+    pub fn call<T: ?Sized, F>(&self, id: u64, use_old_id: Option<u64>, callback: F) -> Box<T>
+    where
+        F: FnOnce(
+            Option<u64>,
+        ) -> (
+            &'static dyn corelib::CoreFunction,
+            &'static dyn rref::SharedHeapAlloc,
+            StorageArg,
+        ),
+    {
+        type F<T> = fn(
+            &'static dyn corelib::CoreFunction,
+            u64,
+            &'static dyn rref::SharedHeapAlloc,
+            StorageArg,
+        ) -> Box<T>;
+        let main =
+            unsafe { core::mem::transmute::<*const (), F<T>>(self.entry_point() as *const ()) };
+        let (syscall, heap, storage_arg) = callback(use_old_id);
+        main(syscall, id, heap, storage_arg)
     }
 
-    fn load_program(&mut self, elf: &ElfFile) -> KernelResult<()> {
+    fn load_program(&mut self, elf: &ElfFile) -> Result<()> {
         elf.program_iter()
             .filter(|ph| ph.get_type() == Ok(Type::Load))
             .for_each(|ph| {
                 let start_vaddr = ph.virtual_addr() as usize + self.virt_start;
                 let end_vaddr = start_vaddr + ph.mem_size() as usize;
-                let mut permission = MappingFlags::empty();
+                let mut permission = DomainMappingFlags::empty();
                 let ph_flags = ph.flags();
                 if ph_flags.is_read() {
-                    permission |= MappingFlags::READ;
+                    permission |= DomainMappingFlags::READ;
                 }
                 if ph_flags.is_write() {
-                    permission |= MappingFlags::WRITE;
+                    permission |= DomainMappingFlags::WRITE;
                 }
                 if ph_flags.is_execute() {
-                    permission |= MappingFlags::EXECUTE;
+                    permission |= DomainMappingFlags::EXECUTE;
                 }
-                let vaddr = VirtAddr::from(start_vaddr).align_down(PAGE_SIZE).as_usize();
-                let end_vaddr = VirtAddr::from(end_vaddr).align_up(PAGE_SIZE).as_usize();
-                info!(
+                let vaddr = VirtAddr::from(start_vaddr).align_down_4k().as_usize();
+                let end_vaddr = VirtAddr::from(end_vaddr).align_up_4k().as_usize();
+                trace!(
                     "map range: [{:#x}-{:#x}], memsize:{}, perm:{:?}",
                     vaddr,
                     end_vaddr,
@@ -105,7 +145,6 @@ impl DomainLoader {
                 // direct copy data to kernel space
                 let module_area = self.module_area.as_ref().unwrap();
                 let module_slice = module_area.as_mut_slice();
-
                 let copy_start = start_vaddr - self.virt_start;
                 module_slice[copy_start..copy_start + data_len].copy_from_slice(data);
                 info!(
@@ -113,47 +152,46 @@ impl DomainLoader {
                     copy_start,
                     copy_start + data_len
                 );
-                if permission.contains(MappingFlags::EXECUTE) {
+                if permission.contains(DomainMappingFlags::EXECUTE) {
                     self.text_section = vaddr..end_vaddr;
                 }
             });
         Ok(())
     }
-
-    fn relocate_dyn(&self, elf: &ElfFile) -> KernelResult<()> {
+    fn relocate_dyn(&self, elf: &ElfFile) -> Result<()> {
         if let Ok(res) = relocate_dyn(elf, self.virt_start) {
-            warn!("Relocate_dyn {} entries", res.len());
+            trace!("Relocate_dyn {} entries", res.len());
             res.into_iter().for_each(|kv| {
-                info!("relocate: {:#x} -> {:#x}", kv.0, kv.1);
+                trace!("relocate: {:#x} -> {:#x}", kv.0, kv.1);
                 let addr = kv.0;
                 unsafe { (addr as *mut usize).write(kv.1) }
             });
-            warn!("Relocate_dyn done");
+            trace!("Relocate_dyn done");
         }
         Ok(())
     }
 
-    pub fn load(&mut self) -> KernelResult<()> {
+    pub fn load(&mut self) -> Result<()> {
         let data = self.data.clone();
         let elf_binary = data.as_slice();
         const ELF_MAGIC: [u8; 4] = [0x7f, b'E', b'L', b'F'];
         if elf_binary[0..4] != ELF_MAGIC {
-            panic!("Invalid ELF file");
+            return Err("not a elf file");
         }
         debug!("Domain address:{:p}", elf_binary.as_ptr());
-        let elf = ElfFile::new(elf_binary).map_err(|_| code::EINVAL)?;
-        info!("Domain type:{:?}", elf.header.pt2.type_().as_type());
+        let elf = ElfFile::new(elf_binary)?;
+        debug!("Domain type:{:?}", elf.header.pt2.type_().as_type());
         let end_paddr = elf
             .program_iter()
             .filter(|ph| ph.get_type() == Ok(Type::Load))
             .last()
             .map(|x| x.virtual_addr() as usize + x.mem_size() as usize)
             .unwrap();
-        let end_paddr = VirtAddr::from(end_paddr).align_up(PAGE_SIZE);
+        let end_paddr = VirtAddr::from(end_paddr).align_up(FRAME_SIZE);
         // alloc free page to map elf
-        let module_area = crate::mm::alloc_free_region(end_paddr.as_usize())?;
-        let region_start = module_area.as_ptr() as usize;
-        info!(
+        let module_area = V::map_domain_area(end_paddr.as_usize());
+        let region_start = module_area.start_virtual_address().as_usize();
+        debug!(
             "region range:{:#x}-{:#x}",
             region_start,
             region_start + end_paddr.as_usize()
@@ -162,15 +200,13 @@ impl DomainLoader {
         self.module_area = Some(module_area);
         self.load_program(&elf)?;
         self.relocate_dyn(&elf)?;
-
-        //
-        let text_pages = (self.text_section.end - self.text_section.start) / PAGE_SIZE;
-        linux_kernel_module::mm::set_memory_x(self.text_section.start, text_pages).unwrap();
+        // update text section permission
+        let text_pages = (self.text_section.end - self.text_section.start) / FRAME_SIZE;
+        V::set_memory_x(self.text_section.start, text_pages)?;
         info!(
             "set_memory_x range: {:#x}-{:#x}",
             self.text_section.start, self.text_section.end
         );
-
         let entry = elf.header.pt2.entry_point() as usize + region_start;
         info!("entry: {:#x}", entry);
         self.entry_point = entry;
@@ -178,16 +214,16 @@ impl DomainLoader {
     }
 }
 
-impl Drop for DomainLoader {
+impl<V: DomainVmOps> Drop for DomainLoader<V> {
     fn drop(&mut self) {
-        println!("drop domain loader [{}]", self.ident);
+        info!("drop domain loader [{}]", self.ident);
         if let Some(module_area) = self.module_area.take() {
-            drop(module_area);
+            V::unmap_domain_area(module_area)
         }
     }
 }
 
-fn relocate_dyn(elf: &ElfFile, region_start: usize) -> Result<Vec<(usize, usize)>, &'static str> {
+fn relocate_dyn(elf: &ElfFile, region_start: usize) -> Result<Vec<(usize, usize)>> {
     let data = elf
         .find_section_by_name(".rela.dyn")
         .map(|h| h.get_data(elf).unwrap())
@@ -199,7 +235,7 @@ fn relocate_dyn(elf: &ElfFile, region_start: usize) -> Result<Vec<(usize, usize)
     let mut res = vec![];
     for entry in entries.iter() {
         match entry.get_type() {
-            R_X86_64_RELATIVE => {
+            RELATIVE => {
                 let value = region_start + entry.get_addend() as usize;
                 let addr = region_start + entry.get_offset() as usize;
                 res.push((addr, value))
@@ -210,5 +246,13 @@ fn relocate_dyn(elf: &ElfFile, region_start: usize) -> Result<Vec<(usize, usize)
     Ok(res)
 }
 
-/// Adjust by program base
-pub const R_X86_64_RELATIVE: u32 = 8;
+#[cfg(target_arch = "riscv64")]
+const R_RISCV_RELATIVE: u32 = 3;
+#[cfg(target_arch = "x86_64")]
+const R_X86_64_RELATIVE: u32 = 8;
+
+#[cfg(target_arch = "riscv64")]
+const RELATIVE: u32 = R_RISCV_RELATIVE;
+
+#[cfg(target_arch = "x86_64")]
+const RELATIVE: u32 = R_X86_64_RELATIVE;

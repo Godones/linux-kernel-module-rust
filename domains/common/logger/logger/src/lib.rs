@@ -64,7 +64,7 @@ impl Log for SimpleLogger {
         if !self.enabled(record.metadata()) {
             return;
         }
-        let color = match record.level() {
+        let _color = match record.level() {
             log::Level::Error => 31, // Red
             log::Level::Warn => 93,  // BrightYellow
             log::Level::Info => 35,  // Blue
@@ -72,8 +72,7 @@ impl Log for SimpleLogger {
             log::Level::Trace => 90, // BrightBlack
         };
         println!(
-            "\u{1B}[{}m[{:>1}] {}\u{1B}[0m",
-            color,
+            "[{}] {}",
             record.level(),
             record.args(),
         );

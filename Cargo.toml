@@ -6,7 +6,7 @@ members = [
     "domain-lib/*",
     "xtask",
     "tcb"
-, "loader_test"]
+]
 
 
 resolver = "2"

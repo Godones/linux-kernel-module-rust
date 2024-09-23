@@ -118,6 +118,15 @@ pub fn register_domain(
     res
 }
 
+/// Register the domain elf data with the given identifier.
+///
+/// # Arguments
+/// `ident` - The identifier of the domain.
+///
+/// `domain_file` - The domain file information.
+///
+/// `domain` - The domain type
+///
 #[macro_export]
 macro_rules! register_domain {
     ($ident:expr,$domain_file:expr,$domain:expr,$unique:expr) => {

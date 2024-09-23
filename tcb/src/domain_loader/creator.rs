@@ -12,7 +12,7 @@ use ksync::RwLock;
 
 use crate::{
     domain_helper::{alloc_domain_id, DomainCreate, DOMAIN_INFO},
-    domain_loader::loader::DomainLoader,
+    domain_loader::loader::{DomainCall, DomainLoader},
     domain_proxy::*,
     register_domain,
 };
@@ -119,6 +119,7 @@ where
 }
 
 pub struct DomainCreateImpl;
+
 impl DomainCreate for DomainCreateImpl {
     fn create_domain(
         &self,
@@ -150,8 +151,7 @@ pub fn create_domain<T: ?Sized>(
     let mut domain_loader = DomainLoader::new(data.data, domain_file_name);
     domain_loader.load().unwrap();
     let id = alloc_domain_id();
-    let domain = domain_loader.call(id, use_old_id);
-
+    let domain = domain_loader.call_main(id, use_old_id);
     Some((id, domain, domain_loader))
 }
 
@@ -161,6 +161,6 @@ pub fn create_domain_with_loader<T: ?Sized>(
 ) -> Option<(u64, Box<T>, DomainLoader)> {
     domain_loader.load().unwrap();
     let id = alloc_domain_id();
-    let domain = domain_loader.call(id, use_old_id);
+    let domain = domain_loader.call_main(id, use_old_id);
     Some((id, domain, domain_loader))
 }

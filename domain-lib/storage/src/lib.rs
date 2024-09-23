@@ -25,7 +25,7 @@ static DATA_ALLOCATOR: Once<DataStorageHeap> = Once::new();
 
 pub fn init_data_allocator(allocator: &'static dyn SendAllocator) {
     DATA_ALLOCATOR.call_once(|| allocator);
-    log::error!("init data allocator success");
+    log::info!("init data allocator success");
 }
 
 impl StorageBuilder for DataStorageHeap {

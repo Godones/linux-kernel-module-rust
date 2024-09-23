@@ -14,6 +14,7 @@ basic = { path = "../domain-lib/basic" }
 ksync = { path = "../domain-lib/ksync" }
 rref = { path = "../domain-lib/rref" }
 storage = { path = "../domain-lib/storage" }
+loader = { path = "../domain-lib/loader" }
 #
 log = "0"
 hashbrown = "0.14.5"

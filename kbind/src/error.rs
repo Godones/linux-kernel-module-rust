@@ -21,7 +21,7 @@ impl Error {
                 "attempted to create `Error` with out of range `errno`: {}",
                 errno
             );
-            return code::EINVAL;
+            return linux_err::EINVAL;
         }
         // INVARIANT: The check above ensures the type invariant
         // will hold.
@@ -71,7 +71,7 @@ impl Debug for Error {
 /// Contains the C-compatible error codes.
 #[rustfmt::skip]
 #[allow(unused)]
-pub mod code {
+pub mod linux_err {
     macro_rules! declare_err {
         ($err:tt $(,)? $($doc:expr),+) => {
             $(
@@ -138,31 +138,31 @@ pub mod code {
 
 impl From<AllocError> for Error {
     fn from(_: AllocError) -> Error {
-        code::ENOMEM
+        linux_err::ENOMEM
     }
 }
 
 impl From<TryFromIntError> for Error {
     fn from(_: TryFromIntError) -> Error {
-        code::EINVAL
+        linux_err::EINVAL
     }
 }
 
 impl From<Utf8Error> for Error {
     fn from(_: Utf8Error) -> Error {
-        code::EINVAL
+        linux_err::EINVAL
     }
 }
 
 impl From<LayoutError> for Error {
     fn from(_: LayoutError) -> Error {
-        code::ENOMEM
+        linux_err::ENOMEM
     }
 }
 
 impl From<fmt::Error> for Error {
     fn from(_: fmt::Error) -> Error {
-        code::EINVAL
+        linux_err::EINVAL
     }
 }
 

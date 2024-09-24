@@ -50,7 +50,7 @@ impl SysctlStorage for atomic::AtomicBool {
                 self.store(true, atomic::Ordering::Relaxed);
                 Ok(())
             }
-            _ => Err(error::code::EINVAL),
+            _ => Err(error::linux_err::EINVAL),
         };
         (data.len(), result)
     }
@@ -83,10 +83,10 @@ unsafe extern "C" fn proc_handler<T: SysctlStorage>(
     len: *mut usize,
     ppos: *mut bindings::loff_t,
 ) -> core::ffi::c_int {
-    println!(
-        "proc_handler: ctl={:p}, write={}, buffer={:p}, len={}, ppos={}",
-        ctl, write, buffer, *len, *ppos
-    );
+    // println!(
+    //     "proc_handler: ctl={:p}, write={}, buffer={:p}, len={}, ppos={}",
+    //     ctl, write, buffer, *len, *ppos
+    // );
     // If we're reading from some offset other than the beginning of the file,
     // return an empty read to signal EOF.
     if *ppos != 0 && write == 0 {
@@ -128,7 +128,7 @@ impl<T: SysctlStorage> Sysctl<T> {
         mode: types::Mode,
     ) -> error::KernelResult<Sysctl<T>> {
         if name.contains('/') {
-            return Err(error::code::EINVAL);
+            return Err(error::linux_err::EINVAL);
         }
 
         let storage = Box::new(storage);
@@ -152,7 +152,7 @@ impl<T: SysctlStorage> Sysctl<T> {
         let result =
             unsafe { bindings::register_sysctl(path.as_ptr() as *const i8, table.as_mut_ptr()) };
         if result.is_null() {
-            return Err(error::code::ENOMEM);
+            return Err(error::linux_err::ENOMEM);
         }
 
         Ok(Sysctl {

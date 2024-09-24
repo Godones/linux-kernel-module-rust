@@ -1,4 +1,4 @@
-use crate::{bindings, code, env, pr_warning, KernelResult};
+use crate::{bindings, env, linux_err, pr_warning, KernelResult};
 
 type ModuleAllocFn = extern "C" fn(size: core::ffi::c_ulong) -> *mut core::ffi::c_void;
 type ModuleMemFreeFn = extern "C" fn(*mut core::ffi::c_void);
@@ -50,7 +50,7 @@ pub fn alloc_module_area(size: usize) -> KernelResult<ModuleArea> {
     assert_eq!(size % 4096, 0);
     let start = module_alloc(size);
     if start == 0 {
-        Err(code::ENOMEM)
+        Err(linux_err::ENOMEM)
     } else {
         Ok(ModuleArea { start, size })
     }
@@ -101,7 +101,7 @@ pub fn alloc_contiguous_vspace(size: usize) -> KernelResult<VSpace> {
     assert_eq!(size % 4096, 0);
     assert_eq!(start % 4096, 0);
     if start == 0 {
-        Err(code::ENOMEM)
+        Err(linux_err::ENOMEM)
     } else {
         Ok(VSpace::new(start, size))
     }

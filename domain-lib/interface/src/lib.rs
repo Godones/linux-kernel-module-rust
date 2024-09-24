@@ -40,27 +40,10 @@ impl DomainType {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Ord, PartialOrd)]
+#[repr(u8)]
 pub enum DomainTypeRaw {
-    FsDomain = 1,
-    BlkDeviceDomain = 2,
-    CacheBlkDeviceDomain = 3,
-    RtcDomain = 4,
-    GpuDomain = 5,
-    InputDomain = 6,
-    VfsDomain = 7,
-    UartDomain = 8,
-    PLICDomain = 9,
-    TaskDomain = 10,
-    SysCallDomain = 11,
-    ShadowBlockDomain = 12,
-    BufUartDomain = 13,
-    NetDeviceDomain = 14,
-    BufInputDomain = 15,
-    EmptyDeviceDomain = 16,
-    DevFsDomain = 17,
-    SchedulerDomain = 18,
-    LogDomain = 19,
-    NetDomain = 20,
+    EmptyDeviceDomain = 1,
+    LogDomain = 2,
 }
 
 impl TryFrom<u8> for DomainTypeRaw {
@@ -68,26 +51,8 @@ impl TryFrom<u8> for DomainTypeRaw {
 
     fn try_from(value: u8) -> Result<Self, Self::Error> {
         match value {
-            1 => Ok(DomainTypeRaw::FsDomain),
-            2 => Ok(DomainTypeRaw::BlkDeviceDomain),
-            3 => Ok(DomainTypeRaw::CacheBlkDeviceDomain),
-            4 => Ok(DomainTypeRaw::RtcDomain),
-            5 => Ok(DomainTypeRaw::GpuDomain),
-            6 => Ok(DomainTypeRaw::InputDomain),
-            7 => Ok(DomainTypeRaw::VfsDomain),
-            8 => Ok(DomainTypeRaw::UartDomain),
-            9 => Ok(DomainTypeRaw::PLICDomain),
-            10 => Ok(DomainTypeRaw::TaskDomain),
-            11 => Ok(DomainTypeRaw::SysCallDomain),
-            12 => Ok(DomainTypeRaw::ShadowBlockDomain),
-            13 => Ok(DomainTypeRaw::BufUartDomain),
-            14 => Ok(DomainTypeRaw::NetDeviceDomain),
-            15 => Ok(DomainTypeRaw::BufInputDomain),
-            16 => Ok(DomainTypeRaw::EmptyDeviceDomain),
-            17 => Ok(DomainTypeRaw::DevFsDomain),
-            18 => Ok(DomainTypeRaw::SchedulerDomain),
-            19 => Ok(DomainTypeRaw::LogDomain),
-            20 => Ok(DomainTypeRaw::NetDomain),
+            1 => Ok(DomainTypeRaw::EmptyDeviceDomain),
+            2 => Ok(DomainTypeRaw::LogDomain),
             _ => Err(()),
         }
     }

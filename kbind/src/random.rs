@@ -25,7 +25,7 @@ pub fn getrandom(dest: &mut [u8]) -> error::KernelResult<()> {
 /// available on 4.19 and later kernels.
 pub fn getrandom_nonblock(dest: &mut [u8]) -> error::KernelResult<()> {
     if !unsafe { bindings::rng_is_initialized() } {
-        return Err(error::code::EAGAIN);
+        return Err(error::linux_err::EAGAIN);
     }
     getrandom(dest)
 }

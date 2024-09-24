@@ -81,7 +81,7 @@ impl KernelSlicePtrReader {
 
     pub fn read(&mut self, data: &mut [u8]) -> error::KernelResult<()> {
         if data.len() > self.1 || data.len() > u32::MAX as usize {
-            return Err(error::code::EFAULT);
+            return Err(error::linux_err::EFAULT);
         }
         unsafe {
             core::ptr::copy_nonoverlapping(self.0 as *const u8, data.as_mut_ptr(), data.len());
@@ -108,7 +108,7 @@ impl KernelSlicePtrWriter {
 
     pub fn write(&mut self, data: &[u8]) -> error::KernelResult<()> {
         if data.len() > self.1 || data.len() > u32::MAX as usize {
-            return Err(error::code::EFAULT);
+            return Err(error::linux_err::EFAULT);
         }
         unsafe {
             core::ptr::copy_nonoverlapping(data.as_ptr(), self.0 as *mut u8, data.len());

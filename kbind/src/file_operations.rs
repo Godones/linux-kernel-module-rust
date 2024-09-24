@@ -68,7 +68,7 @@ unsafe extern "C" fn read_callback<T: FileOperations>(
     // See discussion in #113
     let positive_offset = match (*offset).try_into() {
         Ok(v) => v,
-        Err(_) => return error::code::EINVAL.to_errno().try_into().unwrap(),
+        Err(_) => return error::linux_err::EINVAL.to_errno().try_into().unwrap(),
     };
     let read = T::READ.unwrap();
     match read(f, &File::from_ptr(file), &mut data, positive_offset) {
@@ -96,7 +96,7 @@ unsafe extern "C" fn write_callback<T: FileOperations>(
     // See discussion in #113
     let positive_offset = match (*offset).try_into() {
         Ok(v) => v,
-        Err(_) => return error::code::EINVAL.to_errno().try_into().unwrap(),
+        Err(_) => return error::linux_err::EINVAL.to_errno().try_into().unwrap(),
     };
     let write = T::WRITE.unwrap();
     match write(f, &mut data, positive_offset) {
@@ -126,11 +126,11 @@ unsafe extern "C" fn llseek_callback<T: FileOperations>(
     let off = match whence as u32 {
         bindings::SEEK_SET => match offset.try_into() {
             Ok(v) => SeekFrom::Start(v),
-            Err(_) => return error::code::EINVAL.to_errno().into(),
+            Err(_) => return error::linux_err::EINVAL.to_errno().into(),
         },
         bindings::SEEK_CUR => SeekFrom::Current(offset),
         bindings::SEEK_END => SeekFrom::End(offset),
-        _ => return error::code::EINVAL.to_errno().into(),
+        _ => return error::linux_err::EINVAL.to_errno().into(),
     };
     let f = &*((*file).private_data as *const T);
     let seek = T::SEEK.unwrap();

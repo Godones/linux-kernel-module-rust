@@ -8,8 +8,9 @@ extern crate alloc;
 extern crate log;
 
 #[macro_use]
-extern crate linux_kernel_module;
+extern crate kbind;
 
+mod channel;
 mod config;
 mod domain;
 mod domain_helper;
@@ -19,21 +20,26 @@ mod mem;
 
 use alloc::{borrow::ToOwned, string::String};
 
-use linux_kernel_module::{logger, println};
+use kbind::{logger, println, sysctl::Sysctl};
+
+use crate::channel::CommandChannel;
 
 struct TcbModule {
+    _sysctl_domain_command: Sysctl<CommandChannel>,
     message: String,
 }
 
-impl linux_kernel_module::KernelModule for TcbModule {
-    fn init() -> linux_kernel_module::KernelResult<Self> {
+impl kbind::KernelModule for TcbModule {
+    fn init() -> kbind::KernelResult<Self> {
         println!("TCB kernel module!");
         println_color!(31, "This is a red message");
         println_color!(32, "This is a green message");
         println_color!(33, "This is a yellow message");
         logger::init_logger();
+        let channel = channel::init_domain_channel()?;
         domain::init_domain_system().unwrap();
         Ok(TcbModule {
+            _sysctl_domain_command: channel,
             message: "on the heap!".to_owned(),
         })
     }
@@ -46,7 +52,7 @@ impl Drop for TcbModule {
     }
 }
 
-linux_kernel_module::kernel_module!(
+kbind::kernel_module!(
     TcbModule,
     author: b"godones",
     description: b"TCB kernel module",

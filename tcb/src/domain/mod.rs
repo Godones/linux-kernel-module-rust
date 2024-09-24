@@ -5,7 +5,7 @@ use interface::{
     logger::{Level, LogDomain},
     Basic, DomainTypeRaw,
 };
-use linux_kernel_module::env;
+use kbind::env;
 use rref::RRefVec;
 
 use crate::{
@@ -30,12 +30,10 @@ pub fn init_domain_system() -> LinuxResult<()> {
 }
 
 static GNULL: &[u8] = include_bytes!("../../../build/disk/gnull");
-static GLOGGER: &[u8] = include_bytes!("../../../build/disk/glogger");
 
 /// Register the basic domains
 fn init_basic_domains() {
     register_domain_elf("null", GNULL.to_vec(), DomainTypeRaw::EmptyDeviceDomain);
-    register_domain_elf("logger", GLOGGER.to_vec(), DomainTypeRaw::LogDomain);
 }
 
 /// set the kernel to the specific domain
@@ -45,29 +43,13 @@ fn init_kernel_domain() {
 }
 
 pub fn load_domains() -> LinuxResult<()> {
-    pr_info!("module_alloc: {:x?}", env::MODULE_ALLOC_ADDR);
-    pr_info!("module_dealloc: {:x?}", env::MODULE_MEMFREE_ADDR);
-
+    pr_info!("module_alloc func ptr: {:x?}", env::MODULE_ALLOC_ADDR);
+    pr_info!("module_dealloc func ptr: {:x?}", env::MODULE_MEMFREE_ADDR);
     let null_domain = GNULL;
     pr_info!("The null domain size: {} bytes", null_domain.len());
     let mut loader = DomainLoader::new(Arc::new(null_domain.to_vec()), "gnull");
     loader.load().unwrap();
     loader.call_raw();
-
     pr_info!("The null domain is loaded");
-
-    let (logger, domain_file_info) =
-        create_domain!(LogDomainProxy, DomainTypeRaw::LogDomain, "logger")?;
-    logger.init_by_box(Box::new(()))?;
-    // register_domain!(
-    //     "logger",
-    //     domain_file_info,
-    //     DomainType::LogDomain(logger),
-    //     true
-    // );
-    let id = logger.domain_id();
-    let info = RRefVec::from_slice(b"print using logger");
-    logger.log(Level::Error, &info)?;
-    free_domain_resource(id, FreeShared::Free);
     Ok(())
 }

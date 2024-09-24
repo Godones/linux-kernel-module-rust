@@ -56,7 +56,7 @@ impl UserSlicePtr {
         length: usize,
     ) -> error::KernelResult<UserSlicePtr> {
         if access_ok_helper(ptr, length as core::ffi::c_ulong) == 0 {
-            return Err(error::code::EFAULT);
+            return Err(error::linux_err::EFAULT);
         }
         Ok(UserSlicePtr(ptr, length))
     }
@@ -118,7 +118,7 @@ impl UserSlicePtrReader {
 
     pub fn read(&mut self, data: &mut [u8]) -> error::KernelResult<()> {
         if data.len() > self.1 || data.len() > u32::MAX as usize {
-            return Err(error::code::EFAULT);
+            return Err(error::linux_err::EFAULT);
         }
         let res = unsafe {
             bindings::_copy_from_user(
@@ -128,7 +128,7 @@ impl UserSlicePtrReader {
             )
         };
         if res != 0 {
-            return Err(error::code::EFAULT);
+            return Err(error::linux_err::EFAULT);
         }
         // Since this is not a pointer to a valid object in our program,
         // we cannot use `add`, which has C-style rules for defined
@@ -152,7 +152,7 @@ impl UserSlicePtrWriter {
 
     pub fn write(&mut self, data: &[u8]) -> error::KernelResult<()> {
         if data.len() > self.1 || data.len() > u32::MAX as usize {
-            return Err(error::code::EFAULT);
+            return Err(error::linux_err::EFAULT);
         }
         let res = unsafe {
             bindings::_copy_to_user(
@@ -162,7 +162,7 @@ impl UserSlicePtrWriter {
             )
         };
         if res != 0 {
-            return Err(error::code::EFAULT);
+            return Err(error::linux_err::EFAULT);
         }
         // Since this is not a pointer to a valid object in our program,
         // we cannot use `add`, which has C-style rules for defined

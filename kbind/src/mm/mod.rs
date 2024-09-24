@@ -1,4 +1,4 @@
-use crate::{code, env, KernelResult};
+use crate::{env, linux_err, KernelResult};
 
 pub mod vm;
 
@@ -14,6 +14,6 @@ pub fn set_memory_x(virt_addr: usize, numpages: usize) -> KernelResult<()> {
     if ret == 0 {
         Ok(())
     } else {
-        Err(code::EINVAL)
+        Err(linux_err::EINVAL)
     }
 }

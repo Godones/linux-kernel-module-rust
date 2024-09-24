@@ -19,7 +19,7 @@ mod types;
 pub mod user_ptr;
 
 pub use crate::{
-    error::{code, Error, KernelResult},
+    error::{linux_err, Error, KernelResult},
     types::{CStr, Mode},
 };
 pub mod env;

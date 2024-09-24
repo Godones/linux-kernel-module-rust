@@ -15,11 +15,14 @@ ksync = { path = "../domain-lib/ksync" }
 rref = { path = "../domain-lib/rref" }
 storage = { path = "../domain-lib/storage" }
 loader = { path = "../domain-lib/loader" }
+command = { path = "../tests/command" }
+
 #
 log = "0"
 hashbrown = "0.14.5"
 xmas-elf = "0.9"
 bitflags = "2.6.0"
 memory_addr = { git ="https://github.com/os-module/memory_addr" }
+spin = "0.9.8"
 # kernel bind
-linux-kernel-module = { path = "../kbind", package = "kbind" }
+kbind = { path = "../kbind" }

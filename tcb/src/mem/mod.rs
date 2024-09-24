@@ -1,6 +1,6 @@
 use core::fmt::Debug;
 
-use linux_kernel_module::{mm, mm::vm::VSpace};
+use kbind::{mm, mm::vm::VSpace};
 
 use crate::config::FRAME_SIZE;
 

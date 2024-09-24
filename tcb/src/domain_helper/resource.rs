@@ -1,7 +1,7 @@
 use alloc::{boxed::Box, collections::BTreeMap, vec::Vec};
 
+use kbind::{println, println_color};
 use ksync::Mutex;
-use linux_kernel_module::{println, println_color};
 
 use crate::{
     config::FRAME_BITS,

@@ -1,5 +1,5 @@
 export KDIR ?= /lib/modules/$(shell uname -r)/build
-module-name := tcb
+module-name := sync
 CLANG ?= clang
 ifeq ($(origin CC),default)
 CC := ${CLANG}
@@ -11,7 +11,7 @@ all:
 
 clean:
 	$(MAKE) -C $(KDIR) M=$(CURDIR) CC=$(CC) clean
-	-rm ../target/x86_64-kernel -dr
+	-rm ../../target/x86_64-kernel -dr
 
 rebuild: clean all
 	@echo "rebuild done"

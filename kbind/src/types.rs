@@ -41,6 +41,8 @@ impl Deref for CStr<'_> {
 /// Creates a new `CStr` from a string literal. The string literal should not contain any NUL
 /// bytes. Example usage:
 /// ```
+/// use kbind::{cstr, CStr};
+///
 /// const MY_CSTR: CStr<'static> = cstr!("My awesome CStr!");
 /// ```
 #[macro_export]

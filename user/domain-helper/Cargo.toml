@@ -4,4 +4,4 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-command = { path = "../../tests/command" }
+command = { path = "../../domain-lib/command" }

@@ -45,7 +45,7 @@ impl Error {
     /// Returns a string representing the error, if one exists.
     pub fn name(&self) -> Option<&'static CStr> {
         // SAFETY: Just an FFI call, there are no extra safety requirements.
-        let ptr = unsafe { bindings::errname(-self.0) };
+        let ptr = unsafe { bindings::rust_helper_errname(-self.0) };
         if ptr.is_null() {
             None
         } else {

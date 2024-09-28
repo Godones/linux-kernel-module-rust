@@ -15,7 +15,7 @@ ksync = { path = "../domain-lib/ksync" }
 rref = { path = "../domain-lib/rref" }
 storage = { path = "../domain-lib/storage" }
 loader = { path = "../domain-lib/loader" }
-command = { path = "../tests/command" }
+command = { path = "../domain-lib/command" }
 
 #
 log = "0"

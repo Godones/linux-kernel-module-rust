@@ -13,9 +13,8 @@ pub mod kernel_ptr;
 pub mod logger;
 pub mod printk;
 pub mod random;
-mod str;
 pub mod sysctl;
-mod types;
+pub mod types;
 pub mod user_ptr;
 
 pub use crate::{
@@ -24,21 +23,22 @@ pub use crate::{
 };
 pub mod env;
 pub mod mm;
+pub mod sync;
 
 /// Declares the entrypoint for a kernel module. The first argument should be a type which
 /// implements the [`KernelModule`] trait. Also accepts various forms of kernel metadata.
 ///
 /// Example:
 /// ```rust,no_run
-/// use linux_kernel_module;
+/// use kbind;
 /// struct MyKernelModule;
-/// impl linux_kernel_module::KernelModule for MyKernelModule {
-///     fn init() -> linux_kernel_module::KernelResult<Self> {
+/// impl kbind::KernelModule for MyKernelModule {
+///     fn init() -> kbind::KernelResult<Self> {
 ///         Ok(MyKernelModule)
 ///     }
 /// }
 ///
-/// linux_kernel_module::kernel_module!(
+/// kbind::kernel_module!(
 ///     MyKernelModule,
 ///     author: b"Fish in a Barrel Contributors",
 ///     description: b"My very own kernel module!",

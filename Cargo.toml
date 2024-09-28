@@ -5,8 +5,9 @@ members = [
     "tests/*",
     "domain-lib/*",
     "xtask",
-    "tcb"
-, "user/connect", "user/domain-helper"]
+    "tcb",
+    "user/*",
+]
 
 
 resolver = "2"

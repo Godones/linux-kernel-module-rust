@@ -1,10 +1,15 @@
 #[allow(
     clippy::all,
+    missing_docs,
     non_camel_case_types,
     non_upper_case_globals,
     non_snake_case,
+    improper_ctypes,
+    unreachable_pub,
+    unsafe_op_in_unsafe_fn,
     improper_ctypes
 )]
+
 mod bindings {
     include!("bindings_c.rs");
 }
@@ -31,10 +36,51 @@ extern "C" {
     pub(crate) fn rust_helper_mutex_init(lock: *mut mutex);
     pub(crate) fn rust_helper_mutex_lock(lock: *mut mutex);
     pub(crate) fn rust_helper_mutex_unlock(lock: *mut mutex);
+
+    pub(crate) fn rust_helper_get_current() -> *mut task_struct;
+    pub(crate) fn rust_helper_get_task_struct(t: *mut task_struct);
+    pub(crate) fn rust_helper_put_task_struct(t: *mut task_struct);
+    pub(crate) fn rust_helper_signal_pending(t: *mut task_struct) -> core::ffi::c_int;
+
+    pub(crate) fn rust_helper_IS_ERR(ptr: *const core::ffi::c_void) -> bool_;
+    pub(crate) fn rust_helper_PTR_ERR(ptr: *const core::ffi::c_void) -> core::ffi::c_long;
+
+    pub(crate) fn rust_helper_blk_mq_rq_to_pdu(rq: *mut request) -> *mut core::ffi::c_void;
+
+    pub(crate) fn rust_helper_blk_mq_rq_from_pdu(pdu: *mut core::ffi::c_void) -> *mut request;
+
 }
 
 #[repr(C)]
 #[derive(Debug)]
 pub(crate) struct CRcuData {
     pub data_ptr: *mut core::ffi::c_void,
+}
+
+pub(crate) unsafe fn is_err(ptr: *const core::ffi::c_void) -> bool {
+    rust_helper_IS_ERR(ptr)
+}
+pub(crate) unsafe fn ptr_err(ptr: *const core::ffi::c_void) -> core::ffi::c_long {
+    rust_helper_PTR_ERR(ptr)
+}
+pub(crate) unsafe fn get_current() -> *mut task_struct {
+    rust_helper_get_current()
+}
+pub(crate) unsafe fn get_task_struct(t: *mut task_struct) {
+    rust_helper_get_task_struct(t)
+}
+pub(crate) unsafe fn put_task_struct(t: *mut task_struct) {
+    rust_helper_put_task_struct(t)
+}
+
+pub(crate) unsafe fn signal_pending(t: *mut task_struct) -> core::ffi::c_int {
+    rust_helper_signal_pending(t)
+}
+
+pub(crate) unsafe fn blk_mq_rq_to_pdu(rq: *mut request) -> *mut core::ffi::c_void {
+    rust_helper_blk_mq_rq_to_pdu(rq)
+}
+
+pub(crate) unsafe fn blk_mq_rq_from_pdu(pdu: *mut core::ffi::c_void) -> *mut request {
+    rust_helper_blk_mq_rq_from_pdu(pdu)
 }

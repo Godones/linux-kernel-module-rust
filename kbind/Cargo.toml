@@ -6,6 +6,9 @@ edition = "2021"
 [dependencies]
 bitflags = "2"
 log = "0"
+kmacro = { path = "../kmacro" }
+pinned-init = { version = "0.0.8", default-features = false, features = ["alloc"]}
+
 
 [build-dependencies]
 bindgen = "0.70"

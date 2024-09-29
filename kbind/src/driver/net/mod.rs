@@ -1,0 +1,2 @@
+#[cfg(CONFIG_RUST_PHYLIB_ABSTRACTIONS)]
+pub mod phy;

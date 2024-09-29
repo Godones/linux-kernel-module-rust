@@ -9,7 +9,10 @@
 #include <linux/errname.h>
 #include <linux/errno.h>
 #include <linux/set_memory.h>
-
+#include <linux/phy.h>
+#include <linux/blk-mq.h>
+#include <linux/blk_types.h>
+#include <linux/blkdev.h>
 
 // Bindgen gets confused at certain things
 //

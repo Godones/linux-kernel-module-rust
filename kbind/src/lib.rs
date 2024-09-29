@@ -21,9 +21,15 @@ pub use crate::{
     error::{linux_err, Error, KernelResult},
     types::{CStr, Mode},
 };
+pub mod driver;
 pub mod env;
 pub mod mm;
 pub mod sync;
+pub mod task;
+pub mod time;
+
+pub use error::build_error;
+pub use kmacro::vtable;
 
 /// Declares the entrypoint for a kernel module. The first argument should be a type which
 /// implements the [`KernelModule`] trait. Also accepts various forms of kernel metadata.
@@ -137,6 +143,32 @@ pub trait KernelModule: Sized + Sync {
 
 extern "C" {
     fn bug_helper() -> !;
+}
+
+/// Equivalent to `THIS_MODULE` in the C API.
+///
+/// C header: [`include/linux/export.h`](srctree/include/linux/export.h)
+pub struct ThisModule(*mut bindings::module);
+
+// SAFETY: `THIS_MODULE` may be used from all threads within a module.
+unsafe impl Sync for ThisModule {}
+
+impl ThisModule {
+    /// Creates a [`ThisModule`] given the `THIS_MODULE` pointer.
+    ///
+    /// # Safety
+    ///
+    /// The pointer must be equal to the right `THIS_MODULE`.
+    pub const unsafe fn from_ptr(ptr: *mut bindings::module) -> ThisModule {
+        ThisModule(ptr)
+    }
+
+    /// Access the raw pointer for this module.
+    ///
+    /// It is up to the user to use it correctly.
+    pub const fn as_ptr(&self) -> *mut bindings::module {
+        self.0
+    }
 }
 
 #[panic_handler]

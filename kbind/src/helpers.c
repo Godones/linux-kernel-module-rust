@@ -7,7 +7,13 @@
 #include <linux/rcupdate.h>
 #include <linux/mutex.h>
 #include <linux/spinlock.h>
-
+#include <linux/sched/signal.h>
+#include <linux/refcount.h>
+#include <linux/wait.h>
+#include <linux/workqueue.h>
+#include <linux/blk-mq.h>
+#include <linux/blk_types.h>
+#include <linux/blkdev.h>
 
 void bug_helper(void) { BUG(); }
 
@@ -55,3 +61,25 @@ void rust_helper_mutex_init(struct mutex *lock) { mutex_init(lock); }
 void rust_helper_mutex_lock(struct mutex *lock) { mutex_lock(lock); }
 void rust_helper_mutex_unlock(struct mutex *lock) { mutex_unlock(lock); }
 
+
+struct task_struct *rust_helper_get_current(void){ return current; }
+void rust_helper_get_task_struct(struct task_struct *t){ get_task_struct(t); }
+void rust_helper_put_task_struct(struct task_struct *t){ put_task_struct(t); }
+int rust_helper_signal_pending(struct task_struct *t){ return signal_pending(t); }
+
+
+long rust_helper_PTR_ERR(__force const void *ptr){ return PTR_ERR(ptr); }
+bool rust_helper_IS_ERR(__force const void *ptr){ return IS_ERR(ptr); }
+
+
+
+void *rust_helper_blk_mq_rq_to_pdu(struct request *rq)
+{
+    return blk_mq_rq_to_pdu(rq);
+}
+
+
+struct request *rust_helper_blk_mq_rq_from_pdu(void *pdu)
+{
+    return blk_mq_rq_from_pdu(pdu);
+}

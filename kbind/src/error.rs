@@ -171,3 +171,129 @@ impl From<core::convert::Infallible> for Error {
         match e {}
     }
 }
+
+/// Converts an integer as returned by a C kernel function to an error if it's negative, and
+/// `Ok(())` otherwise.
+pub fn to_result(err: core::ffi::c_int) -> KernelResult<()> {
+    if err < 0 {
+        Err(Error::from_errno(err))
+    } else {
+        Ok(())
+    }
+}
+
+/// Calls a closure returning a [`crate::error::Result<T>`] and converts the result to
+/// a C integer result.
+///
+/// This is useful when calling Rust functions that return [`crate::error::Result<T>`]
+/// from inside `extern "C"` functions that need to return an integer error result.
+///
+/// `T` should be convertible from an `i16` via `From<i16>`.
+///
+/// # Examples
+///
+/// ```ignore
+/// # use kernel::from_result;
+/// # use kernel::bindings;
+/// unsafe extern "C" fn probe_callback(
+///     pdev: *mut bindings::platform_device,
+/// ) -> core::ffi::c_int {
+///     from_result(|| {
+///         let ptr = devm_alloc(pdev)?;
+///         bindings::platform_set_drvdata(pdev, ptr);
+///         Ok(0)
+///     })
+/// }
+/// ```
+// TODO: Remove `dead_code` marker once an in-kernel client is available.
+#[allow(dead_code)]
+pub(crate) fn from_result<T, F>(f: F) -> T
+where
+    T: From<i16>,
+    F: FnOnce() -> KernelResult<T>,
+{
+    match f() {
+        Ok(v) => v,
+        // NO-OVERFLOW: negative `errno`s are no smaller than `-bindings::MAX_ERRNO`,
+        // `-bindings::MAX_ERRNO` fits in an `i16` as per invariant above,
+        // therefore a negative `errno` always fits in an `i16` and will not overflow.
+        Err(e) => T::from(e.to_errno() as i16),
+    }
+}
+
+/// Error message for calling a default function of a [`#[vtable]`](macros::vtable) trait.
+pub const VTABLE_DEFAULT_ERROR: &str =
+    "This function must not be called, see the #[vtable] documentation.";
+
+/// Transform a kernel "error pointer" to a normal pointer.
+///
+/// Some kernel C API functions return an "error pointer" which optionally
+/// embeds an `errno`. Callers are supposed to check the returned pointer
+/// for errors. This function performs the check and converts the "error pointer"
+/// to a normal pointer in an idiomatic fashion.
+///
+/// # Examples
+///
+/// ```ignore
+/// # use kernel::from_err_ptr;
+/// # use kernel::bindings;
+/// fn devm_platform_ioremap_resource(
+///     pdev: &mut PlatformDevice,
+///     index: u32,
+/// ) -> Result<*mut core::ffi::c_void> {
+///     // SAFETY: `pdev` points to a valid platform device. There are no safety requirements
+///     // on `index`.
+///     from_err_ptr(unsafe { bindings::devm_platform_ioremap_resource(pdev.to_ptr(), index) })
+/// }
+/// ```
+// TODO: Remove `dead_code` marker once an in-kernel client is available.
+#[allow(dead_code)]
+pub(crate) fn from_err_ptr<T>(ptr: *mut T) -> KernelResult<*mut T> {
+    // CAST: Casting a pointer to `*const core::ffi::c_void` is always valid.
+    let const_ptr: *const core::ffi::c_void = ptr.cast();
+    // SAFETY: The FFI function does not deref the pointer.
+    if unsafe { bindings::is_err(const_ptr) } {
+        // SAFETY: The FFI function does not deref the pointer.
+        let err = unsafe { bindings::ptr_err(const_ptr) };
+        // CAST: If `IS_ERR()` returns `true`,
+        // then `PTR_ERR()` is guaranteed to return a
+        // negative value greater-or-equal to `-bindings::MAX_ERRNO`,
+        // which always fits in an `i16`, as per the invariant above.
+        // And an `i16` always fits in an `i32`. So casting `err` to
+        // an `i32` can never overflow, and is always valid.
+        //
+        // SAFETY: `IS_ERR()` ensures `err` is a
+        // negative value greater-or-equal to `-bindings::MAX_ERRNO`.
+        #[allow(clippy::unnecessary_cast)]
+        return Err(unsafe { Error::from_errno_unchecked(err as core::ffi::c_int) });
+    }
+    Ok(ptr)
+}
+
+// Build-time error.
+//
+// This crate provides a [const function][const-functions] `build_error`, which will panic in
+// compile-time if executed in [const context][const-context], and will cause a build error
+// if not executed at compile time and the optimizer does not optimise away the call.
+//
+// It is used by `build_assert!` in the kernel crate, allowing checking of
+// conditions that could be checked statically, but could not be enforced in
+// Rust yet (e.g. perform some checks in [const functions][const-functions], but those
+// functions could still be called in the runtime).
+//
+// For details on constant evaluation in Rust, please see the [Reference][const-eval].
+//
+// [const-eval]: https://doc.rust-lang.org/reference/const_eval.html
+// [const-functions]: https://doc.rust-lang.org/reference/const_eval.html#const-functions
+// [const-context]: https://doc.rust-lang.org/reference/const_eval.html#const-context
+
+/// Panics if executed in [const context][const-context], or triggers a build error if not.
+///
+/// [const-context]: https://doc.rust-lang.org/reference/const_eval.html#const-context
+#[inline(never)]
+#[cold]
+#[export_name = "rust_build_error"]
+#[track_caller]
+pub const fn build_error(msg: &'static str) -> ! {
+    panic!("{}", msg);
+}

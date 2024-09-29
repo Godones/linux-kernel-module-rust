@@ -1,56 +1,76 @@
 use alloc::boxed::Box;
-use core::any::Any;
+use core::{any::Any, mem::forget};
 
-use corelib::LinuxResult;
+use corelib::{LinuxErrno, LinuxResult};
 use interface::{logger::LogDomain, Basic};
-use ksync::Mutex;
+use kbind::sync::{RcuData, Spinlock};
 use rref::RRefVec;
 
-use crate::{domain_loader::loader::DomainLoader, domain_proxy::ProxyBuilder};
+use crate::{
+    domain_helper::{free_domain_resource, FreeShared},
+    domain_loader::loader::DomainLoader,
+    domain_proxy::ProxyBuilder,
+};
 
 #[derive(Debug)]
 pub struct LogDomainProxy {
-    domain: Box<dyn LogDomain>,
-    domain_loader: Mutex<DomainLoader>,
+    domain: RcuData<Box<dyn LogDomain>>,
+    domain_loader: Spinlock<DomainLoader>,
 }
 
 impl LogDomainProxy {
-    pub fn replace(
-        &self,
-        domain: Box<dyn LogDomain>,
-        domain_loader: DomainLoader,
-    ) -> LinuxResult<()> {
-        // *self.domain_loader.lock() = domain_loader;
-        // self.domain = domain;
-        unimplemented!("replace LogDomainProxy")
-    }
     pub fn new(domain: Box<dyn LogDomain>, domain_loader: DomainLoader) -> Self {
         LogDomainProxy {
-            domain,
-            domain_loader: Mutex::new(domain_loader),
+            domain: RcuData::new(domain),
+            domain_loader: Spinlock::new(domain_loader),
         }
+    }
+    pub fn domain_loader(&self) -> DomainLoader {
+        self.domain_loader.lock().clone()
     }
 }
 
 impl Basic for LogDomainProxy {
     fn domain_id(&self) -> u64 {
-        self.domain.domain_id()
+        self.domain.read(|domain| domain.domain_id())
     }
 }
 
 impl LogDomain for LogDomainProxy {
     fn init(&self) -> LinuxResult<()> {
-        self.domain.init()
+        self.domain.read(|domain| domain.init())
     }
 
     fn log(&self, level: interface::logger::Level, msg: &RRefVec<u8>) -> LinuxResult<()> {
-        self.domain.log(level, msg)
+        self.domain.read(|domain| domain.log(level, msg))
     }
 
     fn set_max_level(&self, level: interface::logger::LevelFilter) -> LinuxResult<()> {
-        self.domain.set_max_level(level)
+        self.domain.read(|domain| domain.set_max_level(level))
     }
 }
+
+impl LogDomainProxy {
+    pub fn replace(
+        &self,
+        new_domain: Box<dyn LogDomain>,
+        domain_loader: DomainLoader,
+    ) -> LinuxResult<()> {
+        let mut loader_guard = self.domain_loader.lock();
+        let old_id = self.domain_id();
+        // init new domain
+        new_domain.init().unwrap();
+        // swap domain
+        let old_domain = self.domain.update(new_domain);
+        // free old domain
+        let real_domain = Box::into_inner(old_domain);
+        forget(real_domain);
+        free_domain_resource(old_id, FreeShared::Free);
+        *loader_guard = domain_loader;
+        Ok(())
+    }
+}
+
 #[derive(Debug)]
 pub struct LogDomainEmptyImpl;
 impl LogDomainEmptyImpl {
@@ -70,11 +90,11 @@ impl LogDomain for LogDomainEmptyImpl {
     }
 
     fn log(&self, _level: interface::logger::Level, _msg: &RRefVec<u8>) -> LinuxResult<()> {
-        Ok(())
+        Err(LinuxErrno::ENOSYS)
     }
 
     fn set_max_level(&self, _level: interface::logger::LevelFilter) -> LinuxResult<()> {
-        Ok(())
+        Err(LinuxErrno::ENOSYS)
     }
 }
 

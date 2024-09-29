@@ -1,5 +1,6 @@
 use core::{
     cell::UnsafeCell,
+    fmt::Debug,
     ops::{Deref, DerefMut, Drop},
 };
 
@@ -8,6 +9,14 @@ use crate::bindings;
 pub struct Spinlock<T: ?Sized> {
     lock: UnsafeCell<bindings::spinlock_t>,
     data: UnsafeCell<T>,
+}
+
+impl<T: Debug> Debug for Spinlock<T> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        f.debug_struct("Spinlock")
+            .field("data", &self.data)
+            .finish()
+    }
 }
 
 pub struct SpinlockGuard<'a, T: ?Sized + 'a> {

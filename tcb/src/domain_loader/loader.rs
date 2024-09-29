@@ -14,19 +14,12 @@ use crate::{
 pub type DomainLoader = loader::DomainLoader<VmOpsImpl>;
 
 pub trait DomainCall {
-    fn call_raw(&self);
     fn call_main<T: ?Sized>(&self, _id: u64, _use_old_id: Option<u64>) -> Box<T> {
         unimplemented!()
     }
 }
 
 impl DomainCall for DomainLoader {
-    fn call_raw(&self) {
-        type F = fn() -> usize;
-        let main = unsafe { core::mem::transmute::<*const (), F>(self.entry_point() as *const ()) };
-        let res = main();
-        println!("call domain res: {}", res);
-    }
     fn call_main<T: ?Sized>(&self, id: u64, use_old_id: Option<u64>) -> Box<T> {
         let callback = |use_old_id: Option<u64>| {
             let syscall = DOMAIN_SYS;

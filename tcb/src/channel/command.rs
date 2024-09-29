@@ -99,7 +99,7 @@ impl SysctlStorage for CommandChannel {
                 let ident = inner.domain_ident.take().unwrap();
                 inner.domain_size = None;
 
-                super::register_domain(ident.as_str(), domain_elf, ty);
+                super::register_domain(ident.as_str(), domain_elf, ty).unwrap();
 
                 // set res
                 inner.response = Some(Response::Ok(id as usize));

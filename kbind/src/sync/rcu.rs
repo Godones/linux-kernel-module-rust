@@ -8,6 +8,9 @@ pub struct RcuData<T> {
     _marker: core::marker::PhantomData<T>,
 }
 
+unsafe impl<T> Sync for RcuData<T> {}
+unsafe impl<T> Send for RcuData<T> {}
+
 impl<T> RcuData<T> {
     pub fn new(data: T) -> RcuData<T> {
         let v = Box::into_raw(Box::new(data));
@@ -35,14 +38,13 @@ impl<T> RcuData<T> {
     /// This primitive protects concurrent readers from the updater, not concurrent updates from each other!
     /// You therefore still need to use locking (or something similar) to keep concurrent updates from interfering
     /// with each other.
-    pub fn update(&mut self, data: T) {
+    pub fn update(&self, data: T) -> Box<T> {
         let old_ptr = self.crcu_data.data_ptr;
         let new_ptr = Box::into_raw(Box::new(data));
-        rcu_assign_pointer(&mut self.crcu_data, new_ptr);
+        rcu_assign_pointer(&self.crcu_data, new_ptr);
         synchronize_rcu();
-        unsafe {
-            let _ = Box::from_raw(old_ptr as *mut T);
-        }
+        let old_data = unsafe { Box::from_raw(old_ptr as *mut T) };
+        old_data
     }
 }
 
@@ -65,6 +67,6 @@ fn rcu_defererence<T>(crcu_data: &CRcuData) -> *const T {
     }
 }
 
-fn rcu_assign_pointer<T>(crcu_data: &mut CRcuData, new_ptr: *const T) {
+fn rcu_assign_pointer<T>(crcu_data: &CRcuData, new_ptr: *const T) {
     unsafe { bindings::rust_helper_rcu_assign_pointer(crcu_data, new_ptr as _) }
 }

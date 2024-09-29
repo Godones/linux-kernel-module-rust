@@ -7,7 +7,6 @@ use crate::domain_loader::loader::DomainLoader;
 
 pub mod empty_device;
 pub mod logger;
-mod scheduler;
 
 pub trait ProxyBuilder {
     type T;

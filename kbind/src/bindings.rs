@@ -6,8 +6,7 @@
     non_snake_case,
     improper_ctypes,
     unreachable_pub,
-    unsafe_op_in_unsafe_fn,
-    improper_ctypes
+    unsafe_op_in_unsafe_fn
 )]
 
 mod bindings {
@@ -23,7 +22,7 @@ extern "C" {
     pub(crate) fn rust_helper_rcu_read_lock();
     pub(crate) fn rust_helper_synchronize_rcu();
     pub(crate) fn rust_helper_rcu_assign_pointer(
-        rcu_data: *mut CRcuData,
+        rcu_data: *const CRcuData,
         new_ptr: *const core::ffi::c_void,
     );
     pub(crate) fn rust_helper_rcu_dereference(

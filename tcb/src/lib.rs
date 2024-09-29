@@ -1,6 +1,7 @@
 #![feature(allocator_api)]
 #![feature(alloc_layout_extra)]
 #![feature(let_chains)]
+#![feature(box_into_inner)]
 #![no_std]
 
 extern crate alloc;

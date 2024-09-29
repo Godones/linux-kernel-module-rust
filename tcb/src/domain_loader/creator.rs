@@ -14,7 +14,6 @@ use crate::{
     domain_helper::{alloc_domain_id, DomainCreate, DOMAIN_INFO},
     domain_loader::loader::{DomainCall, DomainLoader},
     domain_proxy::*,
-    register_domain,
 };
 
 static DOMAIN_ELF: RwLock<BTreeMap<String, DomainData>> = RwLock::new(BTreeMap::new());
@@ -124,7 +123,7 @@ impl DomainCreate for DomainCreateImpl {
     fn create_domain(
         &self,
         domain_file_name: &str,
-        identifier: &mut [u8],
+        _identifier: &mut [u8],
     ) -> LinuxResult<DomainType> {
         match domain_file_name {
             name => {

@@ -1,6 +1,7 @@
 #![no_std]
 #![feature(allocator_api, alloc_error_handler)]
 #![feature(c_size_t)]
+#![allow(improper_ctypes)]
 extern crate alloc;
 
 pub mod bindings;

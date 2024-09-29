@@ -4,3 +4,6 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+basic = { path = "../../../../domain-lib/basic" }
+interface = { path = "../../../../domain-lib/interface" }
+rref = { path = "../../../../domain-lib/rref" }

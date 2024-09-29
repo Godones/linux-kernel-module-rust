@@ -1,5 +1,3 @@
-use core::fmt::Debug;
-
 use kbind::{mm, mm::vm::VSpace};
 
 use crate::config::FRAME_SIZE;

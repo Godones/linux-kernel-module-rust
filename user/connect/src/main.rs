@@ -80,5 +80,4 @@ fn main() {
             println!("No command");
         }
     }
-    Box::pin()
 }

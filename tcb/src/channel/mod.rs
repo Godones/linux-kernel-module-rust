@@ -40,6 +40,7 @@ fn register_domain(ident: &str, elf: Vec<u8>, ty: DomainTypeRaw) -> LinuxResult<
         //     DomainType::LogDomain(logger),
         //     true
         // );
+        println!("Register logger domain: {:?}", domain_file_info);
         let id = logger.domain_id();
         let info = RRefVec::from_slice(b"print using logger");
         logger.log(Level::Error, &info)?;

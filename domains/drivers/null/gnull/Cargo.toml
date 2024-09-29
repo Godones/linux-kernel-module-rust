@@ -4,3 +4,11 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+malloc = { path = "../../../../domain-lib/malloc" }
+corelib = { path = "../../../../domain-lib/corelib" }
+basic = { path = "../../../../domain-lib/basic",  default-features = false  }
+rref = { path = "../../../../domain-lib/rref" }
+interface = { path = "../../../../domain-lib/interface",  features = ["domain"]  }
+storage = { path = "../../../../domain-lib/storage", features = ["impl"] }
+
+null = { path = "../null" }

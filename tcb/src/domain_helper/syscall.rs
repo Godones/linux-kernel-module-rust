@@ -7,7 +7,7 @@ use interface::*;
 use crate::{
     config::FRAME_BITS,
     domain_helper::{resource::DOMAIN_RESOURCE, DOMAIN_CREATE, DOMAIN_INFO},
-    domain_proxy::{logger::LogDomainProxy, *},
+    domain_proxy::logger::LogDomainProxy,
 };
 
 pub static DOMAIN_SYS: &'static dyn CoreFunction = &DomainSyscall;

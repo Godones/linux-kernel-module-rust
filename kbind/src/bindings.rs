@@ -48,6 +48,19 @@ extern "C" {
 
     pub(crate) fn rust_helper_blk_mq_rq_from_pdu(pdu: *mut core::ffi::c_void) -> *mut request;
 
+    pub(crate) fn rust_helper_num_online_cpus() -> core::ffi::c_uint;
+
+    pub(crate) fn rust_helper_alloc_percpu_longlong() -> *mut core::ffi::c_longlong;
+
+    pub(crate) fn rust_helper_free_percpu_longlong(p: *mut core::ffi::c_longlong);
+
+    pub(crate) fn rust_helper_get_cpu() -> core::ffi::c_int;
+
+    pub(crate) fn rust_helper_put_cpu();
+    pub(crate) fn rust_helper_per_cpu_ptr(
+        p: *mut core::ffi::c_longlong,
+        cpu: core::ffi::c_int,
+    ) -> *mut core::ffi::c_longlong;
 }
 
 #[repr(C)]
@@ -82,4 +95,42 @@ pub(crate) unsafe fn blk_mq_rq_to_pdu(rq: *mut request) -> *mut core::ffi::c_voi
 
 pub(crate) unsafe fn blk_mq_rq_from_pdu(pdu: *mut core::ffi::c_void) -> *mut request {
     rust_helper_blk_mq_rq_from_pdu(pdu)
+}
+
+#[inline]
+pub(crate) unsafe fn num_online_cpus() -> core::ffi::c_uint {
+    rust_helper_num_online_cpus()
+}
+
+/// dynamically allocate and free per-cpu variables with long long type
+#[inline]
+pub(crate) unsafe fn alloc_percpu_longlong() -> *mut core::ffi::c_longlong {
+    rust_helper_alloc_percpu_longlong()
+}
+
+/// dynamically allocate and free per-cpu variables with long long type
+#[inline]
+pub(crate) unsafe fn free_percpu_longlong(p: *mut core::ffi::c_longlong) {
+    rust_helper_free_percpu_longlong(p)
+}
+
+/// get current cpu
+#[inline]
+pub(crate) unsafe fn get_cpu() -> core::ffi::c_int {
+    rust_helper_get_cpu()
+}
+
+/// put current cpu
+#[inline]
+pub(crate) unsafe fn put_cpu() {
+    rust_helper_put_cpu()
+}
+
+/// get per-cpu pointer with long long type
+#[inline]
+pub(crate) unsafe fn per_cpu_ptr(
+    p: *mut core::ffi::c_longlong,
+    cpu: core::ffi::c_int,
+) -> *mut core::ffi::c_longlong {
+    rust_helper_per_cpu_ptr(p, cpu)
 }

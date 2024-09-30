@@ -1,16 +1,11 @@
 use clap::{Parser, Subcommand};
-use domain_helper::register_domain;
+use domain_helper::{DomainHelperBuilder, DomainTypeRaw};
 
 #[derive(Parser)]
 #[command(version, about, long_about = None)]
 struct Cli {
     #[command(subcommand)]
     command: Option<Commands>,
-}
-
-pub enum DomainTypeRaw {
-    EmptyDeviceDomain = 1,
-    LogDomain = 2,
 }
 
 #[derive(Subcommand)]
@@ -64,7 +59,12 @@ fn main() {
             } else {
                 name_file.clone()
             };
-            register_domain(&name_file, type_, &register_ident);
+            DomainHelperBuilder::new()
+                .domain_file_name(&name_file)
+                .domain_register_ident(&register_ident)
+                .ty(DomainTypeRaw::from(type_))
+                .register_domain_file()
+                .expect("Failed to register domain");
         }
         Some(Commands::Update {
             old_domain_name,
@@ -75,6 +75,12 @@ fn main() {
                 "Update Domain: {}, new name: {}, type: {}",
                 old_domain_name, new_domain_name, type_
             );
+            DomainHelperBuilder::new()
+                .domain_name(&old_domain_name)
+                .ty(DomainTypeRaw::from(type_))
+                .domain_register_ident(&new_domain_name)
+                .update_domain()
+                .expect("Failed to update domain");
         }
         None => {
             println!("No command");

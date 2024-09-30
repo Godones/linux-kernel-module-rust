@@ -17,16 +17,18 @@ mod domain;
 mod domain_helper;
 mod domain_loader;
 mod domain_proxy;
+mod kshim;
 mod mem;
 
 use alloc::{borrow::ToOwned, string::String};
 
-use kbind::{logger, println, sysctl::Sysctl};
+use kbind::{println, sysctl::Sysctl};
 
-use crate::channel::CommandChannel;
+use crate::{channel::CommandChannel, kshim::KObj};
 
 struct TcbModule {
     _sysctl_domain_command: Sysctl<CommandChannel>,
+    kobj: KObj,
     message: String,
 }
 
@@ -36,11 +38,15 @@ impl kbind::KernelModule for TcbModule {
         println_color!(31, "This is a red message");
         println_color!(32, "This is a green message");
         println_color!(33, "This is a yellow message");
-        logger::init_logger();
+        // kbind::logger::init_logger();
         let channel = channel::init_domain_channel()?;
         domain::init_domain_system().unwrap();
+
+        let kobj = kshim::init_kernel_shim()?;
+
         Ok(TcbModule {
             _sysctl_domain_command: channel,
+            kobj,
             message: "on the heap!".to_owned(),
         })
     }

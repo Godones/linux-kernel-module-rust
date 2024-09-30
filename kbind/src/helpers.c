@@ -14,6 +14,7 @@
 #include <linux/blk-mq.h>
 #include <linux/blk_types.h>
 #include <linux/blkdev.h>
+#include <linux/percpu.h>
 
 void bug_helper(void) { BUG(); }
 
@@ -83,3 +84,13 @@ struct request *rust_helper_blk_mq_rq_from_pdu(void *pdu)
 {
     return blk_mq_rq_from_pdu(pdu);
 }
+
+
+unsigned int rust_helper_num_online_cpus(void){ return num_online_cpus(); }
+// dynamically allocate and free per-cpu variables
+long long *rust_helper_alloc_percpu_longlong(void){ return alloc_percpu(long long); }
+void rust_helper_free_percpu_longlong(long long *p){ free_percpu(p); }
+int rust_helper_get_cpu(void){ return get_cpu(); }
+void rust_helper_put_cpu(void){ put_cpu(); }
+
+long long *rust_helper_per_cpu_ptr(long long *p, int cpu){ return per_cpu_ptr(p, cpu); }

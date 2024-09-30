@@ -25,7 +25,7 @@ impl EmptyDeviceDomain for NullDeviceDomainImpl {
     }
 
     fn read(&self, mut data: RRefVec<u8>) -> LinuxResult<RRefVec<u8>> {
-        data.as_mut_slice().fill(0);
+        data.as_mut_slice().fill(1);
         Ok(data)
     }
     fn write(&self, data: &RRefVec<u8>) -> LinuxResult<usize> {

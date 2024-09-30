@@ -1,0 +1,9 @@
+[package]
+name = "done"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+domain-helper = { path = "../domain-helper" }
+core_affinity = "0.8.1"
+spin = "0.9.8"

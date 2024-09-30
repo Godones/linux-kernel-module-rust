@@ -7,7 +7,7 @@ use interface::*;
 use crate::{
     config::FRAME_BITS,
     domain_helper::{resource::DOMAIN_RESOURCE, DOMAIN_CREATE, DOMAIN_INFO},
-    domain_proxy::logger::LogDomainProxy,
+    domain_proxy::{empty_device::EmptyDeviceDomainProxy, logger::LogDomainProxy},
 };
 
 pub static DOMAIN_SYS: &'static dyn CoreFunction = &DomainSyscall;
@@ -103,16 +103,36 @@ impl CoreFunction for DomainSyscall {
                 );
                 Ok((domain_info, id))
             }
+            Some(DomainType::EmptyDeviceDomain(empty_device)) => {
+                let old_domain_id = empty_device.domain_id();
+                let (id, new_domain, loader) = crate::domain_loader::creator::create_domain(
+                    ty,
+                    new_domain_name,
+                    None,
+                    Some(old_domain_id),
+                )
+                .ok_or(LinuxError::EINVAL)?;
+                let empty_device = empty_device
+                    .downcast_arc::<EmptyDeviceDomainProxy>()
+                    .unwrap();
+                let domain_info = loader.domain_file_info();
+                empty_device.replace(new_domain, loader)?;
+                println!(
+                    "Try to replace empty device domain {} with {} ok",
+                    old_domain_name, new_domain_name
+                );
+                Ok((domain_info, id))
+            }
             None => {
                 println!(
                     "<sys_update_domain> old domain {:?} not found",
                     old_domain_name
                 );
                 Err(LinuxError::EINVAL)
-            }
-            _ => {
-                panic!("replace domain not support");
-            }
+            } // Some(d) => {
+              //     pr_err!("replace domain not support: {:?}", d);
+              //     Err(LinuxError::EINVAL)
+              // }
         }?;
         let domain_data = DomainDataInfo {
             name: old_domain_name.to_string(),

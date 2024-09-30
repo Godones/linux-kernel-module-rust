@@ -12,6 +12,8 @@ use kbind::{
 };
 use spin::Mutex;
 
+use crate::channel::update_domain;
+
 #[derive(Debug)]
 pub struct CommandChannel {
     id: atomic::AtomicU64,
@@ -103,6 +105,20 @@ impl SysctlStorage for CommandChannel {
 
                 // set res
                 inner.response = Some(Response::Ok(id as usize));
+                (data.len(), Ok(()))
+            }
+            Some(Command::Update(ref update_command)) => {
+                println!("Command: {:?}", command);
+                let old_domain_ident = update_command.old_domain_ident;
+                let new_domain_ident = update_command.new_domain_ident;
+                let domain_type = DomainTypeRaw::try_from(update_command.domain_type);
+                if domain_type.is_err() {
+                    pr_err!("Invalid domain type");
+                    return (0, Err(linux_err::EINVAL));
+                }
+                let domain_type = domain_type.unwrap();
+                update_domain(old_domain_ident, new_domain_ident, domain_type).unwrap();
+                inner.response = Some(Response::Ok(0));
                 (data.len(), Ok(()))
             }
             None => {

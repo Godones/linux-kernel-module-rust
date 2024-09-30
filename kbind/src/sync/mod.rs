@@ -1,7 +1,9 @@
 mod lock;
+mod per_cpu;
 mod rcu;
 
 pub use lock::*;
+pub use per_cpu::*;
 pub use rcu::RcuData;
 
 use crate::{bindings, types::Opaque};

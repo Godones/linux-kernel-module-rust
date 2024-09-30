@@ -9,7 +9,16 @@ pub enum Command<'a> {
     Send(SendCommand<'a>),
     Stop(StopCommand),
     Exit(ExitCommand),
+    Update(UpdateCommand<'a>),
 }
+
+#[derive(Debug)]
+pub struct UpdateCommand<'a> {
+    pub old_domain_ident: &'a str,
+    pub new_domain_ident: &'a str,
+    pub domain_type: u8,
+}
+
 #[derive(Debug)]
 pub struct StartCommand<'a> {
     pub domain_ident: &'a str,
@@ -50,6 +59,10 @@ impl Command<'_> {
             "stop" => {
                 let stop_command = Self::parse_stop(iter.next()?)?;
                 Some(Command::Stop(stop_command))
+            }
+            "update" => {
+                let update_command = Self::parse_update(iter.next()?)?;
+                Some(Command::Update(update_command))
             }
             _ => None,
         }
@@ -99,6 +112,23 @@ impl Command<'_> {
         Some(StopCommand { id })
     }
 
+    fn parse_update(data: &[u8]) -> Option<UpdateCommand> {
+        let mut iter = data.splitn(3, |&x| x == b':');
+        let old_domain_ident = iter.next()?;
+        let old_domain_ident = core::str::from_utf8(old_domain_ident).ok()?;
+        let new_domain_ident = iter.next()?;
+        let new_domain_ident = core::str::from_utf8(new_domain_ident).ok()?;
+        let domain_type = iter.next()?;
+        let domain_type = core::str::from_utf8(domain_type).ok()?;
+        let domain_type_num = domain_type.parse::<u8>().ok()?;
+        let domain_type = domain_type_num;
+        Some(UpdateCommand {
+            old_domain_ident,
+            new_domain_ident,
+            domain_type,
+        })
+    }
+
     pub fn to_bytes(&self) -> Vec<u8> {
         match self {
             Command::Start(start_command) => format!(
@@ -119,6 +149,14 @@ impl Command<'_> {
             }
             Command::Stop(stop_command) => format!("stop:{}", stop_command.id).as_bytes().to_vec(),
             Command::Exit(exit_command) => format!("exit:{}", exit_command.id).as_bytes().to_vec(),
+            Command::Update(update_command) => format!(
+                "update:{}:{}:{}",
+                update_command.old_domain_ident,
+                update_command.new_domain_ident,
+                update_command.domain_type
+            )
+            .as_bytes()
+            .to_vec(),
         }
     }
 }
@@ -176,3 +214,5 @@ impl Response {
 
 // ok      : id
 // receive : id           : data_id       : bytes
+
+// update : old_domain_ident : new_domain_ident : DomainTypeRaw

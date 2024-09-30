@@ -1,136 +1,94 @@
-use std::{
-    fs,
-    fs::OpenOptions,
-    io::{Read, Write},
-    path::Path,
-};
+mod helper;
+use std::error::Error;
 
-use command::{Command, Response, SendCommand, StartCommand, StopCommand};
+use crate::helper::{register_domain, update_domain};
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Ord, PartialOrd)]
+#[repr(u8)]
+pub enum DomainTypeRaw {
+    EmptyDeviceDomain = 1,
+    LogDomain = 2,
+}
+impl From<u8> for DomainTypeRaw {
+    fn from(value: u8) -> Self {
+        match value {
+            1 => DomainTypeRaw::EmptyDeviceDomain,
+            2 => DomainTypeRaw::LogDomain,
+            _ => panic!("Invalid domain type"),
+        }
+    }
+}
 
 const PATH: &str = "/proc/sys/rust/domain/command";
 const DOMAIN_TYPE: &[&str] = &["disk", "init"];
 
-fn find_path(name: &str) -> Option<String> {
-    for ty in DOMAIN_TYPE {
-        let file_path = format!("./build/{}/g{}", ty, name);
-        let path = Path::new(&file_path);
-        if path.exists() {
-            return Some(file_path);
+type Result<T> = core::result::Result<T, Box<dyn Error>>;
+
+#[derive(Clone)]
+pub struct DomainHelperBuilder {
+    ty: Option<DomainTypeRaw>,
+    domain_file_name: Option<String>,
+    domain_register_ident: Option<String>,
+    domain_name: Option<String>,
+}
+
+impl DomainHelperBuilder {
+    pub fn new() -> Self {
+        Self {
+            ty: None,
+            domain_file_name: None,
+            domain_name: None,
+            domain_register_ident: None,
         }
     }
-    None
-}
 
-/// Register a domain to the kernel
-///
-/// It will communicate with the kernel module using a file in /proc/sys/rust/domain/command
-/// and send the domain file to the kernel module
-pub fn register_domain(name: &str, ty: u8, register_ident: &str) {
-    let path = find_path(name).expect("Domain not found");
-    let mut file = fs::File::open(path).unwrap();
-    let file_size = file.metadata().unwrap().len();
-
-    // send start command
-    let start_command = StartCommand {
-        domain_ident: register_ident,
-        domain_type: ty,
-        domain_size: file_size as usize,
-    };
-    let start_command = Command::Start(start_command);
-    let start_command = start_command.to_bytes();
-
-    write_to_channel(&start_command);
-
-    let res_buf = read_from_channel();
-    let response = Response::parse(&res_buf).expect("Parse response failed");
-    println!("Response: {:?}", response);
-    let id = match response {
-        Response::Ok(id) => id,
-        _ => {
-            println!("Invalid response");
-            return;
-        }
-    };
-    // send file data
-    let mut count = 0;
-    let mut buf = [0; 512];
-    let mut data_id = 0;
-    while count < file_size as usize {
-        let res = file.read(&mut buf).expect("Read file failed");
-        if res == 0 {
-            break;
-        }
-        let send_command = Command::Send(SendCommand {
-            id: id as u64,
-            data_id,
-            bytes: res,
-            data: &buf[..res],
-        });
-        let send_command = send_command.to_bytes();
-        write_to_channel(&send_command);
-        // read response to make sure the data is sent
-        let res_buf = read_from_channel();
-        let response = Response::parse(&res_buf).expect("Parse response failed");
-        println!("Response: {:?}", response);
-
-        match response {
-            Response::Receive(id, data_id, bytes) => {
-                if id != id {
-                    println!("Invalid id");
-                    return;
-                }
-                if data_id != data_id {
-                    println!("Invalid data id");
-                    return;
-                }
-                if bytes != res {
-                    println!("Invalid data length");
-                    return;
-                }
-            }
-            _ => {
-                println!("Invalid response");
-                return;
-            }
-        }
-        count += res;
-        data_id += 1;
+    /// Set the domain type
+    pub fn ty(mut self, ty: DomainTypeRaw) -> Self {
+        self.ty = Some(ty);
+        self
     }
-    // send stop command
-    let stop_command = StopCommand { id: id as u64 };
-    let stop_command = Command::Stop(stop_command);
-    let stop_command = stop_command.to_bytes();
-    write_to_channel(&stop_command);
 
-    let res_buf = read_from_channel();
-    let response = Response::parse(&res_buf).expect("Parse response failed");
-    println!("Response: {:?}", response);
-    let id = match response {
-        Response::Ok(id) => id,
-        _ => {
-            println!("Invalid response");
-            return;
-        }
-    };
-    println!("Domain registered: {}", id);
+    /// Set the domain file name which is used to register the domain
+    pub fn domain_file_name(mut self, domain_file_name: &str) -> Self {
+        self.domain_file_name = Some(domain_file_name.to_string());
+        self
+    }
+
+    /// Set the domain name which will be updated
+    pub fn domain_name(mut self, domain_name: &str) -> Self {
+        self.domain_name = Some(domain_name.to_string());
+        self
+    }
+
+    /// Set the domain file path which will be opened and registered
+    pub fn domain_register_ident(mut self, domain_register_ident: &str) -> Self {
+        self.domain_register_ident = Some(domain_register_ident.to_string());
+        self
+    }
 }
 
-fn open_channel() -> fs::File {
-    OpenOptions::new()
-        .write(true)
-        .read(true)
-        .open(PATH)
-        .unwrap()
-}
-
-fn write_to_channel(data: &[u8]) {
-    let mut file = open_channel();
-    file.write(data).expect("Write failed");
-}
-
-fn read_from_channel() -> Vec<u8> {
-    let mut file = open_channel();
-    let mut buf = [0u8; 64];
-    let res = file.read(&mut buf).expect("Read failed");
-    buf[..res].to_vec()
+impl DomainHelperBuilder {
+    pub fn register_domain_file(self) -> Result<()> {
+        let ty = self.ty.ok_or("Domain type is not set")?;
+        let domain_file_name = self
+            .domain_file_name
+            .as_ref()
+            .ok_or("Domain file name is not set")?;
+        let domain_register_ident = self
+            .domain_register_ident
+            .as_ref()
+            .ok_or("Domain file path is not set")?;
+        register_domain(domain_file_name, ty as u8, domain_register_ident)?;
+        Ok(())
+    }
+    pub fn update_domain(self) -> Result<()> {
+        let ty = self.ty.ok_or("Domain type is not set")?;
+        let domain_name = self.domain_name.as_ref().ok_or("Domain name is not set")?;
+        let domain_register_ident = self
+            .domain_register_ident
+            .as_ref()
+            .ok_or("Domain file name is not set")?;
+        update_domain(domain_name, domain_register_ident, ty as u8)?;
+        Ok(())
+    }
 }

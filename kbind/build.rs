@@ -49,12 +49,12 @@ fn handle_kernel_version_cfg() {
     }
 
     println!("cargo:rustc-check-cfg=cfg(KVER_6_6_OR_NEWER)");
+    println!("cargo:rustc-check-cfg=cfg(KVER_LESS_6_6)");
     let cfg = if kernel_version.0 == 6 && kernel_version.1 < 6 {
         "KVER_LESS_6_6"
     } else {
         "KVER_6_6_OR_NEWER"
     };
-    println!("cargo:rustc-check-cfg=cfg({})", cfg);
     println!("cargo:rustc-cfg={}", cfg);
 }
 

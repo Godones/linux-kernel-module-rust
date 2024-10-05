@@ -69,7 +69,8 @@ fn run_log_domain_test() {
                         let mut file = file.lock();
                         file.write(format!("I'm Thread {}", id.id).as_bytes())
                             .unwrap();
-                        sleep(Duration::from_secs(3));
+                        drop(file);
+                        sleep(Duration::from_secs(1));
                     }
                 }
             });

@@ -159,7 +159,7 @@ impl<T: SysctlStorage> Sysctl<T> {
                     table.as_mut_ptr(),
                     table.len(),
                 )
-            };
+            }
             #[cfg(KVER_LESS_6_6)]
             bindings::register_sysctl(path.as_ptr() as *const i8, table.as_mut_ptr())
         };

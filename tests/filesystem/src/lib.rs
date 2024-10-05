@@ -4,7 +4,7 @@ extern crate alloc;
 
 use linux_kernel_module::{
     self, cstr,
-    filesystem::{self, FileSystem, FileSystemFlags},
+    fs::filesystem::{self, FileSystem, FileSystemFlags},
     CStr,
 };
 

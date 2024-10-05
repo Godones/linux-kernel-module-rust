@@ -4,7 +4,7 @@ use core::{convert::TryInto, mem, ops::Range, ptr::addr_of_mut};
 use crate::{
     bindings,
     error::{Error, KernelResult},
-    file_operations,
+    fs::file_operations,
     types::CStr,
 };
 

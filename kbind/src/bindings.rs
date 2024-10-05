@@ -16,8 +16,11 @@ pub use bindings::*;
 
 pub const GFP_KERNEL: gfp_t = BINDINGS_GFP_KERNEL;
 
+pub(crate) fn rust_helper_errname(_err: core::ffi::c_int) -> *const core::ffi::c_char {
+    core::ptr::null()
+}
+
 extern "C" {
-    pub(crate) fn rust_helper_errname(err: core::ffi::c_int) -> *const core::ffi::c_char;
     pub(crate) fn rust_helper_rcu_read_unlock();
     pub(crate) fn rust_helper_rcu_read_lock();
     pub(crate) fn rust_helper_synchronize_rcu();

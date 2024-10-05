@@ -30,8 +30,6 @@ int access_ok_helper(const void __user *addr, unsigned long n) {
 _Static_assert(__builtin_types_compatible_p(size_t, uintptr_t),
                "size_t must match uintptr_t, what architecture is this??");
 
-const char *rust_helper_errname(int err) { return errname(err); }
-
 
 
 // make sure the arg is void if the function doesn't have any args

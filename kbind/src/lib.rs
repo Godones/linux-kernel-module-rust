@@ -7,8 +7,6 @@ extern crate alloc;
 pub mod bindings;
 pub mod chrdev;
 mod error;
-pub mod file_operations;
-pub mod filesystem;
 pub mod kalloc;
 pub mod kernel_ptr;
 pub mod logger;
@@ -24,6 +22,7 @@ pub use crate::{
 };
 pub mod driver;
 pub mod env;
+pub mod fs;
 pub mod mm;
 pub mod sync;
 pub mod task;

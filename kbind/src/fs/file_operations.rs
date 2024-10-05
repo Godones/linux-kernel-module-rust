@@ -171,6 +171,7 @@ impl<T: FileOperations> FileOperationsVtable<T> {
         flush: None,
         fsync: None,
         get_unmapped_area: None,
+        #[cfg(KVER_LESS_6_6)]
         iterate: None,
         iterate_shared: None,
         iopoll: None,
@@ -181,6 +182,7 @@ impl<T: FileOperations> FileOperationsVtable<T> {
         poll: None,
         read_iter: None,
         remap_file_range: None,
+        #[cfg(KVER_LESS_6_6)]
         sendpage: None,
         setlease: None,
         show_fdinfo: None,
@@ -190,6 +192,8 @@ impl<T: FileOperations> FileOperationsVtable<T> {
         write_iter: None,
         uring_cmd: None,
         uring_cmd_iopoll: None,
+        #[cfg(KVER_6_6_OR_NEWER)]
+        splice_eof: None,
     };
 }
 

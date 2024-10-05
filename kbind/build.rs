@@ -33,6 +33,31 @@ fn prepare_cflags(cflags: &str, kernel_dir: &str) -> Vec<String> {
     kernel_args
 }
 
+fn handle_kernel_version_cfg() {
+    // read kernel version
+    // if kernel version is less than 6.6, add KVER_LESS_6_6 to cfg
+    // if kernel version is 6.6 or newer, add KVER_6_6_OR_NEWER to cfg
+    let kernel_version = exec("uname", &["-r"]);
+    let kernel_version = kernel_version.trim().split("-").next().unwrap();
+    let kernel_version = kernel_version.split(".").collect::<Vec<&str>>();
+    let kernel_version = (
+        kernel_version[0].parse::<u32>().unwrap(),
+        kernel_version[1].parse::<u32>().unwrap(),
+    );
+    if kernel_version.0 < 6 {
+        panic!("The kernel version is less than 6.*");
+    }
+
+    println!("cargo:rustc-check-cfg=cfg(KVER_6_6_OR_NEWER)");
+    let cfg = if kernel_version.0 == 6 && kernel_version.1 < 6 {
+        "KVER_LESS_6_6"
+    } else {
+        "KVER_6_6_OR_NEWER"
+    };
+    println!("cargo:rustc-check-cfg=cfg({})", cfg);
+    println!("cargo:rustc-cfg={}", cfg);
+}
+
 fn main() {
     println!("cargo:rerun-if-env-changed=CC");
     println!("cargo:rerun-if-env-changed=KDIR");
@@ -44,6 +69,7 @@ fn main() {
     }
 
     kallsyms_lookup_name();
+    handle_kernel_version_cfg();
 
     let kernel_dir = kernel_dir.unwrap();
     let mut kernel_cflags = env::var("c_flags").expect("Add 'export c_flags' to Kbuild");
@@ -75,6 +101,7 @@ fn main() {
     for arg in kernel_args.iter() {
         builder = builder.clang_arg(arg.clone());
     }
+    builder = builder.opaque_type("alt_instr");
 
     println!("cargo:rerun-if-changed=src/bindings_helper.h");
     builder = builder.header("src/bindings_helper.h");

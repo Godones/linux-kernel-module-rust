@@ -20,7 +20,6 @@ use corelib::{
     LinuxResult,
 };
 pub use interface::DomainType;
-use kbind::println;
 use ksync::{Lazy, Mutex, Once};
 pub use resource::*;
 pub use sheap::{checkout_shared_data, FreeShared, SHARED_HEAP_ALLOCATOR};

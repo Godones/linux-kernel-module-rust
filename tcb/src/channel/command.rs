@@ -6,9 +6,11 @@ use core::sync::atomic;
 
 use command::{Command, Response};
 use interface::DomainTypeRaw;
-use kbind::{
-    kernel_ptr::KernelSlicePtrWriter, linux_err, pr_err, println, sysctl::SysctlStorage,
-    KernelResult,
+use kernel::{
+    buf::KernelSlicePtrWriter,
+    error::{linux_err, KernelResult},
+    pr_err, println,
+    sysctl::SysctlStorage,
 };
 use spin::Mutex;
 

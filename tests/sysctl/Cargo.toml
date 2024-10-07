@@ -1,5 +1,5 @@
 [package]
-name = "sysctl-tests"
+name = "sysctl"
 version = "0.1.0"
 authors = ["Alex Gaynor <alex.gaynor@gmail.com", "Geoffrey Thomas <geofft@ldpreload.com>"]
 edition = "2018"
@@ -9,10 +9,11 @@ crate-type = ["staticlib"]
 test = false
 
 [features]
-default = ["linux-kernel-module"]
+default = ["kernel"]
 
 [dependencies]
-linux-kernel-module = { path = "../../kbind", optional = true , package = "kbind"}
+kernel = { path = "../../kernel", optional = true }
 
 [dev-dependencies]
 kernel-module-testlib = { path = "../../testlib" }
+libc = "0.2.58"

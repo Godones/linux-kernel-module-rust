@@ -1,9 +1,12 @@
 use alloc::boxed::Box;
-use core::{any::Any, mem::forget};
+use core::{any::Any, mem::forget, pin::Pin};
 
 use corelib::{LinuxErrno, LinuxResult};
 use interface::{logger::LogDomain, Basic};
-use kbind::sync::{RcuData, Spinlock};
+use kernel::{
+    init::InPlaceInit,
+    sync::{RcuData, SpinLock},
+};
 use rref::RRefVec;
 
 use crate::{
@@ -15,14 +18,14 @@ use crate::{
 #[derive(Debug)]
 pub struct LogDomainProxy {
     domain: RcuData<Box<dyn LogDomain>>,
-    domain_loader: Spinlock<DomainLoader>,
+    domain_loader: Pin<Box<SpinLock<DomainLoader>>>,
 }
 
 impl LogDomainProxy {
     pub fn new(domain: Box<dyn LogDomain>, domain_loader: DomainLoader) -> Self {
         LogDomainProxy {
             domain: RcuData::new(domain),
-            domain_loader: Spinlock::new(domain_loader),
+            domain_loader: Box::pin_init(new_spinlock!(domain_loader)).unwrap(),
         }
     }
     pub fn domain_loader(&self) -> DomainLoader {

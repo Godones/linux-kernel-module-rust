@@ -1,7 +1,7 @@
 use alloc::boxed::Box;
 use core::{any::Any, fmt::Debug};
 
-use kbind::{mm, mm::vm::ModuleArea, println};
+use kernel::{mm, mm::vm::ModuleArea};
 use loader::{DomainArea, DomainVmOps};
 use memory_addr::VirtAddr;
 use storage::StorageArg;

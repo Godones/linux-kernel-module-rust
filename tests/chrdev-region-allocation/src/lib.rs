@@ -1,16 +1,15 @@
 #![no_std]
 
-use linux_kernel_module::{self, cstr};
+use kernel::{c_str, chrdev, module, Module, ThisModule};
 
 struct ChrdevRegionAllocationTestModule {
-    _chrdev_reg: linux_kernel_module::chrdev::Registration,
+    _chrdev_reg: chrdev::Registration,
 }
 
-impl linux_kernel_module::KernelModule for ChrdevRegionAllocationTestModule {
-    fn init() -> linux_kernel_module::KernelResult<Self> {
+impl Module for ChrdevRegionAllocationTestModule {
+    fn init(_module: &'static ThisModule) -> kernel::error::KernelResult<Self> {
         let chrdev_reg =
-            linux_kernel_module::chrdev::builder(cstr!("chrdev-region-allocation-tests"), 0..1)?
-                .build()?;
+            chrdev::builder(c_str!("chrdev-region-allocation-tests"), 0..1)?.build()?;
 
         Ok(ChrdevRegionAllocationTestModule {
             _chrdev_reg: chrdev_reg,
@@ -18,9 +17,10 @@ impl linux_kernel_module::KernelModule for ChrdevRegionAllocationTestModule {
     }
 }
 
-linux_kernel_module::kernel_module!(
-    ChrdevRegionAllocationTestModule,
-    author: b"Fish in a Barrel Contributors",
-    description: b"A module for testing character device region allocation",
-    license: b"GPL"
-);
+module! {
+    type: ChrdevRegionAllocationTestModule,
+    name: "ChrdevRegionAllocationTestModule",
+    author: "Rust for Linux Contributors",
+    description: "A module for testing character device region allocation",
+    license: "GPL",
+}

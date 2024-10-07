@@ -7,9 +7,10 @@ TARGET_PROFILE := ../../x86_64-kernel.json
 BUILD := release
 
 export c_flags
+export RUST_MODFILE := $(module-name)
 
 $(src)/../../target/$(TARGET)/$(BUILD)/lib$(module-name).a:
-	cd $(src); $(CARGO) build --$(BUILD) -Z build-std=core,alloc --target=$(TARGET_PROFILE)
+	cd $(src); RUSTFLAGS="--cfg MODULE" $(CARGO) build --$(BUILD) -Z build-std=core,alloc --target=$(TARGET_PROFILE)
 
 .PHONY: clean
 

@@ -1,9 +1,9 @@
 use alloc::sync::Arc;
 
 use interface::empty_device::EmptyDeviceDomain;
-use kbind::{
-    kernel_ptr::KernelSlicePtrWriter, linux_err::EINVAL, sync::CpuId, sysctl::SysctlStorage,
-    KernelResult,
+use kernel::{
+    buf::KernelSlicePtrWriter, code::EINVAL, error::KernelResult, sync::CpuId,
+    sysctl::SysctlStorage,
 };
 use rref::RRefVec;
 

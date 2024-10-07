@@ -1,19 +1,20 @@
 use alloc::vec::Vec;
 
-use kbind::{println, sysctl::Sysctl, Mode};
+use kernel::sysctl::Sysctl;
 
 mod command;
 pub use command::CommandChannel;
 use corelib::LinuxResult;
 use interface::DomainTypeRaw;
+use kernel::{error::KernelResult, types::Mode};
 
 use crate::domain_helper::DOMAIN_SYS;
 
-pub fn init_domain_channel() -> kbind::KernelResult<Sysctl<CommandChannel>> {
+pub fn init_domain_channel() -> KernelResult<Sysctl<CommandChannel>> {
     println!("Init Domain Channel");
     let command_channel = Sysctl::register(
-        cstr!("rust/domain"),
-        cstr!("command"),
+        c_str!("rust/domain"),
+        c_str!("command"),
         CommandChannel::new(),
         Mode::from_int(0o666),
     )?;

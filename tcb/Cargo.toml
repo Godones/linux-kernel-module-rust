@@ -25,4 +25,4 @@ bitflags = "2.6.0"
 memory_addr = { git ="https://github.com/os-module/memory_addr" }
 spin = "0.9.8"
 # kernel bind
-kbind = { path = "../kbind" }
+kernel = { path = "../kernel" }

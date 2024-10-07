@@ -1,12 +1,12 @@
 [workspace]
 members = [
-    "kbind",
     "tests/*",
     "domain-lib/*",
     "xtask",
     "tcb",
     "user/*",
     "kmacro",
+    "kernel",
 ]
 
 

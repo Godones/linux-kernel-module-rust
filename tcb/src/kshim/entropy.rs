@@ -1,7 +1,9 @@
 use alloc::sync::Arc;
 
 use interface::logger::LogDomain;
-use kbind::{
+use kernel::{
+    buf::KernelSlicePtrWriter,
+    error::KernelResult,
     random,
     sync::{CpuId, LongLongPerCpu},
     sysctl::SysctlStorage,
@@ -23,7 +25,7 @@ impl EntropySource {
 }
 
 impl SysctlStorage for EntropySource {
-    fn store_value(&self, data: &[u8]) -> (usize, kbind::KernelResult<()>) {
+    fn store_value(&self, data: &[u8]) -> (usize, KernelResult<()>) {
         // println!("EntropySource::store_value {:?}", data);
         let str = core::str::from_utf8(data).unwrap();
         CpuId::read(|id| {
@@ -43,10 +45,7 @@ impl SysctlStorage for EntropySource {
         (data.len(), Ok(()))
     }
 
-    fn read_value(
-        &self,
-        data: &mut kbind::kernel_ptr::KernelSlicePtrWriter,
-    ) -> (usize, kbind::KernelResult<()>) {
+    fn read_value(&self, data: &mut KernelSlicePtrWriter) -> (usize, KernelResult<()>) {
         let mut storage = alloc::vec![0; data.len()];
         if let Err(e) = random::getrandom(&mut storage) {
             return (0, Err(e));

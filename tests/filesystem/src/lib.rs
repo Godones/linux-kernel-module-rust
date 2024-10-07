@@ -2,10 +2,12 @@
 
 extern crate alloc;
 
-use linux_kernel_module::{
-    self, cstr,
+use kernel::{
+    self, c_str,
     fs::filesystem::{self, FileSystem, FileSystemFlags},
-    CStr,
+    module,
+    str::CStr,
+    Module, ThisModule,
 };
 
 struct TestFSModule {
@@ -15,12 +17,12 @@ struct TestFSModule {
 struct TestFS {}
 
 impl FileSystem for TestFS {
-    const NAME: CStr<'static> = cstr!("testfs");
+    const NAME: &'static CStr = c_str!("testfs");
     const FLAGS: FileSystemFlags = FileSystemFlags::empty();
 }
 
-impl linux_kernel_module::KernelModule for TestFSModule {
-    fn init() -> linux_kernel_module::KernelResult<Self> {
+impl Module for TestFSModule {
+    fn init(_module: &'static ThisModule) -> kernel::error::KernelResult<Self> {
         let fs_registration = filesystem::register::<TestFS>()?;
         Ok(TestFSModule {
             _fs_registration: fs_registration,
@@ -28,9 +30,10 @@ impl linux_kernel_module::KernelModule for TestFSModule {
     }
 }
 
-linux_kernel_module::kernel_module!(
-    TestFSModule,
-    author: b"Fish in a Barrel Contributors",
-    description: b"A module for testing filesystem::register",
-    license: b"GPL"
-);
+module! {
+    type: TestFSModule,
+    name: "TestFSModule",
+    author: "Rust for Linux Contributors",
+    description: "A module for testing filesystem::register",
+    license: "GPL",
+}

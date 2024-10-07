@@ -3,18 +3,22 @@ extern crate alloc;
 use alloc::{boxed::Box, format};
 use core::{
     fmt::Debug,
+    pin::Pin,
     sync::atomic::{AtomicUsize, Ordering},
 };
 
-use kbind::{
-    println,
-    sync::{Mutex, RcuData, Spinlock},
+use kernel::{
+    init::InPlaceInit,
+    module, new_mutex, new_spinlock, println,
+    sync::{Mutex, RcuData, SpinLock},
+    Module, ThisModule,
 };
 use spin::Lazy;
 
 struct SyncModule;
 
-static GLOBAL: Lazy<Spinlock<i32>> = Lazy::new(|| Spinlock::new(0));
+static GLOBAL: Lazy<Pin<Box<SpinLock<usize>>>> =
+    Lazy::new(|| Box::pin_init(new_spinlock!(0)).unwrap());
 
 fn global_synchronization_example() {
     let mut global = GLOBAL.lock();
@@ -28,7 +32,7 @@ fn return_dyn_data() -> Box<dyn Debug> {
 }
 
 fn rcu_example() {
-    let mut data = RcuData::new(10);
+    let data = RcuData::new(10);
     data.read(|v| {
         println!("RcuData is {}", v);
     });
@@ -38,7 +42,7 @@ fn rcu_example() {
         println!("New RcuData is {}", v);
     });
 
-    let mut data = RcuData::new(return_dyn_data());
+    let data = RcuData::new(return_dyn_data());
     data.read(|v| {
         println!("RcuData is {:?}", v);
     });
@@ -53,17 +57,17 @@ fn rcu_example() {
 
 fn lock_example() {
     global_synchronization_example();
-    let spinlock_data = Spinlock::new(100);
+    let spinlock_data = Box::pin_init(new_spinlock!(10)).unwrap();
     println!("Data {} is locked by a spinlock", *spinlock_data.lock());
-    let mutex_data = Mutex::new(50);
+    let mutex_data = Box::pin_init(new_mutex!(50)).unwrap();
     let mut data = mutex_data.lock();
     println!("Data {} is locked by a mutex", *data);
     *data = 100;
     println!("Now data is {}", *data);
 }
 
-impl kbind::KernelModule for SyncModule {
-    fn init() -> kbind::KernelResult<Self> {
+impl Module for SyncModule {
+    fn init(_module: &'static ThisModule) -> kernel::error::KernelResult<Self> {
         println!("Test kernel sync primitives");
         lock_example();
         rcu_example();
@@ -77,9 +81,10 @@ impl Drop for SyncModule {
     }
 }
 
-kbind::kernel_module!(
-    SyncModule,
-    author: b"godones",
-    description: b"Test kernel sync primitives",
-    license: b"GPL"
-);
+module! {
+    type: SyncModule,
+    name: "SyncModule",
+    author: "godones",
+    description: "Test kernel sync primitives",
+    license: "GPL",
+}

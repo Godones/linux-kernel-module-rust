@@ -1,0 +1,16 @@
+[package]
+name = "kernel"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+pinned-init = { version = "0.0.8", default-features = false, features = ["alloc"]}
+kmacro = { path = "../kmacro" }
+bitflags = "2.6.0"
+log = "0.4.22"
+
+
+[build-dependencies]
+bindgen = "0.70"
+cc = "1.0"
+shlex = "1"

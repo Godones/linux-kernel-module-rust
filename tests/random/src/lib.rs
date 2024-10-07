@@ -2,25 +2,27 @@
 
 extern crate alloc;
 
-use linux_kernel_module::{
-    self, cstr, println, random,
+use kernel::{
+    self,
+    buf::KernelSlicePtrWriter,
+    c_str,
+    error::KernelResult,
+    module, println, random,
     sysctl::{Sysctl, SysctlStorage},
-    Mode,
+    types::Mode,
+    Module, ThisModule,
 };
 
 struct EntropySource;
 
 impl SysctlStorage for EntropySource {
-    fn store_value(&self, data: &[u8]) -> (usize, linux_kernel_module::KernelResult<()>) {
+    fn store_value(&self, data: &[u8]) -> (usize, KernelResult<()>) {
         println!("EntropySource::store_value {:?}", data);
         random::add_randomness(data);
         (data.len(), Ok(()))
     }
 
-    fn read_value(
-        &self,
-        data: &mut linux_kernel_module::kernel_ptr::KernelSlicePtrWriter,
-    ) -> (usize, linux_kernel_module::KernelResult<()>) {
+    fn read_value(&self, data: &mut KernelSlicePtrWriter) -> (usize, KernelResult<()>) {
         let mut storage = alloc::vec![0; data.len()];
         if let Err(e) = random::getrandom(&mut storage) {
             return (0, Err(e));
@@ -33,13 +35,13 @@ struct RandomTestModule {
     _sysctl_entropy: Sysctl<EntropySource>,
 }
 
-impl linux_kernel_module::KernelModule for RandomTestModule {
-    fn init() -> linux_kernel_module::KernelResult<Self> {
+impl Module for RandomTestModule {
+    fn init(_module: &'static ThisModule) -> KernelResult<Self> {
         println!("RandomTestModule::init");
         Ok(RandomTestModule {
             _sysctl_entropy: Sysctl::register(
-                cstr!("rust/rrandom"),
-                cstr!("entropy"),
+                c_str!("rust/rrandom"),
+                c_str!("entropy"),
                 EntropySource,
                 Mode::from_int(0o666),
             )?,
@@ -53,9 +55,10 @@ impl Drop for RandomTestModule {
     }
 }
 
-linux_kernel_module::kernel_module!(
-    RandomTestModule,
-    author: b"Fish in a Barrel Contributors",
-    description: b"A module for testing the CSPRNG",
-    license: b"GPL"
-);
+module! {
+    type: RandomTestModule,
+    name: "RandomTestModule",
+    author: "Rust for Linux Contributors",
+    description: "A module for testing the CSPRNG",
+    license: "GPL",
+}

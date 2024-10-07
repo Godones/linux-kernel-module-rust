@@ -2,7 +2,7 @@ use alloc::boxed::Box;
 
 use corelib::LinuxResult;
 use interface::{DomainType, DomainTypeRaw};
-use kbind::env;
+use kernel::env;
 
 use crate::{
     create_domain, domain_helper,

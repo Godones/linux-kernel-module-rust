@@ -1,4 +1,4 @@
-use kbind::{mm, mm::vm::VSpace};
+use kernel::{mm, mm::vm::VSpace};
 
 use crate::config::FRAME_SIZE;
 

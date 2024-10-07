@@ -8,5 +8,5 @@ edition = "2021"
 crate-type = ["staticlib"]
 
 [dependencies]
-kbind = { path = "../../kbind" }
+kernel = { path = "../../kernel" }
 spin = "0.9.8"

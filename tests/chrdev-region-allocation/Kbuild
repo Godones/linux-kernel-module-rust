@@ -1,0 +1,18 @@
+module-name := chrdev_region_allocation
+obj-m := $(module-name).o
+
+CARGO ?= cargo
+TARGET := x86_64-kernel
+TARGET_PROFILE := ../../x86_64-kernel.json
+BUILD := release
+
+export c_flags
+export RUST_MODFILE := $(module-name)
+
+$(src)/../../target/$(TARGET)/$(BUILD)/lib$(module-name).a:
+	cd $(src); RUSTFLAGS="--cfg MODULE" $(CARGO) build --$(BUILD) -Z build-std=core,alloc --target=$(TARGET_PROFILE)
+
+.PHONY: clean
+
+%.o: ../../target/$(TARGET)/$(BUILD)/lib%.a
+	$(LD) -r -o $@ --whole-archive $<

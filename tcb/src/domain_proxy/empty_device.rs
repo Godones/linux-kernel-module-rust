@@ -1,9 +1,12 @@
 use alloc::boxed::Box;
-use core::{any::Any, mem::forget, sync::atomic::AtomicBool};
+use core::{any::Any, mem::forget, pin::Pin, sync::atomic::AtomicBool};
 
 use corelib::{LinuxError, LinuxResult};
 use interface::{empty_device::EmptyDeviceDomain, Basic};
-use kbind::sync::{LongLongPerCpu, Mutex, RcuData, Spinlock};
+use kernel::{
+    init::InPlaceInit,
+    sync::{LongLongPerCpu, Mutex, RcuData, SpinLock},
+};
 use rref::{RRefVec, SharedData};
 
 use crate::{
@@ -15,8 +18,8 @@ use crate::{
 #[derive(Debug)]
 pub struct EmptyDeviceDomainProxy {
     domain: RcuData<Box<dyn EmptyDeviceDomain>>,
-    lock: Mutex<()>,
-    domain_loader: Spinlock<DomainLoader>,
+    lock: Pin<Box<Mutex<()>>>,
+    domain_loader: Pin<Box<SpinLock<DomainLoader>>>,
     flag: AtomicBool,
     counter: LongLongPerCpu,
 }
@@ -25,8 +28,8 @@ impl EmptyDeviceDomainProxy {
     pub fn new(domain: Box<dyn EmptyDeviceDomain>, domain_loader: DomainLoader) -> Self {
         EmptyDeviceDomainProxy {
             domain: RcuData::new(domain),
-            lock: Mutex::new(()),
-            domain_loader: Spinlock::new(domain_loader),
+            lock: Box::pin_init(new_mutex!(())).unwrap(),
+            domain_loader: Box::pin_init(new_spinlock!(domain_loader)).unwrap(),
             flag: AtomicBool::new(false),
             counter: LongLongPerCpu::new(),
         }

@@ -1,5 +1,9 @@
 use interface::DomainType;
-use kbind::{linux_err, sysctl::Sysctl, KernelResult, Mode};
+use kernel::{
+    error::{linux_err, KernelResult},
+    sysctl::Sysctl,
+    types::Mode,
+};
 
 use crate::{
     domain_helper::query_domain,
@@ -25,8 +29,8 @@ pub fn init_kernel_shim() -> KernelResult<KObj> {
     };
     let entropy = EntropySource::new(log_domain);
     let entropy = Sysctl::register(
-        cstr!("rust/domain"),
-        cstr!("entropy"),
+        c_str!("rust/domain"),
+        c_str!("entropy"),
         entropy,
         Mode::from_int(0o666),
     )?;
@@ -42,8 +46,8 @@ pub fn init_kernel_shim() -> KernelResult<KObj> {
     };
     let one_device = OneDevice::new(empty_device);
     let one_device = Sysctl::register(
-        cstr!("rust/domain"),
-        cstr!("one"),
+        c_str!("rust/domain"),
+        c_str!("one"),
         one_device,
         Mode::from_int(0o666),
     )?;

@@ -9,7 +9,7 @@ extern crate alloc;
 extern crate log;
 
 #[macro_use]
-extern crate kbind;
+extern crate kernel;
 
 mod channel;
 mod config;
@@ -22,7 +22,7 @@ mod mem;
 
 use alloc::{borrow::ToOwned, string::String};
 
-use kbind::{println, sysctl::Sysctl};
+use kernel::{sysctl::Sysctl, ThisModule};
 
 use crate::{channel::CommandChannel, kshim::KObj};
 
@@ -32,8 +32,8 @@ struct TcbModule {
     message: String,
 }
 
-impl kbind::KernelModule for TcbModule {
-    fn init() -> kbind::KernelResult<Self> {
+impl kernel::Module for TcbModule {
+    fn init(_module: &'static ThisModule) -> kernel::error::KernelResult<Self> {
         println!("TCB kernel module!");
         println_color!(31, "This is a red message");
         println_color!(32, "This is a green message");
@@ -59,9 +59,10 @@ impl Drop for TcbModule {
     }
 }
 
-kbind::kernel_module!(
-    TcbModule,
-    author: b"godones",
-    description: b"TCB kernel module",
-    license: b"GPL"
-);
+module! {
+    type: TcbModule,
+    name: "TcbModule",
+    author: "godones",
+    description: "TCB kernel module",
+    license: "GPL",
+}

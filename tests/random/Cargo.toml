@@ -9,10 +9,11 @@ crate-type = ["staticlib"]
 test = false
 
 [features]
-default = ["linux-kernel-module"]
+default = ["kernel"]
 
 [dependencies]
-linux-kernel-module = { path = "../../kbind", optional = true , package = "kbind"}
+kernel = { path = "../../kernel", optional = true }
 
 [dev-dependencies]
 kernel-module-testlib = { path = "../../testlib" }
+libc = "0.2.58"

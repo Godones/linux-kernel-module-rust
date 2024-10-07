@@ -1,6 +1,5 @@
 use alloc::{boxed::Box, collections::BTreeMap, vec::Vec};
 
-use kbind::{println, println_color};
 use ksync::Mutex;
 
 use crate::{

@@ -32,10 +32,9 @@ impl SysctlStorage for EntropySource {
             println!("[core: {}]EntropySource::store_value: {}", id, str);
         });
         self.counter.get_with(|counter| {
-            println!("counter: {}", *counter);
+            // println!("counter: {}", *counter);
             *counter += 1;
         });
-
         let str = core::str::from_utf8(data).unwrap();
         let log_message = RRefVec::from_slice(str.as_bytes());
         let _r = self

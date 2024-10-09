@@ -47,18 +47,11 @@ extern "C" {
     pub fn spin_lock(lock: *mut spinlock_t);
     #[link_name = "rust_helper_spin_unlock"]
     pub fn spin_unlock(lock: *mut spinlock_t);
-
     #[link_name = "rust_helper_spin_unlock_irqrestore"]
     pub fn spin_unlock_irqrestore(lock: *mut spinlock_t, flags: core::ffi::c_ulong);
     #[link_name = "rust_helper_spin_lock_irqsave"]
     pub fn spin_lock_irqsave(lock: *mut spinlock_t) -> core::ffi::c_ulong;
 
-    // #[link_name ="rust_helper_mutex_init"]
-    // pub fn mutex_init(lock: *mut mutex);
-    // #[link_name ="rust_helper_mutex_lock"]
-    // pub fn mutex_lock(lock: *mut mutex);
-    // #[link_name ="rust_helper_mutex_unlock"]
-    // pub fn mutex_unlock(lock: *mut mutex);
 
     #[link_name = "rust_helper_get_current"]
     pub(crate) fn get_current() -> *mut task_struct;

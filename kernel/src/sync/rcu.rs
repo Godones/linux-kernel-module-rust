@@ -1,6 +1,6 @@
 use alloc::boxed::Box;
 
-use crate::{bindings, bindings::CRcuData};
+use crate::{bindings, bindings::CRcuData, pr_warn};
 
 #[derive(Debug)]
 pub struct RcuData<T> {
@@ -42,7 +42,9 @@ impl<T> RcuData<T> {
         let old_ptr = self.crcu_data.data_ptr;
         let new_ptr = Box::into_raw(Box::new(data));
         rcu_assign_pointer(&self.crcu_data, new_ptr);
+        pr_warn!("before synchronize_rcu");
         synchronize_rcu();
+        pr_warn!("after synchronize_rcu");
         let old_data = unsafe { Box::from_raw(old_ptr as *mut T) };
         old_data
     }

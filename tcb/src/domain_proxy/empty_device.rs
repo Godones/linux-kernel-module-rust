@@ -19,7 +19,7 @@ use crate::{
 pub struct EmptyDeviceDomainProxy {
     domain: RcuData<Box<dyn EmptyDeviceDomain>>,
     lock: Pin<Box<Mutex<()>>>,
-    domain_loader: Pin<Box<SpinLock<DomainLoader>>>,
+    domain_loader: Pin<Box<Mutex<DomainLoader>>>,
     flag: AtomicBool,
     counter: LongLongPerCpu,
 }
@@ -29,7 +29,7 @@ impl EmptyDeviceDomainProxy {
         EmptyDeviceDomainProxy {
             domain: RcuData::new(domain),
             lock: Box::pin_init(new_mutex!(())).unwrap(),
-            domain_loader: Box::pin_init(new_spinlock!(domain_loader)).unwrap(),
+            domain_loader: Box::pin_init(new_mutex!(domain_loader)).unwrap(),
             flag: AtomicBool::new(false),
             counter: LongLongPerCpu::new(),
         }
@@ -45,6 +45,9 @@ impl ProxyBuilder for EmptyDeviceDomainProxy {
 
     fn build_empty(domain_loader: DomainLoader) -> Self {
         Self::new(Box::new(EmptyDeviceDomainEmptyImpl::new()), domain_loader)
+    }
+    fn build_empty_no_proxy() -> Self::T {
+        Box::new(EmptyDeviceDomainEmptyImpl::new())
     }
 
     fn init_by_box(&self, _argv: Box<dyn Any + Send + Sync>) -> LinuxResult<()> {

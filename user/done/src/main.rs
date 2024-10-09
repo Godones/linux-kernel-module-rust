@@ -12,15 +12,7 @@ fn main() {
     let option = argv[1].as_str();
     match option {
         "new" => {
-            println!("Register and update null device domain");
-            let builder = DomainHelperBuilder::new()
-                .ty(DomainTypeRaw::EmptyDeviceDomain)
-                .domain_name("empty_device")
-                .domain_file_name("null")
-                .domain_register_ident("null");
-            builder.clone().register_domain_file().unwrap();
-            builder.clone().update_domain().unwrap();
-            println!("Register and update null device domain to new version successfully");
+           update_to_new();
         }
         "test" => {
             println!("Run null device domain test");
@@ -31,6 +23,18 @@ fn main() {
             return;
         }
     }
+}
+
+fn update_to_new() {
+    println!("Register and update null device domain");
+    let builder = DomainHelperBuilder::new()
+        .ty(DomainTypeRaw::EmptyDeviceDomain)
+        .domain_name("empty_device")
+        .domain_file_name("null")
+        .domain_register_ident("null");
+    builder.clone().register_domain_file().unwrap();
+    builder.clone().update_domain().unwrap();
+    println!("Register and update null device domain to new version successfully");
 }
 
 fn run_log_domain_test() {
@@ -52,6 +56,7 @@ fn run_log_domain_test() {
         if id.id < THREAD_NUM {
             let file = file.clone();
             let thread = std::thread::spawn(move || {
+                let start = std::time::Instant::now();
                 // Pin this thread to a single CPU core.
                 let res = core_affinity::set_for_current(id);
                 if res {
@@ -60,14 +65,26 @@ fn run_log_domain_test() {
                         let mut file = file.lock();
                         let r = file.write(format!("I'm Thread {}", id.id).as_bytes());
                         println!("Thread {} write to file: {:?}", id.id, r);
-                        sleep(Duration::from_secs(3));
+                        let now = std::time::Instant::now();
+                        // 75
+                        if now.duration_since(start) > Duration::from_millis(200) {
+                            println!("Thread {} is done", id.id);
+                            break;
+                        }
+                        // sleep(Duration::from_millis(5));
                     }
                 }
             });
             handlers.push(thread);
         }
     }
-
+    let updater = std::thread::spawn(move || {
+        sleep(Duration::from_millis(10));
+        update_to_new();
+        // sleep(Duration::from_millis(10));
+        // update_to_old();
+    });
+    handlers.push(updater);
     for handle in handlers.into_iter() {
         handle.join().unwrap();
     }

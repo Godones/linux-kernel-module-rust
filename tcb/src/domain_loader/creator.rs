@@ -154,6 +154,27 @@ pub fn create_domain<T: ?Sized>(
     Some((id, domain, domain_loader))
 }
 
+pub fn create_domain_or_empty<P,T: ?Sized>(
+    ty: DomainTypeRaw,
+    domain_file_name: &str,
+    elf: Option<Vec<u8>>,
+    use_old_id: Option<u64>,
+) -> (u64, Box<T>, DomainLoader)
+where
+    P: ProxyBuilder<T = Box<T>>,
+{
+    let res = create_domain(ty, domain_file_name, elf, use_old_id);
+    match res {
+        Some(res) => res,
+        None => {
+            println!("Create empty domain: {}", domain_file_name);
+            let loader = DomainLoader::empty();
+            let domain = P::build_empty_no_proxy();
+            (u64::MAX, domain, loader)
+        }
+    }
+}
+
 pub fn create_domain_with_loader<T: ?Sized>(
     mut domain_loader: DomainLoader,
     use_old_id: Option<u64>,

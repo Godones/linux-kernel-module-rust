@@ -5,7 +5,7 @@ use corelib::{LinuxErrno, LinuxResult};
 use interface::{logger::LogDomain, Basic};
 use kernel::{
     init::InPlaceInit,
-    sync::{RcuData, Mutex},
+    sync::{Mutex, RcuData},
 };
 use rref::RRefVec;
 

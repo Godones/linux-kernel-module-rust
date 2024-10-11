@@ -2,15 +2,17 @@
 
 //! String representations.
 
-use alloc::{alloc::AllocError, vec::Vec};
+use alloc::{alloc::AllocError, boxed::Box, vec::Vec};
 use core::{
+    ffi::c_void,
     fmt::{self, Write},
-    ops::{self, Deref, Index},
+    ops::{self, Deref, DerefMut, Index},
 };
 
 use crate::{
     bindings,
-    error::{linux_err::*, Error},
+    error::{linux_err::*, Error, KernelResult},
+    types::ForeignOwnable,
 };
 
 /// Byte string without UTF-8 validity guarantee.
@@ -107,6 +109,18 @@ impl CStr {
         unsafe { Self::from_bytes_with_nul_unchecked(bytes) }
     }
 
+    #[inline]
+    pub unsafe fn from_char_ptr_mut<'a>(ptr: *const core::ffi::c_char) -> &'a mut Self {
+        // SAFETY: The safety precondition guarantees `ptr` is a valid pointer
+        // to a `NUL`-terminated C string.
+        let len = unsafe { bindings::strlen(ptr) } + 1;
+        // SAFETY: Lifetime guaranteed by the safety precondition.
+        let bytes = unsafe { core::slice::from_raw_parts_mut(ptr as _, len as _) };
+        // SAFETY: As `len` is returned by `strlen`, `bytes` does not contain interior `NUL`.
+        // As we have added 1 to `len`, the last byte is known to be `NUL`.
+        unsafe { Self::from_bytes_with_nul_unchecked_mut(bytes) }
+    }
+
     /// Creates a [`CStr`] from a `[u8]`.
     ///
     /// The provided slice must be `NUL`-terminated, does not contain any
@@ -140,6 +154,18 @@ impl CStr {
     /// `NUL` byte (or the string will be truncated).
     #[inline]
     pub const unsafe fn from_bytes_with_nul_unchecked(bytes: &[u8]) -> &CStr {
+        // SAFETY: Properties of `bytes` guaranteed by the safety precondition.
+        unsafe { core::mem::transmute(bytes) }
+    }
+    /// Creates a mutable [`CStr`] from a `[u8]` without performing any
+    /// additional checks.
+    ///
+    /// # Safety
+    ///
+    /// `bytes` *must* end with a `NUL` byte, and should only have a single
+    /// `NUL` byte (or the string will be truncated).
+    #[inline]
+    pub unsafe fn from_bytes_with_nul_unchecked_mut(bytes: &mut [u8]) -> &mut CStr {
         // SAFETY: Properties of `bytes` guaranteed by the safety precondition.
         unsafe { core::mem::transmute(bytes) }
     }
@@ -593,6 +619,13 @@ impl Deref for CString {
         unsafe { CStr::from_bytes_with_nul_unchecked(self.buf.as_slice()) }
     }
 }
+impl DerefMut for CString {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        // SAFETY: A `CString` is always NUL-terminated and contains no other
+        // NUL bytes.
+        unsafe { CStr::from_bytes_with_nul_unchecked_mut(self.buf.as_mut()) }
+    }
+}
 
 impl<'a> TryFrom<&'a CStr> for CString {
     type Error = AllocError;
@@ -605,6 +638,49 @@ impl<'a> TryFrom<&'a CStr> for CString {
         // INVARIANT: The `CStr` and `CString` types have the same invariants for
         // the string data, and we copied it over without changes.
         Ok(CString { buf })
+    }
+}
+
+impl ForeignOwnable for CString {
+    type Borrowed<'a> = &'a CStr;
+    type BorrowedMut<'a> = &'a mut CStr;
+
+    fn into_foreign(self) -> *const core::ffi::c_void {
+        let s = Vec::into_boxed_slice(self.buf);
+        Box::into_raw(s) as _
+    }
+
+    unsafe fn from_foreign(ptr: *const core::ffi::c_void) -> Self {
+        // SAFETY: The safety requirements of this function satisfy those of `Self::borrow`.
+        let str = unsafe { Self::borrow(ptr) };
+        let ptr = &str.0 as *const [u8];
+        // SAFETY: The safety requirements of this function satisfy those of `Box::from_raw`.
+        Self {
+            buf: unsafe {
+                let s = Box::from_raw(ptr.cast_mut());
+                Vec::from(s)
+            },
+        }
+    }
+
+    unsafe fn borrow<'a>(ptr: *const core::ffi::c_void) -> Self::Borrowed<'a> {
+        unsafe { CStr::from_char_ptr(ptr.cast::<core::ffi::c_char>()) }
+    }
+
+    unsafe fn borrow_mut<'a>(ptr: *const c_void) -> Self::BorrowedMut<'a> {
+        unsafe { CStr::from_char_ptr_mut(ptr.cast::<core::ffi::c_char>()) }
+    }
+}
+
+impl TryFrom<&[u8]> for CString {
+    type Error = Error;
+
+    fn try_from(buf: &[u8]) -> KernelResult<CString> {
+        let len = buf.len().checked_add(1).ok_or(ENOMEM)?;
+        let mut b = Vec::with_capacity(len);
+        b.copy_from_slice(buf);
+        b.push(0);
+        Ok(CString { buf: b })
     }
 }
 

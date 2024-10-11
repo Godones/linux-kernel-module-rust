@@ -12,6 +12,6 @@ pub trait ProxyBuilder {
     type T;
     fn build(domain: Self::T, domain_loader: DomainLoader) -> Self;
     fn build_empty(domain_loader: DomainLoader) -> Self;
-    fn build_empty_no_proxy()->Self::T;
+    fn build_empty_no_proxy() -> Self::T;
     fn init_by_box(&self, argv: Box<dyn Any + Send + Sync>) -> LinuxResult<()>;
 }

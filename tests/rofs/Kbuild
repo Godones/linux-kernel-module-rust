@@ -1,4 +1,4 @@
-module-name := chrdev
+module-name := rofs
 obj-m := $(module-name).o
 
 CARGO ?= cargo

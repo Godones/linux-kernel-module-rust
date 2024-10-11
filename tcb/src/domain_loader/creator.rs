@@ -154,7 +154,7 @@ pub fn create_domain<T: ?Sized>(
     Some((id, domain, domain_loader))
 }
 
-pub fn create_domain_or_empty<P,T: ?Sized>(
+pub fn create_domain_or_empty<P, T: ?Sized>(
     ty: DomainTypeRaw,
     domain_file_name: &str,
     elf: Option<Vec<u8>>,

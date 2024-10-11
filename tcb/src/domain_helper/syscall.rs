@@ -7,9 +7,9 @@ use interface::*;
 use crate::{
     config::FRAME_BITS,
     domain_helper::{resource::DOMAIN_RESOURCE, DOMAIN_CREATE, DOMAIN_INFO},
+    domain_loader::creator,
     domain_proxy::{empty_device::EmptyDeviceDomainProxy, logger::LogDomainProxy},
 };
-use crate::domain_loader::creator;
 
 pub static DOMAIN_SYS: &'static dyn CoreFunction = &DomainSyscall;
 
@@ -88,7 +88,7 @@ impl CoreFunction for DomainSyscall {
         let (domain_info, new_domain_id) = match old_domain {
             Some(DomainType::LogDomain(logger)) => {
                 let old_domain_id = logger.domain_id();
-                let (id, new_domain, loader) = creator::create_domain_or_empty::<LogDomainProxy,_>(
+                let (id, new_domain, loader) = creator::create_domain_or_empty::<LogDomainProxy, _>(
                     ty,
                     new_domain_name,
                     None,
@@ -105,12 +105,11 @@ impl CoreFunction for DomainSyscall {
             }
             Some(DomainType::EmptyDeviceDomain(empty_device)) => {
                 let old_domain_id = empty_device.domain_id();
-                let (id, new_domain, loader) = creator::create_domain_or_empty
-                    ::<EmptyDeviceDomainProxy,_>(
-                    ty,
-                    new_domain_name,
-                    None,
-                    Some(old_domain_id),
+                let (id, new_domain, loader) = creator::create_domain_or_empty::<
+                    EmptyDeviceDomainProxy,
+                    _,
+                >(
+                    ty, new_domain_name, None, Some(old_domain_id)
                 );
                 let empty_device = empty_device
                     .downcast_arc::<EmptyDeviceDomainProxy>()

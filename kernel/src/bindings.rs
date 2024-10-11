@@ -17,14 +17,23 @@ pub use bindings::*;
 pub const GFP_KERNEL: gfp_t = BINDINGS_GFP_KERNEL;
 pub const BINDINGS_GFP_ATOMIC: gfp_t = 2080;
 pub const BINDINGS___GFP_ZERO: gfp_t = 256;
-
 pub const GFP_ATOMIC: gfp_t = BINDINGS_GFP_ATOMIC;
 pub const __GFP_ZERO: gfp_t = BINDINGS___GFP_ZERO;
+
+// wait to remove
+pub const SLAB_RECLAIM_ACCOUNT: slab_flags_t = 32768;
+pub const SLAB_ACCOUNT: slab_flags_t = 8192;
+pub const MAX_LFS_FILESIZE: loff_t = 9223372036854775807;
+pub const PAGE_SIZE: usize = 4096;
+pub const SB_RDONLY: core::ffi::c_ulong = 1;
+
 pub(crate) fn rust_helper_errname(_err: core::ffi::c_int) -> *const core::ffi::c_char {
     core::ptr::null()
 }
 
 extern "C" {
+    #[link_name = "rust_helper_ERR_PTR"]
+    pub fn ERR_PTR(err: core::ffi::c_long) -> *mut core::ffi::c_void;
     pub(crate) fn rust_helper_rcu_read_unlock();
 
     pub(crate) fn rust_helper_rcu_read_lock();
@@ -51,7 +60,6 @@ extern "C" {
     pub fn spin_unlock_irqrestore(lock: *mut spinlock_t, flags: core::ffi::c_ulong);
     #[link_name = "rust_helper_spin_lock_irqsave"]
     pub fn spin_lock_irqsave(lock: *mut spinlock_t) -> core::ffi::c_ulong;
-
 
     #[link_name = "rust_helper_get_current"]
     pub(crate) fn get_current() -> *mut task_struct;
@@ -124,6 +132,79 @@ extern "C" {
         iter: *mut radix_tree_iter,
         flags: core::ffi::c_uint,
     ) -> *mut *mut core::ffi::c_void;
+
+    // folio
+    #[link_name = "rust_helper_folio_get"]
+    pub fn folio_get(folio: *mut folio);
+    #[link_name = "rust_helper_folio_put"]
+    pub fn folio_put(folio: *mut folio);
+    #[link_name = "rust_helper_folio_alloc"]
+    pub fn folio_alloc(gfp: gfp_t, order: core::ffi::c_uint) -> *mut folio;
+    #[link_name = "rust_helper_folio_page"]
+    pub fn folio_page(folio: *mut folio, n: usize) -> *mut page;
+    #[link_name = "rust_helper_folio_pos"]
+    pub fn folio_pos(folio: *mut folio) -> loff_t;
+    #[link_name = "rust_helper_folio_size"]
+    pub fn folio_size(folio: *mut folio) -> usize;
+
+    #[link_name = "rust_helper_folio_lock"]
+    pub fn folio_lock(folio: *mut folio);
+    #[link_name = "rust_helper_folio_test_uptodate"]
+    pub fn folio_test_uptodate(folio: *mut folio) -> bool_;
+    #[link_name = "rust_helper_folio_mark_uptodate"]
+    pub fn folio_mark_uptodate(folio: *mut folio);
+    #[link_name = "rust_helper_folio_test_highmem"]
+    pub fn folio_test_highmem(folio: *mut folio) -> bool_;
+    #[link_name = "rust_helper_flush_dcache_folio"]
+    pub fn flush_dcache_folio(folio: *mut folio);
+    #[link_name = "rust_helper_kmap_local_folio"]
+    pub fn kmap_local_folio(folio: *mut folio, offset: usize) -> *mut core::ffi::c_void;
+    #[link_name = "rust_helper_kunmap_local"]
+    pub fn kunmap_local(vaddr: *const core::ffi::c_void);
+    #[link_name = "rust_helper_read_mapping_folio"]
+    pub fn read_mapping_folio(
+        mapping: *mut address_space,
+        index: core::ffi::c_ulong,
+        file: *mut file,
+    ) -> *mut folio;
+
+    // fs
+    #[link_name = "rust_helper_bdev_nr_sectors"]
+    pub fn bdev_nr_sectors(bdev: *mut block_device) -> sector_t;
+    #[link_name = "rust_helper_dget"]
+    pub fn dget(dentry: *mut dentry) -> *mut dentry;
+    #[link_name = "rust_helper_i_size_read"]
+    pub fn i_size_read(inode: *const inode) -> loff_t;
+    #[link_name = "rust_helper_alloc_inode_sb"]
+    pub fn alloc_inode_sb(
+        sb: *mut super_block,
+        cache: *mut kmem_cache,
+        gfp: gfp_t,
+    ) -> *mut core::ffi::c_void;
+    #[link_name = "rust_helper_inode_lock_shared"]
+    pub fn inode_lock_shared(inode: *mut inode);
+    #[link_name = "rust_helper_inode_unlock_shared"]
+    pub fn inode_unlock_shared(inode: *mut inode);
+    #[link_name = "rust_helper_mapping_set_large_folios"]
+    pub fn mapping_set_large_folios(mapping: *mut address_space);
+    #[link_name = "rust_helper_MKDEV"]
+    pub fn MKDEV(major: core::ffi::c_uint, minor: core::ffi::c_uint) -> core::ffi::c_uint;
+    #[link_name = "rust_helper_i_uid_write"]
+    pub fn i_uid_write(inode: *mut inode, uid: uid_t);
+    #[link_name = "rust_helper_i_gid_write"]
+    pub fn i_gid_write(inode: *mut inode, gid: gid_t);
+    #[link_name = "rust_helper_set_delayed_call"]
+    pub fn set_delayed_call(
+        call: *mut delayed_call,
+        fn_: ::core::option::Option<unsafe extern "C" fn(arg1: *mut core::ffi::c_void)>,
+        arg: *mut core::ffi::c_void,
+    );
+    #[link_name = "rust_helper_get_file"]
+    pub fn get_file(f: *mut file) -> *mut file;
+    #[link_name = "rust_helper_memalloc_nofs_save"]
+    pub fn memalloc_nofs_save() -> core::ffi::c_uint;
+    #[link_name = "rust_helper_memalloc_nofs_restore"]
+    pub fn memalloc_nofs_restore(flags: core::ffi::c_uint);
 }
 
 #[repr(C)]

@@ -4,6 +4,8 @@ use crate::{
 };
 
 pub mod cache_padded;
+pub mod folio;
+pub mod mem_cache;
 pub mod pages;
 pub mod vm;
 

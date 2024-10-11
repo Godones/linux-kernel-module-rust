@@ -1,4 +1,5 @@
 use std::{fs::OpenOptions, io::Write, sync::Arc, thread::sleep, time::Duration};
+
 use domain_helper::{DomainHelperBuilder, DomainTypeRaw};
 use spin::mutex::TicketMutex;
 
@@ -39,7 +40,6 @@ fn update_to_new() {
     println!("Register and update logger domain to new version successfully");
 }
 
-
 fn update_to_old() {
     println!("Register and update logger domain to old version");
     DomainHelperBuilder::new()
@@ -61,15 +61,14 @@ fn run_log_domain_test() {
     let file = Arc::new(TicketMutex::<_>::new(file));
     let mut handlers = vec![];
     // Create a thread for each active CPU core.
-    for id in 0..THREAD_NUM{
+    for id in 0..THREAD_NUM {
         let file = file.clone();
         let thread = std::thread::spawn(move || {
             let start = std::time::Instant::now();
             println!("Thread {} is running ", id);
             loop {
                 let mut file = file.lock();
-                file.write(format!("I'm Thread {}", id).as_bytes())
-                    .unwrap();
+                file.write(format!("I'm Thread {}", id).as_bytes()).unwrap();
                 drop(file);
                 // sleep(Duration::from_secs(1));
                 let now = std::time::Instant::now();

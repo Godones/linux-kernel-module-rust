@@ -8536,24 +8536,8 @@ pub const CHRDEV_MAJOR_MAX: u32 = 512;
 pub const CHRDEV_MAJOR_DYN_END: u32 = 234;
 pub const CHRDEV_MAJOR_DYN_EXT_START: u32 = 511;
 pub const CHRDEV_MAJOR_DYN_EXT_END: u32 = 384;
-pub const LINUX_VERSION_CODE: u32 = 394752;
-pub const LINUX_VERSION_MAJOR: u32 = 6;
-pub const LINUX_VERSION_PATCHLEVEL: u32 = 6;
-pub const LINUX_VERSION_SUBLEVEL: u32 = 0;
-pub const CPU_ENTRY_AREA_MAP_SIZE: u64 = 549755813888;
-pub const VM_IOREMAP: u32 = 1;
-pub const VM_ALLOC: u32 = 2;
-pub const VM_MAP: u32 = 4;
-pub const VM_USERMAP: u32 = 8;
-pub const VM_DMA_COHERENT: u32 = 16;
-pub const VM_UNINITIALIZED: u32 = 32;
-pub const VM_NO_GUARD: u32 = 64;
-pub const VM_KASAN: u32 = 128;
-pub const VM_FLUSH_RESET_PERMS: u32 = 256;
-pub const VM_MAP_PUT_PAGES: u32 = 512;
-pub const VM_ALLOW_HUGE_VMAP: u32 = 1024;
-pub const VM_DEFER_KMEMLEAK: u32 = 0;
-pub const ARCH_PAGE_TABLE_SYNC_MASK: u32 = 0;
+pub const FDPUT_FPUT: u32 = 1;
+pub const FDPUT_POS_UNLOCK: u32 = 2;
 pub const STACK_DEPOT_EXTRA_BITS: u32 = 5;
 pub const SZ_1: u32 = 1;
 pub const SZ_2: u32 = 2;
@@ -8708,6 +8692,192 @@ pub const MM_CP_UFFD_WP_RESOLVE: u32 = 8;
 pub const MM_CP_UFFD_WP_ALL: u32 = 12;
 pub const VM_UNMAPPED_AREA_TOPDOWN: u32 = 1;
 pub const VMEMMAP_RESERVE_NR: u32 = 2;
+pub const CAP_OPT_NONE: u32 = 0;
+pub const SECURITY_LSM_NATIVE_LABELS: u32 = 1;
+pub const LSM_SETID_ID: u32 = 1;
+pub const LSM_SETID_RE: u32 = 2;
+pub const LSM_SETID_RES: u32 = 4;
+pub const LSM_SETID_FS: u32 = 8;
+pub const LSM_PRLIMIT_READ: u32 = 1;
+pub const LSM_PRLIMIT_WRITE: u32 = 2;
+pub const LSM_UNSAFE_SHARE: u32 = 1;
+pub const LSM_UNSAFE_PTRACE: u32 = 2;
+pub const LSM_UNSAFE_NO_NEW_PRIVS: u32 = 4;
+pub const LINUX_IOMAP_H: u32 = 1;
+pub const ARCH_IMPLEMENTS_FLUSH_DCACHE_PAGE: u32 = 0;
+pub const SECTOR_SHIFT: u32 = 9;
+pub const SECTOR_SIZE: u32 = 512;
+pub const PAGE_SECTORS_SHIFT: u32 = 3;
+pub const PAGE_SECTORS: u32 = 8;
+pub const SECTOR_MASK: u32 = 7;
+pub const BLK_STS_OK: u32 = 0;
+pub const BIO_ISSUE_RES_BITS: u32 = 1;
+pub const BIO_ISSUE_SIZE_BITS: u32 = 12;
+pub const BIO_ISSUE_RES_SHIFT: u32 = 63;
+pub const BIO_ISSUE_SIZE_SHIFT: u32 = 51;
+pub const BIO_ISSUE_TIME_MASK: u64 = 2251799813685247;
+pub const BIO_ISSUE_SIZE_MASK: u64 = 9221120237041090560;
+pub const BIO_ISSUE_RES_MASK: i64 = -9223372036854775808;
+pub const BIO_ISSUE_THROTL_SKIP_LATENCY: i64 = -9223372036854775808;
+pub const BLK_QC_T_NONE: i32 = -1;
+pub const BIO_MAX_SECTORS: i32 = -1;
+pub const REQ_OP_BITS: u32 = 8;
+pub const REQ_FLAG_BITS: u32 = 24;
+pub const UIO_FASTIOV: u32 = 8;
+pub const UIO_MAXIOV: u32 = 1024;
+pub const ITER_SOURCE: u32 = 1;
+pub const ITER_DEST: u32 = 0;
+pub const BIO_MAX_VECS: u32 = 256;
+pub const BIO_POOL_SIZE: u32 = 2;
+pub const SBQ_WAIT_QUEUES: u32 = 8;
+pub const SBQ_WAKE_BATCH: u32 = 8;
+pub const BLKCG_MAX_POLS: u32 = 6;
+pub const DISK_MAX_PARTS: u32 = 256;
+pub const DISK_NAME_LEN: u32 = 32;
+pub const PARTITION_META_INFO_VOLNAMELTH: u32 = 64;
+pub const PARTITION_META_INFO_UUIDLTH: u32 = 37;
+pub const GD_NEED_PART_SCAN: u32 = 0;
+pub const GD_READ_ONLY: u32 = 1;
+pub const GD_DEAD: u32 = 2;
+pub const GD_NATIVE_CAPACITY: u32 = 3;
+pub const GD_ADDED: u32 = 4;
+pub const GD_SUPPRESS_PART_SCAN: u32 = 5;
+pub const GD_OWNS_QUEUE: u32 = 6;
+pub const QUEUE_FLAG_STOPPED: u32 = 0;
+pub const QUEUE_FLAG_DYING: u32 = 1;
+pub const QUEUE_FLAG_NOMERGES: u32 = 3;
+pub const QUEUE_FLAG_SAME_COMP: u32 = 4;
+pub const QUEUE_FLAG_FAIL_IO: u32 = 5;
+pub const QUEUE_FLAG_NONROT: u32 = 6;
+pub const QUEUE_FLAG_VIRT: u32 = 6;
+pub const QUEUE_FLAG_IO_STAT: u32 = 7;
+pub const QUEUE_FLAG_NOXMERGES: u32 = 9;
+pub const QUEUE_FLAG_ADD_RANDOM: u32 = 10;
+pub const QUEUE_FLAG_SYNCHRONOUS: u32 = 11;
+pub const QUEUE_FLAG_SAME_FORCE: u32 = 12;
+pub const QUEUE_FLAG_HW_WC: u32 = 18;
+pub const QUEUE_FLAG_INIT_DONE: u32 = 14;
+pub const QUEUE_FLAG_STABLE_WRITES: u32 = 15;
+pub const QUEUE_FLAG_POLL: u32 = 16;
+pub const QUEUE_FLAG_WC: u32 = 17;
+pub const QUEUE_FLAG_FUA: u32 = 18;
+pub const QUEUE_FLAG_DAX: u32 = 19;
+pub const QUEUE_FLAG_STATS: u32 = 20;
+pub const QUEUE_FLAG_REGISTERED: u32 = 22;
+pub const QUEUE_FLAG_QUIESCED: u32 = 24;
+pub const QUEUE_FLAG_PCI_P2PDMA: u32 = 25;
+pub const QUEUE_FLAG_ZONE_RESETALL: u32 = 26;
+pub const QUEUE_FLAG_RQ_ALLOC_TIME: u32 = 27;
+pub const QUEUE_FLAG_HCTX_ACTIVE: u32 = 28;
+pub const QUEUE_FLAG_NOWAIT: u32 = 29;
+pub const QUEUE_FLAG_SQ_SCHED: u32 = 30;
+pub const QUEUE_FLAG_SKIP_TAGSET_QUIESCE: u32 = 31;
+pub const QUEUE_FLAG_MQ_DEFAULT: u32 = 536871056;
+pub const BLK_DEFAULT_SG_TIMEOUT: u32 = 15000;
+pub const BLK_MIN_SG_TIMEOUT: u32 = 1750;
+pub const BLK_POLL_ONESHOT: u32 = 1;
+pub const ELEVATOR_F_ZBD_SEQ_WRITE: u32 = 1;
+pub const BLKDEV_ZERO_NOUNMAP: u32 = 1;
+pub const BLKDEV_ZERO_NOFALLBACK: u32 = 2;
+pub const BLK_DEF_MAX_SECTORS: u32 = 2560;
+pub const BDEVNAME_SIZE: u32 = 32;
+pub const BDEVT_SIZE: u32 = 10;
+pub const BLKDEV_MAJOR_MAX: u32 = 512;
+pub const IOMAP_HOLE: u32 = 0;
+pub const IOMAP_DELALLOC: u32 = 1;
+pub const IOMAP_MAPPED: u32 = 2;
+pub const IOMAP_UNWRITTEN: u32 = 3;
+pub const IOMAP_INLINE: u32 = 4;
+pub const IOMAP_F_NEW: u32 = 1;
+pub const IOMAP_F_DIRTY: u32 = 2;
+pub const IOMAP_F_SHARED: u32 = 4;
+pub const IOMAP_F_MERGED: u32 = 8;
+pub const IOMAP_F_BUFFER_HEAD: u32 = 16;
+pub const IOMAP_F_XATTR: u32 = 32;
+pub const IOMAP_F_SIZE_CHANGED: u32 = 256;
+pub const IOMAP_F_STALE: u32 = 512;
+pub const IOMAP_F_PRIVATE: u32 = 4096;
+pub const IOMAP_NULL_ADDR: i32 = -1;
+pub const IOMAP_WRITE: u32 = 1;
+pub const IOMAP_ZERO: u32 = 2;
+pub const IOMAP_REPORT: u32 = 4;
+pub const IOMAP_FAULT: u32 = 8;
+pub const IOMAP_DIRECT: u32 = 16;
+pub const IOMAP_NOWAIT: u32 = 32;
+pub const IOMAP_OVERWRITE_ONLY: u32 = 64;
+pub const IOMAP_UNSHARE: u32 = 128;
+pub const IOMAP_DAX: u32 = 256;
+pub const IOMAP_DIO_UNWRITTEN: u32 = 1;
+pub const IOMAP_DIO_COW: u32 = 2;
+pub const IOMAP_DIO_FORCE_WAIT: u32 = 1;
+pub const IOMAP_DIO_OVERWRITE_ONLY: u32 = 2;
+pub const IOMAP_DIO_PARTIAL: u32 = 4;
+pub const UID_GID_MAP_MAX_BASE_EXTENTS: u32 = 5;
+pub const UID_GID_MAP_MAX_EXTENTS: u32 = 340;
+pub const USERNS_SETGROUPS_ALLOWED: u32 = 1;
+pub const USERNS_INIT_FLAGS: u32 = 1;
+pub const __UAPI_DEF_IF_IFCONF: u32 = 1;
+pub const __UAPI_DEF_IF_IFMAP: u32 = 1;
+pub const __UAPI_DEF_IF_IFNAMSIZ: u32 = 1;
+pub const __UAPI_DEF_IF_IFREQ: u32 = 1;
+pub const __UAPI_DEF_IF_NET_DEVICE_FLAGS: u32 = 1;
+pub const __UAPI_DEF_IF_NET_DEVICE_FLAGS_LOWER_UP_DORMANT_ECHO: u32 = 1;
+pub const __UAPI_DEF_IN_ADDR: u32 = 1;
+pub const __UAPI_DEF_IN_IPPROTO: u32 = 1;
+pub const __UAPI_DEF_IN_PKTINFO: u32 = 1;
+pub const __UAPI_DEF_IP_MREQ: u32 = 1;
+pub const __UAPI_DEF_SOCKADDR_IN: u32 = 1;
+pub const __UAPI_DEF_IN_CLASS: u32 = 1;
+pub const __UAPI_DEF_IN6_ADDR: u32 = 1;
+pub const __UAPI_DEF_IN6_ADDR_ALT: u32 = 1;
+pub const __UAPI_DEF_SOCKADDR_IN6: u32 = 1;
+pub const __UAPI_DEF_IPV6_MREQ: u32 = 1;
+pub const __UAPI_DEF_IPPROTO_V6: u32 = 1;
+pub const __UAPI_DEF_IPV6_OPTIONS: u32 = 1;
+pub const __UAPI_DEF_IN6_PKTINFO: u32 = 1;
+pub const __UAPI_DEF_IP6_MTUINFO: u32 = 1;
+pub const __UAPI_DEF_SOCKADDR_IPX: u32 = 1;
+pub const __UAPI_DEF_IPX_ROUTE_DEFINITION: u32 = 1;
+pub const __UAPI_DEF_IPX_INTERFACE_DEFINITION: u32 = 1;
+pub const __UAPI_DEF_IPX_CONFIG_DATA: u32 = 1;
+pub const __UAPI_DEF_IPX_ROUTE_DEF: u32 = 1;
+pub const __UAPI_DEF_XATTR: u32 = 1;
+pub const XATTR_CREATE: u32 = 1;
+pub const XATTR_REPLACE: u32 = 2;
+pub const XATTR_OS2_PREFIX: &[u8; 5] = b"os2.\0";
+pub const XATTR_MAC_OSX_PREFIX: &[u8; 5] = b"osx.\0";
+pub const XATTR_BTRFS_PREFIX: &[u8; 7] = b"btrfs.\0";
+pub const XATTR_HURD_PREFIX: &[u8; 5] = b"gnu.\0";
+pub const XATTR_SECURITY_PREFIX: &[u8; 10] = b"security.\0";
+pub const XATTR_SYSTEM_PREFIX: &[u8; 8] = b"system.\0";
+pub const XATTR_TRUSTED_PREFIX: &[u8; 9] = b"trusted.\0";
+pub const XATTR_USER_PREFIX: &[u8; 6] = b"user.\0";
+pub const XATTR_EVM_SUFFIX: &[u8; 4] = b"evm\0";
+pub const XATTR_NAME_EVM: &[u8; 13] = b"security.evm\0";
+pub const XATTR_IMA_SUFFIX: &[u8; 4] = b"ima\0";
+pub const XATTR_NAME_IMA: &[u8; 13] = b"security.ima\0";
+pub const XATTR_SELINUX_SUFFIX: &[u8; 8] = b"selinux\0";
+pub const XATTR_NAME_SELINUX: &[u8; 17] = b"security.selinux\0";
+pub const XATTR_SMACK_SUFFIX: &[u8; 8] = b"SMACK64\0";
+pub const XATTR_SMACK_IPIN: &[u8; 12] = b"SMACK64IPIN\0";
+pub const XATTR_SMACK_IPOUT: &[u8; 13] = b"SMACK64IPOUT\0";
+pub const XATTR_SMACK_EXEC: &[u8; 12] = b"SMACK64EXEC\0";
+pub const XATTR_SMACK_TRANSMUTE: &[u8; 17] = b"SMACK64TRANSMUTE\0";
+pub const XATTR_SMACK_MMAP: &[u8; 12] = b"SMACK64MMAP\0";
+pub const XATTR_NAME_SMACK: &[u8; 17] = b"security.SMACK64\0";
+pub const XATTR_NAME_SMACKIPIN: &[u8; 21] = b"security.SMACK64IPIN\0";
+pub const XATTR_NAME_SMACKIPOUT: &[u8; 22] = b"security.SMACK64IPOUT\0";
+pub const XATTR_NAME_SMACKEXEC: &[u8; 21] = b"security.SMACK64EXEC\0";
+pub const XATTR_NAME_SMACKTRANSMUTE: &[u8; 26] = b"security.SMACK64TRANSMUTE\0";
+pub const XATTR_NAME_SMACKMMAP: &[u8; 21] = b"security.SMACK64MMAP\0";
+pub const XATTR_APPARMOR_SUFFIX: &[u8; 9] = b"apparmor\0";
+pub const XATTR_NAME_APPARMOR: &[u8; 18] = b"security.apparmor\0";
+pub const XATTR_CAPS_SUFFIX: &[u8; 11] = b"capability\0";
+pub const XATTR_NAME_CAPS: &[u8; 20] = b"security.capability\0";
+pub const XATTR_POSIX_ACL_ACCESS: &[u8; 17] = b"posix_acl_access\0";
+pub const XATTR_NAME_POSIX_ACL_ACCESS: &[u8; 24] = b"system.posix_acl_access\0";
+pub const XATTR_POSIX_ACL_DEFAULT: &[u8; 18] = b"posix_acl_default\0";
+pub const XATTR_NAME_POSIX_ACL_DEFAULT: &[u8; 25] = b"system.posix_acl_default\0";
 pub const FIOSETOWN: u32 = 35073;
 pub const SIOCSPGRP: u32 = 35074;
 pub const FIOGETOWN: u32 = 35075;
@@ -8875,10 +9045,6 @@ pub const SIOCSHWTSTAMP: u32 = 35248;
 pub const SIOCGHWTSTAMP: u32 = 35249;
 pub const SIOCDEVPRIVATE: u32 = 35312;
 pub const SIOCPROTOPRIVATE: u32 = 35296;
-pub const UIO_FASTIOV: u32 = 8;
-pub const UIO_MAXIOV: u32 = 1024;
-pub const ITER_SOURCE: u32 = 1;
-pub const ITER_DEST: u32 = 0;
 pub const _K_SS_MAXSIZE: u32 = 128;
 pub const SOCK_SNDBUF_LOCK: u32 = 1;
 pub const SOCK_RCVBUF_LOCK: u32 = 2;
@@ -9058,32 +9224,6 @@ pub const SOL_MPTCP: u32 = 284;
 pub const SOL_MCTP: u32 = 285;
 pub const SOL_SMC: u32 = 286;
 pub const IPX_TYPE: u32 = 1;
-pub const __UAPI_DEF_IF_IFCONF: u32 = 1;
-pub const __UAPI_DEF_IF_IFMAP: u32 = 1;
-pub const __UAPI_DEF_IF_IFNAMSIZ: u32 = 1;
-pub const __UAPI_DEF_IF_IFREQ: u32 = 1;
-pub const __UAPI_DEF_IF_NET_DEVICE_FLAGS: u32 = 1;
-pub const __UAPI_DEF_IF_NET_DEVICE_FLAGS_LOWER_UP_DORMANT_ECHO: u32 = 1;
-pub const __UAPI_DEF_IN_ADDR: u32 = 1;
-pub const __UAPI_DEF_IN_IPPROTO: u32 = 1;
-pub const __UAPI_DEF_IN_PKTINFO: u32 = 1;
-pub const __UAPI_DEF_IP_MREQ: u32 = 1;
-pub const __UAPI_DEF_SOCKADDR_IN: u32 = 1;
-pub const __UAPI_DEF_IN_CLASS: u32 = 1;
-pub const __UAPI_DEF_IN6_ADDR: u32 = 1;
-pub const __UAPI_DEF_IN6_ADDR_ALT: u32 = 1;
-pub const __UAPI_DEF_SOCKADDR_IN6: u32 = 1;
-pub const __UAPI_DEF_IPV6_MREQ: u32 = 1;
-pub const __UAPI_DEF_IPPROTO_V6: u32 = 1;
-pub const __UAPI_DEF_IPV6_OPTIONS: u32 = 1;
-pub const __UAPI_DEF_IN6_PKTINFO: u32 = 1;
-pub const __UAPI_DEF_IP6_MTUINFO: u32 = 1;
-pub const __UAPI_DEF_SOCKADDR_IPX: u32 = 1;
-pub const __UAPI_DEF_IPX_ROUTE_DEFINITION: u32 = 1;
-pub const __UAPI_DEF_IPX_INTERFACE_DEFINITION: u32 = 1;
-pub const __UAPI_DEF_IPX_CONFIG_DATA: u32 = 1;
-pub const __UAPI_DEF_IPX_ROUTE_DEF: u32 = 1;
-pub const __UAPI_DEF_XATTR: u32 = 1;
 pub const IFNAMSIZ: u32 = 16;
 pub const IFALIASZ: u32 = 256;
 pub const ALTIFNAMSIZ: u32 = 128;
@@ -9230,7 +9370,6 @@ pub const COMPAT_UTS_MACHINE: &[u8; 7] = b"i686\0\0\0";
 pub const COMPAT_USE_64BIT_TIME: u32 = 0;
 pub const COMPAT_MINSIGSTKSZ: u32 = 2048;
 pub const _COMPAT_NSIG_WORDS: u32 = 2;
-pub const ARCH_IMPLEMENTS_FLUSH_DCACHE_PAGE: u32 = 0;
 pub const _HAVE_ARCH_COPY_AND_CSUM_FROM_USER: u32 = 1;
 pub const _HAVE_ARCH_IPV6_CSUM: u32 = 1;
 pub const IO_SPACE_LIMIT: u32 = 65535;
@@ -9239,6 +9378,20 @@ pub const SWNODE_GRAPH_ENDPOINT_NAME_FMT: &[u8; 12] = b"endpoint@%u\0";
 pub const NR_FWNODE_REFERENCE_ARGS: u32 = 8;
 pub const PIO_INDIRECT_SIZE: u32 = 0;
 pub const MMIO_UPPER_LIMIT: u32 = 65535;
+pub const CPU_ENTRY_AREA_MAP_SIZE: u64 = 549755813888;
+pub const VM_IOREMAP: u32 = 1;
+pub const VM_ALLOC: u32 = 2;
+pub const VM_MAP: u32 = 4;
+pub const VM_USERMAP: u32 = 8;
+pub const VM_DMA_COHERENT: u32 = 16;
+pub const VM_UNINITIALIZED: u32 = 32;
+pub const VM_NO_GUARD: u32 = 64;
+pub const VM_KASAN: u32 = 128;
+pub const VM_FLUSH_RESET_PERMS: u32 = 256;
+pub const VM_MAP_PUT_PAGES: u32 = 512;
+pub const VM_ALLOW_HUGE_VMAP: u32 = 1024;
+pub const VM_DEFER_KMEMLEAK: u32 = 0;
+pub const ARCH_PAGE_TABLE_SYNC_MASK: u32 = 0;
 pub const SG_CHAIN: u32 = 1;
 pub const SG_END: u32 = 2;
 pub const SG_PAGE_LINK_MASK: u32 = 3;
@@ -9627,19 +9780,6 @@ pub const SOCK_PASSPIDFD: u32 = 7;
 pub const SOCK_TYPE_MASK: u32 = 15;
 pub const SOCK_CLOEXEC: u32 = 524288;
 pub const SOCK_NONBLOCK: u32 = 2048;
-pub const FDPUT_FPUT: u32 = 1;
-pub const FDPUT_POS_UNLOCK: u32 = 2;
-pub const CAP_OPT_NONE: u32 = 0;
-pub const SECURITY_LSM_NATIVE_LABELS: u32 = 1;
-pub const LSM_SETID_ID: u32 = 1;
-pub const LSM_SETID_RE: u32 = 2;
-pub const LSM_SETID_RES: u32 = 4;
-pub const LSM_SETID_FS: u32 = 8;
-pub const LSM_PRLIMIT_READ: u32 = 1;
-pub const LSM_PRLIMIT_WRITE: u32 = 2;
-pub const LSM_UNSAFE_SHARE: u32 = 1;
-pub const LSM_UNSAFE_PTRACE: u32 = 2;
-pub const LSM_UNSAFE_NO_NEW_PRIVS: u32 = 4;
 pub const SCM_MAX_FD: u32 = 253;
 pub const NETLINK_ROUTE: u32 = 0;
 pub const NETLINK_UNUSED: u32 = 1;
@@ -9933,84 +10073,6 @@ pub const ETHTOOL_MAX_LANES: u32 = 8;
 pub const ETHTOOL_RMON_HIST_MAX: u32 = 10;
 pub const ETH_MODULE_EEPROM_PAGE_LEN: u32 = 128;
 pub const ETH_MODULE_MAX_I2C_ADDRESS: u32 = 127;
-pub const LEDS_TRIG_TYPE_EDGE: u32 = 0;
-pub const LEDS_TRIG_TYPE_LEVEL: u32 = 1;
-pub const LEDS_BOOST_OFF: u32 = 0;
-pub const LEDS_BOOST_ADAPTIVE: u32 = 1;
-pub const LEDS_BOOST_FIXED: u32 = 2;
-pub const LED_COLOR_ID_WHITE: u32 = 0;
-pub const LED_COLOR_ID_RED: u32 = 1;
-pub const LED_COLOR_ID_GREEN: u32 = 2;
-pub const LED_COLOR_ID_BLUE: u32 = 3;
-pub const LED_COLOR_ID_AMBER: u32 = 4;
-pub const LED_COLOR_ID_VIOLET: u32 = 5;
-pub const LED_COLOR_ID_YELLOW: u32 = 6;
-pub const LED_COLOR_ID_IR: u32 = 7;
-pub const LED_COLOR_ID_MULTI: u32 = 8;
-pub const LED_COLOR_ID_RGB: u32 = 9;
-pub const LED_COLOR_ID_PURPLE: u32 = 10;
-pub const LED_COLOR_ID_ORANGE: u32 = 11;
-pub const LED_COLOR_ID_PINK: u32 = 12;
-pub const LED_COLOR_ID_CYAN: u32 = 13;
-pub const LED_COLOR_ID_LIME: u32 = 14;
-pub const LED_COLOR_ID_MAX: u32 = 15;
-pub const LED_FUNCTION_CAPSLOCK: &[u8; 9] = b"capslock\0";
-pub const LED_FUNCTION_SCROLLLOCK: &[u8; 11] = b"scrolllock\0";
-pub const LED_FUNCTION_NUMLOCK: &[u8; 8] = b"numlock\0";
-pub const LED_FUNCTION_KBD_BACKLIGHT: &[u8; 14] = b"kbd_backlight\0";
-pub const LED_FUNCTION_POWER: &[u8; 6] = b"power\0";
-pub const LED_FUNCTION_DISK: &[u8; 5] = b"disk\0";
-pub const LED_FUNCTION_CHARGING: &[u8; 9] = b"charging\0";
-pub const LED_FUNCTION_STATUS: &[u8; 7] = b"status\0";
-pub const LED_FUNCTION_MICMUTE: &[u8; 8] = b"micmute\0";
-pub const LED_FUNCTION_MUTE: &[u8; 5] = b"mute\0";
-pub const LED_FUNCTION_PLAYER1: &[u8; 9] = b"player-1\0";
-pub const LED_FUNCTION_PLAYER2: &[u8; 9] = b"player-2\0";
-pub const LED_FUNCTION_PLAYER3: &[u8; 9] = b"player-3\0";
-pub const LED_FUNCTION_PLAYER4: &[u8; 9] = b"player-4\0";
-pub const LED_FUNCTION_PLAYER5: &[u8; 9] = b"player-5\0";
-pub const LED_FUNCTION_ACTIVITY: &[u8; 9] = b"activity\0";
-pub const LED_FUNCTION_ALARM: &[u8; 6] = b"alarm\0";
-pub const LED_FUNCTION_BACKLIGHT: &[u8; 10] = b"backlight\0";
-pub const LED_FUNCTION_BLUETOOTH: &[u8; 10] = b"bluetooth\0";
-pub const LED_FUNCTION_BOOT: &[u8; 5] = b"boot\0";
-pub const LED_FUNCTION_CPU: &[u8; 4] = b"cpu\0";
-pub const LED_FUNCTION_DEBUG: &[u8; 6] = b"debug\0";
-pub const LED_FUNCTION_DISK_ACTIVITY: &[u8; 14] = b"disk-activity\0";
-pub const LED_FUNCTION_DISK_ERR: &[u8; 9] = b"disk-err\0";
-pub const LED_FUNCTION_DISK_READ: &[u8; 10] = b"disk-read\0";
-pub const LED_FUNCTION_DISK_WRITE: &[u8; 11] = b"disk-write\0";
-pub const LED_FUNCTION_FAULT: &[u8; 6] = b"fault\0";
-pub const LED_FUNCTION_FLASH: &[u8; 6] = b"flash\0";
-pub const LED_FUNCTION_HEARTBEAT: &[u8; 10] = b"heartbeat\0";
-pub const LED_FUNCTION_INDICATOR: &[u8; 10] = b"indicator\0";
-pub const LED_FUNCTION_LAN: &[u8; 4] = b"lan\0";
-pub const LED_FUNCTION_MAIL: &[u8; 5] = b"mail\0";
-pub const LED_FUNCTION_MTD: &[u8; 4] = b"mtd\0";
-pub const LED_FUNCTION_PANIC: &[u8; 6] = b"panic\0";
-pub const LED_FUNCTION_PROGRAMMING: &[u8; 12] = b"programming\0";
-pub const LED_FUNCTION_RX: &[u8; 3] = b"rx\0";
-pub const LED_FUNCTION_SD: &[u8; 3] = b"sd\0";
-pub const LED_FUNCTION_STANDBY: &[u8; 8] = b"standby\0";
-pub const LED_FUNCTION_TORCH: &[u8; 6] = b"torch\0";
-pub const LED_FUNCTION_TX: &[u8; 3] = b"tx\0";
-pub const LED_FUNCTION_USB: &[u8; 4] = b"usb\0";
-pub const LED_FUNCTION_WAN: &[u8; 4] = b"wan\0";
-pub const LED_FUNCTION_WLAN: &[u8; 5] = b"wlan\0";
-pub const LED_FUNCTION_WPS: &[u8; 4] = b"wps\0";
-pub const LED_BLINK_SW: u32 = 0;
-pub const LED_BLINK_ONESHOT: u32 = 1;
-pub const LED_BLINK_ONESHOT_STOP: u32 = 2;
-pub const LED_BLINK_INVERT: u32 = 3;
-pub const LED_BLINK_BRIGHTNESS_CHANGE: u32 = 4;
-pub const LED_BLINK_DISABLE: u32 = 5;
-pub const LED_SET_BRIGHTNESS_OFF: u32 = 6;
-pub const LED_SET_BRIGHTNESS: u32 = 7;
-pub const LED_SET_BLINK: u32 = 8;
-pub const TRIG_NAME_MAX: u32 = 50;
-pub const GPIO_LED_NO_BLINK_LOW: u32 = 0;
-pub const GPIO_LED_NO_BLINK_HIGH: u32 = 1;
-pub const GPIO_LED_BLINK: u32 = 2;
 pub const MII_BMCR: u32 = 0;
 pub const MII_BMSR: u32 = 1;
 pub const MII_PHYSID1: u32 = 2;
@@ -10597,6 +10659,99 @@ pub const MDIO_DEVAD_NONE: i32 = -1;
 pub const MDIO_SUPPORTS_C22: u32 = 1;
 pub const MDIO_SUPPORTS_C45: u32 = 2;
 pub const MDIO_EMULATE_C22: u32 = 4;
+pub const ST_RDONLY: u32 = 1;
+pub const ST_NOSUID: u32 = 2;
+pub const ST_NODEV: u32 = 4;
+pub const ST_NOEXEC: u32 = 8;
+pub const ST_SYNCHRONOUS: u32 = 16;
+pub const ST_VALID: u32 = 32;
+pub const ST_MANDLOCK: u32 = 64;
+pub const ST_NOATIME: u32 = 1024;
+pub const ST_NODIRATIME: u32 = 2048;
+pub const ST_RELATIME: u32 = 4096;
+pub const ST_NOSYMFOLLOW: u32 = 8192;
+pub const LINUX_VERSION_CODE: u32 = 394752;
+pub const LINUX_VERSION_MAJOR: u32 = 6;
+pub const LINUX_VERSION_PATCHLEVEL: u32 = 6;
+pub const LINUX_VERSION_SUBLEVEL: u32 = 0;
+pub const LEDS_TRIG_TYPE_EDGE: u32 = 0;
+pub const LEDS_TRIG_TYPE_LEVEL: u32 = 1;
+pub const LEDS_BOOST_OFF: u32 = 0;
+pub const LEDS_BOOST_ADAPTIVE: u32 = 1;
+pub const LEDS_BOOST_FIXED: u32 = 2;
+pub const LED_COLOR_ID_WHITE: u32 = 0;
+pub const LED_COLOR_ID_RED: u32 = 1;
+pub const LED_COLOR_ID_GREEN: u32 = 2;
+pub const LED_COLOR_ID_BLUE: u32 = 3;
+pub const LED_COLOR_ID_AMBER: u32 = 4;
+pub const LED_COLOR_ID_VIOLET: u32 = 5;
+pub const LED_COLOR_ID_YELLOW: u32 = 6;
+pub const LED_COLOR_ID_IR: u32 = 7;
+pub const LED_COLOR_ID_MULTI: u32 = 8;
+pub const LED_COLOR_ID_RGB: u32 = 9;
+pub const LED_COLOR_ID_PURPLE: u32 = 10;
+pub const LED_COLOR_ID_ORANGE: u32 = 11;
+pub const LED_COLOR_ID_PINK: u32 = 12;
+pub const LED_COLOR_ID_CYAN: u32 = 13;
+pub const LED_COLOR_ID_LIME: u32 = 14;
+pub const LED_COLOR_ID_MAX: u32 = 15;
+pub const LED_FUNCTION_CAPSLOCK: &[u8; 9] = b"capslock\0";
+pub const LED_FUNCTION_SCROLLLOCK: &[u8; 11] = b"scrolllock\0";
+pub const LED_FUNCTION_NUMLOCK: &[u8; 8] = b"numlock\0";
+pub const LED_FUNCTION_KBD_BACKLIGHT: &[u8; 14] = b"kbd_backlight\0";
+pub const LED_FUNCTION_POWER: &[u8; 6] = b"power\0";
+pub const LED_FUNCTION_DISK: &[u8; 5] = b"disk\0";
+pub const LED_FUNCTION_CHARGING: &[u8; 9] = b"charging\0";
+pub const LED_FUNCTION_STATUS: &[u8; 7] = b"status\0";
+pub const LED_FUNCTION_MICMUTE: &[u8; 8] = b"micmute\0";
+pub const LED_FUNCTION_MUTE: &[u8; 5] = b"mute\0";
+pub const LED_FUNCTION_PLAYER1: &[u8; 9] = b"player-1\0";
+pub const LED_FUNCTION_PLAYER2: &[u8; 9] = b"player-2\0";
+pub const LED_FUNCTION_PLAYER3: &[u8; 9] = b"player-3\0";
+pub const LED_FUNCTION_PLAYER4: &[u8; 9] = b"player-4\0";
+pub const LED_FUNCTION_PLAYER5: &[u8; 9] = b"player-5\0";
+pub const LED_FUNCTION_ACTIVITY: &[u8; 9] = b"activity\0";
+pub const LED_FUNCTION_ALARM: &[u8; 6] = b"alarm\0";
+pub const LED_FUNCTION_BACKLIGHT: &[u8; 10] = b"backlight\0";
+pub const LED_FUNCTION_BLUETOOTH: &[u8; 10] = b"bluetooth\0";
+pub const LED_FUNCTION_BOOT: &[u8; 5] = b"boot\0";
+pub const LED_FUNCTION_CPU: &[u8; 4] = b"cpu\0";
+pub const LED_FUNCTION_DEBUG: &[u8; 6] = b"debug\0";
+pub const LED_FUNCTION_DISK_ACTIVITY: &[u8; 14] = b"disk-activity\0";
+pub const LED_FUNCTION_DISK_ERR: &[u8; 9] = b"disk-err\0";
+pub const LED_FUNCTION_DISK_READ: &[u8; 10] = b"disk-read\0";
+pub const LED_FUNCTION_DISK_WRITE: &[u8; 11] = b"disk-write\0";
+pub const LED_FUNCTION_FAULT: &[u8; 6] = b"fault\0";
+pub const LED_FUNCTION_FLASH: &[u8; 6] = b"flash\0";
+pub const LED_FUNCTION_HEARTBEAT: &[u8; 10] = b"heartbeat\0";
+pub const LED_FUNCTION_INDICATOR: &[u8; 10] = b"indicator\0";
+pub const LED_FUNCTION_LAN: &[u8; 4] = b"lan\0";
+pub const LED_FUNCTION_MAIL: &[u8; 5] = b"mail\0";
+pub const LED_FUNCTION_MTD: &[u8; 4] = b"mtd\0";
+pub const LED_FUNCTION_PANIC: &[u8; 6] = b"panic\0";
+pub const LED_FUNCTION_PROGRAMMING: &[u8; 12] = b"programming\0";
+pub const LED_FUNCTION_RX: &[u8; 3] = b"rx\0";
+pub const LED_FUNCTION_SD: &[u8; 3] = b"sd\0";
+pub const LED_FUNCTION_STANDBY: &[u8; 8] = b"standby\0";
+pub const LED_FUNCTION_TORCH: &[u8; 6] = b"torch\0";
+pub const LED_FUNCTION_TX: &[u8; 3] = b"tx\0";
+pub const LED_FUNCTION_USB: &[u8; 4] = b"usb\0";
+pub const LED_FUNCTION_WAN: &[u8; 4] = b"wan\0";
+pub const LED_FUNCTION_WLAN: &[u8; 5] = b"wlan\0";
+pub const LED_FUNCTION_WPS: &[u8; 4] = b"wps\0";
+pub const LED_BLINK_SW: u32 = 0;
+pub const LED_BLINK_ONESHOT: u32 = 1;
+pub const LED_BLINK_ONESHOT_STOP: u32 = 2;
+pub const LED_BLINK_INVERT: u32 = 3;
+pub const LED_BLINK_BRIGHTNESS_CHANGE: u32 = 4;
+pub const LED_BLINK_DISABLE: u32 = 5;
+pub const LED_SET_BRIGHTNESS_OFF: u32 = 6;
+pub const LED_SET_BRIGHTNESS: u32 = 7;
+pub const LED_SET_BLINK: u32 = 8;
+pub const TRIG_NAME_MAX: u32 = 50;
+pub const GPIO_LED_NO_BLINK_LOW: u32 = 0;
+pub const GPIO_LED_NO_BLINK_HIGH: u32 = 1;
+pub const GPIO_LED_BLINK: u32 = 2;
 pub const MAX_UDELAY_MS: u32 = 5;
 pub const PHY_POLL: i32 = -1;
 pub const PHY_MAC_INTERRUPT: i32 = -2;
@@ -10617,80 +10772,6 @@ pub const PHY_F_NO_IRQ: u32 = 2147483648;
 pub const PHY_PAIR_ALL: i32 = -1;
 pub const PHY_ANY_ID: &[u8; 14] = b"MATCH ANY PHY\0";
 pub const PHY_ANY_UID: u32 = 4294967295;
-pub const SECTOR_SHIFT: u32 = 9;
-pub const SECTOR_SIZE: u32 = 512;
-pub const PAGE_SECTORS_SHIFT: u32 = 3;
-pub const PAGE_SECTORS: u32 = 8;
-pub const SECTOR_MASK: u32 = 7;
-pub const BLK_STS_OK: u32 = 0;
-pub const BIO_ISSUE_RES_BITS: u32 = 1;
-pub const BIO_ISSUE_SIZE_BITS: u32 = 12;
-pub const BIO_ISSUE_RES_SHIFT: u32 = 63;
-pub const BIO_ISSUE_SIZE_SHIFT: u32 = 51;
-pub const BIO_ISSUE_TIME_MASK: u64 = 2251799813685247;
-pub const BIO_ISSUE_SIZE_MASK: u64 = 9221120237041090560;
-pub const BIO_ISSUE_RES_MASK: i64 = -9223372036854775808;
-pub const BIO_ISSUE_THROTL_SKIP_LATENCY: i64 = -9223372036854775808;
-pub const BLK_QC_T_NONE: i32 = -1;
-pub const BIO_MAX_SECTORS: i32 = -1;
-pub const REQ_OP_BITS: u32 = 8;
-pub const REQ_FLAG_BITS: u32 = 24;
-pub const BIO_MAX_VECS: u32 = 256;
-pub const BIO_POOL_SIZE: u32 = 2;
-pub const SBQ_WAIT_QUEUES: u32 = 8;
-pub const SBQ_WAKE_BATCH: u32 = 8;
-pub const BLKCG_MAX_POLS: u32 = 6;
-pub const DISK_MAX_PARTS: u32 = 256;
-pub const DISK_NAME_LEN: u32 = 32;
-pub const PARTITION_META_INFO_VOLNAMELTH: u32 = 64;
-pub const PARTITION_META_INFO_UUIDLTH: u32 = 37;
-pub const GD_NEED_PART_SCAN: u32 = 0;
-pub const GD_READ_ONLY: u32 = 1;
-pub const GD_DEAD: u32 = 2;
-pub const GD_NATIVE_CAPACITY: u32 = 3;
-pub const GD_ADDED: u32 = 4;
-pub const GD_SUPPRESS_PART_SCAN: u32 = 5;
-pub const GD_OWNS_QUEUE: u32 = 6;
-pub const QUEUE_FLAG_STOPPED: u32 = 0;
-pub const QUEUE_FLAG_DYING: u32 = 1;
-pub const QUEUE_FLAG_NOMERGES: u32 = 3;
-pub const QUEUE_FLAG_SAME_COMP: u32 = 4;
-pub const QUEUE_FLAG_FAIL_IO: u32 = 5;
-pub const QUEUE_FLAG_NONROT: u32 = 6;
-pub const QUEUE_FLAG_VIRT: u32 = 6;
-pub const QUEUE_FLAG_IO_STAT: u32 = 7;
-pub const QUEUE_FLAG_NOXMERGES: u32 = 9;
-pub const QUEUE_FLAG_ADD_RANDOM: u32 = 10;
-pub const QUEUE_FLAG_SYNCHRONOUS: u32 = 11;
-pub const QUEUE_FLAG_SAME_FORCE: u32 = 12;
-pub const QUEUE_FLAG_HW_WC: u32 = 18;
-pub const QUEUE_FLAG_INIT_DONE: u32 = 14;
-pub const QUEUE_FLAG_STABLE_WRITES: u32 = 15;
-pub const QUEUE_FLAG_POLL: u32 = 16;
-pub const QUEUE_FLAG_WC: u32 = 17;
-pub const QUEUE_FLAG_FUA: u32 = 18;
-pub const QUEUE_FLAG_DAX: u32 = 19;
-pub const QUEUE_FLAG_STATS: u32 = 20;
-pub const QUEUE_FLAG_REGISTERED: u32 = 22;
-pub const QUEUE_FLAG_QUIESCED: u32 = 24;
-pub const QUEUE_FLAG_PCI_P2PDMA: u32 = 25;
-pub const QUEUE_FLAG_ZONE_RESETALL: u32 = 26;
-pub const QUEUE_FLAG_RQ_ALLOC_TIME: u32 = 27;
-pub const QUEUE_FLAG_HCTX_ACTIVE: u32 = 28;
-pub const QUEUE_FLAG_NOWAIT: u32 = 29;
-pub const QUEUE_FLAG_SQ_SCHED: u32 = 30;
-pub const QUEUE_FLAG_SKIP_TAGSET_QUIESCE: u32 = 31;
-pub const QUEUE_FLAG_MQ_DEFAULT: u32 = 536871056;
-pub const BLK_DEFAULT_SG_TIMEOUT: u32 = 15000;
-pub const BLK_MIN_SG_TIMEOUT: u32 = 1750;
-pub const BLK_POLL_ONESHOT: u32 = 1;
-pub const ELEVATOR_F_ZBD_SEQ_WRITE: u32 = 1;
-pub const BLKDEV_ZERO_NOUNMAP: u32 = 1;
-pub const BLKDEV_ZERO_NOFALLBACK: u32 = 2;
-pub const BLK_DEF_MAX_SECTORS: u32 = 2560;
-pub const BDEVNAME_SIZE: u32 = 32;
-pub const BDEVT_SIZE: u32 = 10;
-pub const BLKDEV_MAJOR_MAX: u32 = 512;
 pub const PREFETCH_STRIDE: u32 = 256;
 pub const BLKDEV_MIN_RQ: u32 = 4;
 pub const BLKDEV_DEFAULT_RQ: u32 = 128;
@@ -27373,9 +27454,36 @@ extern "C" {
     pub static mut fs_overflowgid: core::ffi::c_int;
 }
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
+#[derive(Copy, Clone)]
 pub struct user_namespace {
-    _unused: [u8; 0],
+    pub uid_map: uid_gid_map,
+    pub gid_map: uid_gid_map,
+    pub projid_map: uid_gid_map,
+    pub parent: *mut user_namespace,
+    pub level: core::ffi::c_int,
+    pub owner: kuid_t,
+    pub group: kgid_t,
+    pub ns: ns_common,
+    pub flags: core::ffi::c_ulong,
+    pub parent_could_setfcap: bool_,
+    pub keyring_name_list: list_head,
+    pub user_keyring_register: *mut key,
+    pub keyring_sem: rw_semaphore,
+    pub work: work_struct,
+    pub set: ctl_table_set,
+    pub sysctls: *mut ctl_table_header,
+    pub ucounts: *mut ucounts,
+    pub ucount_max: [core::ffi::c_long; 12usize],
+    pub rlimit_max: [core::ffi::c_long; 4usize],
+}
+impl Default for user_namespace {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
 }
 extern "C" {
     pub static mut init_user_ns: user_namespace;
@@ -28730,11 +28838,6 @@ impl Default for kernel_siginfo {
     }
 }
 pub type kernel_siginfo_t = kernel_siginfo;
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct ucounts {
-    _unused: [u8; 0],
-}
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub struct sigqueue {
@@ -31143,11 +31246,6 @@ extern "C" {
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct poll_table_struct {
-    _unused: [u8; 0],
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct fs_context {
     _unused: [u8; 0],
 }
 #[repr(C)]
@@ -42636,11 +42734,6 @@ pub struct hd_geometry {
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
-pub struct kstatfs {
-    _unused: [u8; 0],
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
 pub struct swap_info_struct {
     _unused: [u8; 0],
 }
@@ -42672,11 +42765,6 @@ pub struct fs_parameter_spec {
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct fileattr {
-    _unused: [u8; 0],
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct iomap_ops {
     _unused: [u8; 0],
 }
 extern "C" {
@@ -43372,11 +43460,6 @@ pub type positive_aop_returns = core::ffi::c_uint;
 pub struct writeback_control {
     _unused: [u8; 0],
 }
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct readahead_control {
-    _unused: [u8; 0],
-}
 pub const rw_hint_WRITE_LIFE_NOT_SET: rw_hint = 0;
 pub const rw_hint_WRITE_LIFE_NONE: rw_hint = 1;
 pub const rw_hint_WRITE_LIFE_SHORT: rw_hint = 2;
@@ -43906,7 +43989,7 @@ pub struct super_block {
     pub s_count: core::ffi::c_int,
     pub s_active: atomic_t,
     pub s_security: *mut core::ffi::c_void,
-    pub s_xattr: *mut *mut xattr_handler,
+    pub s_xattr: *mut *const xattr_handler,
     pub s_roots: hlist_bl_head,
     pub s_mounts: list_head,
     pub s_bdev: *mut block_device,
@@ -45949,54 +46032,32 @@ extern "C" {
         advice: core::ffi::c_int,
     ) -> core::ffi::c_int;
 }
+extern "C" {
+    pub fn fput(arg1: *mut file);
+}
+extern "C" {
+    pub fn alloc_file_pseudo(
+        arg1: *mut inode,
+        arg2: *mut vfsmount,
+        arg3: *const core::ffi::c_char,
+        flags: core::ffi::c_int,
+        arg4: *const file_operations,
+    ) -> *mut file;
+}
+extern "C" {
+    pub fn alloc_file_clone(
+        arg1: *mut file,
+        flags: core::ffi::c_int,
+        arg2: *const file_operations,
+    ) -> *mut file;
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
-pub struct vm_struct {
-    pub next: *mut vm_struct,
-    pub addr: *mut core::ffi::c_void,
-    pub size: core::ffi::c_ulong,
-    pub flags: core::ffi::c_ulong,
-    pub pages: *mut *mut page,
-    pub page_order: core::ffi::c_uint,
-    pub nr_pages: core::ffi::c_uint,
-    pub phys_addr: phys_addr_t,
-    pub caller: *const core::ffi::c_void,
+pub struct fd {
+    pub file: *mut file,
+    pub flags: core::ffi::c_uint,
 }
-impl Default for vm_struct {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Copy, Clone)]
-pub struct vmap_area {
-    pub va_start: core::ffi::c_ulong,
-    pub va_end: core::ffi::c_ulong,
-    pub rb_node: rb_node,
-    pub list: list_head,
-    pub __bindgen_anon_1: vmap_area__bindgen_ty_1,
-    pub flags: core::ffi::c_ulong,
-}
-#[repr(C)]
-#[derive(Copy, Clone)]
-pub union vmap_area__bindgen_ty_1 {
-    pub subtree_max_size: core::ffi::c_ulong,
-    pub vm: *mut vm_struct,
-}
-impl Default for vmap_area__bindgen_ty_1 {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-impl Default for vmap_area {
+impl Default for fd {
     fn default() -> Self {
         let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
         unsafe {
@@ -46006,199 +46067,143 @@ impl Default for vmap_area {
     }
 }
 extern "C" {
-    pub fn vm_unmap_ram(mem: *const core::ffi::c_void, count: core::ffi::c_uint);
+    pub fn fget(fd: core::ffi::c_uint) -> *mut file;
 }
 extern "C" {
-    pub fn vm_map_ram(
-        pages: *mut *mut page,
-        count: core::ffi::c_uint,
-        node: core::ffi::c_int,
-    ) -> *mut core::ffi::c_void;
+    pub fn fget_raw(fd: core::ffi::c_uint) -> *mut file;
 }
 extern "C" {
-    pub fn vm_unmap_aliases();
+    pub fn fget_task(task: *mut task_struct, fd: core::ffi::c_uint) -> *mut file;
 }
 extern "C" {
-    pub fn vmalloc_nr_pages() -> core::ffi::c_ulong;
+    pub fn __fdget(fd: core::ffi::c_uint) -> core::ffi::c_ulong;
 }
 extern "C" {
-    pub fn vmalloc(size: core::ffi::c_ulong) -> *mut core::ffi::c_void;
+    pub fn __fdget_raw(fd: core::ffi::c_uint) -> core::ffi::c_ulong;
 }
 extern "C" {
-    pub fn vzalloc(size: core::ffi::c_ulong) -> *mut core::ffi::c_void;
+    pub fn __fdget_pos(fd: core::ffi::c_uint) -> core::ffi::c_ulong;
 }
 extern "C" {
-    pub fn vmalloc_user(size: core::ffi::c_ulong) -> *mut core::ffi::c_void;
+    pub fn __f_unlock_pos(arg1: *mut file);
 }
+pub type class_fd_t = fd;
 extern "C" {
-    pub fn vmalloc_node(size: core::ffi::c_ulong, node: core::ffi::c_int)
-        -> *mut core::ffi::c_void;
-}
-extern "C" {
-    pub fn vzalloc_node(size: core::ffi::c_ulong, node: core::ffi::c_int)
-        -> *mut core::ffi::c_void;
-}
-extern "C" {
-    pub fn vmalloc_32(size: core::ffi::c_ulong) -> *mut core::ffi::c_void;
-}
-extern "C" {
-    pub fn vmalloc_32_user(size: core::ffi::c_ulong) -> *mut core::ffi::c_void;
-}
-extern "C" {
-    pub fn __vmalloc(size: core::ffi::c_ulong, gfp_mask: gfp_t) -> *mut core::ffi::c_void;
-}
-extern "C" {
-    pub fn __vmalloc_node_range(
-        size: core::ffi::c_ulong,
-        align: core::ffi::c_ulong,
-        start: core::ffi::c_ulong,
-        end: core::ffi::c_ulong,
-        gfp_mask: gfp_t,
-        prot: pgprot_t,
-        vm_flags: core::ffi::c_ulong,
-        node: core::ffi::c_int,
-        caller: *const core::ffi::c_void,
-    ) -> *mut core::ffi::c_void;
-}
-extern "C" {
-    pub fn __vmalloc_node(
-        size: core::ffi::c_ulong,
-        align: core::ffi::c_ulong,
-        gfp_mask: gfp_t,
-        node: core::ffi::c_int,
-        caller: *const core::ffi::c_void,
-    ) -> *mut core::ffi::c_void;
-}
-extern "C" {
-    pub fn vmalloc_huge(size: core::ffi::c_ulong, gfp_mask: gfp_t) -> *mut core::ffi::c_void;
-}
-extern "C" {
-    pub fn __vmalloc_array(n: usize, size: usize, flags: gfp_t) -> *mut core::ffi::c_void;
-}
-extern "C" {
-    pub fn vmalloc_array(n: usize, size: usize) -> *mut core::ffi::c_void;
-}
-extern "C" {
-    pub fn __vcalloc(n: usize, size: usize, flags: gfp_t) -> *mut core::ffi::c_void;
-}
-extern "C" {
-    pub fn vcalloc(n: usize, size: usize) -> *mut core::ffi::c_void;
-}
-extern "C" {
-    pub fn vfree(addr: *const core::ffi::c_void);
-}
-extern "C" {
-    pub fn vfree_atomic(addr: *const core::ffi::c_void);
-}
-extern "C" {
-    pub fn vmap(
-        pages: *mut *mut page,
-        count: core::ffi::c_uint,
-        flags: core::ffi::c_ulong,
-        prot: pgprot_t,
-    ) -> *mut core::ffi::c_void;
-}
-extern "C" {
-    pub fn vmap_pfn(
-        pfns: *mut core::ffi::c_ulong,
-        count: core::ffi::c_uint,
-        prot: pgprot_t,
-    ) -> *mut core::ffi::c_void;
-}
-extern "C" {
-    pub fn vunmap(addr: *const core::ffi::c_void);
-}
-extern "C" {
-    pub fn remap_vmalloc_range_partial(
-        vma: *mut vm_area_struct,
-        uaddr: core::ffi::c_ulong,
-        kaddr: *mut core::ffi::c_void,
-        pgoff: core::ffi::c_ulong,
-        size: core::ffi::c_ulong,
+    pub fn f_dupfd(
+        from: core::ffi::c_uint,
+        file: *mut file,
+        flags: core::ffi::c_uint,
     ) -> core::ffi::c_int;
 }
 extern "C" {
-    pub fn remap_vmalloc_range(
-        vma: *mut vm_area_struct,
-        addr: *mut core::ffi::c_void,
-        pgoff: core::ffi::c_ulong,
+    pub fn replace_fd(
+        fd: core::ffi::c_uint,
+        file: *mut file,
+        flags: core::ffi::c_uint,
     ) -> core::ffi::c_int;
 }
 extern "C" {
-    pub fn arch_sync_kernel_mappings(start: core::ffi::c_ulong, end: core::ffi::c_ulong);
+    pub fn set_close_on_exec(fd: core::ffi::c_uint, flag: core::ffi::c_int);
 }
 extern "C" {
-    pub fn get_vm_area(size: core::ffi::c_ulong, flags: core::ffi::c_ulong) -> *mut vm_struct;
+    pub fn get_close_on_exec(fd: core::ffi::c_uint) -> bool_;
 }
 extern "C" {
-    pub fn get_vm_area_caller(
-        size: core::ffi::c_ulong,
-        flags: core::ffi::c_ulong,
-        caller: *const core::ffi::c_void,
-    ) -> *mut vm_struct;
+    pub fn __get_unused_fd_flags(
+        flags: core::ffi::c_uint,
+        nofile: core::ffi::c_ulong,
+    ) -> core::ffi::c_int;
 }
 extern "C" {
-    pub fn __get_vm_area_caller(
-        size: core::ffi::c_ulong,
-        flags: core::ffi::c_ulong,
-        start: core::ffi::c_ulong,
-        end: core::ffi::c_ulong,
-        caller: *const core::ffi::c_void,
-    ) -> *mut vm_struct;
+    pub fn get_unused_fd_flags(flags: core::ffi::c_uint) -> core::ffi::c_int;
 }
 extern "C" {
-    pub fn free_vm_area(area: *mut vm_struct);
+    pub fn put_unused_fd(fd: core::ffi::c_uint);
+}
+pub type class_get_unused_fd_t = core::ffi::c_int;
+extern "C" {
+    pub fn fd_install(fd: core::ffi::c_uint, file: *mut file);
 }
 extern "C" {
-    pub fn remove_vm_area(addr: *const core::ffi::c_void) -> *mut vm_struct;
+    pub fn __receive_fd(
+        file: *mut file,
+        ufd: *mut core::ffi::c_int,
+        o_flags: core::ffi::c_uint,
+    ) -> core::ffi::c_int;
 }
 extern "C" {
-    pub fn find_vm_area(addr: *const core::ffi::c_void) -> *mut vm_struct;
+    pub fn receive_fd(file: *mut file, o_flags: core::ffi::c_uint) -> core::ffi::c_int;
 }
 extern "C" {
-    pub fn find_vmap_area(addr: core::ffi::c_ulong) -> *mut vmap_area;
+    pub fn receive_fd_replace(
+        new_fd: core::ffi::c_int,
+        file: *mut file,
+        o_flags: core::ffi::c_uint,
+    ) -> core::ffi::c_int;
 }
 extern "C" {
-    pub fn vunmap_range(addr: core::ffi::c_ulong, end: core::ffi::c_ulong);
+    pub fn flush_delayed_fput();
 }
 extern "C" {
-    pub fn vread_iter(
-        iter: *mut iov_iter,
-        addr: *const core::ffi::c_char,
-        count: usize,
-    ) -> core::ffi::c_long;
+    pub fn __fput_sync(arg1: *mut file);
 }
 extern "C" {
-    pub static mut vmap_area_list: list_head;
+    pub static mut sysctl_nr_open_min: core::ffi::c_uint;
 }
 extern "C" {
-    pub fn vm_area_add_early(vm: *mut vm_struct);
+    pub static mut sysctl_nr_open_max: core::ffi::c_uint;
+}
+pub const kernel_read_file_id_READING_UNKNOWN: kernel_read_file_id = 0;
+pub const kernel_read_file_id_READING_FIRMWARE: kernel_read_file_id = 1;
+pub const kernel_read_file_id_READING_MODULE: kernel_read_file_id = 2;
+pub const kernel_read_file_id_READING_KEXEC_IMAGE: kernel_read_file_id = 3;
+pub const kernel_read_file_id_READING_KEXEC_INITRAMFS: kernel_read_file_id = 4;
+pub const kernel_read_file_id_READING_POLICY: kernel_read_file_id = 5;
+pub const kernel_read_file_id_READING_X509_CERTIFICATE: kernel_read_file_id = 6;
+pub const kernel_read_file_id_READING_MAX_ID: kernel_read_file_id = 7;
+pub type kernel_read_file_id = core::ffi::c_uint;
+extern "C" {
+    pub static kernel_read_file_str: [*const core::ffi::c_char; 8usize];
 }
 extern "C" {
-    pub fn vm_area_register_early(vm: *mut vm_struct, align: usize);
+    pub fn kernel_read_file(
+        file: *mut file,
+        offset: loff_t,
+        buf: *mut *mut core::ffi::c_void,
+        buf_size: usize,
+        file_size: *mut usize,
+        id: kernel_read_file_id,
+    ) -> isize;
 }
 extern "C" {
-    pub fn pcpu_get_vm_areas(
-        offsets: *const core::ffi::c_ulong,
-        sizes: *const usize,
-        nr_vms: core::ffi::c_int,
-        align: usize,
-    ) -> *mut *mut vm_struct;
+    pub fn kernel_read_file_from_path(
+        path: *const core::ffi::c_char,
+        offset: loff_t,
+        buf: *mut *mut core::ffi::c_void,
+        buf_size: usize,
+        file_size: *mut usize,
+        id: kernel_read_file_id,
+    ) -> isize;
 }
 extern "C" {
-    pub fn pcpu_free_vm_areas(vms: *mut *mut vm_struct, nr_vms: core::ffi::c_int);
+    pub fn kernel_read_file_from_path_initns(
+        path: *const core::ffi::c_char,
+        offset: loff_t,
+        buf: *mut *mut core::ffi::c_void,
+        buf_size: usize,
+        file_size: *mut usize,
+        id: kernel_read_file_id,
+    ) -> isize;
 }
 extern "C" {
-    pub fn register_vmap_purge_notifier(nb: *mut notifier_block) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn unregister_vmap_purge_notifier(nb: *mut notifier_block) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn vmalloc_dump_obj(object: *mut core::ffi::c_void) -> bool_;
-}
-extern "C" {
-    pub fn errname(err: core::ffi::c_int) -> *const core::ffi::c_char;
+    pub fn kernel_read_file_from_fd(
+        fd: core::ffi::c_int,
+        offset: loff_t,
+        buf: *mut *mut core::ffi::c_void,
+        buf_size: usize,
+        file_size: *mut usize,
+        id: kernel_read_file_id,
+    ) -> isize;
 }
 #[doc = " stack_trace_consume_fn - Callback for arch_stack_walk()\n @cookie:\tCaller supplied pointer handed back by arch_stack_walk()\n @addr:\tThe stack entry address to consume\n\n Return:\tTrue, if the entry was consumed or skipped\n\t\tFalse, if there is no space left to store"]
 pub type stack_trace_consume_fn = ::core::option::Option<
@@ -48854,137 +48859,2390 @@ extern "C" {
 extern "C" {
     pub fn accept_memory(start: phys_addr_t, end: phys_addr_t);
 }
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub struct sockptr_t {
+    pub __bindgen_anon_1: sockptr_t__bindgen_ty_1,
+    pub _bitfield_align_1: [u8; 0],
+    pub _bitfield_1: __BindgenBitfieldUnit<[u8; 1usize]>,
+    pub __bindgen_padding_0: [u8; 7usize],
+}
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub union sockptr_t__bindgen_ty_1 {
+    pub kernel: *mut core::ffi::c_void,
+    pub user: *mut core::ffi::c_void,
+}
+impl Default for sockptr_t__bindgen_ty_1 {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+impl Default for sockptr_t {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+impl sockptr_t {
+    #[inline]
+    pub fn is_kernel(&self) -> bool_ {
+        unsafe { ::core::mem::transmute(self._bitfield_1.get(0usize, 1u8) as u8) }
+    }
+    #[inline]
+    pub fn set_is_kernel(&mut self, val: bool_) {
+        unsafe {
+            let val: u8 = ::core::mem::transmute(val);
+            self._bitfield_1.set(0usize, 1u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn new_bitfield_1(is_kernel: bool_) -> __BindgenBitfieldUnit<[u8; 1usize]> {
+        let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 1usize]> = Default::default();
+        __bindgen_bitfield_unit.set(0usize, 1u8, {
+            let is_kernel: u8 = unsafe { ::core::mem::transmute(is_kernel) };
+            is_kernel as u64
+        });
+        __bindgen_bitfield_unit
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct msg_msg {
+    _unused: [u8; 0],
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct xfrm_sec_ctx {
+    _unused: [u8; 0],
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct watch {
+    _unused: [u8; 0],
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct watch_notification {
+    _unused: [u8; 0],
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct audit_krule {
+    _unused: [u8; 0],
+}
+pub const lsm_event_LSM_POLICY_CHANGE: lsm_event = 0;
+pub type lsm_event = core::ffi::c_uint;
+pub const lockdown_reason_LOCKDOWN_NONE: lockdown_reason = 0;
+pub const lockdown_reason_LOCKDOWN_MODULE_SIGNATURE: lockdown_reason = 1;
+pub const lockdown_reason_LOCKDOWN_DEV_MEM: lockdown_reason = 2;
+pub const lockdown_reason_LOCKDOWN_EFI_TEST: lockdown_reason = 3;
+pub const lockdown_reason_LOCKDOWN_KEXEC: lockdown_reason = 4;
+pub const lockdown_reason_LOCKDOWN_HIBERNATION: lockdown_reason = 5;
+pub const lockdown_reason_LOCKDOWN_PCI_ACCESS: lockdown_reason = 6;
+pub const lockdown_reason_LOCKDOWN_IOPORT: lockdown_reason = 7;
+pub const lockdown_reason_LOCKDOWN_MSR: lockdown_reason = 8;
+pub const lockdown_reason_LOCKDOWN_ACPI_TABLES: lockdown_reason = 9;
+pub const lockdown_reason_LOCKDOWN_DEVICE_TREE: lockdown_reason = 10;
+pub const lockdown_reason_LOCKDOWN_PCMCIA_CIS: lockdown_reason = 11;
+pub const lockdown_reason_LOCKDOWN_TIOCSSERIAL: lockdown_reason = 12;
+pub const lockdown_reason_LOCKDOWN_MODULE_PARAMETERS: lockdown_reason = 13;
+pub const lockdown_reason_LOCKDOWN_MMIOTRACE: lockdown_reason = 14;
+pub const lockdown_reason_LOCKDOWN_DEBUGFS: lockdown_reason = 15;
+pub const lockdown_reason_LOCKDOWN_XMON_WR: lockdown_reason = 16;
+pub const lockdown_reason_LOCKDOWN_BPF_WRITE_USER: lockdown_reason = 17;
+pub const lockdown_reason_LOCKDOWN_DBG_WRITE_KERNEL: lockdown_reason = 18;
+pub const lockdown_reason_LOCKDOWN_RTAS_ERROR_INJECTION: lockdown_reason = 19;
+pub const lockdown_reason_LOCKDOWN_INTEGRITY_MAX: lockdown_reason = 20;
+pub const lockdown_reason_LOCKDOWN_KCORE: lockdown_reason = 21;
+pub const lockdown_reason_LOCKDOWN_KPROBES: lockdown_reason = 22;
+pub const lockdown_reason_LOCKDOWN_BPF_READ_KERNEL: lockdown_reason = 23;
+pub const lockdown_reason_LOCKDOWN_DBG_READ_KERNEL: lockdown_reason = 24;
+pub const lockdown_reason_LOCKDOWN_PERF: lockdown_reason = 25;
+pub const lockdown_reason_LOCKDOWN_TRACEFS: lockdown_reason = 26;
+pub const lockdown_reason_LOCKDOWN_XMON_RW: lockdown_reason = 27;
+pub const lockdown_reason_LOCKDOWN_XFRM_SECRET: lockdown_reason = 28;
+pub const lockdown_reason_LOCKDOWN_CONFIDENTIALITY_MAX: lockdown_reason = 29;
+pub type lockdown_reason = core::ffi::c_uint;
 extern "C" {
-    pub fn set_memory_ro(addr: core::ffi::c_ulong, numpages: core::ffi::c_int) -> core::ffi::c_int;
+    pub static lockdown_reasons: [*const core::ffi::c_char; 30usize];
 }
 extern "C" {
-    pub fn set_memory_rw(addr: core::ffi::c_ulong, numpages: core::ffi::c_int) -> core::ffi::c_int;
+    pub fn cap_capable(
+        cred: *const cred,
+        ns: *mut user_namespace,
+        cap: core::ffi::c_int,
+        opts: core::ffi::c_uint,
+    ) -> core::ffi::c_int;
 }
 extern "C" {
-    pub fn set_memory_x(addr: core::ffi::c_ulong, numpages: core::ffi::c_int) -> core::ffi::c_int;
+    pub fn cap_settime(ts: *const timespec64, tz: *const timezone) -> core::ffi::c_int;
 }
 extern "C" {
-    pub fn set_memory_nx(addr: core::ffi::c_ulong, numpages: core::ffi::c_int) -> core::ffi::c_int;
+    pub fn cap_ptrace_access_check(
+        child: *mut task_struct,
+        mode: core::ffi::c_uint,
+    ) -> core::ffi::c_int;
 }
 extern "C" {
-    pub fn set_memory_rox(addr: core::ffi::c_ulong, numpages: core::ffi::c_int)
+    pub fn cap_ptrace_traceme(parent: *mut task_struct) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn cap_capget(
+        target: *const task_struct,
+        effective: *mut kernel_cap_t,
+        inheritable: *mut kernel_cap_t,
+        permitted: *mut kernel_cap_t,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn cap_capset(
+        new: *mut cred,
+        old: *const cred,
+        effective: *const kernel_cap_t,
+        inheritable: *const kernel_cap_t,
+        permitted: *const kernel_cap_t,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn cap_bprm_creds_from_file(bprm: *mut linux_binprm, file: *mut file) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn cap_inode_setxattr(
+        dentry: *mut dentry,
+        name: *const core::ffi::c_char,
+        value: *const core::ffi::c_void,
+        size: usize,
+        flags: core::ffi::c_int,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn cap_inode_removexattr(
+        idmap: *mut mnt_idmap,
+        dentry: *mut dentry,
+        name: *const core::ffi::c_char,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn cap_inode_need_killpriv(dentry: *mut dentry) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn cap_inode_killpriv(idmap: *mut mnt_idmap, dentry: *mut dentry) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn cap_inode_getsecurity(
+        idmap: *mut mnt_idmap,
+        inode: *mut inode,
+        name: *const core::ffi::c_char,
+        buffer: *mut *mut core::ffi::c_void,
+        alloc: bool_,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn cap_mmap_addr(addr: core::ffi::c_ulong) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn cap_mmap_file(
+        file: *mut file,
+        reqprot: core::ffi::c_ulong,
+        prot: core::ffi::c_ulong,
+        flags: core::ffi::c_ulong,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn cap_task_fix_setuid(
+        new: *mut cred,
+        old: *const cred,
+        flags: core::ffi::c_int,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn cap_task_prctl(
+        option: core::ffi::c_int,
+        arg2: core::ffi::c_ulong,
+        arg3: core::ffi::c_ulong,
+        arg4: core::ffi::c_ulong,
+        arg5: core::ffi::c_ulong,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn cap_task_setscheduler(p: *mut task_struct) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn cap_task_setioprio(p: *mut task_struct, ioprio: core::ffi::c_int) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn cap_task_setnice(p: *mut task_struct, nice: core::ffi::c_int) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn cap_vm_enough_memory(mm: *mut mm_struct, pages: core::ffi::c_long) -> core::ffi::c_int;
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct dst_entry {
+    _unused: [u8; 0],
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct xfrm_selector {
+    _unused: [u8; 0],
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct xfrm_policy {
+    _unused: [u8; 0],
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct xfrm_state {
+    _unused: [u8; 0],
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct xfrm_user_sec_ctx {
+    _unused: [u8; 0],
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct sctp_association {
+    _unused: [u8; 0],
+}
+extern "C" {
+    pub static mut mmap_min_addr: core::ffi::c_ulong;
+}
+extern "C" {
+    pub static mut dac_mmap_min_addr: core::ffi::c_ulong;
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct request_sock {
+    _unused: [u8; 0],
+}
+extern "C" {
+    pub fn mmap_min_addr_handler(
+        table: *mut ctl_table,
+        write: core::ffi::c_int,
+        buffer: *mut core::ffi::c_void,
+        lenp: *mut usize,
+        ppos: *mut loff_t,
+    ) -> core::ffi::c_int;
+}
+pub type initxattrs = ::core::option::Option<
+    unsafe extern "C" fn(
+        inode: *mut inode,
+        xattr_array: *const xattr,
+        fs_data: *mut core::ffi::c_void,
+    ) -> core::ffi::c_int,
+>;
+pub const kernel_load_data_id_LOADING_UNKNOWN: kernel_load_data_id = 0;
+pub const kernel_load_data_id_LOADING_FIRMWARE: kernel_load_data_id = 1;
+pub const kernel_load_data_id_LOADING_MODULE: kernel_load_data_id = 2;
+pub const kernel_load_data_id_LOADING_KEXEC_IMAGE: kernel_load_data_id = 3;
+pub const kernel_load_data_id_LOADING_KEXEC_INITRAMFS: kernel_load_data_id = 4;
+pub const kernel_load_data_id_LOADING_POLICY: kernel_load_data_id = 5;
+pub const kernel_load_data_id_LOADING_X509_CERTIFICATE: kernel_load_data_id = 6;
+pub const kernel_load_data_id_LOADING_MAX_ID: kernel_load_data_id = 7;
+pub type kernel_load_data_id = core::ffi::c_uint;
+extern "C" {
+    pub static kernel_load_data_str: [*const core::ffi::c_char; 8usize];
+}
+extern "C" {
+    pub fn call_blocking_lsm_notifier(
+        event: lsm_event,
+        data: *mut core::ffi::c_void,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn register_blocking_lsm_notifier(nb: *mut notifier_block) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn unregister_blocking_lsm_notifier(nb: *mut notifier_block) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_init() -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn early_security_init() -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_binder_set_context_mgr(mgr: *const cred) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_binder_transaction(from: *const cred, to: *const cred) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_binder_transfer_binder(from: *const cred, to: *const cred) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_binder_transfer_file(
+        from: *const cred,
+        to: *const cred,
+        file: *const file,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_ptrace_access_check(
+        child: *mut task_struct,
+        mode: core::ffi::c_uint,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_ptrace_traceme(parent: *mut task_struct) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_capget(
+        target: *const task_struct,
+        effective: *mut kernel_cap_t,
+        inheritable: *mut kernel_cap_t,
+        permitted: *mut kernel_cap_t,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_capset(
+        new: *mut cred,
+        old: *const cred,
+        effective: *const kernel_cap_t,
+        inheritable: *const kernel_cap_t,
+        permitted: *const kernel_cap_t,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_capable(
+        cred: *const cred,
+        ns: *mut user_namespace,
+        cap: core::ffi::c_int,
+        opts: core::ffi::c_uint,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_quotactl(
+        cmds: core::ffi::c_int,
+        type_: core::ffi::c_int,
+        id: core::ffi::c_int,
+        sb: *mut super_block,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_quota_on(dentry: *mut dentry) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_syslog(type_: core::ffi::c_int) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_settime64(ts: *const timespec64, tz: *const timezone) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_vm_enough_memory_mm(
+        mm: *mut mm_struct,
+        pages: core::ffi::c_long,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_bprm_creds_for_exec(bprm: *mut linux_binprm) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_bprm_creds_from_file(
+        bprm: *mut linux_binprm,
+        file: *mut file,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_bprm_check(bprm: *mut linux_binprm) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_bprm_committing_creds(bprm: *mut linux_binprm);
+}
+extern "C" {
+    pub fn security_bprm_committed_creds(bprm: *mut linux_binprm);
+}
+extern "C" {
+    pub fn security_fs_context_submount(
+        fc: *mut fs_context,
+        reference: *mut super_block,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_fs_context_dup(
+        fc: *mut fs_context,
+        src_fc: *mut fs_context,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_fs_context_parse_param(
+        fc: *mut fs_context,
+        param: *mut fs_parameter,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_sb_alloc(sb: *mut super_block) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_sb_delete(sb: *mut super_block);
+}
+extern "C" {
+    pub fn security_sb_free(sb: *mut super_block);
+}
+extern "C" {
+    pub fn security_free_mnt_opts(mnt_opts: *mut *mut core::ffi::c_void);
+}
+extern "C" {
+    pub fn security_sb_eat_lsm_opts(
+        options: *mut core::ffi::c_char,
+        mnt_opts: *mut *mut core::ffi::c_void,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_sb_mnt_opts_compat(
+        sb: *mut super_block,
+        mnt_opts: *mut core::ffi::c_void,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_sb_remount(
+        sb: *mut super_block,
+        mnt_opts: *mut core::ffi::c_void,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_sb_kern_mount(sb: *mut super_block) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_sb_show_options(m: *mut seq_file, sb: *mut super_block) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_sb_statfs(dentry: *mut dentry) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_sb_mount(
+        dev_name: *const core::ffi::c_char,
+        path: *const path,
+        type_: *const core::ffi::c_char,
+        flags: core::ffi::c_ulong,
+        data: *mut core::ffi::c_void,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_sb_umount(mnt: *mut vfsmount, flags: core::ffi::c_int) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_sb_pivotroot(old_path: *const path, new_path: *const path) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_sb_set_mnt_opts(
+        sb: *mut super_block,
+        mnt_opts: *mut core::ffi::c_void,
+        kern_flags: core::ffi::c_ulong,
+        set_kern_flags: *mut core::ffi::c_ulong,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_sb_clone_mnt_opts(
+        oldsb: *const super_block,
+        newsb: *mut super_block,
+        kern_flags: core::ffi::c_ulong,
+        set_kern_flags: *mut core::ffi::c_ulong,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_move_mount(from_path: *const path, to_path: *const path) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_dentry_init_security(
+        dentry: *mut dentry,
+        mode: core::ffi::c_int,
+        name: *const qstr,
+        xattr_name: *mut *const core::ffi::c_char,
+        ctx: *mut *mut core::ffi::c_void,
+        ctxlen: *mut u32_,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_dentry_create_files_as(
+        dentry: *mut dentry,
+        mode: core::ffi::c_int,
+        name: *mut qstr,
+        old: *const cred,
+        new: *mut cred,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_path_notify(
+        path: *const path,
+        mask: u64_,
+        obj_type: core::ffi::c_uint,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_inode_alloc(inode: *mut inode) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_inode_free(inode: *mut inode);
+}
+extern "C" {
+    pub fn security_inode_init_security(
+        inode: *mut inode,
+        dir: *mut inode,
+        qstr: *const qstr,
+        initxattrs: initxattrs,
+        fs_data: *mut core::ffi::c_void,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_inode_init_security_anon(
+        inode: *mut inode,
+        name: *const qstr,
+        context_inode: *const inode,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_inode_create(
+        dir: *mut inode,
+        dentry: *mut dentry,
+        mode: umode_t,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_inode_link(
+        old_dentry: *mut dentry,
+        dir: *mut inode,
+        new_dentry: *mut dentry,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_inode_unlink(dir: *mut inode, dentry: *mut dentry) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_inode_symlink(
+        dir: *mut inode,
+        dentry: *mut dentry,
+        old_name: *const core::ffi::c_char,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_inode_mkdir(
+        dir: *mut inode,
+        dentry: *mut dentry,
+        mode: umode_t,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_inode_rmdir(dir: *mut inode, dentry: *mut dentry) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_inode_mknod(
+        dir: *mut inode,
+        dentry: *mut dentry,
+        mode: umode_t,
+        dev: dev_t,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_inode_rename(
+        old_dir: *mut inode,
+        old_dentry: *mut dentry,
+        new_dir: *mut inode,
+        new_dentry: *mut dentry,
+        flags: core::ffi::c_uint,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_inode_readlink(dentry: *mut dentry) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_inode_follow_link(
+        dentry: *mut dentry,
+        inode: *mut inode,
+        rcu: bool_,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_inode_permission(inode: *mut inode, mask: core::ffi::c_int)
         -> core::ffi::c_int;
 }
 extern "C" {
-    pub fn __set_memory_prot(
-        addr: core::ffi::c_ulong,
-        numpages: core::ffi::c_int,
-        prot: pgprot_t,
+    pub fn security_inode_setattr(
+        idmap: *mut mnt_idmap,
+        dentry: *mut dentry,
+        attr: *mut iattr,
     ) -> core::ffi::c_int;
 }
 extern "C" {
-    pub fn _set_memory_uc(addr: core::ffi::c_ulong, numpages: core::ffi::c_int)
+    pub fn security_inode_getattr(path: *const path) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_inode_setxattr(
+        idmap: *mut mnt_idmap,
+        dentry: *mut dentry,
+        name: *const core::ffi::c_char,
+        value: *const core::ffi::c_void,
+        size: usize,
+        flags: core::ffi::c_int,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_inode_set_acl(
+        idmap: *mut mnt_idmap,
+        dentry: *mut dentry,
+        acl_name: *const core::ffi::c_char,
+        kacl: *mut posix_acl,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_inode_get_acl(
+        idmap: *mut mnt_idmap,
+        dentry: *mut dentry,
+        acl_name: *const core::ffi::c_char,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_inode_remove_acl(
+        idmap: *mut mnt_idmap,
+        dentry: *mut dentry,
+        acl_name: *const core::ffi::c_char,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_inode_post_setxattr(
+        dentry: *mut dentry,
+        name: *const core::ffi::c_char,
+        value: *const core::ffi::c_void,
+        size: usize,
+        flags: core::ffi::c_int,
+    );
+}
+extern "C" {
+    pub fn security_inode_getxattr(
+        dentry: *mut dentry,
+        name: *const core::ffi::c_char,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_inode_listxattr(dentry: *mut dentry) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_inode_removexattr(
+        idmap: *mut mnt_idmap,
+        dentry: *mut dentry,
+        name: *const core::ffi::c_char,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_inode_need_killpriv(dentry: *mut dentry) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_inode_killpriv(idmap: *mut mnt_idmap, dentry: *mut dentry) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_inode_getsecurity(
+        idmap: *mut mnt_idmap,
+        inode: *mut inode,
+        name: *const core::ffi::c_char,
+        buffer: *mut *mut core::ffi::c_void,
+        alloc: bool_,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_inode_setsecurity(
+        inode: *mut inode,
+        name: *const core::ffi::c_char,
+        value: *const core::ffi::c_void,
+        size: usize,
+        flags: core::ffi::c_int,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_inode_listsecurity(
+        inode: *mut inode,
+        buffer: *mut core::ffi::c_char,
+        buffer_size: usize,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_inode_getsecid(inode: *mut inode, secid: *mut u32_);
+}
+extern "C" {
+    pub fn security_inode_copy_up(src: *mut dentry, new: *mut *mut cred) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_inode_copy_up_xattr(name: *const core::ffi::c_char) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_kernfs_init_security(
+        kn_dir: *mut kernfs_node,
+        kn: *mut kernfs_node,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_file_permission(file: *mut file, mask: core::ffi::c_int) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_file_alloc(file: *mut file) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_file_free(file: *mut file);
+}
+extern "C" {
+    pub fn security_file_ioctl(
+        file: *mut file,
+        cmd: core::ffi::c_uint,
+        arg: core::ffi::c_ulong,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_mmap_file(
+        file: *mut file,
+        prot: core::ffi::c_ulong,
+        flags: core::ffi::c_ulong,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_mmap_addr(addr: core::ffi::c_ulong) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_file_mprotect(
+        vma: *mut vm_area_struct,
+        reqprot: core::ffi::c_ulong,
+        prot: core::ffi::c_ulong,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_file_lock(file: *mut file, cmd: core::ffi::c_uint) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_file_fcntl(
+        file: *mut file,
+        cmd: core::ffi::c_uint,
+        arg: core::ffi::c_ulong,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_file_set_fowner(file: *mut file);
+}
+extern "C" {
+    pub fn security_file_send_sigiotask(
+        tsk: *mut task_struct,
+        fown: *mut fown_struct,
+        sig: core::ffi::c_int,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_file_receive(file: *mut file) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_file_open(file: *mut file) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_file_truncate(file: *mut file) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_task_alloc(
+        task: *mut task_struct,
+        clone_flags: core::ffi::c_ulong,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_task_free(task: *mut task_struct);
+}
+extern "C" {
+    pub fn security_cred_alloc_blank(cred: *mut cred, gfp: gfp_t) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_cred_free(cred: *mut cred);
+}
+extern "C" {
+    pub fn security_prepare_creds(new: *mut cred, old: *const cred, gfp: gfp_t)
         -> core::ffi::c_int;
 }
 extern "C" {
-    pub fn _set_memory_wc(addr: core::ffi::c_ulong, numpages: core::ffi::c_int)
+    pub fn security_transfer_creds(new: *mut cred, old: *const cred);
+}
+extern "C" {
+    pub fn security_cred_getsecid(c: *const cred, secid: *mut u32_);
+}
+extern "C" {
+    pub fn security_kernel_act_as(new: *mut cred, secid: u32_) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_kernel_create_files_as(new: *mut cred, inode: *mut inode) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_kernel_module_request(kmod_name: *mut core::ffi::c_char) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_kernel_load_data(id: kernel_load_data_id, contents: bool_) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_kernel_post_load_data(
+        buf: *mut core::ffi::c_char,
+        size: loff_t,
+        id: kernel_load_data_id,
+        description: *mut core::ffi::c_char,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_kernel_read_file(
+        file: *mut file,
+        id: kernel_read_file_id,
+        contents: bool_,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_kernel_post_read_file(
+        file: *mut file,
+        buf: *mut core::ffi::c_char,
+        size: loff_t,
+        id: kernel_read_file_id,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_task_fix_setuid(
+        new: *mut cred,
+        old: *const cred,
+        flags: core::ffi::c_int,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_task_fix_setgid(
+        new: *mut cred,
+        old: *const cred,
+        flags: core::ffi::c_int,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_task_fix_setgroups(new: *mut cred, old: *const cred) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_task_setpgid(p: *mut task_struct, pgid: pid_t) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_task_getpgid(p: *mut task_struct) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_task_getsid(p: *mut task_struct) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_current_getsecid_subj(secid: *mut u32_);
+}
+extern "C" {
+    pub fn security_task_getsecid_obj(p: *mut task_struct, secid: *mut u32_);
+}
+extern "C" {
+    pub fn security_task_setnice(p: *mut task_struct, nice: core::ffi::c_int) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_task_setioprio(
+        p: *mut task_struct,
+        ioprio: core::ffi::c_int,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_task_getioprio(p: *mut task_struct) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_task_prlimit(
+        cred: *const cred,
+        tcred: *const cred,
+        flags: core::ffi::c_uint,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_task_setrlimit(
+        p: *mut task_struct,
+        resource: core::ffi::c_uint,
+        new_rlim: *mut rlimit,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_task_setscheduler(p: *mut task_struct) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_task_getscheduler(p: *mut task_struct) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_task_movememory(p: *mut task_struct) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_task_kill(
+        p: *mut task_struct,
+        info: *mut kernel_siginfo,
+        sig: core::ffi::c_int,
+        cred: *const cred,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_task_prctl(
+        option: core::ffi::c_int,
+        arg2: core::ffi::c_ulong,
+        arg3: core::ffi::c_ulong,
+        arg4: core::ffi::c_ulong,
+        arg5: core::ffi::c_ulong,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_task_to_inode(p: *mut task_struct, inode: *mut inode);
+}
+extern "C" {
+    pub fn security_create_user_ns(cred: *const cred) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_ipc_permission(
+        ipcp: *mut kern_ipc_perm,
+        flag: core::ffi::c_short,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_ipc_getsecid(ipcp: *mut kern_ipc_perm, secid: *mut u32_);
+}
+extern "C" {
+    pub fn security_msg_msg_alloc(msg: *mut msg_msg) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_msg_msg_free(msg: *mut msg_msg);
+}
+extern "C" {
+    pub fn security_msg_queue_alloc(msq: *mut kern_ipc_perm) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_msg_queue_free(msq: *mut kern_ipc_perm);
+}
+extern "C" {
+    pub fn security_msg_queue_associate(
+        msq: *mut kern_ipc_perm,
+        msqflg: core::ffi::c_int,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_msg_queue_msgctl(
+        msq: *mut kern_ipc_perm,
+        cmd: core::ffi::c_int,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_msg_queue_msgsnd(
+        msq: *mut kern_ipc_perm,
+        msg: *mut msg_msg,
+        msqflg: core::ffi::c_int,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_msg_queue_msgrcv(
+        msq: *mut kern_ipc_perm,
+        msg: *mut msg_msg,
+        target: *mut task_struct,
+        type_: core::ffi::c_long,
+        mode: core::ffi::c_int,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_shm_alloc(shp: *mut kern_ipc_perm) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_shm_free(shp: *mut kern_ipc_perm);
+}
+extern "C" {
+    pub fn security_shm_associate(
+        shp: *mut kern_ipc_perm,
+        shmflg: core::ffi::c_int,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_shm_shmctl(shp: *mut kern_ipc_perm, cmd: core::ffi::c_int) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_shm_shmat(
+        shp: *mut kern_ipc_perm,
+        shmaddr: *mut core::ffi::c_char,
+        shmflg: core::ffi::c_int,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_sem_alloc(sma: *mut kern_ipc_perm) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_sem_free(sma: *mut kern_ipc_perm);
+}
+extern "C" {
+    pub fn security_sem_associate(
+        sma: *mut kern_ipc_perm,
+        semflg: core::ffi::c_int,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_sem_semctl(sma: *mut kern_ipc_perm, cmd: core::ffi::c_int) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_sem_semop(
+        sma: *mut kern_ipc_perm,
+        sops: *mut sembuf,
+        nsops: core::ffi::c_uint,
+        alter: core::ffi::c_int,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_d_instantiate(dentry: *mut dentry, inode: *mut inode);
+}
+extern "C" {
+    pub fn security_getprocattr(
+        p: *mut task_struct,
+        lsm: *const core::ffi::c_char,
+        name: *const core::ffi::c_char,
+        value: *mut *mut core::ffi::c_char,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_setprocattr(
+        lsm: *const core::ffi::c_char,
+        name: *const core::ffi::c_char,
+        value: *mut core::ffi::c_void,
+        size: usize,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_netlink_send(sk: *mut sock, skb: *mut sk_buff) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_ismaclabel(name: *const core::ffi::c_char) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_secid_to_secctx(
+        secid: u32_,
+        secdata: *mut *mut core::ffi::c_char,
+        seclen: *mut u32_,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_secctx_to_secid(
+        secdata: *const core::ffi::c_char,
+        seclen: u32_,
+        secid: *mut u32_,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_release_secctx(secdata: *mut core::ffi::c_char, seclen: u32_);
+}
+extern "C" {
+    pub fn security_inode_invalidate_secctx(inode: *mut inode);
+}
+extern "C" {
+    pub fn security_inode_notifysecctx(
+        inode: *mut inode,
+        ctx: *mut core::ffi::c_void,
+        ctxlen: u32_,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_inode_setsecctx(
+        dentry: *mut dentry,
+        ctx: *mut core::ffi::c_void,
+        ctxlen: u32_,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_inode_getsecctx(
+        inode: *mut inode,
+        ctx: *mut *mut core::ffi::c_void,
+        ctxlen: *mut u32_,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_locked_down(what: lockdown_reason) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_unix_stream_connect(
+        sock: *mut sock,
+        other: *mut sock,
+        newsk: *mut sock,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_unix_may_send(sock: *mut socket, other: *mut socket) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_socket_create(
+        family: core::ffi::c_int,
+        type_: core::ffi::c_int,
+        protocol: core::ffi::c_int,
+        kern: core::ffi::c_int,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_socket_post_create(
+        sock: *mut socket,
+        family: core::ffi::c_int,
+        type_: core::ffi::c_int,
+        protocol: core::ffi::c_int,
+        kern: core::ffi::c_int,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_socket_socketpair(socka: *mut socket, sockb: *mut socket) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_socket_bind(
+        sock: *mut socket,
+        address: *mut sockaddr,
+        addrlen: core::ffi::c_int,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_socket_connect(
+        sock: *mut socket,
+        address: *mut sockaddr,
+        addrlen: core::ffi::c_int,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_socket_listen(sock: *mut socket, backlog: core::ffi::c_int)
         -> core::ffi::c_int;
 }
 extern "C" {
-    pub fn _set_memory_wt(addr: core::ffi::c_ulong, numpages: core::ffi::c_int)
-        -> core::ffi::c_int;
+    pub fn security_socket_accept(sock: *mut socket, newsock: *mut socket) -> core::ffi::c_int;
 }
 extern "C" {
-    pub fn _set_memory_wb(addr: core::ffi::c_ulong, numpages: core::ffi::c_int)
-        -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn set_memory_uc(addr: core::ffi::c_ulong, numpages: core::ffi::c_int) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn set_memory_wc(addr: core::ffi::c_ulong, numpages: core::ffi::c_int) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn set_memory_wb(addr: core::ffi::c_ulong, numpages: core::ffi::c_int) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn set_memory_np(addr: core::ffi::c_ulong, numpages: core::ffi::c_int) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn set_memory_4k(addr: core::ffi::c_ulong, numpages: core::ffi::c_int) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn set_memory_encrypted(
-        addr: core::ffi::c_ulong,
-        numpages: core::ffi::c_int,
+    pub fn security_socket_sendmsg(
+        sock: *mut socket,
+        msg: *mut msghdr,
+        size: core::ffi::c_int,
     ) -> core::ffi::c_int;
 }
 extern "C" {
-    pub fn set_memory_decrypted(
-        addr: core::ffi::c_ulong,
-        numpages: core::ffi::c_int,
+    pub fn security_socket_recvmsg(
+        sock: *mut socket,
+        msg: *mut msghdr,
+        size: core::ffi::c_int,
+        flags: core::ffi::c_int,
     ) -> core::ffi::c_int;
 }
 extern "C" {
-    pub fn set_memory_np_noalias(
-        addr: core::ffi::c_ulong,
-        numpages: core::ffi::c_int,
+    pub fn security_socket_getsockname(sock: *mut socket) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_socket_getpeername(sock: *mut socket) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_socket_getsockopt(
+        sock: *mut socket,
+        level: core::ffi::c_int,
+        optname: core::ffi::c_int,
     ) -> core::ffi::c_int;
 }
 extern "C" {
-    pub fn set_memory_nonglobal(
-        addr: core::ffi::c_ulong,
-        numpages: core::ffi::c_int,
+    pub fn security_socket_setsockopt(
+        sock: *mut socket,
+        level: core::ffi::c_int,
+        optname: core::ffi::c_int,
     ) -> core::ffi::c_int;
 }
 extern "C" {
-    pub fn set_memory_global(
-        addr: core::ffi::c_ulong,
-        numpages: core::ffi::c_int,
+    pub fn security_socket_shutdown(sock: *mut socket, how: core::ffi::c_int) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_sock_rcv_skb(sk: *mut sock, skb: *mut sk_buff) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_socket_getpeersec_stream(
+        sock: *mut socket,
+        optval: sockptr_t,
+        optlen: sockptr_t,
+        len: core::ffi::c_uint,
     ) -> core::ffi::c_int;
 }
 extern "C" {
-    pub fn set_pages_array_uc(
-        pages: *mut *mut page,
-        addrinarray: core::ffi::c_int,
+    pub fn security_socket_getpeersec_dgram(
+        sock: *mut socket,
+        skb: *mut sk_buff,
+        secid: *mut u32_,
     ) -> core::ffi::c_int;
 }
 extern "C" {
-    pub fn set_pages_array_wc(
-        pages: *mut *mut page,
-        addrinarray: core::ffi::c_int,
+    pub fn security_sk_alloc(
+        sk: *mut sock,
+        family: core::ffi::c_int,
+        priority: gfp_t,
     ) -> core::ffi::c_int;
 }
 extern "C" {
-    pub fn set_pages_array_wb(
-        pages: *mut *mut page,
-        addrinarray: core::ffi::c_int,
+    pub fn security_sk_free(sk: *mut sock);
+}
+extern "C" {
+    pub fn security_sk_clone(sk: *const sock, newsk: *mut sock);
+}
+extern "C" {
+    pub fn security_sk_classify_flow(sk: *const sock, flic: *mut flowi_common);
+}
+extern "C" {
+    pub fn security_req_classify_flow(req: *const request_sock, flic: *mut flowi_common);
+}
+extern "C" {
+    pub fn security_sock_graft(sk: *mut sock, parent: *mut socket);
+}
+extern "C" {
+    pub fn security_inet_conn_request(
+        sk: *const sock,
+        skb: *mut sk_buff,
+        req: *mut request_sock,
     ) -> core::ffi::c_int;
 }
 extern "C" {
-    pub fn set_pages_uc(page: *mut page, numpages: core::ffi::c_int) -> core::ffi::c_int;
+    pub fn security_inet_csk_clone(newsk: *mut sock, req: *const request_sock);
 }
 extern "C" {
-    pub fn set_pages_wb(page: *mut page, numpages: core::ffi::c_int) -> core::ffi::c_int;
+    pub fn security_inet_conn_established(sk: *mut sock, skb: *mut sk_buff);
 }
 extern "C" {
-    pub fn set_pages_ro(page: *mut page, numpages: core::ffi::c_int) -> core::ffi::c_int;
+    pub fn security_secmark_relabel_packet(secid: u32_) -> core::ffi::c_int;
 }
 extern "C" {
-    pub fn set_pages_rw(page: *mut page, numpages: core::ffi::c_int) -> core::ffi::c_int;
+    pub fn security_secmark_refcount_inc();
 }
 extern "C" {
-    pub fn set_direct_map_invalid_noflush(page: *mut page) -> core::ffi::c_int;
+    pub fn security_secmark_refcount_dec();
 }
 extern "C" {
-    pub fn set_direct_map_default_noflush(page: *mut page) -> core::ffi::c_int;
+    pub fn security_tun_dev_alloc_security(
+        security: *mut *mut core::ffi::c_void,
+    ) -> core::ffi::c_int;
 }
 extern "C" {
-    pub fn kernel_page_present(page: *mut page) -> bool_;
+    pub fn security_tun_dev_free_security(security: *mut core::ffi::c_void);
 }
 extern "C" {
-    pub static mut kernel_set_to_readonly: core::ffi::c_int;
+    pub fn security_tun_dev_create() -> core::ffi::c_int;
 }
 extern "C" {
-    pub fn set_mce_nospec(pfn: core::ffi::c_ulong) -> core::ffi::c_int;
+    pub fn security_tun_dev_attach_queue(security: *mut core::ffi::c_void) -> core::ffi::c_int;
 }
 extern "C" {
-    pub fn clear_mce_nospec(pfn: core::ffi::c_ulong) -> core::ffi::c_int;
+    pub fn security_tun_dev_attach(
+        sk: *mut sock,
+        security: *mut core::ffi::c_void,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_tun_dev_open(security: *mut core::ffi::c_void) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_sctp_assoc_request(
+        asoc: *mut sctp_association,
+        skb: *mut sk_buff,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_sctp_bind_connect(
+        sk: *mut sock,
+        optname: core::ffi::c_int,
+        address: *mut sockaddr,
+        addrlen: core::ffi::c_int,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_sctp_sk_clone(asoc: *mut sctp_association, sk: *mut sock, newsk: *mut sock);
+}
+extern "C" {
+    pub fn security_sctp_assoc_established(
+        asoc: *mut sctp_association,
+        skb: *mut sk_buff,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_mptcp_add_subflow(sk: *mut sock, ssk: *mut sock) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_ib_pkey_access(
+        sec: *mut core::ffi::c_void,
+        subnet_prefix: u64_,
+        pkey: u16_,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_ib_endport_manage_subnet(
+        sec: *mut core::ffi::c_void,
+        name: *const core::ffi::c_char,
+        port_num: u8_,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_ib_alloc_security(sec: *mut *mut core::ffi::c_void) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_ib_free_security(sec: *mut core::ffi::c_void);
+}
+extern "C" {
+    pub fn security_xfrm_policy_alloc(
+        ctxp: *mut *mut xfrm_sec_ctx,
+        sec_ctx: *mut xfrm_user_sec_ctx,
+        gfp: gfp_t,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_xfrm_policy_clone(
+        old_ctx: *mut xfrm_sec_ctx,
+        new_ctxp: *mut *mut xfrm_sec_ctx,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_xfrm_policy_free(ctx: *mut xfrm_sec_ctx);
+}
+extern "C" {
+    pub fn security_xfrm_policy_delete(ctx: *mut xfrm_sec_ctx) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_xfrm_state_alloc(
+        x: *mut xfrm_state,
+        sec_ctx: *mut xfrm_user_sec_ctx,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_xfrm_state_alloc_acquire(
+        x: *mut xfrm_state,
+        polsec: *mut xfrm_sec_ctx,
+        secid: u32_,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_xfrm_state_delete(x: *mut xfrm_state) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_xfrm_state_free(x: *mut xfrm_state);
+}
+extern "C" {
+    pub fn security_xfrm_policy_lookup(ctx: *mut xfrm_sec_ctx, fl_secid: u32_) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_xfrm_state_pol_flow_match(
+        x: *mut xfrm_state,
+        xp: *mut xfrm_policy,
+        flic: *const flowi_common,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_xfrm_decode_session(skb: *mut sk_buff, secid: *mut u32_) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_skb_classify_flow(skb: *mut sk_buff, flic: *mut flowi_common);
+}
+extern "C" {
+    pub fn security_path_unlink(dir: *const path, dentry: *mut dentry) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_path_mkdir(
+        dir: *const path,
+        dentry: *mut dentry,
+        mode: umode_t,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_path_rmdir(dir: *const path, dentry: *mut dentry) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_path_mknod(
+        dir: *const path,
+        dentry: *mut dentry,
+        mode: umode_t,
+        dev: core::ffi::c_uint,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_path_truncate(path: *const path) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_path_symlink(
+        dir: *const path,
+        dentry: *mut dentry,
+        old_name: *const core::ffi::c_char,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_path_link(
+        old_dentry: *mut dentry,
+        new_dir: *const path,
+        new_dentry: *mut dentry,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_path_rename(
+        old_dir: *const path,
+        old_dentry: *mut dentry,
+        new_dir: *const path,
+        new_dentry: *mut dentry,
+        flags: core::ffi::c_uint,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_path_chmod(path: *const path, mode: umode_t) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_path_chown(path: *const path, uid: kuid_t, gid: kgid_t) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_path_chroot(path: *const path) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_key_alloc(
+        key: *mut key,
+        cred: *const cred,
+        flags: core::ffi::c_ulong,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_key_free(key: *mut key);
+}
+extern "C" {
+    pub fn security_key_permission(
+        key_ref: key_ref_t,
+        cred: *const cred,
+        need_perm: key_need_perm,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_key_getsecurity(
+        key: *mut key,
+        _buffer: *mut *mut core::ffi::c_char,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_audit_rule_init(
+        field: u32_,
+        op: u32_,
+        rulestr: *mut core::ffi::c_char,
+        lsmrule: *mut *mut core::ffi::c_void,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_audit_rule_known(krule: *mut audit_krule) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_audit_rule_match(
+        secid: u32_,
+        field: u32_,
+        op: u32_,
+        lsmrule: *mut core::ffi::c_void,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_audit_rule_free(lsmrule: *mut core::ffi::c_void);
+}
+extern "C" {
+    pub fn securityfs_create_file(
+        name: *const core::ffi::c_char,
+        mode: umode_t,
+        parent: *mut dentry,
+        data: *mut core::ffi::c_void,
+        fops: *const file_operations,
+    ) -> *mut dentry;
+}
+extern "C" {
+    pub fn securityfs_create_dir(
+        name: *const core::ffi::c_char,
+        parent: *mut dentry,
+    ) -> *mut dentry;
+}
+extern "C" {
+    pub fn securityfs_create_symlink(
+        name: *const core::ffi::c_char,
+        parent: *mut dentry,
+        target: *const core::ffi::c_char,
+        iops: *const inode_operations,
+    ) -> *mut dentry;
+}
+extern "C" {
+    pub fn securityfs_remove(dentry: *mut dentry);
+}
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub struct bpf_attr {
+    _unused: [u8; 0],
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct bpf_map {
+    _unused: [u8; 0],
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct bpf_prog {
+    _unused: [u8; 0],
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct bpf_prog_aux {
+    _unused: [u8; 0],
+}
+extern "C" {
+    pub fn security_bpf(
+        cmd: core::ffi::c_int,
+        attr: *mut bpf_attr,
+        size: core::ffi::c_uint,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_bpf_map(map: *mut bpf_map, fmode: fmode_t) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_bpf_prog(prog: *mut bpf_prog) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_bpf_map_alloc(map: *mut bpf_map) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_bpf_map_free(map: *mut bpf_map);
+}
+extern "C" {
+    pub fn security_bpf_prog_alloc(aux: *mut bpf_prog_aux) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_bpf_prog_free(aux: *mut bpf_prog_aux);
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct perf_event_attr {
+    _unused: [u8; 0],
+}
+extern "C" {
+    pub fn security_perf_event_open(
+        attr: *mut perf_event_attr,
+        type_: core::ffi::c_int,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_perf_event_alloc(event: *mut perf_event) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_perf_event_free(event: *mut perf_event);
+}
+extern "C" {
+    pub fn security_perf_event_read(event: *mut perf_event) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_perf_event_write(event: *mut perf_event) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_uring_override_creds(new: *const cred) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_uring_sqpoll() -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn security_uring_cmd(ioucmd: *mut io_uring_cmd) -> core::ffi::c_int;
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct mnt_namespace {
+    _unused: [u8; 0],
+}
+pub const fs_context_purpose_FS_CONTEXT_FOR_MOUNT: fs_context_purpose = 0;
+pub const fs_context_purpose_FS_CONTEXT_FOR_SUBMOUNT: fs_context_purpose = 1;
+pub const fs_context_purpose_FS_CONTEXT_FOR_RECONFIGURE: fs_context_purpose = 2;
+pub type fs_context_purpose = core::ffi::c_uint;
+pub const fs_context_phase_FS_CONTEXT_CREATE_PARAMS: fs_context_phase = 0;
+pub const fs_context_phase_FS_CONTEXT_CREATING: fs_context_phase = 1;
+pub const fs_context_phase_FS_CONTEXT_AWAITING_MOUNT: fs_context_phase = 2;
+pub const fs_context_phase_FS_CONTEXT_AWAITING_RECONF: fs_context_phase = 3;
+pub const fs_context_phase_FS_CONTEXT_RECONF_PARAMS: fs_context_phase = 4;
+pub const fs_context_phase_FS_CONTEXT_RECONFIGURING: fs_context_phase = 5;
+pub const fs_context_phase_FS_CONTEXT_FAILED: fs_context_phase = 6;
+pub type fs_context_phase = core::ffi::c_uint;
+pub const fs_value_type_fs_value_is_undefined: fs_value_type = 0;
+pub const fs_value_type_fs_value_is_flag: fs_value_type = 1;
+pub const fs_value_type_fs_value_is_string: fs_value_type = 2;
+pub const fs_value_type_fs_value_is_blob: fs_value_type = 3;
+pub const fs_value_type_fs_value_is_filename: fs_value_type = 4;
+pub const fs_value_type_fs_value_is_file: fs_value_type = 5;
+pub type fs_value_type = i32;
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub struct fs_parameter {
+    pub key: *const core::ffi::c_char,
+    pub _bitfield_align_1: [u8; 0],
+    pub _bitfield_1: __BindgenBitfieldUnit<[u8; 1usize]>,
+    pub __bindgen_anon_1: fs_parameter__bindgen_ty_1,
+    pub size: usize,
+    pub dirfd: core::ffi::c_int,
+}
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub union fs_parameter__bindgen_ty_1 {
+    pub string: *mut core::ffi::c_char,
+    pub blob: *mut core::ffi::c_void,
+    pub name: *mut filename,
+    pub file: *mut file,
+}
+impl Default for fs_parameter__bindgen_ty_1 {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+impl Default for fs_parameter {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+impl fs_parameter {
+    #[inline]
+    pub fn type_(&self) -> fs_value_type {
+        unsafe { ::core::mem::transmute(self._bitfield_1.get(0usize, 8u8) as u32) }
+    }
+    #[inline]
+    pub fn set_type(&mut self, val: fs_value_type) {
+        unsafe {
+            let val: u32 = ::core::mem::transmute(val);
+            self._bitfield_1.set(0usize, 8u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn new_bitfield_1(type_: fs_value_type) -> __BindgenBitfieldUnit<[u8; 1usize]> {
+        let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 1usize]> = Default::default();
+        __bindgen_bitfield_unit.set(0usize, 8u8, {
+            let type_: u32 = unsafe { ::core::mem::transmute(type_) };
+            type_ as u64
+        });
+        __bindgen_bitfield_unit
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct p_log {
+    pub prefix: *const core::ffi::c_char,
+    pub log: *mut fc_log,
+}
+impl Default for p_log {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub struct fs_context {
+    pub ops: *const fs_context_operations,
+    pub uapi_mutex: mutex,
+    pub fs_type: *mut file_system_type,
+    pub fs_private: *mut core::ffi::c_void,
+    pub sget_key: *mut core::ffi::c_void,
+    pub root: *mut dentry,
+    pub user_ns: *mut user_namespace,
+    pub net_ns: *mut net,
+    pub cred: *const cred,
+    pub log: p_log,
+    pub source: *const core::ffi::c_char,
+    pub security: *mut core::ffi::c_void,
+    pub s_fs_info: *mut core::ffi::c_void,
+    pub sb_flags: core::ffi::c_uint,
+    pub sb_flags_mask: core::ffi::c_uint,
+    pub s_iflags: core::ffi::c_uint,
+    pub _bitfield_align_1: [u8; 0],
+    pub _bitfield_1: __BindgenBitfieldUnit<[u8; 3usize]>,
+    pub __bindgen_padding_0: u8,
+}
+impl Default for fs_context {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+impl fs_context {
+    #[inline]
+    pub fn purpose(&self) -> fs_context_purpose {
+        unsafe { ::core::mem::transmute(self._bitfield_1.get(0usize, 8u8) as u32) }
+    }
+    #[inline]
+    pub fn set_purpose(&mut self, val: fs_context_purpose) {
+        unsafe {
+            let val: u32 = ::core::mem::transmute(val);
+            self._bitfield_1.set(0usize, 8u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn phase(&self) -> fs_context_phase {
+        unsafe { ::core::mem::transmute(self._bitfield_1.get(8usize, 8u8) as u32) }
+    }
+    #[inline]
+    pub fn set_phase(&mut self, val: fs_context_phase) {
+        unsafe {
+            let val: u32 = ::core::mem::transmute(val);
+            self._bitfield_1.set(8usize, 8u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn need_free(&self) -> bool_ {
+        unsafe { ::core::mem::transmute(self._bitfield_1.get(16usize, 1u8) as u8) }
+    }
+    #[inline]
+    pub fn set_need_free(&mut self, val: bool_) {
+        unsafe {
+            let val: u8 = ::core::mem::transmute(val);
+            self._bitfield_1.set(16usize, 1u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn global(&self) -> bool_ {
+        unsafe { ::core::mem::transmute(self._bitfield_1.get(17usize, 1u8) as u8) }
+    }
+    #[inline]
+    pub fn set_global(&mut self, val: bool_) {
+        unsafe {
+            let val: u8 = ::core::mem::transmute(val);
+            self._bitfield_1.set(17usize, 1u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn oldapi(&self) -> bool_ {
+        unsafe { ::core::mem::transmute(self._bitfield_1.get(18usize, 1u8) as u8) }
+    }
+    #[inline]
+    pub fn set_oldapi(&mut self, val: bool_) {
+        unsafe {
+            let val: u8 = ::core::mem::transmute(val);
+            self._bitfield_1.set(18usize, 1u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn exclusive(&self) -> bool_ {
+        unsafe { ::core::mem::transmute(self._bitfield_1.get(19usize, 1u8) as u8) }
+    }
+    #[inline]
+    pub fn set_exclusive(&mut self, val: bool_) {
+        unsafe {
+            let val: u8 = ::core::mem::transmute(val);
+            self._bitfield_1.set(19usize, 1u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn new_bitfield_1(
+        purpose: fs_context_purpose,
+        phase: fs_context_phase,
+        need_free: bool_,
+        global: bool_,
+        oldapi: bool_,
+        exclusive: bool_,
+    ) -> __BindgenBitfieldUnit<[u8; 3usize]> {
+        let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 3usize]> = Default::default();
+        __bindgen_bitfield_unit.set(0usize, 8u8, {
+            let purpose: u32 = unsafe { ::core::mem::transmute(purpose) };
+            purpose as u64
+        });
+        __bindgen_bitfield_unit.set(8usize, 8u8, {
+            let phase: u32 = unsafe { ::core::mem::transmute(phase) };
+            phase as u64
+        });
+        __bindgen_bitfield_unit.set(16usize, 1u8, {
+            let need_free: u8 = unsafe { ::core::mem::transmute(need_free) };
+            need_free as u64
+        });
+        __bindgen_bitfield_unit.set(17usize, 1u8, {
+            let global: u8 = unsafe { ::core::mem::transmute(global) };
+            global as u64
+        });
+        __bindgen_bitfield_unit.set(18usize, 1u8, {
+            let oldapi: u8 = unsafe { ::core::mem::transmute(oldapi) };
+            oldapi as u64
+        });
+        __bindgen_bitfield_unit.set(19usize, 1u8, {
+            let exclusive: u8 = unsafe { ::core::mem::transmute(exclusive) };
+            exclusive as u64
+        });
+        __bindgen_bitfield_unit
+    }
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct fs_context_operations {
+    pub free: ::core::option::Option<unsafe extern "C" fn(fc: *mut fs_context)>,
+    pub dup: ::core::option::Option<
+        unsafe extern "C" fn(fc: *mut fs_context, src_fc: *mut fs_context) -> core::ffi::c_int,
+    >,
+    pub parse_param: ::core::option::Option<
+        unsafe extern "C" fn(fc: *mut fs_context, param: *mut fs_parameter) -> core::ffi::c_int,
+    >,
+    pub parse_monolithic: ::core::option::Option<
+        unsafe extern "C" fn(fc: *mut fs_context, data: *mut core::ffi::c_void) -> core::ffi::c_int,
+    >,
+    pub get_tree:
+        ::core::option::Option<unsafe extern "C" fn(fc: *mut fs_context) -> core::ffi::c_int>,
+    pub reconfigure:
+        ::core::option::Option<unsafe extern "C" fn(fc: *mut fs_context) -> core::ffi::c_int>,
+}
+extern "C" {
+    pub fn fs_context_for_mount(
+        fs_type: *mut file_system_type,
+        sb_flags: core::ffi::c_uint,
+    ) -> *mut fs_context;
+}
+extern "C" {
+    pub fn fs_context_for_reconfigure(
+        dentry: *mut dentry,
+        sb_flags: core::ffi::c_uint,
+        sb_flags_mask: core::ffi::c_uint,
+    ) -> *mut fs_context;
+}
+extern "C" {
+    pub fn fs_context_for_submount(
+        fs_type: *mut file_system_type,
+        reference: *mut dentry,
+    ) -> *mut fs_context;
+}
+extern "C" {
+    pub fn vfs_dup_fs_context(fc: *mut fs_context) -> *mut fs_context;
+}
+extern "C" {
+    pub fn vfs_parse_fs_param(fc: *mut fs_context, param: *mut fs_parameter) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn vfs_parse_fs_string(
+        fc: *mut fs_context,
+        key: *const core::ffi::c_char,
+        value: *const core::ffi::c_char,
+        v_size: usize,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn vfs_parse_monolithic_sep(
+        fc: *mut fs_context,
+        data: *mut core::ffi::c_void,
+        sep: ::core::option::Option<
+            unsafe extern "C" fn(arg1: *mut *mut core::ffi::c_char) -> *mut core::ffi::c_char,
+        >,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn generic_parse_monolithic(
+        fc: *mut fs_context,
+        data: *mut core::ffi::c_void,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn vfs_get_tree(fc: *mut fs_context) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn put_fs_context(fc: *mut fs_context);
+}
+extern "C" {
+    pub fn vfs_parse_fs_param_source(
+        fc: *mut fs_context,
+        param: *mut fs_parameter,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn fc_drop_locked(fc: *mut fs_context);
+}
+extern "C" {
+    pub fn reconfigure_single(
+        s: *mut super_block,
+        flags: core::ffi::c_int,
+        data: *mut core::ffi::c_void,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn get_tree_nodev(
+        fc: *mut fs_context,
+        fill_super: ::core::option::Option<
+            unsafe extern "C" fn(sb: *mut super_block, fc: *mut fs_context) -> core::ffi::c_int,
+        >,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn get_tree_single(
+        fc: *mut fs_context,
+        fill_super: ::core::option::Option<
+            unsafe extern "C" fn(sb: *mut super_block, fc: *mut fs_context) -> core::ffi::c_int,
+        >,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn get_tree_keyed(
+        fc: *mut fs_context,
+        fill_super: ::core::option::Option<
+            unsafe extern "C" fn(sb: *mut super_block, fc: *mut fs_context) -> core::ffi::c_int,
+        >,
+        key: *mut core::ffi::c_void,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn setup_bdev_super(
+        sb: *mut super_block,
+        sb_flags: core::ffi::c_int,
+        fc: *mut fs_context,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn get_tree_bdev(
+        fc: *mut fs_context,
+        fill_super: ::core::option::Option<
+            unsafe extern "C" fn(sb: *mut super_block, fc: *mut fs_context) -> core::ffi::c_int,
+        >,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub static fscontext_fops: file_operations;
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct fc_log {
+    pub usage: refcount_t,
+    pub head: u8_,
+    pub tail: u8_,
+    pub need_free: u8_,
+    pub owner: *mut module,
+    pub buffer: [*mut core::ffi::c_char; 8usize],
+}
+impl Default for fc_log {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+extern "C" {
+    pub fn logfc(
+        log: *mut fc_log,
+        prefix: *const core::ffi::c_char,
+        level: core::ffi::c_char,
+        fmt: *const core::ffi::c_char,
+        ...
+    );
+}
+extern "C" {
+    pub fn clflush_cache_range(addr: *mut core::ffi::c_void, size: core::ffi::c_uint);
+}
+pub const dma_data_direction_DMA_BIDIRECTIONAL: dma_data_direction = 0;
+pub const dma_data_direction_DMA_TO_DEVICE: dma_data_direction = 1;
+pub const dma_data_direction_DMA_FROM_DEVICE: dma_data_direction = 2;
+pub const dma_data_direction_DMA_NONE: dma_data_direction = 3;
+pub type dma_data_direction = core::ffi::c_uint;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct urb {
+    _unused: [u8; 0],
+}
+pub const ctx_state_CONTEXT_DISABLED: ctx_state = -1;
+pub const ctx_state_CONTEXT_KERNEL: ctx_state = 0;
+pub const ctx_state_CONTEXT_IDLE: ctx_state = 1;
+pub const ctx_state_CONTEXT_USER: ctx_state = 2;
+pub const ctx_state_CONTEXT_GUEST: ctx_state = 3;
+pub const ctx_state_CONTEXT_MAX: ctx_state = 4;
+pub type ctx_state = core::ffi::c_int;
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct context_tracking {
+    pub state: atomic_t,
+    pub dynticks_nesting: core::ffi::c_long,
+    pub dynticks_nmi_nesting: core::ffi::c_long,
+}
+extern "C" {
+    pub static mut context_tracking: context_tracking;
+}
+#[repr(C)]
+#[repr(align(64))]
+#[derive(Debug, Copy, Clone)]
+pub struct irq_cpustat_t {
+    pub kvm_cpu_l1tf_flush_l1d: u8_,
+    pub __nmi_count: core::ffi::c_uint,
+    pub apic_timer_irqs: core::ffi::c_uint,
+    pub irq_spurious_count: core::ffi::c_uint,
+    pub icr_read_retry_count: core::ffi::c_uint,
+    pub kvm_posted_intr_ipis: core::ffi::c_uint,
+    pub kvm_posted_intr_wakeup_ipis: core::ffi::c_uint,
+    pub kvm_posted_intr_nested_ipis: core::ffi::c_uint,
+    pub x86_platform_ipis: core::ffi::c_uint,
+    pub apic_perf_irqs: core::ffi::c_uint,
+    pub apic_irq_work_irqs: core::ffi::c_uint,
+    pub irq_resched_count: core::ffi::c_uint,
+    pub irq_call_count: core::ffi::c_uint,
+    pub irq_tlb_count: core::ffi::c_uint,
+    pub irq_thermal_count: core::ffi::c_uint,
+    pub irq_threshold_count: core::ffi::c_uint,
+    pub irq_deferred_error_count: core::ffi::c_uint,
+    pub irq_hv_callback_count: core::ffi::c_uint,
+    pub irq_hv_reenlightenment_count: core::ffi::c_uint,
+    pub hyperv_stimer0_count: core::ffi::c_uint,
+}
+impl Default for irq_cpustat_t {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+extern "C" {
+    pub static mut irq_stat: irq_cpustat_t;
+}
+extern "C" {
+    pub fn ack_bad_irq(irq: core::ffi::c_uint);
+}
+extern "C" {
+    pub fn arch_irq_stat_cpu(cpu: core::ffi::c_uint) -> u64_;
+}
+extern "C" {
+    pub fn arch_irq_stat() -> u64_;
+}
+extern "C" {
+    pub fn synchronize_irq(irq: core::ffi::c_uint);
+}
+extern "C" {
+    pub fn synchronize_hardirq(irq: core::ffi::c_uint) -> bool_;
+}
+extern "C" {
+    pub fn irq_enter();
+}
+extern "C" {
+    pub fn irq_enter_rcu();
+}
+extern "C" {
+    pub fn irq_exit();
+}
+extern "C" {
+    pub fn irq_exit_rcu();
+}
+#[doc = " struct bio_vec - a contiguous range of physical memory addresses\n @bv_page:   First page associated with the address range.\n @bv_len:    Number of bytes in the address range.\n @bv_offset: Start of the address range relative to the start of @bv_page.\n\n The following holds for a bvec if n * PAGE_SIZE < bv_offset + bv_len:\n\n   nth_page(@bv_page, n) == @bv_page + n\n\n This holds because page_is_mergeable() checks the above property."]
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct bio_vec {
+    pub bv_page: *mut page,
+    pub bv_len: core::ffi::c_uint,
+    pub bv_offset: core::ffi::c_uint,
+}
+impl Default for bio_vec {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C, packed)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct bvec_iter {
+    pub bi_sector: sector_t,
+    pub bi_size: core::ffi::c_uint,
+    pub bi_idx: core::ffi::c_uint,
+    pub bi_bvec_done: core::ffi::c_uint,
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct bvec_iter_all {
+    pub bv: bio_vec,
+    pub idx: core::ffi::c_int,
+    pub done: core::ffi::c_uint,
+}
+impl Default for bvec_iter_all {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct cgroup_subsys_state {
+    _unused: [u8; 0],
+}
+pub type bio_end_io_t = ::core::option::Option<unsafe extern "C" fn(arg1: *mut bio)>;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct bio_crypt_ctx {
+    _unused: [u8; 0],
+}
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub struct block_device {
+    pub bd_start_sect: sector_t,
+    pub bd_nr_sectors: sector_t,
+    pub bd_disk: *mut gendisk,
+    pub bd_queue: *mut request_queue,
+    pub bd_stats: *mut disk_stats,
+    pub bd_stamp: core::ffi::c_ulong,
+    pub bd_read_only: bool_,
+    pub bd_partno: u8_,
+    pub bd_write_holder: bool_,
+    pub bd_has_submit_bio: bool_,
+    pub bd_dev: dev_t,
+    pub bd_openers: atomic_t,
+    pub bd_size_lock: spinlock_t,
+    pub bd_inode: *mut inode,
+    pub bd_claiming: *mut core::ffi::c_void,
+    pub bd_holder: *mut core::ffi::c_void,
+    pub bd_holder_ops: *const blk_holder_ops,
+    pub bd_holder_lock: mutex,
+    pub bd_fsfreeze_count: core::ffi::c_int,
+    pub bd_holders: core::ffi::c_int,
+    pub bd_holder_dir: *mut kobject,
+    pub bd_fsfreeze_mutex: mutex,
+    pub bd_fsfreeze_sb: *mut super_block,
+    pub bd_meta_info: *mut partition_meta_info,
+    pub bd_device: device,
+}
+impl Default for block_device {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub type blk_status_t = u8_;
+pub type blk_short_t = u16_;
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct bio_issue {
+    pub value: u64_,
+}
+pub type blk_opf_t = __u32;
+pub type blk_qc_t = core::ffi::c_uint;
+#[repr(C)]
+pub struct bio {
+    pub bi_next: *mut bio,
+    pub bi_bdev: *mut block_device,
+    pub bi_opf: blk_opf_t,
+    pub bi_flags: core::ffi::c_ushort,
+    pub bi_ioprio: core::ffi::c_ushort,
+    pub bi_status: blk_status_t,
+    pub __bi_remaining: atomic_t,
+    pub bi_iter: bvec_iter,
+    pub bi_cookie: blk_qc_t,
+    pub bi_end_io: bio_end_io_t,
+    pub bi_private: *mut core::ffi::c_void,
+    pub bi_blkg: *mut blkcg_gq,
+    pub bi_issue: bio_issue,
+    pub __bindgen_anon_1: bio__bindgen_ty_1,
+    pub bi_vcnt: core::ffi::c_ushort,
+    pub bi_max_vecs: core::ffi::c_ushort,
+    pub __bi_cnt: atomic_t,
+    pub bi_io_vec: *mut bio_vec,
+    pub bi_pool: *mut bio_set,
+    pub bi_inline_vecs: __IncompleteArrayField<bio_vec>,
+}
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub union bio__bindgen_ty_1 {
+    pub bi_integrity: *mut bio_integrity_payload,
+}
+impl Default for bio__bindgen_ty_1 {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+impl Default for bio {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub const BIO_PAGE_PINNED: _bindgen_ty_97 = 0;
+pub const BIO_CLONED: _bindgen_ty_97 = 1;
+pub const BIO_BOUNCED: _bindgen_ty_97 = 2;
+pub const BIO_QUIET: _bindgen_ty_97 = 3;
+pub const BIO_CHAIN: _bindgen_ty_97 = 4;
+pub const BIO_REFFED: _bindgen_ty_97 = 5;
+pub const BIO_BPS_THROTTLED: _bindgen_ty_97 = 6;
+pub const BIO_TRACE_COMPLETION: _bindgen_ty_97 = 7;
+pub const BIO_CGROUP_ACCT: _bindgen_ty_97 = 8;
+pub const BIO_QOS_THROTTLED: _bindgen_ty_97 = 9;
+pub const BIO_QOS_MERGED: _bindgen_ty_97 = 10;
+pub const BIO_REMAPPED: _bindgen_ty_97 = 11;
+pub const BIO_ZONE_WRITE_LOCKED: _bindgen_ty_97 = 12;
+pub const BIO_FLAG_LAST: _bindgen_ty_97 = 13;
+pub type _bindgen_ty_97 = core::ffi::c_uint;
+pub type blk_mq_req_flags_t = __u32;
+pub const req_op_REQ_OP_READ: req_op = 0;
+pub const req_op_REQ_OP_WRITE: req_op = 1;
+pub const req_op_REQ_OP_FLUSH: req_op = 2;
+pub const req_op_REQ_OP_DISCARD: req_op = 3;
+pub const req_op_REQ_OP_SECURE_ERASE: req_op = 5;
+pub const req_op_REQ_OP_WRITE_ZEROES: req_op = 9;
+pub const req_op_REQ_OP_ZONE_OPEN: req_op = 10;
+pub const req_op_REQ_OP_ZONE_CLOSE: req_op = 11;
+pub const req_op_REQ_OP_ZONE_FINISH: req_op = 12;
+pub const req_op_REQ_OP_ZONE_APPEND: req_op = 13;
+pub const req_op_REQ_OP_ZONE_RESET: req_op = 15;
+pub const req_op_REQ_OP_ZONE_RESET_ALL: req_op = 17;
+pub const req_op_REQ_OP_DRV_IN: req_op = 34;
+pub const req_op_REQ_OP_DRV_OUT: req_op = 35;
+pub const req_op_REQ_OP_LAST: req_op = 36;
+#[doc = " enum req_op - Operations common to the bio and request structures.\n We use 8 bits for encoding the operation, and the remaining 24 for flags.\n\n The least significant bit of the operation number indicates the data\n transfer direction:\n\n   - if the least significant bit is set transfers are TO the device\n   - if the least significant bit is not set transfers are FROM the device\n\n If a operation does not transfer data the least significant bit has no\n meaning."]
+pub type req_op = core::ffi::c_uint;
+pub const req_flag_bits___REQ_FAILFAST_DEV: req_flag_bits = 8;
+pub const req_flag_bits___REQ_FAILFAST_TRANSPORT: req_flag_bits = 9;
+pub const req_flag_bits___REQ_FAILFAST_DRIVER: req_flag_bits = 10;
+pub const req_flag_bits___REQ_SYNC: req_flag_bits = 11;
+pub const req_flag_bits___REQ_META: req_flag_bits = 12;
+pub const req_flag_bits___REQ_PRIO: req_flag_bits = 13;
+pub const req_flag_bits___REQ_NOMERGE: req_flag_bits = 14;
+pub const req_flag_bits___REQ_IDLE: req_flag_bits = 15;
+pub const req_flag_bits___REQ_INTEGRITY: req_flag_bits = 16;
+pub const req_flag_bits___REQ_FUA: req_flag_bits = 17;
+pub const req_flag_bits___REQ_PREFLUSH: req_flag_bits = 18;
+pub const req_flag_bits___REQ_RAHEAD: req_flag_bits = 19;
+pub const req_flag_bits___REQ_BACKGROUND: req_flag_bits = 20;
+pub const req_flag_bits___REQ_NOWAIT: req_flag_bits = 21;
+pub const req_flag_bits___REQ_POLLED: req_flag_bits = 22;
+pub const req_flag_bits___REQ_ALLOC_CACHE: req_flag_bits = 23;
+pub const req_flag_bits___REQ_SWAP: req_flag_bits = 24;
+pub const req_flag_bits___REQ_DRV: req_flag_bits = 25;
+pub const req_flag_bits___REQ_FS_PRIVATE: req_flag_bits = 26;
+pub const req_flag_bits___REQ_NOUNMAP: req_flag_bits = 27;
+pub const req_flag_bits___REQ_NR_BITS: req_flag_bits = 28;
+pub type req_flag_bits = core::ffi::c_uint;
+pub const stat_group_STAT_READ: stat_group = 0;
+pub const stat_group_STAT_WRITE: stat_group = 1;
+pub const stat_group_STAT_DISCARD: stat_group = 2;
+pub const stat_group_STAT_FLUSH: stat_group = 3;
+pub const stat_group_NR_STAT_GROUPS: stat_group = 4;
+pub type stat_group = core::ffi::c_uint;
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct blk_rq_stat {
+    pub mean: u64_,
+    pub min: u64_,
+    pub max: u64_,
+    pub nr_samples: u32_,
+    pub batch: u64_,
+}
+pub type mempool_alloc_t = ::core::option::Option<
+    unsafe extern "C" fn(
+        gfp_mask: gfp_t,
+        pool_data: *mut core::ffi::c_void,
+    ) -> *mut core::ffi::c_void,
+>;
+pub type mempool_free_t = ::core::option::Option<
+    unsafe extern "C" fn(element: *mut core::ffi::c_void, pool_data: *mut core::ffi::c_void),
+>;
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub struct mempool_s {
+    pub lock: spinlock_t,
+    pub min_nr: core::ffi::c_int,
+    pub curr_nr: core::ffi::c_int,
+    pub elements: *mut *mut core::ffi::c_void,
+    pub pool_data: *mut core::ffi::c_void,
+    pub alloc: mempool_alloc_t,
+    pub free: mempool_free_t,
+    pub wait: wait_queue_head_t,
+}
+impl Default for mempool_s {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub type mempool_t = mempool_s;
+extern "C" {
+    pub fn mempool_exit(pool: *mut mempool_t);
+}
+extern "C" {
+    pub fn mempool_init_node(
+        pool: *mut mempool_t,
+        min_nr: core::ffi::c_int,
+        alloc_fn: mempool_alloc_t,
+        free_fn: mempool_free_t,
+        pool_data: *mut core::ffi::c_void,
+        gfp_mask: gfp_t,
+        node_id: core::ffi::c_int,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn mempool_init(
+        pool: *mut mempool_t,
+        min_nr: core::ffi::c_int,
+        alloc_fn: mempool_alloc_t,
+        free_fn: mempool_free_t,
+        pool_data: *mut core::ffi::c_void,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn mempool_create(
+        min_nr: core::ffi::c_int,
+        alloc_fn: mempool_alloc_t,
+        free_fn: mempool_free_t,
+        pool_data: *mut core::ffi::c_void,
+    ) -> *mut mempool_t;
+}
+extern "C" {
+    pub fn mempool_create_node(
+        min_nr: core::ffi::c_int,
+        alloc_fn: mempool_alloc_t,
+        free_fn: mempool_free_t,
+        pool_data: *mut core::ffi::c_void,
+        gfp_mask: gfp_t,
+        nid: core::ffi::c_int,
+    ) -> *mut mempool_t;
+}
+extern "C" {
+    pub fn mempool_resize(pool: *mut mempool_t, new_min_nr: core::ffi::c_int) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn mempool_destroy(pool: *mut mempool_t);
+}
+extern "C" {
+    pub fn mempool_alloc(pool: *mut mempool_t, gfp_mask: gfp_t) -> *mut core::ffi::c_void;
+}
+extern "C" {
+    pub fn mempool_free(element: *mut core::ffi::c_void, pool: *mut mempool_t);
+}
+extern "C" {
+    pub fn mempool_alloc_slab(
+        gfp_mask: gfp_t,
+        pool_data: *mut core::ffi::c_void,
+    ) -> *mut core::ffi::c_void;
+}
+extern "C" {
+    pub fn mempool_free_slab(element: *mut core::ffi::c_void, pool_data: *mut core::ffi::c_void);
+}
+extern "C" {
+    pub fn mempool_kmalloc(
+        gfp_mask: gfp_t,
+        pool_data: *mut core::ffi::c_void,
+    ) -> *mut core::ffi::c_void;
+}
+extern "C" {
+    pub fn mempool_kfree(element: *mut core::ffi::c_void, pool_data: *mut core::ffi::c_void);
+}
+extern "C" {
+    pub fn mempool_alloc_pages(
+        gfp_mask: gfp_t,
+        pool_data: *mut core::ffi::c_void,
+    ) -> *mut core::ffi::c_void;
+}
+extern "C" {
+    pub fn mempool_free_pages(element: *mut core::ffi::c_void, pool_data: *mut core::ffi::c_void);
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -49384,6 +51642,2516 @@ extern "C" {
         sg_max: core::ffi::c_uint,
         extraction_flags: iov_iter_extraction_t,
     ) -> isize;
+}
+extern "C" {
+    pub fn __bio_advance(arg1: *mut bio, bytes: core::ffi::c_uint);
+}
+#[doc = " struct folio_iter - State for iterating all folios in a bio.\n @folio: The current folio we're iterating.  NULL after the last folio.\n @offset: The byte offset within the current folio.\n @length: The number of bytes in this iteration (will not cross folio\n\tboundary)."]
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct folio_iter {
+    pub folio: *mut folio,
+    pub offset: usize,
+    pub length: usize,
+    pub _next: *mut folio,
+    pub _seg_count: usize,
+    pub _i: core::ffi::c_int,
+}
+impl Default for folio_iter {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub const bip_flags_BIP_BLOCK_INTEGRITY: bip_flags = 1;
+pub const bip_flags_BIP_MAPPED_INTEGRITY: bip_flags = 2;
+pub const bip_flags_BIP_CTRL_NOCHECK: bip_flags = 4;
+pub const bip_flags_BIP_DISK_NOCHECK: bip_flags = 8;
+pub const bip_flags_BIP_IP_CHECKSUM: bip_flags = 16;
+pub type bip_flags = core::ffi::c_uint;
+#[repr(C)]
+#[derive(Debug)]
+pub struct bio_integrity_payload {
+    pub bip_bio: *mut bio,
+    pub bip_iter: bvec_iter,
+    pub bip_vcnt: core::ffi::c_ushort,
+    pub bip_max_vcnt: core::ffi::c_ushort,
+    pub bip_flags: core::ffi::c_ushort,
+    pub bio_iter: bvec_iter,
+    pub bip_work: work_struct,
+    pub bip_vec: *mut bio_vec,
+    pub bip_inline_vecs: __IncompleteArrayField<bio_vec>,
+}
+impl Default for bio_integrity_payload {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+extern "C" {
+    pub fn bio_trim(bio: *mut bio, offset: sector_t, size: sector_t);
+}
+extern "C" {
+    pub fn bio_split(
+        bio: *mut bio,
+        sectors: core::ffi::c_int,
+        gfp: gfp_t,
+        bs: *mut bio_set,
+    ) -> *mut bio;
+}
+extern "C" {
+    pub fn bio_split_rw(
+        bio: *mut bio,
+        lim: *const queue_limits,
+        segs: *mut core::ffi::c_uint,
+        bs: *mut bio_set,
+        max_bytes: core::ffi::c_uint,
+    ) -> *mut bio;
+}
+pub const BIOSET_NEED_BVECS: _bindgen_ty_98 = 1;
+pub const BIOSET_NEED_RESCUER: _bindgen_ty_98 = 2;
+pub const BIOSET_PERCPU_CACHE: _bindgen_ty_98 = 4;
+pub type _bindgen_ty_98 = core::ffi::c_uint;
+extern "C" {
+    pub fn bioset_init(
+        arg1: *mut bio_set,
+        arg2: core::ffi::c_uint,
+        arg3: core::ffi::c_uint,
+        flags: core::ffi::c_int,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn bioset_exit(arg1: *mut bio_set);
+}
+extern "C" {
+    pub fn biovec_init_pool(
+        pool: *mut mempool_t,
+        pool_entries: core::ffi::c_int,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn bio_alloc_bioset(
+        bdev: *mut block_device,
+        nr_vecs: core::ffi::c_ushort,
+        opf: blk_opf_t,
+        gfp_mask: gfp_t,
+        bs: *mut bio_set,
+    ) -> *mut bio;
+}
+extern "C" {
+    pub fn bio_kmalloc(nr_vecs: core::ffi::c_ushort, gfp_mask: gfp_t) -> *mut bio;
+}
+extern "C" {
+    pub fn bio_put(arg1: *mut bio);
+}
+extern "C" {
+    pub fn bio_alloc_clone(
+        bdev: *mut block_device,
+        bio_src: *mut bio,
+        gfp: gfp_t,
+        bs: *mut bio_set,
+    ) -> *mut bio;
+}
+extern "C" {
+    pub fn bio_init_clone(
+        bdev: *mut block_device,
+        bio: *mut bio,
+        bio_src: *mut bio,
+        gfp: gfp_t,
+    ) -> core::ffi::c_int;
+}
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub struct bio_set {
+    pub bio_slab: *mut kmem_cache,
+    pub front_pad: core::ffi::c_uint,
+    pub cache: *mut bio_alloc_cache,
+    pub bio_pool: mempool_t,
+    pub bvec_pool: mempool_t,
+    pub bio_integrity_pool: mempool_t,
+    pub bvec_integrity_pool: mempool_t,
+    pub back_pad: core::ffi::c_uint,
+    pub rescue_lock: spinlock_t,
+    pub rescue_list: bio_list,
+    pub rescue_work: work_struct,
+    pub rescue_workqueue: *mut workqueue_struct,
+    pub cpuhp_dead: hlist_node,
+}
+impl Default for bio_set {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+extern "C" {
+    pub static mut fs_bio_set: bio_set;
+}
+extern "C" {
+    pub fn submit_bio(bio: *mut bio);
+}
+extern "C" {
+    pub fn bio_endio(arg1: *mut bio);
+}
+extern "C" {
+    pub fn submit_bio_wait(bio: *mut bio) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn bio_init(
+        bio: *mut bio,
+        bdev: *mut block_device,
+        table: *mut bio_vec,
+        max_vecs: core::ffi::c_ushort,
+        opf: blk_opf_t,
+    );
+}
+extern "C" {
+    pub fn bio_uninit(arg1: *mut bio);
+}
+extern "C" {
+    pub fn bio_reset(bio: *mut bio, bdev: *mut block_device, opf: blk_opf_t);
+}
+extern "C" {
+    pub fn bio_chain(arg1: *mut bio, arg2: *mut bio);
+}
+extern "C" {
+    #[must_use]
+    pub fn bio_add_page(
+        bio: *mut bio,
+        page: *mut page,
+        len: core::ffi::c_uint,
+        off: core::ffi::c_uint,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    #[must_use]
+    pub fn bio_add_folio(bio: *mut bio, folio: *mut folio, len: usize, off: usize) -> bool_;
+}
+extern "C" {
+    pub fn bio_add_pc_page(
+        arg1: *mut request_queue,
+        arg2: *mut bio,
+        arg3: *mut page,
+        arg4: core::ffi::c_uint,
+        arg5: core::ffi::c_uint,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn bio_add_zone_append_page(
+        bio: *mut bio,
+        page: *mut page,
+        len: core::ffi::c_uint,
+        offset: core::ffi::c_uint,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn __bio_add_page(
+        bio: *mut bio,
+        page: *mut page,
+        len: core::ffi::c_uint,
+        off: core::ffi::c_uint,
+    );
+}
+extern "C" {
+    pub fn bio_add_folio_nofail(bio: *mut bio, folio: *mut folio, len: usize, off: usize);
+}
+extern "C" {
+    pub fn bio_iov_iter_get_pages(bio: *mut bio, iter: *mut iov_iter) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn bio_iov_bvec_set(bio: *mut bio, iter: *mut iov_iter);
+}
+extern "C" {
+    pub fn __bio_release_pages(bio: *mut bio, mark_dirty: bool_);
+}
+extern "C" {
+    pub fn bio_set_pages_dirty(bio: *mut bio);
+}
+extern "C" {
+    pub fn bio_check_pages_dirty(bio: *mut bio);
+}
+extern "C" {
+    pub fn bio_copy_data_iter(
+        dst: *mut bio,
+        dst_iter: *mut bvec_iter,
+        src: *mut bio,
+        src_iter: *mut bvec_iter,
+    );
+}
+extern "C" {
+    pub fn bio_copy_data(dst: *mut bio, src: *mut bio);
+}
+extern "C" {
+    pub fn bio_free_pages(bio: *mut bio);
+}
+extern "C" {
+    pub fn guard_bio_eod(bio: *mut bio);
+}
+extern "C" {
+    pub fn zero_fill_bio_iter(bio: *mut bio, iter: bvec_iter);
+}
+extern "C" {
+    pub fn bio_associate_blkg(bio: *mut bio);
+}
+extern "C" {
+    pub fn bio_associate_blkg_from_css(bio: *mut bio, css: *mut cgroup_subsys_state);
+}
+extern "C" {
+    pub fn bio_clone_blkg_association(dst: *mut bio, src: *mut bio);
+}
+extern "C" {
+    pub fn blkcg_punt_bio_submit(bio: *mut bio);
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct bio_list {
+    pub head: *mut bio,
+    pub tail: *mut bio,
+}
+impl Default for bio_list {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+extern "C" {
+    pub fn bio_integrity_alloc(
+        arg1: *mut bio,
+        arg2: gfp_t,
+        arg3: core::ffi::c_uint,
+    ) -> *mut bio_integrity_payload;
+}
+extern "C" {
+    pub fn bio_integrity_add_page(
+        arg1: *mut bio,
+        arg2: *mut page,
+        arg3: core::ffi::c_uint,
+        arg4: core::ffi::c_uint,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn bio_integrity_prep(arg1: *mut bio) -> bool_;
+}
+extern "C" {
+    pub fn bio_integrity_advance(arg1: *mut bio, arg2: core::ffi::c_uint);
+}
+extern "C" {
+    pub fn bio_integrity_trim(arg1: *mut bio);
+}
+extern "C" {
+    pub fn bio_integrity_clone(arg1: *mut bio, arg2: *mut bio, arg3: gfp_t) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn bioset_integrity_create(arg1: *mut bio_set, arg2: core::ffi::c_int) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn bioset_integrity_free(arg1: *mut bio_set);
+}
+extern "C" {
+    pub fn bio_integrity_init();
+}
+extern "C" {
+    pub fn blk_next_bio(
+        bio: *mut bio,
+        bdev: *mut block_device,
+        nr_pages: core::ffi::c_uint,
+        opf: blk_opf_t,
+        gfp: gfp_t,
+    ) -> *mut bio;
+}
+pub const blk_zone_type_BLK_ZONE_TYPE_CONVENTIONAL: blk_zone_type = 1;
+pub const blk_zone_type_BLK_ZONE_TYPE_SEQWRITE_REQ: blk_zone_type = 2;
+pub const blk_zone_type_BLK_ZONE_TYPE_SEQWRITE_PREF: blk_zone_type = 3;
+#[doc = " enum blk_zone_type - Types of zones allowed in a zoned device.\n\n @BLK_ZONE_TYPE_CONVENTIONAL: The zone has no write pointer and can be writen\n                              randomly. Zone reset has no effect on the zone.\n @BLK_ZONE_TYPE_SEQWRITE_REQ: The zone must be written sequentially\n @BLK_ZONE_TYPE_SEQWRITE_PREF: The zone can be written non-sequentially\n\n Any other value not defined is reserved and must be considered as invalid."]
+pub type blk_zone_type = core::ffi::c_uint;
+pub const blk_zone_cond_BLK_ZONE_COND_NOT_WP: blk_zone_cond = 0;
+pub const blk_zone_cond_BLK_ZONE_COND_EMPTY: blk_zone_cond = 1;
+pub const blk_zone_cond_BLK_ZONE_COND_IMP_OPEN: blk_zone_cond = 2;
+pub const blk_zone_cond_BLK_ZONE_COND_EXP_OPEN: blk_zone_cond = 3;
+pub const blk_zone_cond_BLK_ZONE_COND_CLOSED: blk_zone_cond = 4;
+pub const blk_zone_cond_BLK_ZONE_COND_READONLY: blk_zone_cond = 13;
+pub const blk_zone_cond_BLK_ZONE_COND_FULL: blk_zone_cond = 14;
+pub const blk_zone_cond_BLK_ZONE_COND_OFFLINE: blk_zone_cond = 15;
+#[doc = " enum blk_zone_cond - Condition [state] of a zone in a zoned device.\n\n @BLK_ZONE_COND_NOT_WP: The zone has no write pointer, it is conventional.\n @BLK_ZONE_COND_EMPTY: The zone is empty.\n @BLK_ZONE_COND_IMP_OPEN: The zone is open, but not explicitly opened.\n @BLK_ZONE_COND_EXP_OPEN: The zones was explicitly opened by an\n                          OPEN ZONE command.\n @BLK_ZONE_COND_CLOSED: The zone was [explicitly] closed after writing.\n @BLK_ZONE_COND_FULL: The zone is marked as full, possibly by a zone\n                      FINISH ZONE command.\n @BLK_ZONE_COND_READONLY: The zone is read-only.\n @BLK_ZONE_COND_OFFLINE: The zone is offline (sectors cannot be read/written).\n\n The Zone Condition state machine in the ZBC/ZAC standards maps the above\n deinitions as:\n   - ZC1: Empty         | BLK_ZONE_COND_EMPTY\n   - ZC2: Implicit Open | BLK_ZONE_COND_IMP_OPEN\n   - ZC3: Explicit Open | BLK_ZONE_COND_EXP_OPEN\n   - ZC4: Closed        | BLK_ZONE_COND_CLOSED\n   - ZC5: Full          | BLK_ZONE_COND_FULL\n   - ZC6: Read Only     | BLK_ZONE_COND_READONLY\n   - ZC7: Offline       | BLK_ZONE_COND_OFFLINE\n\n Conditions 0x5 to 0xC are reserved by the current ZBC/ZAC spec and should\n be considered invalid."]
+pub type blk_zone_cond = core::ffi::c_uint;
+pub const blk_zone_report_flags_BLK_ZONE_REP_CAPACITY: blk_zone_report_flags = 1;
+#[doc = " enum blk_zone_report_flags - Feature flags of reported zone descriptors.\n\n @BLK_ZONE_REP_CAPACITY: Zone descriptor has capacity field."]
+pub type blk_zone_report_flags = core::ffi::c_uint;
+#[doc = " struct blk_zone - Zone descriptor for BLKREPORTZONE ioctl.\n\n @start: Zone start in 512 B sector units\n @len: Zone length in 512 B sector units\n @wp: Zone write pointer location in 512 B sector units\n @type: see enum blk_zone_type for possible values\n @cond: see enum blk_zone_cond for possible values\n @non_seq: Flag indicating that the zone is using non-sequential resources\n           (for host-aware zoned block devices only).\n @reset: Flag indicating that a zone reset is recommended.\n @resv: Padding for 8B alignment.\n @capacity: Zone usable capacity in 512 B sector units\n @reserved: Padding to 64 B to match the ZBC, ZAC and ZNS defined zone\n            descriptor size.\n\n start, len, capacity and wp use the regular 512 B sector unit, regardless\n of the device logical block size. The overall structure size is 64 B to\n match the ZBC, ZAC and ZNS defined zone descriptor and allow support for\n future additional zone information."]
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct blk_zone {
+    pub start: __u64,
+    pub len: __u64,
+    pub wp: __u64,
+    pub type_: __u8,
+    pub cond: __u8,
+    pub non_seq: __u8,
+    pub reset: __u8,
+    pub resv: [__u8; 4usize],
+    pub capacity: __u64,
+    pub reserved: [__u8; 24usize],
+}
+#[doc = " struct blk_zone_report - BLKREPORTZONE ioctl request/reply\n\n @sector: starting sector of report\n @nr_zones: IN maximum / OUT actual\n @flags: one or more flags as defined by enum blk_zone_report_flags.\n @zones: Space to hold @nr_zones @zones entries on reply.\n\n The array of at most @nr_zones must follow this structure in memory."]
+#[repr(C)]
+#[derive(Debug, Default)]
+pub struct blk_zone_report {
+    pub sector: __u64,
+    pub nr_zones: __u32,
+    pub flags: __u32,
+    pub zones: __IncompleteArrayField<blk_zone>,
+}
+#[doc = " struct blk_zone_range - BLKRESETZONE/BLKOPENZONE/\n                         BLKCLOSEZONE/BLKFINISHZONE ioctl\n                         requests\n @sector: Starting sector of the first zone to operate on.\n @nr_sectors: Total number of sectors of all zones to operate on."]
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct blk_zone_range {
+    pub sector: __u64,
+    pub nr_sectors: __u64,
+}
+#[doc = " struct sbitmap_word - Word in a &struct sbitmap."]
+#[repr(C)]
+#[repr(align(64))]
+#[derive(Debug, Copy, Clone)]
+pub struct sbitmap_word {
+    #[doc = " @word: word holding free bits"]
+    pub word: core::ffi::c_ulong,
+    pub __bindgen_padding_0: [u64; 7usize],
+    #[doc = " @cleared: word holding cleared bits"]
+    pub cleared: core::ffi::c_ulong,
+}
+impl Default for sbitmap_word {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[doc = " struct sbitmap - Scalable bitmap.\n\n A &struct sbitmap is spread over multiple cachelines to avoid ping-pong. This\n trades off higher memory usage for better scalability."]
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct sbitmap {
+    #[doc = " @depth: Number of bits used in the whole bitmap."]
+    pub depth: core::ffi::c_uint,
+    #[doc = " @shift: log2(number of bits used per word)"]
+    pub shift: core::ffi::c_uint,
+    #[doc = " @map_nr: Number of words (cachelines) being used for the bitmap."]
+    pub map_nr: core::ffi::c_uint,
+    #[doc = " @round_robin: Allocate bits in strict round-robin order."]
+    pub round_robin: bool_,
+    #[doc = " @map: Allocated bitmap."]
+    pub map: *mut sbitmap_word,
+    pub alloc_hint: *mut core::ffi::c_uint,
+}
+impl Default for sbitmap {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[doc = " struct sbq_wait_state - Wait queue in a &struct sbitmap_queue."]
+#[repr(C)]
+#[repr(align(64))]
+#[derive(Copy, Clone)]
+pub struct sbq_wait_state {
+    #[doc = " @wait: Wait queue."]
+    pub wait: wait_queue_head_t,
+}
+impl Default for sbq_wait_state {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[doc = " struct sbitmap_queue - Scalable bitmap with the added ability to wait on free\n bits.\n\n A &struct sbitmap_queue uses multiple wait queues and rolling wakeups to\n avoid contention on the wait queue spinlock. This ensures that we don't hit a\n scalability wall when we run out of free bits and have to start putting tasks\n to sleep."]
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct sbitmap_queue {
+    #[doc = " @sb: Scalable bitmap."]
+    pub sb: sbitmap,
+    #[doc = " @wake_batch: Number of bits which must be freed before we wake up any\n waiters."]
+    pub wake_batch: core::ffi::c_uint,
+    #[doc = " @wake_index: Next wait queue in @ws to wake up."]
+    pub wake_index: atomic_t,
+    #[doc = " @ws: Wait queues."]
+    pub ws: *mut sbq_wait_state,
+    pub ws_active: atomic_t,
+    #[doc = " @min_shallow_depth: The minimum shallow depth which may be passed to\n sbitmap_queue_get_shallow()"]
+    pub min_shallow_depth: core::ffi::c_uint,
+    #[doc = " @completion_cnt: Number of bits cleared passed to the\n wakeup function."]
+    pub completion_cnt: atomic_t,
+    #[doc = " @wakeup_cnt: Number of thread wake ups issued."]
+    pub wakeup_cnt: atomic_t,
+}
+impl Default for sbitmap_queue {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+extern "C" {
+    #[doc = " sbitmap_init_node() - Initialize a &struct sbitmap on a specific memory node.\n @sb: Bitmap to initialize.\n @depth: Number of bits to allocate.\n @shift: Use 2^@shift bits per word in the bitmap; if a negative number if\n         given, a good default is chosen.\n @flags: Allocation flags.\n @node: Memory node to allocate on.\n @round_robin: If true, be stricter about allocation order; always allocate\n               starting from the last allocated bit. This is less efficient\n               than the default behavior (false).\n @alloc_hint: If true, apply percpu hint for where to start searching for\n              a free bit.\n\n Return: Zero on success or negative errno on failure."]
+    pub fn sbitmap_init_node(
+        sb: *mut sbitmap,
+        depth: core::ffi::c_uint,
+        shift: core::ffi::c_int,
+        flags: gfp_t,
+        node: core::ffi::c_int,
+        round_robin: bool_,
+        alloc_hint: bool_,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    #[doc = " sbitmap_resize() - Resize a &struct sbitmap.\n @sb: Bitmap to resize.\n @depth: New number of bits to resize to.\n\n Doesn't reallocate anything. It's up to the caller to ensure that the new\n depth doesn't exceed the depth that the sb was initialized with."]
+    pub fn sbitmap_resize(sb: *mut sbitmap, depth: core::ffi::c_uint);
+}
+extern "C" {
+    #[doc = " sbitmap_get() - Try to allocate a free bit from a &struct sbitmap.\n @sb: Bitmap to allocate from.\n\n This operation provides acquire barrier semantics if it succeeds.\n\n Return: Non-negative allocated bit number if successful, -1 otherwise."]
+    pub fn sbitmap_get(sb: *mut sbitmap) -> core::ffi::c_int;
+}
+extern "C" {
+    #[doc = " sbitmap_get_shallow() - Try to allocate a free bit from a &struct sbitmap,\n limiting the depth used from each word.\n @sb: Bitmap to allocate from.\n @shallow_depth: The maximum number of bits to allocate from a single word.\n\n This rather specific operation allows for having multiple users with\n different allocation limits. E.g., there can be a high-priority class that\n uses sbitmap_get() and a low-priority class that uses sbitmap_get_shallow()\n with a @shallow_depth of (1 << (@sb->shift - 1)). Then, the low-priority\n class can only allocate half of the total bits in the bitmap, preventing it\n from starving out the high-priority class.\n\n Return: Non-negative allocated bit number if successful, -1 otherwise."]
+    pub fn sbitmap_get_shallow(
+        sb: *mut sbitmap,
+        shallow_depth: core::ffi::c_ulong,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    #[doc = " sbitmap_any_bit_set() - Check for a set bit in a &struct sbitmap.\n @sb: Bitmap to check.\n\n Return: true if any bit in the bitmap is set, false otherwise."]
+    pub fn sbitmap_any_bit_set(sb: *const sbitmap) -> bool_;
+}
+pub type sb_for_each_fn = ::core::option::Option<
+    unsafe extern "C" fn(
+        arg1: *mut sbitmap,
+        arg2: core::ffi::c_uint,
+        arg3: *mut core::ffi::c_void,
+    ) -> bool_,
+>;
+extern "C" {
+    #[doc = " sbitmap_show() - Dump &struct sbitmap information to a &struct seq_file.\n @sb: Bitmap to show.\n @m: struct seq_file to write to.\n\n This is intended for debugging. The format may change at any time."]
+    pub fn sbitmap_show(sb: *mut sbitmap, m: *mut seq_file);
+}
+extern "C" {
+    #[doc = " sbitmap_weight() - Return how many set and not cleared bits in a &struct\n sbitmap.\n @sb: Bitmap to check.\n\n Return: How many set and not cleared bits set"]
+    pub fn sbitmap_weight(sb: *const sbitmap) -> core::ffi::c_uint;
+}
+extern "C" {
+    #[doc = " sbitmap_bitmap_show() - Write a hex dump of a &struct sbitmap to a &struct\n seq_file.\n @sb: Bitmap to show.\n @m: struct seq_file to write to.\n\n This is intended for debugging. The output isn't guaranteed to be internally\n consistent."]
+    pub fn sbitmap_bitmap_show(sb: *mut sbitmap, m: *mut seq_file);
+}
+extern "C" {
+    #[doc = " sbitmap_queue_init_node() - Initialize a &struct sbitmap_queue on a specific\n memory node.\n @sbq: Bitmap queue to initialize.\n @depth: See sbitmap_init_node().\n @shift: See sbitmap_init_node().\n @round_robin: See sbitmap_get().\n @flags: Allocation flags.\n @node: Memory node to allocate on.\n\n Return: Zero on success or negative errno on failure."]
+    pub fn sbitmap_queue_init_node(
+        sbq: *mut sbitmap_queue,
+        depth: core::ffi::c_uint,
+        shift: core::ffi::c_int,
+        round_robin: bool_,
+        flags: gfp_t,
+        node: core::ffi::c_int,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    #[doc = " sbitmap_queue_recalculate_wake_batch() - Recalculate wake batch\n @sbq: Bitmap queue to recalculate wake batch.\n @users: Number of shares.\n\n Like sbitmap_queue_update_wake_batch(), this will calculate wake batch\n by depth. This interface is for HCTX shared tags or queue shared tags."]
+    pub fn sbitmap_queue_recalculate_wake_batch(sbq: *mut sbitmap_queue, users: core::ffi::c_uint);
+}
+extern "C" {
+    #[doc = " sbitmap_queue_resize() - Resize a &struct sbitmap_queue.\n @sbq: Bitmap queue to resize.\n @depth: New number of bits to resize to.\n\n Like sbitmap_resize(), this doesn't reallocate anything. It has to do\n some extra work on the &struct sbitmap_queue, so it's not safe to just\n resize the underlying &struct sbitmap."]
+    pub fn sbitmap_queue_resize(sbq: *mut sbitmap_queue, depth: core::ffi::c_uint);
+}
+extern "C" {
+    #[doc = " __sbitmap_queue_get() - Try to allocate a free bit from a &struct\n sbitmap_queue with preemption already disabled.\n @sbq: Bitmap queue to allocate from.\n\n Return: Non-negative allocated bit number if successful, -1 otherwise."]
+    pub fn __sbitmap_queue_get(sbq: *mut sbitmap_queue) -> core::ffi::c_int;
+}
+extern "C" {
+    #[doc = " __sbitmap_queue_get_batch() - Try to allocate a batch of free bits\n @sbq: Bitmap queue to allocate from.\n @nr_tags: number of tags requested\n @offset: offset to add to returned bits\n\n Return: Mask of allocated tags, 0 if none are found. Each tag allocated is\n a bit in the mask returned, and the caller must add @offset to the value to\n get the absolute tag value."]
+    pub fn __sbitmap_queue_get_batch(
+        sbq: *mut sbitmap_queue,
+        nr_tags: core::ffi::c_int,
+        offset: *mut core::ffi::c_uint,
+    ) -> core::ffi::c_ulong;
+}
+extern "C" {
+    #[doc = " sbitmap_queue_get_shallow() - Try to allocate a free bit from a &struct\n sbitmap_queue, limiting the depth used from each word, with preemption\n already disabled.\n @sbq: Bitmap queue to allocate from.\n @shallow_depth: The maximum number of bits to allocate from a single word.\n See sbitmap_get_shallow().\n\n If you call this, make sure to call sbitmap_queue_min_shallow_depth() after\n initializing @sbq.\n\n Return: Non-negative allocated bit number if successful, -1 otherwise."]
+    pub fn sbitmap_queue_get_shallow(
+        sbq: *mut sbitmap_queue,
+        shallow_depth: core::ffi::c_uint,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    #[doc = " sbitmap_queue_min_shallow_depth() - Inform a &struct sbitmap_queue of the\n minimum shallow depth that will be used.\n @sbq: Bitmap queue in question.\n @min_shallow_depth: The minimum shallow depth that will be passed to\n sbitmap_queue_get_shallow() or __sbitmap_queue_get_shallow().\n\n sbitmap_queue_clear() batches wakeups as an optimization. The batch size\n depends on the depth of the bitmap. Since the shallow allocation functions\n effectively operate with a different depth, the shallow depth must be taken\n into account when calculating the batch size. This function must be called\n with the minimum shallow depth that will be used. Failure to do so can result\n in missed wakeups."]
+    pub fn sbitmap_queue_min_shallow_depth(
+        sbq: *mut sbitmap_queue,
+        min_shallow_depth: core::ffi::c_uint,
+    );
+}
+extern "C" {
+    #[doc = " sbitmap_queue_clear() - Free an allocated bit and wake up waiters on a\n &struct sbitmap_queue.\n @sbq: Bitmap to free from.\n @nr: Bit number to free.\n @cpu: CPU the bit was allocated on."]
+    pub fn sbitmap_queue_clear(
+        sbq: *mut sbitmap_queue,
+        nr: core::ffi::c_uint,
+        cpu: core::ffi::c_uint,
+    );
+}
+extern "C" {
+    #[doc = " sbitmap_queue_clear_batch() - Free a batch of allocated bits\n &struct sbitmap_queue.\n @sbq: Bitmap to free from.\n @offset: offset for each tag in array\n @tags: array of tags\n @nr_tags: number of tags in array"]
+    pub fn sbitmap_queue_clear_batch(
+        sbq: *mut sbitmap_queue,
+        offset: core::ffi::c_int,
+        tags: *mut core::ffi::c_int,
+        nr_tags: core::ffi::c_int,
+    );
+}
+extern "C" {
+    #[doc = " sbitmap_queue_wake_all() - Wake up everything waiting on a &struct\n sbitmap_queue.\n @sbq: Bitmap queue to wake up."]
+    pub fn sbitmap_queue_wake_all(sbq: *mut sbitmap_queue);
+}
+extern "C" {
+    #[doc = " sbitmap_queue_wake_up() - Wake up some of waiters in one waitqueue\n on a &struct sbitmap_queue.\n @sbq: Bitmap queue to wake up.\n @nr: Number of bits cleared."]
+    pub fn sbitmap_queue_wake_up(sbq: *mut sbitmap_queue, nr: core::ffi::c_int);
+}
+extern "C" {
+    #[doc = " sbitmap_queue_show() - Dump &struct sbitmap_queue information to a &struct\n seq_file.\n @sbq: Bitmap queue to show.\n @m: struct seq_file to write to.\n\n This is intended for debugging. The format may change at any time."]
+    pub fn sbitmap_queue_show(sbq: *mut sbitmap_queue, m: *mut seq_file);
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct sbq_wait {
+    pub sbq: *mut sbitmap_queue,
+    pub wait: wait_queue_entry,
+}
+impl Default for sbq_wait {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+extern "C" {
+    pub fn sbitmap_prepare_to_wait(
+        sbq: *mut sbitmap_queue,
+        ws: *mut sbq_wait_state,
+        sbq_wait: *mut sbq_wait,
+        state: core::ffi::c_int,
+    );
+}
+extern "C" {
+    pub fn sbitmap_finish_wait(
+        sbq: *mut sbitmap_queue,
+        ws: *mut sbq_wait_state,
+        sbq_wait: *mut sbq_wait,
+    );
+}
+extern "C" {
+    pub fn sbitmap_add_wait_queue(
+        sbq: *mut sbitmap_queue,
+        ws: *mut sbq_wait_state,
+        sbq_wait: *mut sbq_wait,
+    );
+}
+extern "C" {
+    pub fn sbitmap_del_wait_queue(sbq_wait: *mut sbq_wait);
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct elevator_queue {
+    _unused: [u8; 0],
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct blk_trace {
+    _unused: [u8; 0],
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct sg_io_hdr {
+    _unused: [u8; 0],
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct blkcg_gq {
+    _unused: [u8; 0],
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct blk_flush_queue {
+    _unused: [u8; 0],
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct pr_ops {
+    _unused: [u8; 0],
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct rq_qos {
+    _unused: [u8; 0],
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct blk_queue_stats {
+    _unused: [u8; 0],
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct blk_stat_callback {
+    _unused: [u8; 0],
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct blk_crypto_profile {
+    _unused: [u8; 0],
+}
+extern "C" {
+    pub static disk_type: device_type;
+}
+extern "C" {
+    pub static part_type: device_type;
+}
+extern "C" {
+    pub static mut block_class: class;
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct partition_meta_info {
+    pub uuid: [core::ffi::c_char; 37usize],
+    pub volname: [u8_; 64usize],
+}
+impl Default for partition_meta_info {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub const GENHD_FL_REMOVABLE: _bindgen_ty_99 = 1;
+pub const GENHD_FL_HIDDEN: _bindgen_ty_99 = 2;
+pub const GENHD_FL_NO_PART: _bindgen_ty_99 = 4;
+#[doc = " DOC: genhd capability flags\n\n ``GENHD_FL_REMOVABLE``: indicates that the block device gives access to\n removable media.  When set, the device remains present even when media is not\n inserted.  Shall not be set for devices which are removed entirely when the\n media is removed.\n\n ``GENHD_FL_HIDDEN``: the block device is hidden; it doesn't produce events,\n doesn't appear in sysfs, and can't be opened from userspace or using\n blkdev_get*. Used for the underlying components of multipath devices.\n\n ``GENHD_FL_NO_PART``: partition support is disabled.  The kernel will not\n scan for partitions from add_disk, and users can't add partitions manually.\n"]
+pub type _bindgen_ty_99 = core::ffi::c_uint;
+pub const DISK_EVENT_MEDIA_CHANGE: _bindgen_ty_100 = 1;
+pub const DISK_EVENT_EJECT_REQUEST: _bindgen_ty_100 = 2;
+pub type _bindgen_ty_100 = core::ffi::c_uint;
+pub const DISK_EVENT_FLAG_POLL: _bindgen_ty_101 = 1;
+pub const DISK_EVENT_FLAG_UEVENT: _bindgen_ty_101 = 2;
+pub const DISK_EVENT_FLAG_BLOCK_ON_EXCL_WRITE: _bindgen_ty_101 = 4;
+pub type _bindgen_ty_101 = core::ffi::c_uint;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct disk_events {
+    _unused: [u8; 0],
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct badblocks {
+    _unused: [u8; 0],
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct blk_integrity {
+    pub profile: *mut blk_integrity_profile,
+    pub flags: core::ffi::c_uchar,
+    pub tuple_size: core::ffi::c_uchar,
+    pub interval_exp: core::ffi::c_uchar,
+    pub tag_size: core::ffi::c_uchar,
+}
+impl Default for blk_integrity {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub type blk_mode_t = core::ffi::c_uint;
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub struct gendisk {
+    pub major: core::ffi::c_int,
+    pub first_minor: core::ffi::c_int,
+    pub minors: core::ffi::c_int,
+    pub disk_name: [core::ffi::c_char; 32usize],
+    pub events: core::ffi::c_ushort,
+    pub event_flags: core::ffi::c_ushort,
+    pub part_tbl: xarray,
+    pub part0: *mut block_device,
+    pub fops: *const block_device_operations,
+    pub queue: *mut request_queue,
+    pub private_data: *mut core::ffi::c_void,
+    pub bio_split: bio_set,
+    pub flags: core::ffi::c_int,
+    pub state: core::ffi::c_ulong,
+    pub open_mutex: mutex,
+    pub open_partitions: core::ffi::c_uint,
+    pub bdi: *mut backing_dev_info,
+    pub queue_kobj: kobject,
+    pub slave_dir: *mut kobject,
+    pub slave_bdevs: list_head,
+    pub random: *mut timer_rand_state,
+    pub sync_io: atomic_t,
+    pub ev: *mut disk_events,
+    pub nr_zones: core::ffi::c_uint,
+    pub max_open_zones: core::ffi::c_uint,
+    pub max_active_zones: core::ffi::c_uint,
+    pub conv_zones_bitmap: *mut core::ffi::c_ulong,
+    pub seq_zones_wlock: *mut core::ffi::c_ulong,
+    pub cdi: *mut cdrom_device_info,
+    pub node_id: core::ffi::c_int,
+    pub bb: *mut badblocks,
+    pub lockdep_map: lockdep_map,
+    pub diskseq: u64_,
+    pub open_mode: blk_mode_t,
+    pub ia_ranges: *mut blk_independent_access_ranges,
+}
+impl Default for gendisk {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub const blk_zoned_model_BLK_ZONED_NONE: blk_zoned_model = 0;
+pub const blk_zoned_model_BLK_ZONED_HA: blk_zoned_model = 1;
+pub const blk_zoned_model_BLK_ZONED_HM: blk_zoned_model = 2;
+pub type blk_zoned_model = core::ffi::c_uint;
+pub const blk_bounce_BLK_BOUNCE_NONE: blk_bounce = 0;
+pub const blk_bounce_BLK_BOUNCE_HIGH: blk_bounce = 1;
+pub type blk_bounce = core::ffi::c_uint;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct queue_limits {
+    pub bounce: blk_bounce,
+    pub seg_boundary_mask: core::ffi::c_ulong,
+    pub virt_boundary_mask: core::ffi::c_ulong,
+    pub max_hw_sectors: core::ffi::c_uint,
+    pub max_dev_sectors: core::ffi::c_uint,
+    pub chunk_sectors: core::ffi::c_uint,
+    pub max_sectors: core::ffi::c_uint,
+    pub max_user_sectors: core::ffi::c_uint,
+    pub max_segment_size: core::ffi::c_uint,
+    pub physical_block_size: core::ffi::c_uint,
+    pub logical_block_size: core::ffi::c_uint,
+    pub alignment_offset: core::ffi::c_uint,
+    pub io_min: core::ffi::c_uint,
+    pub io_opt: core::ffi::c_uint,
+    pub max_discard_sectors: core::ffi::c_uint,
+    pub max_hw_discard_sectors: core::ffi::c_uint,
+    pub max_secure_erase_sectors: core::ffi::c_uint,
+    pub max_write_zeroes_sectors: core::ffi::c_uint,
+    pub max_zone_append_sectors: core::ffi::c_uint,
+    pub discard_granularity: core::ffi::c_uint,
+    pub discard_alignment: core::ffi::c_uint,
+    pub zone_write_granularity: core::ffi::c_uint,
+    pub max_segments: core::ffi::c_ushort,
+    pub max_integrity_segments: core::ffi::c_ushort,
+    pub max_discard_segments: core::ffi::c_ushort,
+    pub misaligned: core::ffi::c_uchar,
+    pub discard_misaligned: core::ffi::c_uchar,
+    pub raid_partial_stripes_expensive: core::ffi::c_uchar,
+    pub zoned: blk_zoned_model,
+    pub dma_alignment: core::ffi::c_uint,
+}
+impl Default for queue_limits {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub type report_zones_cb = ::core::option::Option<
+    unsafe extern "C" fn(
+        zone: *mut blk_zone,
+        idx: core::ffi::c_uint,
+        data: *mut core::ffi::c_void,
+    ) -> core::ffi::c_int,
+>;
+extern "C" {
+    pub fn disk_set_zoned(disk: *mut gendisk, model: blk_zoned_model);
+}
+extern "C" {
+    pub fn blkdev_report_zones(
+        bdev: *mut block_device,
+        sector: sector_t,
+        nr_zones: core::ffi::c_uint,
+        cb: report_zones_cb,
+        data: *mut core::ffi::c_void,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn bdev_nr_zones(bdev: *mut block_device) -> core::ffi::c_uint;
+}
+extern "C" {
+    pub fn blkdev_zone_mgmt(
+        bdev: *mut block_device,
+        op: req_op,
+        sectors: sector_t,
+        nr_sectors: sector_t,
+        gfp_mask: gfp_t,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn blk_revalidate_disk_zones(
+        disk: *mut gendisk,
+        update_driver_data: ::core::option::Option<unsafe extern "C" fn(disk: *mut gendisk)>,
+    ) -> core::ffi::c_int;
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct blk_independent_access_range {
+    pub kobj: kobject,
+    pub sector: sector_t,
+    pub nr_sectors: sector_t,
+}
+impl Default for blk_independent_access_range {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug)]
+pub struct blk_independent_access_ranges {
+    pub kobj: kobject,
+    pub sysfs_registered: bool_,
+    pub nr_ia_ranges: core::ffi::c_uint,
+    pub ia_range: __IncompleteArrayField<blk_independent_access_range>,
+}
+impl Default for blk_independent_access_ranges {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub struct request_queue {
+    pub last_merge: *mut request,
+    pub elevator: *mut elevator_queue,
+    pub q_usage_counter: percpu_ref,
+    pub stats: *mut blk_queue_stats,
+    pub rq_qos: *mut rq_qos,
+    pub rq_qos_mutex: mutex,
+    pub mq_ops: *const blk_mq_ops,
+    pub queue_ctx: *mut blk_mq_ctx,
+    pub queue_depth: core::ffi::c_uint,
+    pub hctx_table: xarray,
+    pub nr_hw_queues: core::ffi::c_uint,
+    pub queuedata: *mut core::ffi::c_void,
+    pub queue_flags: core::ffi::c_ulong,
+    pub pm_only: atomic_t,
+    pub id: core::ffi::c_int,
+    pub queue_lock: spinlock_t,
+    pub disk: *mut gendisk,
+    pub refs: refcount_t,
+    pub mq_kobj: *mut kobject,
+    pub integrity: blk_integrity,
+    pub dev: *mut device,
+    pub rpm_status: rpm_status,
+    pub nr_requests: core::ffi::c_ulong,
+    pub dma_pad_mask: core::ffi::c_uint,
+    pub rq_timeout: core::ffi::c_uint,
+    pub timeout: timer_list,
+    pub timeout_work: work_struct,
+    pub nr_active_requests_shared_tags: atomic_t,
+    pub sched_shared_tags: *mut blk_mq_tags,
+    pub icq_list: list_head,
+    pub blkcg_pols: [core::ffi::c_ulong; 1usize],
+    pub root_blkg: *mut blkcg_gq,
+    pub blkg_list: list_head,
+    pub blkcg_mutex: mutex,
+    pub limits: queue_limits,
+    pub required_elevator_features: core::ffi::c_uint,
+    pub node: core::ffi::c_int,
+    pub blk_trace: *mut blk_trace,
+    pub fq: *mut blk_flush_queue,
+    pub flush_list: list_head,
+    pub requeue_list: list_head,
+    pub requeue_lock: spinlock_t,
+    pub requeue_work: delayed_work,
+    pub sysfs_lock: mutex,
+    pub sysfs_dir_lock: mutex,
+    pub unused_hctx_list: list_head,
+    pub unused_hctx_lock: spinlock_t,
+    pub mq_freeze_depth: core::ffi::c_int,
+    pub td: *mut throtl_data,
+    pub callback_head: callback_head,
+    pub mq_freeze_wq: wait_queue_head_t,
+    pub mq_freeze_lock: mutex,
+    pub quiesce_depth: core::ffi::c_int,
+    pub tag_set: *mut blk_mq_tag_set,
+    pub tag_set_list: list_head,
+    pub debugfs_dir: *mut dentry,
+    pub sched_debugfs_dir: *mut dentry,
+    pub rqos_debugfs_dir: *mut dentry,
+    pub debugfs_mutex: mutex,
+    pub mq_sysfs_init_done: bool_,
+}
+impl Default for request_queue {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+extern "C" {
+    pub fn blk_queue_flag_set(flag: core::ffi::c_uint, q: *mut request_queue);
+}
+extern "C" {
+    pub fn blk_queue_flag_clear(flag: core::ffi::c_uint, q: *mut request_queue);
+}
+extern "C" {
+    pub fn blk_queue_flag_test_and_set(flag: core::ffi::c_uint, q: *mut request_queue) -> bool_;
+}
+extern "C" {
+    pub fn blk_set_pm_only(q: *mut request_queue);
+}
+extern "C" {
+    pub fn blk_clear_pm_only(q: *mut request_queue);
+}
+extern "C" {
+    #[must_use]
+    pub fn device_add_disk(
+        parent: *mut device,
+        disk: *mut gendisk,
+        groups: *mut *const attribute_group,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn del_gendisk(gp: *mut gendisk);
+}
+extern "C" {
+    pub fn invalidate_disk(disk: *mut gendisk);
+}
+extern "C" {
+    pub fn set_disk_ro(disk: *mut gendisk, read_only: bool_);
+}
+extern "C" {
+    pub fn disk_uevent(disk: *mut gendisk, action: kobject_action);
+}
+extern "C" {
+    pub fn set_capacity_and_notify(disk: *mut gendisk, size: sector_t) -> bool_;
+}
+extern "C" {
+    pub fn disk_force_media_change(disk: *mut gendisk);
+}
+extern "C" {
+    pub fn bdev_mark_dead(bdev: *mut block_device, surprise: bool_);
+}
+extern "C" {
+    pub fn add_disk_randomness(disk: *mut gendisk);
+}
+extern "C" {
+    pub fn rand_initialize_disk(disk: *mut gendisk);
+}
+extern "C" {
+    pub fn bdev_disk_changed(disk: *mut gendisk, invalidate: bool_) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn put_disk(disk: *mut gendisk);
+}
+extern "C" {
+    pub fn __blk_alloc_disk(node: core::ffi::c_int, lkclass: *mut lock_class_key) -> *mut gendisk;
+}
+extern "C" {
+    pub fn __register_blkdev(
+        major: core::ffi::c_uint,
+        name: *const core::ffi::c_char,
+        probe: ::core::option::Option<unsafe extern "C" fn(devt: dev_t)>,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn unregister_blkdev(major: core::ffi::c_uint, name: *const core::ffi::c_char);
+}
+extern "C" {
+    pub fn disk_check_media_change(disk: *mut gendisk) -> bool_;
+}
+extern "C" {
+    pub fn set_capacity(disk: *mut gendisk, size: sector_t);
+}
+extern "C" {
+    pub fn bd_link_disk_holder(bdev: *mut block_device, disk: *mut gendisk) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn bd_unlink_disk_holder(bdev: *mut block_device, disk: *mut gendisk);
+}
+extern "C" {
+    pub fn part_devt(disk: *mut gendisk, partno: u8_) -> dev_t;
+}
+extern "C" {
+    pub fn inc_diskseq(disk: *mut gendisk);
+}
+extern "C" {
+    pub fn blk_request_module(devt: dev_t);
+}
+extern "C" {
+    pub fn blk_register_queue(disk: *mut gendisk) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn blk_unregister_queue(disk: *mut gendisk);
+}
+extern "C" {
+    pub fn submit_bio_noacct(bio: *mut bio);
+}
+extern "C" {
+    pub fn bio_split_to_limits(bio: *mut bio) -> *mut bio;
+}
+extern "C" {
+    pub fn blk_lld_busy(q: *mut request_queue) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn blk_queue_enter(q: *mut request_queue, flags: blk_mq_req_flags_t) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn blk_queue_exit(q: *mut request_queue);
+}
+extern "C" {
+    pub fn blk_sync_queue(q: *mut request_queue);
+}
+extern "C" {
+    pub fn blk_op_str(op: req_op) -> *const core::ffi::c_char;
+}
+extern "C" {
+    pub fn blk_status_to_errno(status: blk_status_t) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn errno_to_blk_status(errno: core::ffi::c_int) -> blk_status_t;
+}
+extern "C" {
+    pub fn blk_status_to_str(status: blk_status_t) -> *const core::ffi::c_char;
+}
+extern "C" {
+    pub fn bio_poll(
+        bio: *mut bio,
+        iob: *mut io_comp_batch,
+        flags: core::ffi::c_uint,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn iocb_bio_iopoll(
+        kiocb: *mut kiocb,
+        iob: *mut io_comp_batch,
+        flags: core::ffi::c_uint,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn blk_zone_cond_str(zone_cond: blk_zone_cond) -> *const core::ffi::c_char;
+}
+extern "C" {
+    pub fn blk_queue_bounce_limit(q: *mut request_queue, limit: blk_bounce);
+}
+extern "C" {
+    pub fn blk_queue_max_hw_sectors(arg1: *mut request_queue, arg2: core::ffi::c_uint);
+}
+extern "C" {
+    pub fn blk_queue_chunk_sectors(arg1: *mut request_queue, arg2: core::ffi::c_uint);
+}
+extern "C" {
+    pub fn blk_queue_max_segments(arg1: *mut request_queue, arg2: core::ffi::c_ushort);
+}
+extern "C" {
+    pub fn blk_queue_max_discard_segments(arg1: *mut request_queue, arg2: core::ffi::c_ushort);
+}
+extern "C" {
+    pub fn blk_queue_max_secure_erase_sectors(
+        q: *mut request_queue,
+        max_sectors: core::ffi::c_uint,
+    );
+}
+extern "C" {
+    pub fn blk_queue_max_segment_size(arg1: *mut request_queue, arg2: core::ffi::c_uint);
+}
+extern "C" {
+    pub fn blk_queue_max_discard_sectors(
+        q: *mut request_queue,
+        max_discard_sectors: core::ffi::c_uint,
+    );
+}
+extern "C" {
+    pub fn blk_queue_max_write_zeroes_sectors(
+        q: *mut request_queue,
+        max_write_same_sectors: core::ffi::c_uint,
+    );
+}
+extern "C" {
+    pub fn blk_queue_logical_block_size(arg1: *mut request_queue, arg2: core::ffi::c_uint);
+}
+extern "C" {
+    pub fn blk_queue_max_zone_append_sectors(
+        q: *mut request_queue,
+        max_zone_append_sectors: core::ffi::c_uint,
+    );
+}
+extern "C" {
+    pub fn blk_queue_physical_block_size(arg1: *mut request_queue, arg2: core::ffi::c_uint);
+}
+extern "C" {
+    pub fn blk_queue_zone_write_granularity(q: *mut request_queue, size: core::ffi::c_uint);
+}
+extern "C" {
+    pub fn blk_queue_alignment_offset(q: *mut request_queue, alignment: core::ffi::c_uint);
+}
+extern "C" {
+    pub fn disk_update_readahead(disk: *mut gendisk);
+}
+extern "C" {
+    pub fn blk_limits_io_min(limits: *mut queue_limits, min: core::ffi::c_uint);
+}
+extern "C" {
+    pub fn blk_queue_io_min(q: *mut request_queue, min: core::ffi::c_uint);
+}
+extern "C" {
+    pub fn blk_limits_io_opt(limits: *mut queue_limits, opt: core::ffi::c_uint);
+}
+extern "C" {
+    pub fn blk_queue_io_opt(q: *mut request_queue, opt: core::ffi::c_uint);
+}
+extern "C" {
+    pub fn blk_set_queue_depth(q: *mut request_queue, depth: core::ffi::c_uint);
+}
+extern "C" {
+    pub fn blk_set_stacking_limits(lim: *mut queue_limits);
+}
+extern "C" {
+    pub fn blk_stack_limits(
+        t: *mut queue_limits,
+        b: *mut queue_limits,
+        offset: sector_t,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn disk_stack_limits(disk: *mut gendisk, bdev: *mut block_device, offset: sector_t);
+}
+extern "C" {
+    pub fn blk_queue_update_dma_pad(arg1: *mut request_queue, arg2: core::ffi::c_uint);
+}
+extern "C" {
+    pub fn blk_queue_segment_boundary(arg1: *mut request_queue, arg2: core::ffi::c_ulong);
+}
+extern "C" {
+    pub fn blk_queue_virt_boundary(arg1: *mut request_queue, arg2: core::ffi::c_ulong);
+}
+extern "C" {
+    pub fn blk_queue_dma_alignment(arg1: *mut request_queue, arg2: core::ffi::c_int);
+}
+extern "C" {
+    pub fn blk_queue_update_dma_alignment(arg1: *mut request_queue, arg2: core::ffi::c_int);
+}
+extern "C" {
+    pub fn blk_queue_rq_timeout(arg1: *mut request_queue, arg2: core::ffi::c_uint);
+}
+extern "C" {
+    pub fn blk_queue_write_cache(q: *mut request_queue, enabled: bool_, fua: bool_);
+}
+extern "C" {
+    pub fn disk_alloc_independent_access_ranges(
+        disk: *mut gendisk,
+        nr_ia_ranges: core::ffi::c_int,
+    ) -> *mut blk_independent_access_ranges;
+}
+extern "C" {
+    pub fn disk_set_independent_access_ranges(
+        disk: *mut gendisk,
+        iars: *mut blk_independent_access_ranges,
+    );
+}
+extern "C" {
+    pub fn blk_queue_required_elevator_features(q: *mut request_queue, features: core::ffi::c_uint);
+}
+extern "C" {
+    pub fn blk_queue_can_use_dma_map_merging(q: *mut request_queue, dev: *mut device) -> bool_;
+}
+extern "C" {
+    #[must_use]
+    pub fn blk_get_queue(arg1: *mut request_queue) -> bool_;
+}
+extern "C" {
+    pub fn blk_put_queue(arg1: *mut request_queue);
+}
+extern "C" {
+    pub fn blk_mark_disk_dead(disk: *mut gendisk);
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct blk_plug {
+    pub mq_list: *mut request,
+    pub cached_rq: *mut request,
+    pub nr_ios: core::ffi::c_ushort,
+    pub rq_count: core::ffi::c_ushort,
+    pub multiple_queues: bool_,
+    pub has_elevator: bool_,
+    pub cb_list: list_head,
+}
+impl Default for blk_plug {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub type blk_plug_cb_fn =
+    ::core::option::Option<unsafe extern "C" fn(arg1: *mut blk_plug_cb, arg2: bool_)>;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct blk_plug_cb {
+    pub list: list_head,
+    pub callback: blk_plug_cb_fn,
+    pub data: *mut core::ffi::c_void,
+}
+impl Default for blk_plug_cb {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+extern "C" {
+    pub fn blk_check_plugged(
+        unplug: blk_plug_cb_fn,
+        data: *mut core::ffi::c_void,
+        size: core::ffi::c_int,
+    ) -> *mut blk_plug_cb;
+}
+extern "C" {
+    pub fn blk_start_plug(arg1: *mut blk_plug);
+}
+extern "C" {
+    pub fn blk_start_plug_nr_ios(arg1: *mut blk_plug, arg2: core::ffi::c_ushort);
+}
+extern "C" {
+    pub fn blk_finish_plug(arg1: *mut blk_plug);
+}
+extern "C" {
+    pub fn __blk_flush_plug(plug: *mut blk_plug, from_schedule: bool_);
+}
+extern "C" {
+    pub fn blkdev_issue_flush(bdev: *mut block_device) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn nr_blockdev_pages() -> core::ffi::c_long;
+}
+extern "C" {
+    pub fn blk_io_schedule();
+}
+extern "C" {
+    pub fn blkdev_issue_discard(
+        bdev: *mut block_device,
+        sector: sector_t,
+        nr_sects: sector_t,
+        gfp_mask: gfp_t,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn __blkdev_issue_discard(
+        bdev: *mut block_device,
+        sector: sector_t,
+        nr_sects: sector_t,
+        gfp_mask: gfp_t,
+        biop: *mut *mut bio,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn blkdev_issue_secure_erase(
+        bdev: *mut block_device,
+        sector: sector_t,
+        nr_sects: sector_t,
+        gfp: gfp_t,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn __blkdev_issue_zeroout(
+        bdev: *mut block_device,
+        sector: sector_t,
+        nr_sects: sector_t,
+        gfp_mask: gfp_t,
+        biop: *mut *mut bio,
+        flags: core::ffi::c_uint,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn blkdev_issue_zeroout(
+        bdev: *mut block_device,
+        sector: sector_t,
+        nr_sects: sector_t,
+        gfp_mask: gfp_t,
+        flags: core::ffi::c_uint,
+    ) -> core::ffi::c_int;
+}
+pub const blk_default_limits_BLK_MAX_SEGMENTS: blk_default_limits = 128;
+pub const blk_default_limits_BLK_SAFE_MAX_SECTORS: blk_default_limits = 255;
+pub const blk_default_limits_BLK_MAX_SEGMENT_SIZE: blk_default_limits = 65536;
+pub const blk_default_limits_BLK_SEG_BOUNDARY_MASK: blk_default_limits = 4294967295;
+pub type blk_default_limits = core::ffi::c_uint;
+extern "C" {
+    pub fn bdev_alignment_offset(bdev: *mut block_device) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn bdev_discard_alignment(bdev: *mut block_device) -> core::ffi::c_uint;
+}
+extern "C" {
+    pub fn kblockd_schedule_work(work: *mut work_struct) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn kblockd_mod_delayed_work_on(
+        cpu: core::ffi::c_int,
+        dwork: *mut delayed_work,
+        delay: core::ffi::c_ulong,
+    ) -> core::ffi::c_int;
+}
+pub const blk_unique_id_BLK_UID_T10: blk_unique_id = 1;
+pub const blk_unique_id_BLK_UID_EUI64: blk_unique_id = 2;
+pub const blk_unique_id_BLK_UID_NAA: blk_unique_id = 3;
+pub type blk_unique_id = core::ffi::c_uint;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct block_device_operations {
+    pub submit_bio: ::core::option::Option<unsafe extern "C" fn(bio: *mut bio)>,
+    pub poll_bio: ::core::option::Option<
+        unsafe extern "C" fn(
+            bio: *mut bio,
+            iob: *mut io_comp_batch,
+            flags: core::ffi::c_uint,
+        ) -> core::ffi::c_int,
+    >,
+    pub open: ::core::option::Option<
+        unsafe extern "C" fn(disk: *mut gendisk, mode: blk_mode_t) -> core::ffi::c_int,
+    >,
+    pub release: ::core::option::Option<unsafe extern "C" fn(disk: *mut gendisk)>,
+    pub ioctl: ::core::option::Option<
+        unsafe extern "C" fn(
+            bdev: *mut block_device,
+            mode: blk_mode_t,
+            cmd: core::ffi::c_uint,
+            arg: core::ffi::c_ulong,
+        ) -> core::ffi::c_int,
+    >,
+    pub compat_ioctl: ::core::option::Option<
+        unsafe extern "C" fn(
+            bdev: *mut block_device,
+            mode: blk_mode_t,
+            cmd: core::ffi::c_uint,
+            arg: core::ffi::c_ulong,
+        ) -> core::ffi::c_int,
+    >,
+    pub check_events: ::core::option::Option<
+        unsafe extern "C" fn(disk: *mut gendisk, clearing: core::ffi::c_uint) -> core::ffi::c_uint,
+    >,
+    pub unlock_native_capacity: ::core::option::Option<unsafe extern "C" fn(arg1: *mut gendisk)>,
+    pub getgeo: ::core::option::Option<
+        unsafe extern "C" fn(arg1: *mut block_device, arg2: *mut hd_geometry) -> core::ffi::c_int,
+    >,
+    pub set_read_only: ::core::option::Option<
+        unsafe extern "C" fn(bdev: *mut block_device, ro: bool_) -> core::ffi::c_int,
+    >,
+    pub free_disk: ::core::option::Option<unsafe extern "C" fn(disk: *mut gendisk)>,
+    pub swap_slot_free_notify: ::core::option::Option<
+        unsafe extern "C" fn(arg1: *mut block_device, arg2: core::ffi::c_ulong),
+    >,
+    pub report_zones: ::core::option::Option<
+        unsafe extern "C" fn(
+            arg1: *mut gendisk,
+            sector: sector_t,
+            nr_zones: core::ffi::c_uint,
+            cb: report_zones_cb,
+            data: *mut core::ffi::c_void,
+        ) -> core::ffi::c_int,
+    >,
+    pub devnode: ::core::option::Option<
+        unsafe extern "C" fn(disk: *mut gendisk, mode: *mut umode_t) -> *mut core::ffi::c_char,
+    >,
+    pub get_unique_id: ::core::option::Option<
+        unsafe extern "C" fn(
+            disk: *mut gendisk,
+            id: *mut u8_,
+            id_type: blk_unique_id,
+        ) -> core::ffi::c_int,
+    >,
+    pub owner: *mut module,
+    pub pr_ops: *const pr_ops,
+    pub alternative_gpt_sector: ::core::option::Option<
+        unsafe extern "C" fn(disk: *mut gendisk, sector: *mut sector_t) -> core::ffi::c_int,
+    >,
+}
+impl Default for block_device_operations {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+extern "C" {
+    pub fn blkdev_compat_ptr_ioctl(
+        arg1: *mut block_device,
+        arg2: blk_mode_t,
+        arg3: core::ffi::c_uint,
+        arg4: core::ffi::c_ulong,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn bdev_start_io_acct(
+        bdev: *mut block_device,
+        op: req_op,
+        start_time: core::ffi::c_ulong,
+    ) -> core::ffi::c_ulong;
+}
+extern "C" {
+    pub fn bdev_end_io_acct(
+        bdev: *mut block_device,
+        op: req_op,
+        sectors: core::ffi::c_uint,
+        start_time: core::ffi::c_ulong,
+    );
+}
+extern "C" {
+    pub fn bio_start_io_acct(bio: *mut bio) -> core::ffi::c_ulong;
+}
+extern "C" {
+    pub fn bio_end_io_acct_remapped(
+        bio: *mut bio,
+        start_time: core::ffi::c_ulong,
+        orig_bdev: *mut block_device,
+    );
+}
+extern "C" {
+    pub fn set_blocksize(bdev: *mut block_device, size: core::ffi::c_int) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn lookup_bdev(pathname: *const core::ffi::c_char, dev: *mut dev_t) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn blkdev_show(seqf: *mut seq_file, offset: off_t);
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct blk_holder_ops {
+    pub mark_dead:
+        ::core::option::Option<unsafe extern "C" fn(bdev: *mut block_device, surprise: bool_)>,
+    pub sync: ::core::option::Option<unsafe extern "C" fn(bdev: *mut block_device)>,
+}
+extern "C" {
+    pub static fs_holder_ops: blk_holder_ops;
+}
+extern "C" {
+    pub fn blkdev_get_by_dev(
+        dev: dev_t,
+        mode: blk_mode_t,
+        holder: *mut core::ffi::c_void,
+        hops: *const blk_holder_ops,
+    ) -> *mut block_device;
+}
+extern "C" {
+    pub fn blkdev_get_by_path(
+        path: *const core::ffi::c_char,
+        mode: blk_mode_t,
+        holder: *mut core::ffi::c_void,
+        hops: *const blk_holder_ops,
+    ) -> *mut block_device;
+}
+extern "C" {
+    pub fn bd_prepare_to_claim(
+        bdev: *mut block_device,
+        holder: *mut core::ffi::c_void,
+        hops: *const blk_holder_ops,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn bd_abort_claiming(bdev: *mut block_device, holder: *mut core::ffi::c_void);
+}
+extern "C" {
+    pub fn blkdev_put(bdev: *mut block_device, holder: *mut core::ffi::c_void);
+}
+extern "C" {
+    pub fn blkdev_get_no_open(dev: dev_t) -> *mut block_device;
+}
+extern "C" {
+    pub fn blkdev_put_no_open(bdev: *mut block_device);
+}
+extern "C" {
+    pub fn I_BDEV(inode: *mut inode) -> *mut block_device;
+}
+extern "C" {
+    pub fn invalidate_bdev(bdev: *mut block_device);
+}
+extern "C" {
+    pub fn sync_blockdev(bdev: *mut block_device) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn sync_blockdev_range(
+        bdev: *mut block_device,
+        lstart: loff_t,
+        lend: loff_t,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn sync_blockdev_nowait(bdev: *mut block_device) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn sync_bdevs(wait: bool_);
+}
+extern "C" {
+    pub fn bdev_statx_dioalign(inode: *mut inode, stat: *mut kstat);
+}
+extern "C" {
+    pub fn printk_all_partitions();
+}
+extern "C" {
+    pub fn early_lookup_bdev(
+        pathname: *const core::ffi::c_char,
+        dev: *mut dev_t,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn freeze_bdev(bdev: *mut block_device) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn thaw_bdev(bdev: *mut block_device) -> core::ffi::c_int;
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct io_comp_batch {
+    pub req_list: *mut request,
+    pub need_ts: bool_,
+    pub complete: ::core::option::Option<unsafe extern "C" fn(arg1: *mut io_comp_batch)>,
+}
+impl Default for io_comp_batch {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct iomap_dio {
+    _unused: [u8; 0],
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct iomap {
+    pub addr: u64_,
+    pub offset: loff_t,
+    pub length: u64_,
+    pub type_: u16_,
+    pub flags: u16_,
+    pub bdev: *mut block_device,
+    pub dax_dev: *mut dax_device,
+    pub inline_data: *mut core::ffi::c_void,
+    pub private: *mut core::ffi::c_void,
+    pub folio_ops: *const iomap_folio_ops,
+    pub validity_cookie: u64_,
+}
+impl Default for iomap {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct iomap_folio_ops {
+    pub get_folio: ::core::option::Option<
+        unsafe extern "C" fn(
+            iter: *mut iomap_iter,
+            pos: loff_t,
+            len: core::ffi::c_uint,
+        ) -> *mut folio,
+    >,
+    pub put_folio: ::core::option::Option<
+        unsafe extern "C" fn(
+            inode: *mut inode,
+            pos: loff_t,
+            copied: core::ffi::c_uint,
+            folio: *mut folio,
+        ),
+    >,
+    pub iomap_valid: ::core::option::Option<
+        unsafe extern "C" fn(inode: *mut inode, iomap: *const iomap) -> bool_,
+    >,
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct iomap_ops {
+    pub iomap_begin: ::core::option::Option<
+        unsafe extern "C" fn(
+            inode: *mut inode,
+            pos: loff_t,
+            length: loff_t,
+            flags: core::ffi::c_uint,
+            iomap: *mut iomap,
+            srcmap: *mut iomap,
+        ) -> core::ffi::c_int,
+    >,
+    pub iomap_end: ::core::option::Option<
+        unsafe extern "C" fn(
+            inode: *mut inode,
+            pos: loff_t,
+            length: loff_t,
+            written: isize,
+            flags: core::ffi::c_uint,
+            iomap: *mut iomap,
+        ) -> core::ffi::c_int,
+    >,
+}
+#[doc = " struct iomap_iter - Iterate through a range of a file\n @inode: Set at the start of the iteration and should not change.\n @pos: The current file position we are operating on.  It is updated by\n\tcalls to iomap_iter().  Treat as read-only in the body.\n @len: The remaining length of the file segment we're operating on.\n\tIt is updated at the same time as @pos.\n @processed: The number of bytes processed by the body in the most recent\n\titeration, or a negative errno. 0 causes the iteration to stop.\n @flags: Zero or more of the iomap_begin flags above.\n @iomap: Map describing the I/O iteration\n @srcmap: Source map for COW operations"]
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct iomap_iter {
+    pub inode: *mut inode,
+    pub pos: loff_t,
+    pub len: u64_,
+    pub processed: s64,
+    pub flags: core::ffi::c_uint,
+    pub iomap: iomap,
+    pub srcmap: iomap,
+    pub private: *mut core::ffi::c_void,
+}
+impl Default for iomap_iter {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+extern "C" {
+    pub fn iomap_iter(iter: *mut iomap_iter, ops: *const iomap_ops) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn iomap_file_buffered_write(
+        iocb: *mut kiocb,
+        from: *mut iov_iter,
+        ops: *const iomap_ops,
+    ) -> isize;
+}
+extern "C" {
+    pub fn iomap_file_buffered_write_punch_delalloc(
+        inode: *mut inode,
+        iomap: *mut iomap,
+        pos: loff_t,
+        length: loff_t,
+        written: isize,
+        punch: ::core::option::Option<
+            unsafe extern "C" fn(
+                inode: *mut inode,
+                pos: loff_t,
+                length: loff_t,
+            ) -> core::ffi::c_int,
+        >,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn iomap_read_folio(folio: *mut folio, ops: *const iomap_ops) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn iomap_readahead(arg1: *mut readahead_control, ops: *const iomap_ops);
+}
+extern "C" {
+    pub fn iomap_is_partially_uptodate(arg1: *mut folio, from: usize, count: usize) -> bool_;
+}
+extern "C" {
+    pub fn iomap_get_folio(iter: *mut iomap_iter, pos: loff_t, len: usize) -> *mut folio;
+}
+extern "C" {
+    pub fn iomap_release_folio(folio: *mut folio, gfp_flags: gfp_t) -> bool_;
+}
+extern "C" {
+    pub fn iomap_invalidate_folio(folio: *mut folio, offset: usize, len: usize);
+}
+extern "C" {
+    pub fn iomap_dirty_folio(mapping: *mut address_space, folio: *mut folio) -> bool_;
+}
+extern "C" {
+    pub fn iomap_file_unshare(
+        inode: *mut inode,
+        pos: loff_t,
+        len: loff_t,
+        ops: *const iomap_ops,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn iomap_zero_range(
+        inode: *mut inode,
+        pos: loff_t,
+        len: loff_t,
+        did_zero: *mut bool_,
+        ops: *const iomap_ops,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn iomap_truncate_page(
+        inode: *mut inode,
+        pos: loff_t,
+        did_zero: *mut bool_,
+        ops: *const iomap_ops,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn iomap_page_mkwrite(vmf: *mut vm_fault, ops: *const iomap_ops) -> vm_fault_t;
+}
+extern "C" {
+    pub fn iomap_fiemap(
+        inode: *mut inode,
+        fieinfo: *mut fiemap_extent_info,
+        start: u64_,
+        len: u64_,
+        ops: *const iomap_ops,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn iomap_seek_hole(inode: *mut inode, offset: loff_t, ops: *const iomap_ops) -> loff_t;
+}
+extern "C" {
+    pub fn iomap_seek_data(inode: *mut inode, offset: loff_t, ops: *const iomap_ops) -> loff_t;
+}
+extern "C" {
+    pub fn iomap_bmap(
+        mapping: *mut address_space,
+        bno: sector_t,
+        ops: *const iomap_ops,
+    ) -> sector_t;
+}
+#[repr(C)]
+pub struct iomap_ioend {
+    pub io_list: list_head,
+    pub io_type: u16_,
+    pub io_flags: u16_,
+    pub io_folios: u32_,
+    pub io_inode: *mut inode,
+    pub io_size: usize,
+    pub io_offset: loff_t,
+    pub io_sector: sector_t,
+    pub io_bio: *mut bio,
+    pub io_inline_bio: bio,
+}
+impl Default for iomap_ioend {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct iomap_writeback_ops {
+    pub map_blocks: ::core::option::Option<
+        unsafe extern "C" fn(
+            wpc: *mut iomap_writepage_ctx,
+            inode: *mut inode,
+            offset: loff_t,
+        ) -> core::ffi::c_int,
+    >,
+    pub prepare_ioend: ::core::option::Option<
+        unsafe extern "C" fn(ioend: *mut iomap_ioend, status: core::ffi::c_int) -> core::ffi::c_int,
+    >,
+    pub discard_folio: ::core::option::Option<unsafe extern "C" fn(folio: *mut folio, pos: loff_t)>,
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct iomap_writepage_ctx {
+    pub iomap: iomap,
+    pub ioend: *mut iomap_ioend,
+    pub ops: *const iomap_writeback_ops,
+}
+impl Default for iomap_writepage_ctx {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+extern "C" {
+    pub fn iomap_finish_ioends(ioend: *mut iomap_ioend, error: core::ffi::c_int);
+}
+extern "C" {
+    pub fn iomap_ioend_try_merge(ioend: *mut iomap_ioend, more_ioends: *mut list_head);
+}
+extern "C" {
+    pub fn iomap_sort_ioends(ioend_list: *mut list_head);
+}
+extern "C" {
+    pub fn iomap_writepages(
+        mapping: *mut address_space,
+        wbc: *mut writeback_control,
+        wpc: *mut iomap_writepage_ctx,
+        ops: *const iomap_writeback_ops,
+    ) -> core::ffi::c_int;
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct iomap_dio_ops {
+    pub end_io: ::core::option::Option<
+        unsafe extern "C" fn(
+            iocb: *mut kiocb,
+            size: isize,
+            error: core::ffi::c_int,
+            flags: core::ffi::c_uint,
+        ) -> core::ffi::c_int,
+    >,
+    pub submit_io: ::core::option::Option<
+        unsafe extern "C" fn(iter: *const iomap_iter, bio: *mut bio, file_offset: loff_t),
+    >,
+    pub bio_set: *mut bio_set,
+}
+impl Default for iomap_dio_ops {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+extern "C" {
+    pub fn iomap_dio_rw(
+        iocb: *mut kiocb,
+        iter: *mut iov_iter,
+        ops: *const iomap_ops,
+        dops: *const iomap_dio_ops,
+        dio_flags: core::ffi::c_uint,
+        private: *mut core::ffi::c_void,
+        done_before: usize,
+    ) -> isize;
+}
+extern "C" {
+    pub fn __iomap_dio_rw(
+        iocb: *mut kiocb,
+        iter: *mut iov_iter,
+        ops: *const iomap_ops,
+        dops: *const iomap_dio_ops,
+        dio_flags: core::ffi::c_uint,
+        private: *mut core::ffi::c_void,
+        done_before: usize,
+    ) -> *mut iomap_dio;
+}
+extern "C" {
+    pub fn iomap_dio_complete(dio: *mut iomap_dio) -> isize;
+}
+extern "C" {
+    pub fn iomap_dio_bio_end_io(bio: *mut bio);
+}
+extern "C" {
+    pub fn iomap_swapfile_activate(
+        sis: *mut swap_info_struct,
+        swap_file: *mut file,
+        pagespan: *mut sector_t,
+        ops: *const iomap_ops,
+    ) -> core::ffi::c_int;
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct uts_namespace {
+    _unused: [u8; 0],
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct ipc_namespace {
+    _unused: [u8; 0],
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct cgroup_namespace {
+    _unused: [u8; 0],
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct nsproxy {
+    pub count: refcount_t,
+    pub uts_ns: *mut uts_namespace,
+    pub ipc_ns: *mut ipc_namespace,
+    pub mnt_ns: *mut mnt_namespace,
+    pub pid_ns_for_children: *mut pid_namespace,
+    pub net_ns: *mut net,
+    pub time_ns: *mut time_namespace,
+    pub time_ns_for_children: *mut time_namespace,
+    pub cgroup_ns: *mut cgroup_namespace,
+}
+impl Default for nsproxy {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+extern "C" {
+    pub static mut init_nsproxy: nsproxy;
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct nsset {
+    pub flags: core::ffi::c_uint,
+    pub nsproxy: *mut nsproxy,
+    pub fs: *mut fs_struct,
+    pub cred: *const cred,
+}
+impl Default for nsset {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+extern "C" {
+    pub fn copy_namespaces(flags: core::ffi::c_ulong, tsk: *mut task_struct) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn exit_task_namespaces(tsk: *mut task_struct);
+}
+extern "C" {
+    pub fn switch_task_namespaces(tsk: *mut task_struct, new: *mut nsproxy);
+}
+extern "C" {
+    pub fn exec_task_namespaces() -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn free_nsproxy(ns: *mut nsproxy);
+}
+extern "C" {
+    pub fn unshare_nsproxy_namespaces(
+        arg1: core::ffi::c_ulong,
+        arg2: *mut *mut nsproxy,
+        arg3: *mut cred,
+        arg4: *mut fs_struct,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn nsproxy_cache_init() -> core::ffi::c_int;
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct proc_ns_operations {
+    _unused: [u8; 0],
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct ns_common {
+    pub stashed: atomic_long_t,
+    pub ops: *const proc_ns_operations,
+    pub inum: core::ffi::c_uint,
+    pub count: refcount_t,
+}
+impl Default for ns_common {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct uid_gid_extent {
+    pub first: u32_,
+    pub lower_first: u32_,
+    pub count: u32_,
+}
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub struct uid_gid_map {
+    pub nr_extents: u32_,
+    pub __bindgen_anon_1: uid_gid_map__bindgen_ty_1,
+}
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub union uid_gid_map__bindgen_ty_1 {
+    pub extent: [uid_gid_extent; 5usize],
+    pub __bindgen_anon_1: uid_gid_map__bindgen_ty_1__bindgen_ty_1,
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct uid_gid_map__bindgen_ty_1__bindgen_ty_1 {
+    pub forward: *mut uid_gid_extent,
+    pub reverse: *mut uid_gid_extent,
+}
+impl Default for uid_gid_map__bindgen_ty_1__bindgen_ty_1 {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+impl Default for uid_gid_map__bindgen_ty_1 {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+impl Default for uid_gid_map {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub const ucount_type_UCOUNT_USER_NAMESPACES: ucount_type = 0;
+pub const ucount_type_UCOUNT_PID_NAMESPACES: ucount_type = 1;
+pub const ucount_type_UCOUNT_UTS_NAMESPACES: ucount_type = 2;
+pub const ucount_type_UCOUNT_IPC_NAMESPACES: ucount_type = 3;
+pub const ucount_type_UCOUNT_NET_NAMESPACES: ucount_type = 4;
+pub const ucount_type_UCOUNT_MNT_NAMESPACES: ucount_type = 5;
+pub const ucount_type_UCOUNT_CGROUP_NAMESPACES: ucount_type = 6;
+pub const ucount_type_UCOUNT_TIME_NAMESPACES: ucount_type = 7;
+pub const ucount_type_UCOUNT_INOTIFY_INSTANCES: ucount_type = 8;
+pub const ucount_type_UCOUNT_INOTIFY_WATCHES: ucount_type = 9;
+pub const ucount_type_UCOUNT_FANOTIFY_GROUPS: ucount_type = 10;
+pub const ucount_type_UCOUNT_FANOTIFY_MARKS: ucount_type = 11;
+pub const ucount_type_UCOUNT_COUNTS: ucount_type = 12;
+pub type ucount_type = core::ffi::c_uint;
+pub const rlimit_type_UCOUNT_RLIMIT_NPROC: rlimit_type = 0;
+pub const rlimit_type_UCOUNT_RLIMIT_MSGQUEUE: rlimit_type = 1;
+pub const rlimit_type_UCOUNT_RLIMIT_SIGPENDING: rlimit_type = 2;
+pub const rlimit_type_UCOUNT_RLIMIT_MEMLOCK: rlimit_type = 3;
+pub const rlimit_type_UCOUNT_RLIMIT_COUNTS: rlimit_type = 4;
+pub type rlimit_type = core::ffi::c_uint;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct ucounts {
+    pub node: hlist_node,
+    pub ns: *mut user_namespace,
+    pub uid: kuid_t,
+    pub count: atomic_t,
+    pub ucount: [atomic_long_t; 12usize],
+    pub rlimit: [atomic_long_t; 4usize],
+}
+impl Default for ucounts {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+extern "C" {
+    pub static mut init_ucounts: ucounts;
+}
+extern "C" {
+    pub fn setup_userns_sysctls(ns: *mut user_namespace) -> bool_;
+}
+extern "C" {
+    pub fn retire_userns_sysctls(ns: *mut user_namespace);
+}
+extern "C" {
+    pub fn inc_ucount(ns: *mut user_namespace, uid: kuid_t, type_: ucount_type) -> *mut ucounts;
+}
+extern "C" {
+    pub fn dec_ucount(ucounts: *mut ucounts, type_: ucount_type);
+}
+extern "C" {
+    pub fn alloc_ucounts(ns: *mut user_namespace, uid: kuid_t) -> *mut ucounts;
+}
+extern "C" {
+    #[must_use]
+    pub fn get_ucounts(ucounts: *mut ucounts) -> *mut ucounts;
+}
+extern "C" {
+    pub fn put_ucounts(ucounts: *mut ucounts);
+}
+extern "C" {
+    pub fn inc_rlimit_ucounts(
+        ucounts: *mut ucounts,
+        type_: rlimit_type,
+        v: core::ffi::c_long,
+    ) -> core::ffi::c_long;
+}
+extern "C" {
+    pub fn dec_rlimit_ucounts(
+        ucounts: *mut ucounts,
+        type_: rlimit_type,
+        v: core::ffi::c_long,
+    ) -> bool_;
+}
+extern "C" {
+    pub fn inc_rlimit_get_ucounts(ucounts: *mut ucounts, type_: rlimit_type) -> core::ffi::c_long;
+}
+extern "C" {
+    pub fn dec_rlimit_put_ucounts(ucounts: *mut ucounts, type_: rlimit_type);
+}
+extern "C" {
+    pub fn is_rlimit_overlimit(
+        ucounts: *mut ucounts,
+        type_: rlimit_type,
+        max: core::ffi::c_ulong,
+    ) -> bool_;
+}
+extern "C" {
+    pub fn create_user_ns(new: *mut cred) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn unshare_userns(
+        unshare_flags: core::ffi::c_ulong,
+        new_cred: *mut *mut cred,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn __put_user_ns(ns: *mut user_namespace);
+}
+extern "C" {
+    pub static proc_uid_seq_operations: seq_operations;
+}
+extern "C" {
+    pub static proc_gid_seq_operations: seq_operations;
+}
+extern "C" {
+    pub static proc_projid_seq_operations: seq_operations;
+}
+extern "C" {
+    pub fn proc_uid_map_write(
+        arg1: *mut file,
+        arg2: *const core::ffi::c_char,
+        arg3: usize,
+        arg4: *mut loff_t,
+    ) -> isize;
+}
+extern "C" {
+    pub fn proc_gid_map_write(
+        arg1: *mut file,
+        arg2: *const core::ffi::c_char,
+        arg3: usize,
+        arg4: *mut loff_t,
+    ) -> isize;
+}
+extern "C" {
+    pub fn proc_projid_map_write(
+        arg1: *mut file,
+        arg2: *const core::ffi::c_char,
+        arg3: usize,
+        arg4: *mut loff_t,
+    ) -> isize;
+}
+extern "C" {
+    pub fn proc_setgroups_write(
+        arg1: *mut file,
+        arg2: *const core::ffi::c_char,
+        arg3: usize,
+        arg4: *mut loff_t,
+    ) -> isize;
+}
+extern "C" {
+    pub fn proc_setgroups_show(m: *mut seq_file, v: *mut core::ffi::c_void) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn userns_may_setgroups(ns: *const user_namespace) -> bool_;
+}
+extern "C" {
+    pub fn in_userns(ancestor: *const user_namespace, child: *const user_namespace) -> bool_;
+}
+extern "C" {
+    pub fn current_in_userns(target_ns: *const user_namespace) -> bool_;
+}
+extern "C" {
+    pub fn ns_get_owner(ns: *mut ns_common) -> *mut ns_common;
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct xattr_handler {
+    pub name: *const core::ffi::c_char,
+    pub prefix: *const core::ffi::c_char,
+    pub flags: core::ffi::c_int,
+    pub list: ::core::option::Option<unsafe extern "C" fn(dentry: *mut dentry) -> bool_>,
+    pub get: ::core::option::Option<
+        unsafe extern "C" fn(
+            arg1: *const xattr_handler,
+            dentry: *mut dentry,
+            inode: *mut inode,
+            name: *const core::ffi::c_char,
+            buffer: *mut core::ffi::c_void,
+            size: usize,
+        ) -> core::ffi::c_int,
+    >,
+    pub set: ::core::option::Option<
+        unsafe extern "C" fn(
+            arg1: *const xattr_handler,
+            idmap: *mut mnt_idmap,
+            dentry: *mut dentry,
+            inode: *mut inode,
+            name: *const core::ffi::c_char,
+            buffer: *const core::ffi::c_void,
+            size: usize,
+            flags: core::ffi::c_int,
+        ) -> core::ffi::c_int,
+    >,
+}
+impl Default for xattr_handler {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+extern "C" {
+    pub fn xattr_full_name(
+        arg1: *const xattr_handler,
+        arg2: *const core::ffi::c_char,
+    ) -> *const core::ffi::c_char;
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct xattr {
+    pub name: *const core::ffi::c_char,
+    pub value: *mut core::ffi::c_void,
+    pub value_len: usize,
+}
+impl Default for xattr {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+extern "C" {
+    pub fn __vfs_getxattr(
+        arg1: *mut dentry,
+        arg2: *mut inode,
+        arg3: *const core::ffi::c_char,
+        arg4: *mut core::ffi::c_void,
+        arg5: usize,
+    ) -> isize;
+}
+extern "C" {
+    pub fn vfs_getxattr(
+        arg1: *mut mnt_idmap,
+        arg2: *mut dentry,
+        arg3: *const core::ffi::c_char,
+        arg4: *mut core::ffi::c_void,
+        arg5: usize,
+    ) -> isize;
+}
+extern "C" {
+    pub fn vfs_listxattr(d: *mut dentry, list: *mut core::ffi::c_char, size: usize) -> isize;
+}
+extern "C" {
+    pub fn __vfs_setxattr(
+        arg1: *mut mnt_idmap,
+        arg2: *mut dentry,
+        arg3: *mut inode,
+        arg4: *const core::ffi::c_char,
+        arg5: *const core::ffi::c_void,
+        arg6: usize,
+        arg7: core::ffi::c_int,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn __vfs_setxattr_noperm(
+        arg1: *mut mnt_idmap,
+        arg2: *mut dentry,
+        arg3: *const core::ffi::c_char,
+        arg4: *const core::ffi::c_void,
+        arg5: usize,
+        arg6: core::ffi::c_int,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn __vfs_setxattr_locked(
+        arg1: *mut mnt_idmap,
+        arg2: *mut dentry,
+        arg3: *const core::ffi::c_char,
+        arg4: *const core::ffi::c_void,
+        arg5: usize,
+        arg6: core::ffi::c_int,
+        arg7: *mut *mut inode,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn vfs_setxattr(
+        arg1: *mut mnt_idmap,
+        arg2: *mut dentry,
+        arg3: *const core::ffi::c_char,
+        arg4: *const core::ffi::c_void,
+        arg5: usize,
+        arg6: core::ffi::c_int,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn __vfs_removexattr(
+        arg1: *mut mnt_idmap,
+        arg2: *mut dentry,
+        arg3: *const core::ffi::c_char,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn __vfs_removexattr_locked(
+        arg1: *mut mnt_idmap,
+        arg2: *mut dentry,
+        arg3: *const core::ffi::c_char,
+        arg4: *mut *mut inode,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn vfs_removexattr(
+        arg1: *mut mnt_idmap,
+        arg2: *mut dentry,
+        arg3: *const core::ffi::c_char,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn generic_listxattr(
+        dentry: *mut dentry,
+        buffer: *mut core::ffi::c_char,
+        buffer_size: usize,
+    ) -> isize;
+}
+extern "C" {
+    pub fn vfs_getxattr_alloc(
+        idmap: *mut mnt_idmap,
+        dentry: *mut dentry,
+        name: *const core::ffi::c_char,
+        xattr_value: *mut *mut core::ffi::c_char,
+        size: usize,
+        flags: gfp_t,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn xattr_supports_user_prefix(inode: *mut inode) -> core::ffi::c_int;
+}
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub struct simple_xattrs {
+    pub rb_root: rb_root,
+    pub lock: rwlock_t,
+}
+impl Default for simple_xattrs {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug)]
+pub struct simple_xattr {
+    pub rb_node: rb_node,
+    pub name: *mut core::ffi::c_char,
+    pub size: usize,
+    pub value: __IncompleteArrayField<core::ffi::c_char>,
+}
+impl Default for simple_xattr {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+extern "C" {
+    pub fn simple_xattrs_init(xattrs: *mut simple_xattrs);
+}
+extern "C" {
+    pub fn simple_xattrs_free(xattrs: *mut simple_xattrs, freed_space: *mut usize);
+}
+extern "C" {
+    pub fn simple_xattr_space(name: *const core::ffi::c_char, size: usize) -> usize;
+}
+extern "C" {
+    pub fn simple_xattr_alloc(value: *const core::ffi::c_void, size: usize) -> *mut simple_xattr;
+}
+extern "C" {
+    pub fn simple_xattr_free(xattr: *mut simple_xattr);
+}
+extern "C" {
+    pub fn simple_xattr_get(
+        xattrs: *mut simple_xattrs,
+        name: *const core::ffi::c_char,
+        buffer: *mut core::ffi::c_void,
+        size: usize,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn simple_xattr_set(
+        xattrs: *mut simple_xattrs,
+        name: *const core::ffi::c_char,
+        value: *const core::ffi::c_void,
+        size: usize,
+        flags: core::ffi::c_int,
+    ) -> *mut simple_xattr;
+}
+extern "C" {
+    pub fn simple_xattr_list(
+        inode: *mut inode,
+        xattrs: *mut simple_xattrs,
+        buffer: *mut core::ffi::c_char,
+        size: usize,
+    ) -> isize;
+}
+extern "C" {
+    pub fn simple_xattr_add(xattrs: *mut simple_xattrs, new_xattr: *mut simple_xattr);
+}
+extern "C" {
+    pub fn xattr_list_one(
+        buffer: *mut *mut core::ffi::c_char,
+        remaining_size: *mut isize,
+        name: *const core::ffi::c_char,
+    ) -> core::ffi::c_int;
 }
 pub type __kernel_sa_family_t = core::ffi::c_ushort;
 #[repr(C)]
@@ -49900,18 +54668,18 @@ pub const net_device_flags_IFF_DORMANT: net_device_flags = 131072;
 pub const net_device_flags_IFF_ECHO: net_device_flags = 262144;
 #[doc = " enum net_device_flags - &struct net_device flags\n\n These are the &struct net_device flags, they can be set by drivers, the\n kernel and some can be triggered by userspace. Userspace can query and\n set these flags using userspace utilities but there is also a sysfs\n entry available for all dev flags which can be queried and set. These flags\n are shared for all types of net_devices. The sysfs entries are available\n via /sys/class/net/<dev>/flags. Flags which can be toggled through sysfs\n are annotated below, note that only a few flags can be toggled and some\n other flags are always preserved from the original net_device flags\n even if you try to set them via sysfs. Flags which are always preserved\n are kept under the flag grouping @IFF_VOLATILE. Flags which are volatile\n are annotated below as such.\n\n You should have a pretty good reason to be extending these flags.\n\n @IFF_UP: interface is up. Can be toggled through sysfs.\n @IFF_BROADCAST: broadcast address valid. Volatile.\n @IFF_DEBUG: turn on debugging. Can be toggled through sysfs.\n @IFF_LOOPBACK: is a loopback net. Volatile.\n @IFF_POINTOPOINT: interface is has p-p link. Volatile.\n @IFF_NOTRAILERS: avoid use of trailers. Can be toggled through sysfs.\n\tVolatile.\n @IFF_RUNNING: interface RFC2863 OPER_UP. Volatile.\n @IFF_NOARP: no ARP protocol. Can be toggled through sysfs. Volatile.\n @IFF_PROMISC: receive all packets. Can be toggled through sysfs.\n @IFF_ALLMULTI: receive all multicast packets. Can be toggled through\n\tsysfs.\n @IFF_MASTER: master of a load balancer. Volatile.\n @IFF_SLAVE: slave of a load balancer. Volatile.\n @IFF_MULTICAST: Supports multicast. Can be toggled through sysfs.\n @IFF_PORTSEL: can set media type. Can be toggled through sysfs.\n @IFF_AUTOMEDIA: auto media select active. Can be toggled through sysfs.\n @IFF_DYNAMIC: dialup device with changing addresses. Can be toggled\n\tthrough sysfs.\n @IFF_LOWER_UP: driver signals L1 up. Volatile.\n @IFF_DORMANT: driver signals dormant. Volatile.\n @IFF_ECHO: echo sent packets. Volatile."]
 pub type net_device_flags = core::ffi::c_uint;
-pub const IF_OPER_UNKNOWN: _bindgen_ty_97 = 0;
-pub const IF_OPER_NOTPRESENT: _bindgen_ty_97 = 1;
-pub const IF_OPER_DOWN: _bindgen_ty_97 = 2;
-pub const IF_OPER_LOWERLAYERDOWN: _bindgen_ty_97 = 3;
-pub const IF_OPER_TESTING: _bindgen_ty_97 = 4;
-pub const IF_OPER_DORMANT: _bindgen_ty_97 = 5;
-pub const IF_OPER_UP: _bindgen_ty_97 = 6;
-pub type _bindgen_ty_97 = core::ffi::c_uint;
-pub const IF_LINK_MODE_DEFAULT: _bindgen_ty_98 = 0;
-pub const IF_LINK_MODE_DORMANT: _bindgen_ty_98 = 1;
-pub const IF_LINK_MODE_TESTING: _bindgen_ty_98 = 2;
-pub type _bindgen_ty_98 = core::ffi::c_uint;
+pub const IF_OPER_UNKNOWN: _bindgen_ty_102 = 0;
+pub const IF_OPER_NOTPRESENT: _bindgen_ty_102 = 1;
+pub const IF_OPER_DOWN: _bindgen_ty_102 = 2;
+pub const IF_OPER_LOWERLAYERDOWN: _bindgen_ty_102 = 3;
+pub const IF_OPER_TESTING: _bindgen_ty_102 = 4;
+pub const IF_OPER_DORMANT: _bindgen_ty_102 = 5;
+pub const IF_OPER_UP: _bindgen_ty_102 = 6;
+pub type _bindgen_ty_102 = core::ffi::c_uint;
+pub const IF_LINK_MODE_DEFAULT: _bindgen_ty_103 = 0;
+pub const IF_LINK_MODE_DORMANT: _bindgen_ty_103 = 1;
+pub const IF_LINK_MODE_TESTING: _bindgen_ty_103 = 2;
+pub type _bindgen_ty_103 = core::ffi::c_uint;
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
 pub struct ifmap {
@@ -50044,15 +54812,15 @@ impl Default for ifconf {
     }
 }
 pub type aio_context_t = __kernel_ulong_t;
-pub const IOCB_CMD_PREAD: _bindgen_ty_99 = 0;
-pub const IOCB_CMD_PWRITE: _bindgen_ty_99 = 1;
-pub const IOCB_CMD_FSYNC: _bindgen_ty_99 = 2;
-pub const IOCB_CMD_FDSYNC: _bindgen_ty_99 = 3;
-pub const IOCB_CMD_POLL: _bindgen_ty_99 = 5;
-pub const IOCB_CMD_NOOP: _bindgen_ty_99 = 6;
-pub const IOCB_CMD_PREADV: _bindgen_ty_99 = 7;
-pub const IOCB_CMD_PWRITEV: _bindgen_ty_99 = 8;
-pub type _bindgen_ty_99 = core::ffi::c_uint;
+pub const IOCB_CMD_PREAD: _bindgen_ty_104 = 0;
+pub const IOCB_CMD_PWRITE: _bindgen_ty_104 = 1;
+pub const IOCB_CMD_FSYNC: _bindgen_ty_104 = 2;
+pub const IOCB_CMD_FDSYNC: _bindgen_ty_104 = 3;
+pub const IOCB_CMD_POLL: _bindgen_ty_104 = 5;
+pub const IOCB_CMD_NOOP: _bindgen_ty_104 = 6;
+pub const IOCB_CMD_PREADV: _bindgen_ty_104 = 7;
+pub const IOCB_CMD_PWRITEV: _bindgen_ty_104 = 8;
+pub type _bindgen_ty_104 = core::ffi::c_uint;
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
 pub struct io_event {
@@ -50765,11 +55533,6 @@ pub struct compat_keyctl_kdf_params {
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
-pub struct compat_statfs64 {
-    _unused: [u8; 0],
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
 pub struct compat_old_linux_dirent {
     _unused: [u8; 0],
 }
@@ -50892,141 +55655,6 @@ extern "C" {
         mask: *mut core::ffi::c_ulong,
         bitmap_size: core::ffi::c_ulong,
     ) -> core::ffi::c_long;
-}
-extern "C" {
-    pub fn clflush_cache_range(addr: *mut core::ffi::c_void, size: core::ffi::c_uint);
-}
-pub const dma_data_direction_DMA_BIDIRECTIONAL: dma_data_direction = 0;
-pub const dma_data_direction_DMA_TO_DEVICE: dma_data_direction = 1;
-pub const dma_data_direction_DMA_FROM_DEVICE: dma_data_direction = 2;
-pub const dma_data_direction_DMA_NONE: dma_data_direction = 3;
-pub type dma_data_direction = core::ffi::c_uint;
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct urb {
-    _unused: [u8; 0],
-}
-pub const ctx_state_CONTEXT_DISABLED: ctx_state = -1;
-pub const ctx_state_CONTEXT_KERNEL: ctx_state = 0;
-pub const ctx_state_CONTEXT_IDLE: ctx_state = 1;
-pub const ctx_state_CONTEXT_USER: ctx_state = 2;
-pub const ctx_state_CONTEXT_GUEST: ctx_state = 3;
-pub const ctx_state_CONTEXT_MAX: ctx_state = 4;
-pub type ctx_state = core::ffi::c_int;
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct context_tracking {
-    pub state: atomic_t,
-    pub dynticks_nesting: core::ffi::c_long,
-    pub dynticks_nmi_nesting: core::ffi::c_long,
-}
-extern "C" {
-    pub static mut context_tracking: context_tracking;
-}
-#[repr(C)]
-#[repr(align(64))]
-#[derive(Debug, Copy, Clone)]
-pub struct irq_cpustat_t {
-    pub kvm_cpu_l1tf_flush_l1d: u8_,
-    pub __nmi_count: core::ffi::c_uint,
-    pub apic_timer_irqs: core::ffi::c_uint,
-    pub irq_spurious_count: core::ffi::c_uint,
-    pub icr_read_retry_count: core::ffi::c_uint,
-    pub kvm_posted_intr_ipis: core::ffi::c_uint,
-    pub kvm_posted_intr_wakeup_ipis: core::ffi::c_uint,
-    pub kvm_posted_intr_nested_ipis: core::ffi::c_uint,
-    pub x86_platform_ipis: core::ffi::c_uint,
-    pub apic_perf_irqs: core::ffi::c_uint,
-    pub apic_irq_work_irqs: core::ffi::c_uint,
-    pub irq_resched_count: core::ffi::c_uint,
-    pub irq_call_count: core::ffi::c_uint,
-    pub irq_tlb_count: core::ffi::c_uint,
-    pub irq_thermal_count: core::ffi::c_uint,
-    pub irq_threshold_count: core::ffi::c_uint,
-    pub irq_deferred_error_count: core::ffi::c_uint,
-    pub irq_hv_callback_count: core::ffi::c_uint,
-    pub irq_hv_reenlightenment_count: core::ffi::c_uint,
-    pub hyperv_stimer0_count: core::ffi::c_uint,
-}
-impl Default for irq_cpustat_t {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-extern "C" {
-    pub static mut irq_stat: irq_cpustat_t;
-}
-extern "C" {
-    pub fn ack_bad_irq(irq: core::ffi::c_uint);
-}
-extern "C" {
-    pub fn arch_irq_stat_cpu(cpu: core::ffi::c_uint) -> u64_;
-}
-extern "C" {
-    pub fn arch_irq_stat() -> u64_;
-}
-extern "C" {
-    pub fn synchronize_irq(irq: core::ffi::c_uint);
-}
-extern "C" {
-    pub fn synchronize_hardirq(irq: core::ffi::c_uint) -> bool_;
-}
-extern "C" {
-    pub fn irq_enter();
-}
-extern "C" {
-    pub fn irq_enter_rcu();
-}
-extern "C" {
-    pub fn irq_exit();
-}
-extern "C" {
-    pub fn irq_exit_rcu();
-}
-#[doc = " struct bio_vec - a contiguous range of physical memory addresses\n @bv_page:   First page associated with the address range.\n @bv_len:    Number of bytes in the address range.\n @bv_offset: Start of the address range relative to the start of @bv_page.\n\n The following holds for a bvec if n * PAGE_SIZE < bv_offset + bv_len:\n\n   nth_page(@bv_page, n) == @bv_page + n\n\n This holds because page_is_mergeable() checks the above property."]
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct bio_vec {
-    pub bv_page: *mut page,
-    pub bv_len: core::ffi::c_uint,
-    pub bv_offset: core::ffi::c_uint,
-}
-impl Default for bio_vec {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C, packed)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct bvec_iter {
-    pub bi_sector: sector_t,
-    pub bi_size: core::ffi::c_uint,
-    pub bi_idx: core::ffi::c_uint,
-    pub bi_bvec_done: core::ffi::c_uint,
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct bvec_iter_all {
-    pub bv: bio_vec,
-    pub idx: core::ffi::c_int,
-    pub done: core::ffi::c_uint,
-}
-impl Default for bvec_iter_all {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
 }
 extern "C" {
     #[doc = " csum_partial - Compute an internet checksum.\n @buff: buffer to be checksummed\n @len: length of buffer.\n @sum: initial sum to be added in (32bit unfolded)\n\n Returns the 32bit unfolded internet checksum of the buffer.\n Before filling it in it needs to be csum_fold()'ed.\n buff should be aligned to a 64bit boundary if possible."]
@@ -51568,9 +56196,9 @@ extern "C" {
 extern "C" {
     pub fn fw_devlink_purge_absent_suppliers(fwnode: *mut fwnode_handle);
 }
-pub const LOGIC_PIO_INDIRECT: _bindgen_ty_100 = 0;
-pub const LOGIC_PIO_CPU_MMIO: _bindgen_ty_100 = 1;
-pub type _bindgen_ty_100 = core::ffi::c_uint;
+pub const LOGIC_PIO_INDIRECT: _bindgen_ty_105 = 0;
+pub const LOGIC_PIO_CPU_MMIO: _bindgen_ty_105 = 1;
+pub type _bindgen_ty_105 = core::ffi::c_uint;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct logic_pio_hwaddr {
@@ -51650,6 +56278,254 @@ extern "C" {
 }
 extern "C" {
     pub fn logic_pio_trans_cpuaddr(hw_addr: resource_size_t) -> core::ffi::c_ulong;
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct vm_struct {
+    pub next: *mut vm_struct,
+    pub addr: *mut core::ffi::c_void,
+    pub size: core::ffi::c_ulong,
+    pub flags: core::ffi::c_ulong,
+    pub pages: *mut *mut page,
+    pub page_order: core::ffi::c_uint,
+    pub nr_pages: core::ffi::c_uint,
+    pub phys_addr: phys_addr_t,
+    pub caller: *const core::ffi::c_void,
+}
+impl Default for vm_struct {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub struct vmap_area {
+    pub va_start: core::ffi::c_ulong,
+    pub va_end: core::ffi::c_ulong,
+    pub rb_node: rb_node,
+    pub list: list_head,
+    pub __bindgen_anon_1: vmap_area__bindgen_ty_1,
+    pub flags: core::ffi::c_ulong,
+}
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub union vmap_area__bindgen_ty_1 {
+    pub subtree_max_size: core::ffi::c_ulong,
+    pub vm: *mut vm_struct,
+}
+impl Default for vmap_area__bindgen_ty_1 {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+impl Default for vmap_area {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+extern "C" {
+    pub fn vm_unmap_ram(mem: *const core::ffi::c_void, count: core::ffi::c_uint);
+}
+extern "C" {
+    pub fn vm_map_ram(
+        pages: *mut *mut page,
+        count: core::ffi::c_uint,
+        node: core::ffi::c_int,
+    ) -> *mut core::ffi::c_void;
+}
+extern "C" {
+    pub fn vm_unmap_aliases();
+}
+extern "C" {
+    pub fn vmalloc_nr_pages() -> core::ffi::c_ulong;
+}
+extern "C" {
+    pub fn vmalloc(size: core::ffi::c_ulong) -> *mut core::ffi::c_void;
+}
+extern "C" {
+    pub fn vzalloc(size: core::ffi::c_ulong) -> *mut core::ffi::c_void;
+}
+extern "C" {
+    pub fn vmalloc_user(size: core::ffi::c_ulong) -> *mut core::ffi::c_void;
+}
+extern "C" {
+    pub fn vmalloc_node(size: core::ffi::c_ulong, node: core::ffi::c_int)
+        -> *mut core::ffi::c_void;
+}
+extern "C" {
+    pub fn vzalloc_node(size: core::ffi::c_ulong, node: core::ffi::c_int)
+        -> *mut core::ffi::c_void;
+}
+extern "C" {
+    pub fn vmalloc_32(size: core::ffi::c_ulong) -> *mut core::ffi::c_void;
+}
+extern "C" {
+    pub fn vmalloc_32_user(size: core::ffi::c_ulong) -> *mut core::ffi::c_void;
+}
+extern "C" {
+    pub fn __vmalloc(size: core::ffi::c_ulong, gfp_mask: gfp_t) -> *mut core::ffi::c_void;
+}
+extern "C" {
+    pub fn __vmalloc_node_range(
+        size: core::ffi::c_ulong,
+        align: core::ffi::c_ulong,
+        start: core::ffi::c_ulong,
+        end: core::ffi::c_ulong,
+        gfp_mask: gfp_t,
+        prot: pgprot_t,
+        vm_flags: core::ffi::c_ulong,
+        node: core::ffi::c_int,
+        caller: *const core::ffi::c_void,
+    ) -> *mut core::ffi::c_void;
+}
+extern "C" {
+    pub fn __vmalloc_node(
+        size: core::ffi::c_ulong,
+        align: core::ffi::c_ulong,
+        gfp_mask: gfp_t,
+        node: core::ffi::c_int,
+        caller: *const core::ffi::c_void,
+    ) -> *mut core::ffi::c_void;
+}
+extern "C" {
+    pub fn vmalloc_huge(size: core::ffi::c_ulong, gfp_mask: gfp_t) -> *mut core::ffi::c_void;
+}
+extern "C" {
+    pub fn __vmalloc_array(n: usize, size: usize, flags: gfp_t) -> *mut core::ffi::c_void;
+}
+extern "C" {
+    pub fn vmalloc_array(n: usize, size: usize) -> *mut core::ffi::c_void;
+}
+extern "C" {
+    pub fn __vcalloc(n: usize, size: usize, flags: gfp_t) -> *mut core::ffi::c_void;
+}
+extern "C" {
+    pub fn vcalloc(n: usize, size: usize) -> *mut core::ffi::c_void;
+}
+extern "C" {
+    pub fn vfree(addr: *const core::ffi::c_void);
+}
+extern "C" {
+    pub fn vfree_atomic(addr: *const core::ffi::c_void);
+}
+extern "C" {
+    pub fn vmap(
+        pages: *mut *mut page,
+        count: core::ffi::c_uint,
+        flags: core::ffi::c_ulong,
+        prot: pgprot_t,
+    ) -> *mut core::ffi::c_void;
+}
+extern "C" {
+    pub fn vmap_pfn(
+        pfns: *mut core::ffi::c_ulong,
+        count: core::ffi::c_uint,
+        prot: pgprot_t,
+    ) -> *mut core::ffi::c_void;
+}
+extern "C" {
+    pub fn vunmap(addr: *const core::ffi::c_void);
+}
+extern "C" {
+    pub fn remap_vmalloc_range_partial(
+        vma: *mut vm_area_struct,
+        uaddr: core::ffi::c_ulong,
+        kaddr: *mut core::ffi::c_void,
+        pgoff: core::ffi::c_ulong,
+        size: core::ffi::c_ulong,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn remap_vmalloc_range(
+        vma: *mut vm_area_struct,
+        addr: *mut core::ffi::c_void,
+        pgoff: core::ffi::c_ulong,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn arch_sync_kernel_mappings(start: core::ffi::c_ulong, end: core::ffi::c_ulong);
+}
+extern "C" {
+    pub fn get_vm_area(size: core::ffi::c_ulong, flags: core::ffi::c_ulong) -> *mut vm_struct;
+}
+extern "C" {
+    pub fn get_vm_area_caller(
+        size: core::ffi::c_ulong,
+        flags: core::ffi::c_ulong,
+        caller: *const core::ffi::c_void,
+    ) -> *mut vm_struct;
+}
+extern "C" {
+    pub fn __get_vm_area_caller(
+        size: core::ffi::c_ulong,
+        flags: core::ffi::c_ulong,
+        start: core::ffi::c_ulong,
+        end: core::ffi::c_ulong,
+        caller: *const core::ffi::c_void,
+    ) -> *mut vm_struct;
+}
+extern "C" {
+    pub fn free_vm_area(area: *mut vm_struct);
+}
+extern "C" {
+    pub fn remove_vm_area(addr: *const core::ffi::c_void) -> *mut vm_struct;
+}
+extern "C" {
+    pub fn find_vm_area(addr: *const core::ffi::c_void) -> *mut vm_struct;
+}
+extern "C" {
+    pub fn find_vmap_area(addr: core::ffi::c_ulong) -> *mut vmap_area;
+}
+extern "C" {
+    pub fn vunmap_range(addr: core::ffi::c_ulong, end: core::ffi::c_ulong);
+}
+extern "C" {
+    pub fn vread_iter(
+        iter: *mut iov_iter,
+        addr: *const core::ffi::c_char,
+        count: usize,
+    ) -> core::ffi::c_long;
+}
+extern "C" {
+    pub static mut vmap_area_list: list_head;
+}
+extern "C" {
+    pub fn vm_area_add_early(vm: *mut vm_struct);
+}
+extern "C" {
+    pub fn vm_area_register_early(vm: *mut vm_struct, align: usize);
+}
+extern "C" {
+    pub fn pcpu_get_vm_areas(
+        offsets: *const core::ffi::c_ulong,
+        sizes: *const usize,
+        nr_vms: core::ffi::c_int,
+        align: usize,
+    ) -> *mut *mut vm_struct;
+}
+extern "C" {
+    pub fn pcpu_free_vm_areas(vms: *mut *mut vm_struct, nr_vms: core::ffi::c_int);
+}
+extern "C" {
+    pub fn register_vmap_purge_notifier(nb: *mut notifier_block) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn unregister_vmap_purge_notifier(nb: *mut notifier_block) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn vmalloc_dump_obj(object: *mut core::ffi::c_void) -> bool_;
 }
 extern "C" {
     #[must_use]
@@ -52239,74 +57115,74 @@ extern "C" {
     pub fn dma_coherent_ok(dev: *mut device, phys: phys_addr_t, size: usize) -> bool_;
 }
 pub type netdev_features_t = u64_;
-pub const NETIF_F_SG_BIT: _bindgen_ty_101 = 0;
-pub const NETIF_F_IP_CSUM_BIT: _bindgen_ty_101 = 1;
-pub const __UNUSED_NETIF_F_1: _bindgen_ty_101 = 2;
-pub const NETIF_F_HW_CSUM_BIT: _bindgen_ty_101 = 3;
-pub const NETIF_F_IPV6_CSUM_BIT: _bindgen_ty_101 = 4;
-pub const NETIF_F_HIGHDMA_BIT: _bindgen_ty_101 = 5;
-pub const NETIF_F_FRAGLIST_BIT: _bindgen_ty_101 = 6;
-pub const NETIF_F_HW_VLAN_CTAG_TX_BIT: _bindgen_ty_101 = 7;
-pub const NETIF_F_HW_VLAN_CTAG_RX_BIT: _bindgen_ty_101 = 8;
-pub const NETIF_F_HW_VLAN_CTAG_FILTER_BIT: _bindgen_ty_101 = 9;
-pub const NETIF_F_VLAN_CHALLENGED_BIT: _bindgen_ty_101 = 10;
-pub const NETIF_F_GSO_BIT: _bindgen_ty_101 = 11;
-pub const NETIF_F_LLTX_BIT: _bindgen_ty_101 = 12;
-pub const NETIF_F_NETNS_LOCAL_BIT: _bindgen_ty_101 = 13;
-pub const NETIF_F_GRO_BIT: _bindgen_ty_101 = 14;
-pub const NETIF_F_LRO_BIT: _bindgen_ty_101 = 15;
-pub const NETIF_F_GSO_SHIFT: _bindgen_ty_101 = 16;
-pub const NETIF_F_TSO_BIT: _bindgen_ty_101 = 16;
-pub const NETIF_F_GSO_ROBUST_BIT: _bindgen_ty_101 = 17;
-pub const NETIF_F_TSO_ECN_BIT: _bindgen_ty_101 = 18;
-pub const NETIF_F_TSO_MANGLEID_BIT: _bindgen_ty_101 = 19;
-pub const NETIF_F_TSO6_BIT: _bindgen_ty_101 = 20;
-pub const NETIF_F_FSO_BIT: _bindgen_ty_101 = 21;
-pub const NETIF_F_GSO_GRE_BIT: _bindgen_ty_101 = 22;
-pub const NETIF_F_GSO_GRE_CSUM_BIT: _bindgen_ty_101 = 23;
-pub const NETIF_F_GSO_IPXIP4_BIT: _bindgen_ty_101 = 24;
-pub const NETIF_F_GSO_IPXIP6_BIT: _bindgen_ty_101 = 25;
-pub const NETIF_F_GSO_UDP_TUNNEL_BIT: _bindgen_ty_101 = 26;
-pub const NETIF_F_GSO_UDP_TUNNEL_CSUM_BIT: _bindgen_ty_101 = 27;
-pub const NETIF_F_GSO_PARTIAL_BIT: _bindgen_ty_101 = 28;
-pub const NETIF_F_GSO_TUNNEL_REMCSUM_BIT: _bindgen_ty_101 = 29;
-pub const NETIF_F_GSO_SCTP_BIT: _bindgen_ty_101 = 30;
-pub const NETIF_F_GSO_ESP_BIT: _bindgen_ty_101 = 31;
-pub const NETIF_F_GSO_UDP_BIT: _bindgen_ty_101 = 32;
-pub const NETIF_F_GSO_UDP_L4_BIT: _bindgen_ty_101 = 33;
-pub const NETIF_F_GSO_FRAGLIST_BIT: _bindgen_ty_101 = 34;
-pub const NETIF_F_GSO_LAST: _bindgen_ty_101 = 34;
-pub const NETIF_F_FCOE_CRC_BIT: _bindgen_ty_101 = 35;
-pub const NETIF_F_SCTP_CRC_BIT: _bindgen_ty_101 = 36;
-pub const NETIF_F_FCOE_MTU_BIT: _bindgen_ty_101 = 37;
-pub const NETIF_F_NTUPLE_BIT: _bindgen_ty_101 = 38;
-pub const NETIF_F_RXHASH_BIT: _bindgen_ty_101 = 39;
-pub const NETIF_F_RXCSUM_BIT: _bindgen_ty_101 = 40;
-pub const NETIF_F_NOCACHE_COPY_BIT: _bindgen_ty_101 = 41;
-pub const NETIF_F_LOOPBACK_BIT: _bindgen_ty_101 = 42;
-pub const NETIF_F_RXFCS_BIT: _bindgen_ty_101 = 43;
-pub const NETIF_F_RXALL_BIT: _bindgen_ty_101 = 44;
-pub const NETIF_F_HW_VLAN_STAG_TX_BIT: _bindgen_ty_101 = 45;
-pub const NETIF_F_HW_VLAN_STAG_RX_BIT: _bindgen_ty_101 = 46;
-pub const NETIF_F_HW_VLAN_STAG_FILTER_BIT: _bindgen_ty_101 = 47;
-pub const NETIF_F_HW_L2FW_DOFFLOAD_BIT: _bindgen_ty_101 = 48;
-pub const NETIF_F_HW_TC_BIT: _bindgen_ty_101 = 49;
-pub const NETIF_F_HW_ESP_BIT: _bindgen_ty_101 = 50;
-pub const NETIF_F_HW_ESP_TX_CSUM_BIT: _bindgen_ty_101 = 51;
-pub const NETIF_F_RX_UDP_TUNNEL_PORT_BIT: _bindgen_ty_101 = 52;
-pub const NETIF_F_HW_TLS_TX_BIT: _bindgen_ty_101 = 53;
-pub const NETIF_F_HW_TLS_RX_BIT: _bindgen_ty_101 = 54;
-pub const NETIF_F_GRO_HW_BIT: _bindgen_ty_101 = 55;
-pub const NETIF_F_HW_TLS_RECORD_BIT: _bindgen_ty_101 = 56;
-pub const NETIF_F_GRO_FRAGLIST_BIT: _bindgen_ty_101 = 57;
-pub const NETIF_F_HW_MACSEC_BIT: _bindgen_ty_101 = 58;
-pub const NETIF_F_GRO_UDP_FWD_BIT: _bindgen_ty_101 = 59;
-pub const NETIF_F_HW_HSR_TAG_INS_BIT: _bindgen_ty_101 = 60;
-pub const NETIF_F_HW_HSR_TAG_RM_BIT: _bindgen_ty_101 = 61;
-pub const NETIF_F_HW_HSR_FWD_BIT: _bindgen_ty_101 = 62;
-pub const NETIF_F_HW_HSR_DUP_BIT: _bindgen_ty_101 = 63;
-pub const NETDEV_FEATURE_COUNT: _bindgen_ty_101 = 64;
-pub type _bindgen_ty_101 = core::ffi::c_uint;
+pub const NETIF_F_SG_BIT: _bindgen_ty_106 = 0;
+pub const NETIF_F_IP_CSUM_BIT: _bindgen_ty_106 = 1;
+pub const __UNUSED_NETIF_F_1: _bindgen_ty_106 = 2;
+pub const NETIF_F_HW_CSUM_BIT: _bindgen_ty_106 = 3;
+pub const NETIF_F_IPV6_CSUM_BIT: _bindgen_ty_106 = 4;
+pub const NETIF_F_HIGHDMA_BIT: _bindgen_ty_106 = 5;
+pub const NETIF_F_FRAGLIST_BIT: _bindgen_ty_106 = 6;
+pub const NETIF_F_HW_VLAN_CTAG_TX_BIT: _bindgen_ty_106 = 7;
+pub const NETIF_F_HW_VLAN_CTAG_RX_BIT: _bindgen_ty_106 = 8;
+pub const NETIF_F_HW_VLAN_CTAG_FILTER_BIT: _bindgen_ty_106 = 9;
+pub const NETIF_F_VLAN_CHALLENGED_BIT: _bindgen_ty_106 = 10;
+pub const NETIF_F_GSO_BIT: _bindgen_ty_106 = 11;
+pub const NETIF_F_LLTX_BIT: _bindgen_ty_106 = 12;
+pub const NETIF_F_NETNS_LOCAL_BIT: _bindgen_ty_106 = 13;
+pub const NETIF_F_GRO_BIT: _bindgen_ty_106 = 14;
+pub const NETIF_F_LRO_BIT: _bindgen_ty_106 = 15;
+pub const NETIF_F_GSO_SHIFT: _bindgen_ty_106 = 16;
+pub const NETIF_F_TSO_BIT: _bindgen_ty_106 = 16;
+pub const NETIF_F_GSO_ROBUST_BIT: _bindgen_ty_106 = 17;
+pub const NETIF_F_TSO_ECN_BIT: _bindgen_ty_106 = 18;
+pub const NETIF_F_TSO_MANGLEID_BIT: _bindgen_ty_106 = 19;
+pub const NETIF_F_TSO6_BIT: _bindgen_ty_106 = 20;
+pub const NETIF_F_FSO_BIT: _bindgen_ty_106 = 21;
+pub const NETIF_F_GSO_GRE_BIT: _bindgen_ty_106 = 22;
+pub const NETIF_F_GSO_GRE_CSUM_BIT: _bindgen_ty_106 = 23;
+pub const NETIF_F_GSO_IPXIP4_BIT: _bindgen_ty_106 = 24;
+pub const NETIF_F_GSO_IPXIP6_BIT: _bindgen_ty_106 = 25;
+pub const NETIF_F_GSO_UDP_TUNNEL_BIT: _bindgen_ty_106 = 26;
+pub const NETIF_F_GSO_UDP_TUNNEL_CSUM_BIT: _bindgen_ty_106 = 27;
+pub const NETIF_F_GSO_PARTIAL_BIT: _bindgen_ty_106 = 28;
+pub const NETIF_F_GSO_TUNNEL_REMCSUM_BIT: _bindgen_ty_106 = 29;
+pub const NETIF_F_GSO_SCTP_BIT: _bindgen_ty_106 = 30;
+pub const NETIF_F_GSO_ESP_BIT: _bindgen_ty_106 = 31;
+pub const NETIF_F_GSO_UDP_BIT: _bindgen_ty_106 = 32;
+pub const NETIF_F_GSO_UDP_L4_BIT: _bindgen_ty_106 = 33;
+pub const NETIF_F_GSO_FRAGLIST_BIT: _bindgen_ty_106 = 34;
+pub const NETIF_F_GSO_LAST: _bindgen_ty_106 = 34;
+pub const NETIF_F_FCOE_CRC_BIT: _bindgen_ty_106 = 35;
+pub const NETIF_F_SCTP_CRC_BIT: _bindgen_ty_106 = 36;
+pub const NETIF_F_FCOE_MTU_BIT: _bindgen_ty_106 = 37;
+pub const NETIF_F_NTUPLE_BIT: _bindgen_ty_106 = 38;
+pub const NETIF_F_RXHASH_BIT: _bindgen_ty_106 = 39;
+pub const NETIF_F_RXCSUM_BIT: _bindgen_ty_106 = 40;
+pub const NETIF_F_NOCACHE_COPY_BIT: _bindgen_ty_106 = 41;
+pub const NETIF_F_LOOPBACK_BIT: _bindgen_ty_106 = 42;
+pub const NETIF_F_RXFCS_BIT: _bindgen_ty_106 = 43;
+pub const NETIF_F_RXALL_BIT: _bindgen_ty_106 = 44;
+pub const NETIF_F_HW_VLAN_STAG_TX_BIT: _bindgen_ty_106 = 45;
+pub const NETIF_F_HW_VLAN_STAG_RX_BIT: _bindgen_ty_106 = 46;
+pub const NETIF_F_HW_VLAN_STAG_FILTER_BIT: _bindgen_ty_106 = 47;
+pub const NETIF_F_HW_L2FW_DOFFLOAD_BIT: _bindgen_ty_106 = 48;
+pub const NETIF_F_HW_TC_BIT: _bindgen_ty_106 = 49;
+pub const NETIF_F_HW_ESP_BIT: _bindgen_ty_106 = 50;
+pub const NETIF_F_HW_ESP_TX_CSUM_BIT: _bindgen_ty_106 = 51;
+pub const NETIF_F_RX_UDP_TUNNEL_PORT_BIT: _bindgen_ty_106 = 52;
+pub const NETIF_F_HW_TLS_TX_BIT: _bindgen_ty_106 = 53;
+pub const NETIF_F_HW_TLS_RX_BIT: _bindgen_ty_106 = 54;
+pub const NETIF_F_GRO_HW_BIT: _bindgen_ty_106 = 55;
+pub const NETIF_F_HW_TLS_RECORD_BIT: _bindgen_ty_106 = 56;
+pub const NETIF_F_GRO_FRAGLIST_BIT: _bindgen_ty_106 = 57;
+pub const NETIF_F_HW_MACSEC_BIT: _bindgen_ty_106 = 58;
+pub const NETIF_F_GRO_UDP_FWD_BIT: _bindgen_ty_106 = 59;
+pub const NETIF_F_HW_HSR_TAG_INS_BIT: _bindgen_ty_106 = 60;
+pub const NETIF_F_HW_HSR_TAG_RM_BIT: _bindgen_ty_106 = 61;
+pub const NETIF_F_HW_HSR_FWD_BIT: _bindgen_ty_106 = 62;
+pub const NETIF_F_HW_HSR_DUP_BIT: _bindgen_ty_106 = 63;
+pub const NETDEV_FEATURE_COUNT: _bindgen_ty_106 = 64;
+pub type _bindgen_ty_106 = core::ffi::c_uint;
 #[doc = " csum_ipv6_magic - Compute checksum of an IPv6 pseudo header.\n @saddr: source address\n @daddr: destination address\n @len: length of packet\n @proto: protocol of packet\n @sum: initial sum (32bit unfolded) to be added in\n\n Computes an IPv6 pseudo header checksum. This sum is added the checksum\n into UDP/TCP packets and contains some link layer information.\n Returns the unfolded 32bit checksum."]
 #[repr(C)]
 #[derive(Copy, Clone)]
@@ -52487,11 +57363,6 @@ pub struct ethhdr {
     pub h_dest: [core::ffi::c_uchar; 6usize],
     pub h_source: [core::ffi::c_uchar; 6usize],
     pub h_proto: __be16,
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct bpf_prog {
-    _unused: [u8; 0],
 }
 #[doc = " struct flow_dissector_key_control:\n @thoff:     Transport header offset\n @addr_type: Type of key. One of FLOW_DISSECTOR_KEY_*\n @flags:     Key flags. Any of FLOW_DIS_(IS_FRAGMENT|FIRST_FRAGENCAPSULATION)"]
 #[repr(C)]
@@ -53793,11 +58664,6 @@ pub struct napi_struct {
     _unused: [u8; 0],
 }
 #[repr(C)]
-#[derive(Copy, Clone)]
-pub struct bpf_attr {
-    _unused: [u8; 0],
-}
-#[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct ts_config {
     _unused: [u8; 0],
@@ -54025,20 +58891,20 @@ impl Default for skb_shared_hwtstamps {
         }
     }
 }
-pub const SKBTX_HW_TSTAMP: _bindgen_ty_102 = 1;
-pub const SKBTX_SW_TSTAMP: _bindgen_ty_102 = 2;
-pub const SKBTX_IN_PROGRESS: _bindgen_ty_102 = 4;
-pub const SKBTX_HW_TSTAMP_USE_CYCLES: _bindgen_ty_102 = 8;
-pub const SKBTX_WIFI_STATUS: _bindgen_ty_102 = 16;
-pub const SKBTX_HW_TSTAMP_NETDEV: _bindgen_ty_102 = 32;
-pub const SKBTX_SCHED_TSTAMP: _bindgen_ty_102 = 64;
-pub type _bindgen_ty_102 = core::ffi::c_uint;
-pub const SKBFL_ZEROCOPY_ENABLE: _bindgen_ty_103 = 1;
-pub const SKBFL_SHARED_FRAG: _bindgen_ty_103 = 2;
-pub const SKBFL_PURE_ZEROCOPY: _bindgen_ty_103 = 4;
-pub const SKBFL_DONT_ORPHAN: _bindgen_ty_103 = 8;
-pub const SKBFL_MANAGED_FRAG_REFS: _bindgen_ty_103 = 16;
-pub type _bindgen_ty_103 = core::ffi::c_uint;
+pub const SKBTX_HW_TSTAMP: _bindgen_ty_107 = 1;
+pub const SKBTX_SW_TSTAMP: _bindgen_ty_107 = 2;
+pub const SKBTX_IN_PROGRESS: _bindgen_ty_107 = 4;
+pub const SKBTX_HW_TSTAMP_USE_CYCLES: _bindgen_ty_107 = 8;
+pub const SKBTX_WIFI_STATUS: _bindgen_ty_107 = 16;
+pub const SKBTX_HW_TSTAMP_NETDEV: _bindgen_ty_107 = 32;
+pub const SKBTX_SCHED_TSTAMP: _bindgen_ty_107 = 64;
+pub type _bindgen_ty_107 = core::ffi::c_uint;
+pub const SKBFL_ZEROCOPY_ENABLE: _bindgen_ty_108 = 1;
+pub const SKBFL_SHARED_FRAG: _bindgen_ty_108 = 2;
+pub const SKBFL_PURE_ZEROCOPY: _bindgen_ty_108 = 4;
+pub const SKBFL_DONT_ORPHAN: _bindgen_ty_108 = 8;
+pub const SKBFL_MANAGED_FRAG_REFS: _bindgen_ty_108 = 16;
+pub type _bindgen_ty_108 = core::ffi::c_uint;
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
 pub struct ubuf_info {
@@ -54176,30 +59042,30 @@ impl Default for skb_shared_info {
         }
     }
 }
-pub const SKB_FCLONE_UNAVAILABLE: _bindgen_ty_104 = 0;
-pub const SKB_FCLONE_ORIG: _bindgen_ty_104 = 1;
-pub const SKB_FCLONE_CLONE: _bindgen_ty_104 = 2;
-pub type _bindgen_ty_104 = core::ffi::c_uint;
-pub const SKB_GSO_TCPV4: _bindgen_ty_105 = 1;
-pub const SKB_GSO_DODGY: _bindgen_ty_105 = 2;
-pub const SKB_GSO_TCP_ECN: _bindgen_ty_105 = 4;
-pub const SKB_GSO_TCP_FIXEDID: _bindgen_ty_105 = 8;
-pub const SKB_GSO_TCPV6: _bindgen_ty_105 = 16;
-pub const SKB_GSO_FCOE: _bindgen_ty_105 = 32;
-pub const SKB_GSO_GRE: _bindgen_ty_105 = 64;
-pub const SKB_GSO_GRE_CSUM: _bindgen_ty_105 = 128;
-pub const SKB_GSO_IPXIP4: _bindgen_ty_105 = 256;
-pub const SKB_GSO_IPXIP6: _bindgen_ty_105 = 512;
-pub const SKB_GSO_UDP_TUNNEL: _bindgen_ty_105 = 1024;
-pub const SKB_GSO_UDP_TUNNEL_CSUM: _bindgen_ty_105 = 2048;
-pub const SKB_GSO_PARTIAL: _bindgen_ty_105 = 4096;
-pub const SKB_GSO_TUNNEL_REMCSUM: _bindgen_ty_105 = 8192;
-pub const SKB_GSO_SCTP: _bindgen_ty_105 = 16384;
-pub const SKB_GSO_ESP: _bindgen_ty_105 = 32768;
-pub const SKB_GSO_UDP: _bindgen_ty_105 = 65536;
-pub const SKB_GSO_UDP_L4: _bindgen_ty_105 = 131072;
-pub const SKB_GSO_FRAGLIST: _bindgen_ty_105 = 262144;
-pub type _bindgen_ty_105 = core::ffi::c_uint;
+pub const SKB_FCLONE_UNAVAILABLE: _bindgen_ty_109 = 0;
+pub const SKB_FCLONE_ORIG: _bindgen_ty_109 = 1;
+pub const SKB_FCLONE_CLONE: _bindgen_ty_109 = 2;
+pub type _bindgen_ty_109 = core::ffi::c_uint;
+pub const SKB_GSO_TCPV4: _bindgen_ty_110 = 1;
+pub const SKB_GSO_DODGY: _bindgen_ty_110 = 2;
+pub const SKB_GSO_TCP_ECN: _bindgen_ty_110 = 4;
+pub const SKB_GSO_TCP_FIXEDID: _bindgen_ty_110 = 8;
+pub const SKB_GSO_TCPV6: _bindgen_ty_110 = 16;
+pub const SKB_GSO_FCOE: _bindgen_ty_110 = 32;
+pub const SKB_GSO_GRE: _bindgen_ty_110 = 64;
+pub const SKB_GSO_GRE_CSUM: _bindgen_ty_110 = 128;
+pub const SKB_GSO_IPXIP4: _bindgen_ty_110 = 256;
+pub const SKB_GSO_IPXIP6: _bindgen_ty_110 = 512;
+pub const SKB_GSO_UDP_TUNNEL: _bindgen_ty_110 = 1024;
+pub const SKB_GSO_UDP_TUNNEL_CSUM: _bindgen_ty_110 = 2048;
+pub const SKB_GSO_PARTIAL: _bindgen_ty_110 = 4096;
+pub const SKB_GSO_TUNNEL_REMCSUM: _bindgen_ty_110 = 8192;
+pub const SKB_GSO_SCTP: _bindgen_ty_110 = 16384;
+pub const SKB_GSO_ESP: _bindgen_ty_110 = 32768;
+pub const SKB_GSO_UDP: _bindgen_ty_110 = 65536;
+pub const SKB_GSO_UDP_L4: _bindgen_ty_110 = 131072;
+pub const SKB_GSO_FRAGLIST: _bindgen_ty_110 = 262144;
+pub type _bindgen_ty_110 = core::ffi::c_uint;
 pub type sk_buff_data_t = core::ffi::c_uint;
 #[doc = "\tstruct sk_buff - socket buffer\n\t@next: Next buffer in list\n\t@prev: Previous buffer in list\n\t@tstamp: Time we arrived/left\n\t@skb_mstamp_ns: (aka @tstamp) earliest departure time; start point\n\t\tfor retransmit timer\n\t@rbnode: RB tree node, alternative to next/prev for netem/tcp\n\t@list: queue head\n\t@ll_node: anchor in an llist (eg socket defer_list)\n\t@sk: Socket we are owned by\n\t@ip_defrag_offset: (aka @sk) alternate use of @sk, used in\n\t\tfragmentation management\n\t@dev: Device we arrived on/are leaving by\n\t@dev_scratch: (aka @dev) alternate use of @dev when @dev would be %NULL\n\t@cb: Control buffer. Free for use by every layer. Put private vars here\n\t@_skb_refdst: destination entry (with norefcount bit)\n\t@sp: the security path, used for xfrm\n\t@len: Length of actual data\n\t@data_len: Data length\n\t@mac_len: Length of link layer header\n\t@hdr_len: writable header length of cloned skb\n\t@csum: Checksum (must include start/offset pair)\n\t@csum_start: Offset from skb->head where checksumming should start\n\t@csum_offset: Offset from csum_start where checksum should be stored\n\t@priority: Packet queueing priority\n\t@ignore_df: allow local fragmentation\n\t@cloned: Head may be cloned (check refcnt to be sure)\n\t@ip_summed: Driver fed us an IP checksum\n\t@nohdr: Payload reference only, must not modify header\n\t@pkt_type: Packet class\n\t@fclone: skbuff clone status\n\t@ipvs_property: skbuff is owned by ipvs\n\t@inner_protocol_type: whether the inner protocol is\n\t\tENCAP_TYPE_ETHER or ENCAP_TYPE_IPPROTO\n\t@remcsum_offload: remote checksum offload is enabled\n\t@offload_fwd_mark: Packet was L2-forwarded in hardware\n\t@offload_l3_fwd_mark: Packet was L3-forwarded in hardware\n\t@tc_skip_classify: do not classify packet. set by IFB device\n\t@tc_at_ingress: used within tc_classify to distinguish in/egress\n\t@redirected: packet was redirected by packet classifier\n\t@from_ingress: packet was redirected from the ingress path\n\t@nf_skip_egress: packet shall skip nf egress - see netfilter_netdev.h\n\t@peeked: this packet has been seen already, so stats have been\n\t\tdone for it, don't do them again\n\t@nf_trace: netfilter packet trace flag\n\t@protocol: Packet protocol from driver\n\t@destructor: Destruct function\n\t@tcp_tsorted_anchor: list structure for TCP (tp->tsorted_sent_queue)\n\t@_sk_redir: socket redirection information for skmsg\n\t@_nfct: Associated connection, if any (with nfctinfo bits)\n\t@nf_bridge: Saved data about a bridged frame - see br_netfilter.c\n\t@skb_iif: ifindex of device we arrived on\n\t@tc_index: Traffic control index\n\t@hash: the packet hash\n\t@queue_mapping: Queue mapping for multiqueue devices\n\t@head_frag: skb was allocated from page fragments,\n\t\tnot allocated by kmalloc() or vmalloc().\n\t@pfmemalloc: skbuff was allocated from PFMEMALLOC reserves\n\t@pp_recycle: mark the packet for recycling instead of freeing (implies\n\t\tpage_pool support on driver)\n\t@active_extensions: active extensions (skb_ext_id types)\n\t@ndisc_nodetype: router type (from link layer)\n\t@ooo_okay: allow the mapping of a socket to a queue to be changed\n\t@l4_hash: indicate hash is a canonical 4-tuple hash over transport\n\t\tports.\n\t@sw_hash: indicates hash was computed in software stack\n\t@wifi_acked_valid: wifi_acked was set\n\t@wifi_acked: whether frame was acked on wifi or not\n\t@no_fcs:  Request NIC to treat last 4 bytes as Ethernet FCS\n\t@encapsulation: indicates the inner headers in the skbuff are valid\n\t@encap_hdr_csum: software checksum is needed\n\t@csum_valid: checksum is already valid\n\t@csum_not_inet: use CRC32c to resolve CHECKSUM_PARTIAL\n\t@csum_complete_sw: checksum was completed by software\n\t@csum_level: indicates the number of consecutive checksums found in\n\t\tthe packet minus one that have been verified as\n\t\tCHECKSUM_UNNECESSARY (max 3)\n\t@dst_pending_confirm: need to confirm neighbour\n\t@decrypted: Decrypted SKB\n\t@slow_gro: state present at GRO time, slower prepare step required\n\t@mono_delivery_time: When set, skb->tstamp has the\n\t\tdelivery_time in mono clock base (i.e. EDT).  Otherwise, the\n\t\tskb->tstamp has the (rcv) timestamp at ingress and\n\t\tdelivery_time at egress.\n\t@napi_id: id of the NAPI struct this skb came from\n\t@sender_cpu: (aka @napi_id) source CPU in XPS\n\t@alloc_cpu: CPU which did the skb allocation.\n\t@secmark: security marking\n\t@mark: Generic packet mark\n\t@reserved_tailroom: (aka @mark) number of bytes of free space available\n\t\tat the tail of an sk_buff\n\t@vlan_all: vlan fields (proto & tci)\n\t@vlan_proto: vlan encapsulation protocol\n\t@vlan_tci: vlan tag control information\n\t@inner_protocol: Protocol (encapsulation)\n\t@inner_ipproto: (aka @inner_protocol) stores ipproto when\n\t\tskb->inner_protocol_type == ENCAP_TYPE_IPPROTO;\n\t@inner_transport_header: Inner transport layer header (encapsulation)\n\t@inner_network_header: Network layer header (encapsulation)\n\t@inner_mac_header: Link layer header (encapsulation)\n\t@transport_header: Transport layer header\n\t@network_header: Network layer header\n\t@mac_header: Link layer header\n\t@kcov_handle: KCOV remote handle for remote coverage collection\n\t@tail: Tail pointer\n\t@end: End pointer\n\t@head: Head of buffer\n\t@data: Data head pointer\n\t@truesize: Buffer size\n\t@users: User count - see {datagram,tcp}.c\n\t@extensions: allocated extensions, valid if active_extensions is nonzero"]
 #[repr(C)]
@@ -55708,11 +60574,6 @@ impl sk_buff {
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
-pub struct dst_entry {
-    _unused: [u8; 0],
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
 pub struct rtable {
     _unused: [u8; 0],
 }
@@ -56606,60 +61467,6 @@ extern "C" {
         len: core::ffi::c_int,
     ) -> isize;
 }
-#[repr(C)]
-#[derive(Copy, Clone)]
-pub struct sockptr_t {
-    pub __bindgen_anon_1: sockptr_t__bindgen_ty_1,
-    pub _bitfield_align_1: [u8; 0],
-    pub _bitfield_1: __BindgenBitfieldUnit<[u8; 1usize]>,
-    pub __bindgen_padding_0: [u8; 7usize],
-}
-#[repr(C)]
-#[derive(Copy, Clone)]
-pub union sockptr_t__bindgen_ty_1 {
-    pub kernel: *mut core::ffi::c_void,
-    pub user: *mut core::ffi::c_void,
-}
-impl Default for sockptr_t__bindgen_ty_1 {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-impl Default for sockptr_t {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-impl sockptr_t {
-    #[inline]
-    pub fn is_kernel(&self) -> bool_ {
-        unsafe { ::core::mem::transmute(self._bitfield_1.get(0usize, 1u8) as u8) }
-    }
-    #[inline]
-    pub fn set_is_kernel(&mut self, val: bool_) {
-        unsafe {
-            let val: u8 = ::core::mem::transmute(val);
-            self._bitfield_1.set(0usize, 1u8, val as u64)
-        }
-    }
-    #[inline]
-    pub fn new_bitfield_1(is_kernel: bool_) -> __BindgenBitfieldUnit<[u8; 1usize]> {
-        let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 1usize]> = Default::default();
-        __bindgen_bitfield_unit.set(0usize, 1u8, {
-            let is_kernel: u8 = unsafe { ::core::mem::transmute(is_kernel) };
-            is_kernel as u64
-        });
-        __bindgen_bitfield_unit
-    }
-}
 pub const socket_state_SS_FREE: socket_state = 0;
 pub const socket_state_SS_UNCONNECTED: socket_state = 1;
 pub const socket_state_SS_CONNECTING: socket_state = 2;
@@ -56945,11 +61752,11 @@ impl Default for net_proto_family {
         }
     }
 }
-pub const SOCK_WAKE_IO: _bindgen_ty_106 = 0;
-pub const SOCK_WAKE_WAITD: _bindgen_ty_106 = 1;
-pub const SOCK_WAKE_SPACE: _bindgen_ty_106 = 2;
-pub const SOCK_WAKE_URG: _bindgen_ty_106 = 3;
-pub type _bindgen_ty_106 = core::ffi::c_uint;
+pub const SOCK_WAKE_IO: _bindgen_ty_111 = 0;
+pub const SOCK_WAKE_WAITD: _bindgen_ty_111 = 1;
+pub const SOCK_WAKE_SPACE: _bindgen_ty_111 = 2;
+pub const SOCK_WAKE_URG: _bindgen_ty_111 = 3;
+pub type _bindgen_ty_111 = core::ffi::c_uint;
 extern "C" {
     pub fn sock_wake_async(
         sk_wq: *mut socket_wq,
@@ -57097,1782 +61904,6 @@ extern "C" {
 }
 extern "C" {
     pub fn kernel_sock_ip_overhead(sk: *mut sock) -> u32_;
-}
-extern "C" {
-    pub fn fput(arg1: *mut file);
-}
-extern "C" {
-    pub fn alloc_file_pseudo(
-        arg1: *mut inode,
-        arg2: *mut vfsmount,
-        arg3: *const core::ffi::c_char,
-        flags: core::ffi::c_int,
-        arg4: *const file_operations,
-    ) -> *mut file;
-}
-extern "C" {
-    pub fn alloc_file_clone(
-        arg1: *mut file,
-        flags: core::ffi::c_int,
-        arg2: *const file_operations,
-    ) -> *mut file;
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct fd {
-    pub file: *mut file,
-    pub flags: core::ffi::c_uint,
-}
-impl Default for fd {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-extern "C" {
-    pub fn fget(fd: core::ffi::c_uint) -> *mut file;
-}
-extern "C" {
-    pub fn fget_raw(fd: core::ffi::c_uint) -> *mut file;
-}
-extern "C" {
-    pub fn fget_task(task: *mut task_struct, fd: core::ffi::c_uint) -> *mut file;
-}
-extern "C" {
-    pub fn __fdget(fd: core::ffi::c_uint) -> core::ffi::c_ulong;
-}
-extern "C" {
-    pub fn __fdget_raw(fd: core::ffi::c_uint) -> core::ffi::c_ulong;
-}
-extern "C" {
-    pub fn __fdget_pos(fd: core::ffi::c_uint) -> core::ffi::c_ulong;
-}
-extern "C" {
-    pub fn __f_unlock_pos(arg1: *mut file);
-}
-pub type class_fd_t = fd;
-extern "C" {
-    pub fn f_dupfd(
-        from: core::ffi::c_uint,
-        file: *mut file,
-        flags: core::ffi::c_uint,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn replace_fd(
-        fd: core::ffi::c_uint,
-        file: *mut file,
-        flags: core::ffi::c_uint,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn set_close_on_exec(fd: core::ffi::c_uint, flag: core::ffi::c_int);
-}
-extern "C" {
-    pub fn get_close_on_exec(fd: core::ffi::c_uint) -> bool_;
-}
-extern "C" {
-    pub fn __get_unused_fd_flags(
-        flags: core::ffi::c_uint,
-        nofile: core::ffi::c_ulong,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn get_unused_fd_flags(flags: core::ffi::c_uint) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn put_unused_fd(fd: core::ffi::c_uint);
-}
-pub type class_get_unused_fd_t = core::ffi::c_int;
-extern "C" {
-    pub fn fd_install(fd: core::ffi::c_uint, file: *mut file);
-}
-extern "C" {
-    pub fn __receive_fd(
-        file: *mut file,
-        ufd: *mut core::ffi::c_int,
-        o_flags: core::ffi::c_uint,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn receive_fd(file: *mut file, o_flags: core::ffi::c_uint) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn receive_fd_replace(
-        new_fd: core::ffi::c_int,
-        file: *mut file,
-        o_flags: core::ffi::c_uint,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn flush_delayed_fput();
-}
-extern "C" {
-    pub fn __fput_sync(arg1: *mut file);
-}
-extern "C" {
-    pub static mut sysctl_nr_open_min: core::ffi::c_uint;
-}
-extern "C" {
-    pub static mut sysctl_nr_open_max: core::ffi::c_uint;
-}
-pub const kernel_read_file_id_READING_UNKNOWN: kernel_read_file_id = 0;
-pub const kernel_read_file_id_READING_FIRMWARE: kernel_read_file_id = 1;
-pub const kernel_read_file_id_READING_MODULE: kernel_read_file_id = 2;
-pub const kernel_read_file_id_READING_KEXEC_IMAGE: kernel_read_file_id = 3;
-pub const kernel_read_file_id_READING_KEXEC_INITRAMFS: kernel_read_file_id = 4;
-pub const kernel_read_file_id_READING_POLICY: kernel_read_file_id = 5;
-pub const kernel_read_file_id_READING_X509_CERTIFICATE: kernel_read_file_id = 6;
-pub const kernel_read_file_id_READING_MAX_ID: kernel_read_file_id = 7;
-pub type kernel_read_file_id = core::ffi::c_uint;
-extern "C" {
-    pub static kernel_read_file_str: [*const core::ffi::c_char; 8usize];
-}
-extern "C" {
-    pub fn kernel_read_file(
-        file: *mut file,
-        offset: loff_t,
-        buf: *mut *mut core::ffi::c_void,
-        buf_size: usize,
-        file_size: *mut usize,
-        id: kernel_read_file_id,
-    ) -> isize;
-}
-extern "C" {
-    pub fn kernel_read_file_from_path(
-        path: *const core::ffi::c_char,
-        offset: loff_t,
-        buf: *mut *mut core::ffi::c_void,
-        buf_size: usize,
-        file_size: *mut usize,
-        id: kernel_read_file_id,
-    ) -> isize;
-}
-extern "C" {
-    pub fn kernel_read_file_from_path_initns(
-        path: *const core::ffi::c_char,
-        offset: loff_t,
-        buf: *mut *mut core::ffi::c_void,
-        buf_size: usize,
-        file_size: *mut usize,
-        id: kernel_read_file_id,
-    ) -> isize;
-}
-extern "C" {
-    pub fn kernel_read_file_from_fd(
-        fd: core::ffi::c_int,
-        offset: loff_t,
-        buf: *mut *mut core::ffi::c_void,
-        buf_size: usize,
-        file_size: *mut usize,
-        id: kernel_read_file_id,
-    ) -> isize;
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct msg_msg {
-    _unused: [u8; 0],
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct xattr {
-    _unused: [u8; 0],
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct xfrm_sec_ctx {
-    _unused: [u8; 0],
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct fs_parameter {
-    _unused: [u8; 0],
-}
-pub type fs_value_type = i32;
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct watch {
-    _unused: [u8; 0],
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct watch_notification {
-    _unused: [u8; 0],
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct audit_krule {
-    _unused: [u8; 0],
-}
-pub const lsm_event_LSM_POLICY_CHANGE: lsm_event = 0;
-pub type lsm_event = core::ffi::c_uint;
-pub const lockdown_reason_LOCKDOWN_NONE: lockdown_reason = 0;
-pub const lockdown_reason_LOCKDOWN_MODULE_SIGNATURE: lockdown_reason = 1;
-pub const lockdown_reason_LOCKDOWN_DEV_MEM: lockdown_reason = 2;
-pub const lockdown_reason_LOCKDOWN_EFI_TEST: lockdown_reason = 3;
-pub const lockdown_reason_LOCKDOWN_KEXEC: lockdown_reason = 4;
-pub const lockdown_reason_LOCKDOWN_HIBERNATION: lockdown_reason = 5;
-pub const lockdown_reason_LOCKDOWN_PCI_ACCESS: lockdown_reason = 6;
-pub const lockdown_reason_LOCKDOWN_IOPORT: lockdown_reason = 7;
-pub const lockdown_reason_LOCKDOWN_MSR: lockdown_reason = 8;
-pub const lockdown_reason_LOCKDOWN_ACPI_TABLES: lockdown_reason = 9;
-pub const lockdown_reason_LOCKDOWN_DEVICE_TREE: lockdown_reason = 10;
-pub const lockdown_reason_LOCKDOWN_PCMCIA_CIS: lockdown_reason = 11;
-pub const lockdown_reason_LOCKDOWN_TIOCSSERIAL: lockdown_reason = 12;
-pub const lockdown_reason_LOCKDOWN_MODULE_PARAMETERS: lockdown_reason = 13;
-pub const lockdown_reason_LOCKDOWN_MMIOTRACE: lockdown_reason = 14;
-pub const lockdown_reason_LOCKDOWN_DEBUGFS: lockdown_reason = 15;
-pub const lockdown_reason_LOCKDOWN_XMON_WR: lockdown_reason = 16;
-pub const lockdown_reason_LOCKDOWN_BPF_WRITE_USER: lockdown_reason = 17;
-pub const lockdown_reason_LOCKDOWN_DBG_WRITE_KERNEL: lockdown_reason = 18;
-pub const lockdown_reason_LOCKDOWN_RTAS_ERROR_INJECTION: lockdown_reason = 19;
-pub const lockdown_reason_LOCKDOWN_INTEGRITY_MAX: lockdown_reason = 20;
-pub const lockdown_reason_LOCKDOWN_KCORE: lockdown_reason = 21;
-pub const lockdown_reason_LOCKDOWN_KPROBES: lockdown_reason = 22;
-pub const lockdown_reason_LOCKDOWN_BPF_READ_KERNEL: lockdown_reason = 23;
-pub const lockdown_reason_LOCKDOWN_DBG_READ_KERNEL: lockdown_reason = 24;
-pub const lockdown_reason_LOCKDOWN_PERF: lockdown_reason = 25;
-pub const lockdown_reason_LOCKDOWN_TRACEFS: lockdown_reason = 26;
-pub const lockdown_reason_LOCKDOWN_XMON_RW: lockdown_reason = 27;
-pub const lockdown_reason_LOCKDOWN_XFRM_SECRET: lockdown_reason = 28;
-pub const lockdown_reason_LOCKDOWN_CONFIDENTIALITY_MAX: lockdown_reason = 29;
-pub type lockdown_reason = core::ffi::c_uint;
-extern "C" {
-    pub static lockdown_reasons: [*const core::ffi::c_char; 30usize];
-}
-extern "C" {
-    pub fn cap_capable(
-        cred: *const cred,
-        ns: *mut user_namespace,
-        cap: core::ffi::c_int,
-        opts: core::ffi::c_uint,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn cap_settime(ts: *const timespec64, tz: *const timezone) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn cap_ptrace_access_check(
-        child: *mut task_struct,
-        mode: core::ffi::c_uint,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn cap_ptrace_traceme(parent: *mut task_struct) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn cap_capget(
-        target: *const task_struct,
-        effective: *mut kernel_cap_t,
-        inheritable: *mut kernel_cap_t,
-        permitted: *mut kernel_cap_t,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn cap_capset(
-        new: *mut cred,
-        old: *const cred,
-        effective: *const kernel_cap_t,
-        inheritable: *const kernel_cap_t,
-        permitted: *const kernel_cap_t,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn cap_bprm_creds_from_file(bprm: *mut linux_binprm, file: *mut file) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn cap_inode_setxattr(
-        dentry: *mut dentry,
-        name: *const core::ffi::c_char,
-        value: *const core::ffi::c_void,
-        size: usize,
-        flags: core::ffi::c_int,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn cap_inode_removexattr(
-        idmap: *mut mnt_idmap,
-        dentry: *mut dentry,
-        name: *const core::ffi::c_char,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn cap_inode_need_killpriv(dentry: *mut dentry) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn cap_inode_killpriv(idmap: *mut mnt_idmap, dentry: *mut dentry) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn cap_inode_getsecurity(
-        idmap: *mut mnt_idmap,
-        inode: *mut inode,
-        name: *const core::ffi::c_char,
-        buffer: *mut *mut core::ffi::c_void,
-        alloc: bool_,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn cap_mmap_addr(addr: core::ffi::c_ulong) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn cap_mmap_file(
-        file: *mut file,
-        reqprot: core::ffi::c_ulong,
-        prot: core::ffi::c_ulong,
-        flags: core::ffi::c_ulong,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn cap_task_fix_setuid(
-        new: *mut cred,
-        old: *const cred,
-        flags: core::ffi::c_int,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn cap_task_prctl(
-        option: core::ffi::c_int,
-        arg2: core::ffi::c_ulong,
-        arg3: core::ffi::c_ulong,
-        arg4: core::ffi::c_ulong,
-        arg5: core::ffi::c_ulong,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn cap_task_setscheduler(p: *mut task_struct) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn cap_task_setioprio(p: *mut task_struct, ioprio: core::ffi::c_int) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn cap_task_setnice(p: *mut task_struct, nice: core::ffi::c_int) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn cap_vm_enough_memory(mm: *mut mm_struct, pages: core::ffi::c_long) -> core::ffi::c_int;
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct xfrm_selector {
-    _unused: [u8; 0],
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct xfrm_policy {
-    _unused: [u8; 0],
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct xfrm_state {
-    _unused: [u8; 0],
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct xfrm_user_sec_ctx {
-    _unused: [u8; 0],
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct sctp_association {
-    _unused: [u8; 0],
-}
-extern "C" {
-    pub static mut mmap_min_addr: core::ffi::c_ulong;
-}
-extern "C" {
-    pub static mut dac_mmap_min_addr: core::ffi::c_ulong;
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct request_sock {
-    _unused: [u8; 0],
-}
-extern "C" {
-    pub fn mmap_min_addr_handler(
-        table: *mut ctl_table,
-        write: core::ffi::c_int,
-        buffer: *mut core::ffi::c_void,
-        lenp: *mut usize,
-        ppos: *mut loff_t,
-    ) -> core::ffi::c_int;
-}
-pub type initxattrs = ::core::option::Option<
-    unsafe extern "C" fn(
-        inode: *mut inode,
-        xattr_array: *const xattr,
-        fs_data: *mut core::ffi::c_void,
-    ) -> core::ffi::c_int,
->;
-pub const kernel_load_data_id_LOADING_UNKNOWN: kernel_load_data_id = 0;
-pub const kernel_load_data_id_LOADING_FIRMWARE: kernel_load_data_id = 1;
-pub const kernel_load_data_id_LOADING_MODULE: kernel_load_data_id = 2;
-pub const kernel_load_data_id_LOADING_KEXEC_IMAGE: kernel_load_data_id = 3;
-pub const kernel_load_data_id_LOADING_KEXEC_INITRAMFS: kernel_load_data_id = 4;
-pub const kernel_load_data_id_LOADING_POLICY: kernel_load_data_id = 5;
-pub const kernel_load_data_id_LOADING_X509_CERTIFICATE: kernel_load_data_id = 6;
-pub const kernel_load_data_id_LOADING_MAX_ID: kernel_load_data_id = 7;
-pub type kernel_load_data_id = core::ffi::c_uint;
-extern "C" {
-    pub static kernel_load_data_str: [*const core::ffi::c_char; 8usize];
-}
-extern "C" {
-    pub fn call_blocking_lsm_notifier(
-        event: lsm_event,
-        data: *mut core::ffi::c_void,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn register_blocking_lsm_notifier(nb: *mut notifier_block) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn unregister_blocking_lsm_notifier(nb: *mut notifier_block) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_init() -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn early_security_init() -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_binder_set_context_mgr(mgr: *const cred) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_binder_transaction(from: *const cred, to: *const cred) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_binder_transfer_binder(from: *const cred, to: *const cred) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_binder_transfer_file(
-        from: *const cred,
-        to: *const cred,
-        file: *const file,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_ptrace_access_check(
-        child: *mut task_struct,
-        mode: core::ffi::c_uint,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_ptrace_traceme(parent: *mut task_struct) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_capget(
-        target: *const task_struct,
-        effective: *mut kernel_cap_t,
-        inheritable: *mut kernel_cap_t,
-        permitted: *mut kernel_cap_t,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_capset(
-        new: *mut cred,
-        old: *const cred,
-        effective: *const kernel_cap_t,
-        inheritable: *const kernel_cap_t,
-        permitted: *const kernel_cap_t,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_capable(
-        cred: *const cred,
-        ns: *mut user_namespace,
-        cap: core::ffi::c_int,
-        opts: core::ffi::c_uint,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_quotactl(
-        cmds: core::ffi::c_int,
-        type_: core::ffi::c_int,
-        id: core::ffi::c_int,
-        sb: *mut super_block,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_quota_on(dentry: *mut dentry) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_syslog(type_: core::ffi::c_int) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_settime64(ts: *const timespec64, tz: *const timezone) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_vm_enough_memory_mm(
-        mm: *mut mm_struct,
-        pages: core::ffi::c_long,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_bprm_creds_for_exec(bprm: *mut linux_binprm) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_bprm_creds_from_file(
-        bprm: *mut linux_binprm,
-        file: *mut file,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_bprm_check(bprm: *mut linux_binprm) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_bprm_committing_creds(bprm: *mut linux_binprm);
-}
-extern "C" {
-    pub fn security_bprm_committed_creds(bprm: *mut linux_binprm);
-}
-extern "C" {
-    pub fn security_fs_context_submount(
-        fc: *mut fs_context,
-        reference: *mut super_block,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_fs_context_dup(
-        fc: *mut fs_context,
-        src_fc: *mut fs_context,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_fs_context_parse_param(
-        fc: *mut fs_context,
-        param: *mut fs_parameter,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_sb_alloc(sb: *mut super_block) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_sb_delete(sb: *mut super_block);
-}
-extern "C" {
-    pub fn security_sb_free(sb: *mut super_block);
-}
-extern "C" {
-    pub fn security_free_mnt_opts(mnt_opts: *mut *mut core::ffi::c_void);
-}
-extern "C" {
-    pub fn security_sb_eat_lsm_opts(
-        options: *mut core::ffi::c_char,
-        mnt_opts: *mut *mut core::ffi::c_void,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_sb_mnt_opts_compat(
-        sb: *mut super_block,
-        mnt_opts: *mut core::ffi::c_void,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_sb_remount(
-        sb: *mut super_block,
-        mnt_opts: *mut core::ffi::c_void,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_sb_kern_mount(sb: *mut super_block) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_sb_show_options(m: *mut seq_file, sb: *mut super_block) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_sb_statfs(dentry: *mut dentry) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_sb_mount(
-        dev_name: *const core::ffi::c_char,
-        path: *const path,
-        type_: *const core::ffi::c_char,
-        flags: core::ffi::c_ulong,
-        data: *mut core::ffi::c_void,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_sb_umount(mnt: *mut vfsmount, flags: core::ffi::c_int) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_sb_pivotroot(old_path: *const path, new_path: *const path) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_sb_set_mnt_opts(
-        sb: *mut super_block,
-        mnt_opts: *mut core::ffi::c_void,
-        kern_flags: core::ffi::c_ulong,
-        set_kern_flags: *mut core::ffi::c_ulong,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_sb_clone_mnt_opts(
-        oldsb: *const super_block,
-        newsb: *mut super_block,
-        kern_flags: core::ffi::c_ulong,
-        set_kern_flags: *mut core::ffi::c_ulong,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_move_mount(from_path: *const path, to_path: *const path) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_dentry_init_security(
-        dentry: *mut dentry,
-        mode: core::ffi::c_int,
-        name: *const qstr,
-        xattr_name: *mut *const core::ffi::c_char,
-        ctx: *mut *mut core::ffi::c_void,
-        ctxlen: *mut u32_,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_dentry_create_files_as(
-        dentry: *mut dentry,
-        mode: core::ffi::c_int,
-        name: *mut qstr,
-        old: *const cred,
-        new: *mut cred,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_path_notify(
-        path: *const path,
-        mask: u64_,
-        obj_type: core::ffi::c_uint,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_inode_alloc(inode: *mut inode) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_inode_free(inode: *mut inode);
-}
-extern "C" {
-    pub fn security_inode_init_security(
-        inode: *mut inode,
-        dir: *mut inode,
-        qstr: *const qstr,
-        initxattrs: initxattrs,
-        fs_data: *mut core::ffi::c_void,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_inode_init_security_anon(
-        inode: *mut inode,
-        name: *const qstr,
-        context_inode: *const inode,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_inode_create(
-        dir: *mut inode,
-        dentry: *mut dentry,
-        mode: umode_t,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_inode_link(
-        old_dentry: *mut dentry,
-        dir: *mut inode,
-        new_dentry: *mut dentry,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_inode_unlink(dir: *mut inode, dentry: *mut dentry) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_inode_symlink(
-        dir: *mut inode,
-        dentry: *mut dentry,
-        old_name: *const core::ffi::c_char,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_inode_mkdir(
-        dir: *mut inode,
-        dentry: *mut dentry,
-        mode: umode_t,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_inode_rmdir(dir: *mut inode, dentry: *mut dentry) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_inode_mknod(
-        dir: *mut inode,
-        dentry: *mut dentry,
-        mode: umode_t,
-        dev: dev_t,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_inode_rename(
-        old_dir: *mut inode,
-        old_dentry: *mut dentry,
-        new_dir: *mut inode,
-        new_dentry: *mut dentry,
-        flags: core::ffi::c_uint,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_inode_readlink(dentry: *mut dentry) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_inode_follow_link(
-        dentry: *mut dentry,
-        inode: *mut inode,
-        rcu: bool_,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_inode_permission(inode: *mut inode, mask: core::ffi::c_int)
-        -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_inode_setattr(
-        idmap: *mut mnt_idmap,
-        dentry: *mut dentry,
-        attr: *mut iattr,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_inode_getattr(path: *const path) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_inode_setxattr(
-        idmap: *mut mnt_idmap,
-        dentry: *mut dentry,
-        name: *const core::ffi::c_char,
-        value: *const core::ffi::c_void,
-        size: usize,
-        flags: core::ffi::c_int,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_inode_set_acl(
-        idmap: *mut mnt_idmap,
-        dentry: *mut dentry,
-        acl_name: *const core::ffi::c_char,
-        kacl: *mut posix_acl,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_inode_get_acl(
-        idmap: *mut mnt_idmap,
-        dentry: *mut dentry,
-        acl_name: *const core::ffi::c_char,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_inode_remove_acl(
-        idmap: *mut mnt_idmap,
-        dentry: *mut dentry,
-        acl_name: *const core::ffi::c_char,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_inode_post_setxattr(
-        dentry: *mut dentry,
-        name: *const core::ffi::c_char,
-        value: *const core::ffi::c_void,
-        size: usize,
-        flags: core::ffi::c_int,
-    );
-}
-extern "C" {
-    pub fn security_inode_getxattr(
-        dentry: *mut dentry,
-        name: *const core::ffi::c_char,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_inode_listxattr(dentry: *mut dentry) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_inode_removexattr(
-        idmap: *mut mnt_idmap,
-        dentry: *mut dentry,
-        name: *const core::ffi::c_char,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_inode_need_killpriv(dentry: *mut dentry) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_inode_killpriv(idmap: *mut mnt_idmap, dentry: *mut dentry) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_inode_getsecurity(
-        idmap: *mut mnt_idmap,
-        inode: *mut inode,
-        name: *const core::ffi::c_char,
-        buffer: *mut *mut core::ffi::c_void,
-        alloc: bool_,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_inode_setsecurity(
-        inode: *mut inode,
-        name: *const core::ffi::c_char,
-        value: *const core::ffi::c_void,
-        size: usize,
-        flags: core::ffi::c_int,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_inode_listsecurity(
-        inode: *mut inode,
-        buffer: *mut core::ffi::c_char,
-        buffer_size: usize,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_inode_getsecid(inode: *mut inode, secid: *mut u32_);
-}
-extern "C" {
-    pub fn security_inode_copy_up(src: *mut dentry, new: *mut *mut cred) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_inode_copy_up_xattr(name: *const core::ffi::c_char) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_kernfs_init_security(
-        kn_dir: *mut kernfs_node,
-        kn: *mut kernfs_node,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_file_permission(file: *mut file, mask: core::ffi::c_int) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_file_alloc(file: *mut file) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_file_free(file: *mut file);
-}
-extern "C" {
-    pub fn security_file_ioctl(
-        file: *mut file,
-        cmd: core::ffi::c_uint,
-        arg: core::ffi::c_ulong,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_mmap_file(
-        file: *mut file,
-        prot: core::ffi::c_ulong,
-        flags: core::ffi::c_ulong,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_mmap_addr(addr: core::ffi::c_ulong) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_file_mprotect(
-        vma: *mut vm_area_struct,
-        reqprot: core::ffi::c_ulong,
-        prot: core::ffi::c_ulong,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_file_lock(file: *mut file, cmd: core::ffi::c_uint) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_file_fcntl(
-        file: *mut file,
-        cmd: core::ffi::c_uint,
-        arg: core::ffi::c_ulong,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_file_set_fowner(file: *mut file);
-}
-extern "C" {
-    pub fn security_file_send_sigiotask(
-        tsk: *mut task_struct,
-        fown: *mut fown_struct,
-        sig: core::ffi::c_int,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_file_receive(file: *mut file) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_file_open(file: *mut file) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_file_truncate(file: *mut file) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_task_alloc(
-        task: *mut task_struct,
-        clone_flags: core::ffi::c_ulong,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_task_free(task: *mut task_struct);
-}
-extern "C" {
-    pub fn security_cred_alloc_blank(cred: *mut cred, gfp: gfp_t) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_cred_free(cred: *mut cred);
-}
-extern "C" {
-    pub fn security_prepare_creds(new: *mut cred, old: *const cred, gfp: gfp_t)
-        -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_transfer_creds(new: *mut cred, old: *const cred);
-}
-extern "C" {
-    pub fn security_cred_getsecid(c: *const cred, secid: *mut u32_);
-}
-extern "C" {
-    pub fn security_kernel_act_as(new: *mut cred, secid: u32_) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_kernel_create_files_as(new: *mut cred, inode: *mut inode) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_kernel_module_request(kmod_name: *mut core::ffi::c_char) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_kernel_load_data(id: kernel_load_data_id, contents: bool_) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_kernel_post_load_data(
-        buf: *mut core::ffi::c_char,
-        size: loff_t,
-        id: kernel_load_data_id,
-        description: *mut core::ffi::c_char,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_kernel_read_file(
-        file: *mut file,
-        id: kernel_read_file_id,
-        contents: bool_,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_kernel_post_read_file(
-        file: *mut file,
-        buf: *mut core::ffi::c_char,
-        size: loff_t,
-        id: kernel_read_file_id,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_task_fix_setuid(
-        new: *mut cred,
-        old: *const cred,
-        flags: core::ffi::c_int,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_task_fix_setgid(
-        new: *mut cred,
-        old: *const cred,
-        flags: core::ffi::c_int,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_task_fix_setgroups(new: *mut cred, old: *const cred) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_task_setpgid(p: *mut task_struct, pgid: pid_t) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_task_getpgid(p: *mut task_struct) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_task_getsid(p: *mut task_struct) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_current_getsecid_subj(secid: *mut u32_);
-}
-extern "C" {
-    pub fn security_task_getsecid_obj(p: *mut task_struct, secid: *mut u32_);
-}
-extern "C" {
-    pub fn security_task_setnice(p: *mut task_struct, nice: core::ffi::c_int) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_task_setioprio(
-        p: *mut task_struct,
-        ioprio: core::ffi::c_int,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_task_getioprio(p: *mut task_struct) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_task_prlimit(
-        cred: *const cred,
-        tcred: *const cred,
-        flags: core::ffi::c_uint,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_task_setrlimit(
-        p: *mut task_struct,
-        resource: core::ffi::c_uint,
-        new_rlim: *mut rlimit,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_task_setscheduler(p: *mut task_struct) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_task_getscheduler(p: *mut task_struct) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_task_movememory(p: *mut task_struct) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_task_kill(
-        p: *mut task_struct,
-        info: *mut kernel_siginfo,
-        sig: core::ffi::c_int,
-        cred: *const cred,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_task_prctl(
-        option: core::ffi::c_int,
-        arg2: core::ffi::c_ulong,
-        arg3: core::ffi::c_ulong,
-        arg4: core::ffi::c_ulong,
-        arg5: core::ffi::c_ulong,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_task_to_inode(p: *mut task_struct, inode: *mut inode);
-}
-extern "C" {
-    pub fn security_create_user_ns(cred: *const cred) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_ipc_permission(
-        ipcp: *mut kern_ipc_perm,
-        flag: core::ffi::c_short,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_ipc_getsecid(ipcp: *mut kern_ipc_perm, secid: *mut u32_);
-}
-extern "C" {
-    pub fn security_msg_msg_alloc(msg: *mut msg_msg) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_msg_msg_free(msg: *mut msg_msg);
-}
-extern "C" {
-    pub fn security_msg_queue_alloc(msq: *mut kern_ipc_perm) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_msg_queue_free(msq: *mut kern_ipc_perm);
-}
-extern "C" {
-    pub fn security_msg_queue_associate(
-        msq: *mut kern_ipc_perm,
-        msqflg: core::ffi::c_int,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_msg_queue_msgctl(
-        msq: *mut kern_ipc_perm,
-        cmd: core::ffi::c_int,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_msg_queue_msgsnd(
-        msq: *mut kern_ipc_perm,
-        msg: *mut msg_msg,
-        msqflg: core::ffi::c_int,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_msg_queue_msgrcv(
-        msq: *mut kern_ipc_perm,
-        msg: *mut msg_msg,
-        target: *mut task_struct,
-        type_: core::ffi::c_long,
-        mode: core::ffi::c_int,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_shm_alloc(shp: *mut kern_ipc_perm) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_shm_free(shp: *mut kern_ipc_perm);
-}
-extern "C" {
-    pub fn security_shm_associate(
-        shp: *mut kern_ipc_perm,
-        shmflg: core::ffi::c_int,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_shm_shmctl(shp: *mut kern_ipc_perm, cmd: core::ffi::c_int) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_shm_shmat(
-        shp: *mut kern_ipc_perm,
-        shmaddr: *mut core::ffi::c_char,
-        shmflg: core::ffi::c_int,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_sem_alloc(sma: *mut kern_ipc_perm) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_sem_free(sma: *mut kern_ipc_perm);
-}
-extern "C" {
-    pub fn security_sem_associate(
-        sma: *mut kern_ipc_perm,
-        semflg: core::ffi::c_int,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_sem_semctl(sma: *mut kern_ipc_perm, cmd: core::ffi::c_int) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_sem_semop(
-        sma: *mut kern_ipc_perm,
-        sops: *mut sembuf,
-        nsops: core::ffi::c_uint,
-        alter: core::ffi::c_int,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_d_instantiate(dentry: *mut dentry, inode: *mut inode);
-}
-extern "C" {
-    pub fn security_getprocattr(
-        p: *mut task_struct,
-        lsm: *const core::ffi::c_char,
-        name: *const core::ffi::c_char,
-        value: *mut *mut core::ffi::c_char,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_setprocattr(
-        lsm: *const core::ffi::c_char,
-        name: *const core::ffi::c_char,
-        value: *mut core::ffi::c_void,
-        size: usize,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_netlink_send(sk: *mut sock, skb: *mut sk_buff) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_ismaclabel(name: *const core::ffi::c_char) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_secid_to_secctx(
-        secid: u32_,
-        secdata: *mut *mut core::ffi::c_char,
-        seclen: *mut u32_,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_secctx_to_secid(
-        secdata: *const core::ffi::c_char,
-        seclen: u32_,
-        secid: *mut u32_,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_release_secctx(secdata: *mut core::ffi::c_char, seclen: u32_);
-}
-extern "C" {
-    pub fn security_inode_invalidate_secctx(inode: *mut inode);
-}
-extern "C" {
-    pub fn security_inode_notifysecctx(
-        inode: *mut inode,
-        ctx: *mut core::ffi::c_void,
-        ctxlen: u32_,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_inode_setsecctx(
-        dentry: *mut dentry,
-        ctx: *mut core::ffi::c_void,
-        ctxlen: u32_,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_inode_getsecctx(
-        inode: *mut inode,
-        ctx: *mut *mut core::ffi::c_void,
-        ctxlen: *mut u32_,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_locked_down(what: lockdown_reason) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_unix_stream_connect(
-        sock: *mut sock,
-        other: *mut sock,
-        newsk: *mut sock,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_unix_may_send(sock: *mut socket, other: *mut socket) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_socket_create(
-        family: core::ffi::c_int,
-        type_: core::ffi::c_int,
-        protocol: core::ffi::c_int,
-        kern: core::ffi::c_int,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_socket_post_create(
-        sock: *mut socket,
-        family: core::ffi::c_int,
-        type_: core::ffi::c_int,
-        protocol: core::ffi::c_int,
-        kern: core::ffi::c_int,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_socket_socketpair(socka: *mut socket, sockb: *mut socket) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_socket_bind(
-        sock: *mut socket,
-        address: *mut sockaddr,
-        addrlen: core::ffi::c_int,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_socket_connect(
-        sock: *mut socket,
-        address: *mut sockaddr,
-        addrlen: core::ffi::c_int,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_socket_listen(sock: *mut socket, backlog: core::ffi::c_int)
-        -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_socket_accept(sock: *mut socket, newsock: *mut socket) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_socket_sendmsg(
-        sock: *mut socket,
-        msg: *mut msghdr,
-        size: core::ffi::c_int,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_socket_recvmsg(
-        sock: *mut socket,
-        msg: *mut msghdr,
-        size: core::ffi::c_int,
-        flags: core::ffi::c_int,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_socket_getsockname(sock: *mut socket) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_socket_getpeername(sock: *mut socket) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_socket_getsockopt(
-        sock: *mut socket,
-        level: core::ffi::c_int,
-        optname: core::ffi::c_int,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_socket_setsockopt(
-        sock: *mut socket,
-        level: core::ffi::c_int,
-        optname: core::ffi::c_int,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_socket_shutdown(sock: *mut socket, how: core::ffi::c_int) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_sock_rcv_skb(sk: *mut sock, skb: *mut sk_buff) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_socket_getpeersec_stream(
-        sock: *mut socket,
-        optval: sockptr_t,
-        optlen: sockptr_t,
-        len: core::ffi::c_uint,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_socket_getpeersec_dgram(
-        sock: *mut socket,
-        skb: *mut sk_buff,
-        secid: *mut u32_,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_sk_alloc(
-        sk: *mut sock,
-        family: core::ffi::c_int,
-        priority: gfp_t,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_sk_free(sk: *mut sock);
-}
-extern "C" {
-    pub fn security_sk_clone(sk: *const sock, newsk: *mut sock);
-}
-extern "C" {
-    pub fn security_sk_classify_flow(sk: *const sock, flic: *mut flowi_common);
-}
-extern "C" {
-    pub fn security_req_classify_flow(req: *const request_sock, flic: *mut flowi_common);
-}
-extern "C" {
-    pub fn security_sock_graft(sk: *mut sock, parent: *mut socket);
-}
-extern "C" {
-    pub fn security_inet_conn_request(
-        sk: *const sock,
-        skb: *mut sk_buff,
-        req: *mut request_sock,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_inet_csk_clone(newsk: *mut sock, req: *const request_sock);
-}
-extern "C" {
-    pub fn security_inet_conn_established(sk: *mut sock, skb: *mut sk_buff);
-}
-extern "C" {
-    pub fn security_secmark_relabel_packet(secid: u32_) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_secmark_refcount_inc();
-}
-extern "C" {
-    pub fn security_secmark_refcount_dec();
-}
-extern "C" {
-    pub fn security_tun_dev_alloc_security(
-        security: *mut *mut core::ffi::c_void,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_tun_dev_free_security(security: *mut core::ffi::c_void);
-}
-extern "C" {
-    pub fn security_tun_dev_create() -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_tun_dev_attach_queue(security: *mut core::ffi::c_void) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_tun_dev_attach(
-        sk: *mut sock,
-        security: *mut core::ffi::c_void,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_tun_dev_open(security: *mut core::ffi::c_void) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_sctp_assoc_request(
-        asoc: *mut sctp_association,
-        skb: *mut sk_buff,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_sctp_bind_connect(
-        sk: *mut sock,
-        optname: core::ffi::c_int,
-        address: *mut sockaddr,
-        addrlen: core::ffi::c_int,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_sctp_sk_clone(asoc: *mut sctp_association, sk: *mut sock, newsk: *mut sock);
-}
-extern "C" {
-    pub fn security_sctp_assoc_established(
-        asoc: *mut sctp_association,
-        skb: *mut sk_buff,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_mptcp_add_subflow(sk: *mut sock, ssk: *mut sock) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_ib_pkey_access(
-        sec: *mut core::ffi::c_void,
-        subnet_prefix: u64_,
-        pkey: u16_,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_ib_endport_manage_subnet(
-        sec: *mut core::ffi::c_void,
-        name: *const core::ffi::c_char,
-        port_num: u8_,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_ib_alloc_security(sec: *mut *mut core::ffi::c_void) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_ib_free_security(sec: *mut core::ffi::c_void);
-}
-extern "C" {
-    pub fn security_xfrm_policy_alloc(
-        ctxp: *mut *mut xfrm_sec_ctx,
-        sec_ctx: *mut xfrm_user_sec_ctx,
-        gfp: gfp_t,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_xfrm_policy_clone(
-        old_ctx: *mut xfrm_sec_ctx,
-        new_ctxp: *mut *mut xfrm_sec_ctx,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_xfrm_policy_free(ctx: *mut xfrm_sec_ctx);
-}
-extern "C" {
-    pub fn security_xfrm_policy_delete(ctx: *mut xfrm_sec_ctx) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_xfrm_state_alloc(
-        x: *mut xfrm_state,
-        sec_ctx: *mut xfrm_user_sec_ctx,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_xfrm_state_alloc_acquire(
-        x: *mut xfrm_state,
-        polsec: *mut xfrm_sec_ctx,
-        secid: u32_,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_xfrm_state_delete(x: *mut xfrm_state) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_xfrm_state_free(x: *mut xfrm_state);
-}
-extern "C" {
-    pub fn security_xfrm_policy_lookup(ctx: *mut xfrm_sec_ctx, fl_secid: u32_) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_xfrm_state_pol_flow_match(
-        x: *mut xfrm_state,
-        xp: *mut xfrm_policy,
-        flic: *const flowi_common,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_xfrm_decode_session(skb: *mut sk_buff, secid: *mut u32_) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_skb_classify_flow(skb: *mut sk_buff, flic: *mut flowi_common);
-}
-extern "C" {
-    pub fn security_path_unlink(dir: *const path, dentry: *mut dentry) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_path_mkdir(
-        dir: *const path,
-        dentry: *mut dentry,
-        mode: umode_t,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_path_rmdir(dir: *const path, dentry: *mut dentry) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_path_mknod(
-        dir: *const path,
-        dentry: *mut dentry,
-        mode: umode_t,
-        dev: core::ffi::c_uint,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_path_truncate(path: *const path) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_path_symlink(
-        dir: *const path,
-        dentry: *mut dentry,
-        old_name: *const core::ffi::c_char,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_path_link(
-        old_dentry: *mut dentry,
-        new_dir: *const path,
-        new_dentry: *mut dentry,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_path_rename(
-        old_dir: *const path,
-        old_dentry: *mut dentry,
-        new_dir: *const path,
-        new_dentry: *mut dentry,
-        flags: core::ffi::c_uint,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_path_chmod(path: *const path, mode: umode_t) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_path_chown(path: *const path, uid: kuid_t, gid: kgid_t) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_path_chroot(path: *const path) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_key_alloc(
-        key: *mut key,
-        cred: *const cred,
-        flags: core::ffi::c_ulong,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_key_free(key: *mut key);
-}
-extern "C" {
-    pub fn security_key_permission(
-        key_ref: key_ref_t,
-        cred: *const cred,
-        need_perm: key_need_perm,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_key_getsecurity(
-        key: *mut key,
-        _buffer: *mut *mut core::ffi::c_char,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_audit_rule_init(
-        field: u32_,
-        op: u32_,
-        rulestr: *mut core::ffi::c_char,
-        lsmrule: *mut *mut core::ffi::c_void,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_audit_rule_known(krule: *mut audit_krule) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_audit_rule_match(
-        secid: u32_,
-        field: u32_,
-        op: u32_,
-        lsmrule: *mut core::ffi::c_void,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_audit_rule_free(lsmrule: *mut core::ffi::c_void);
-}
-extern "C" {
-    pub fn securityfs_create_file(
-        name: *const core::ffi::c_char,
-        mode: umode_t,
-        parent: *mut dentry,
-        data: *mut core::ffi::c_void,
-        fops: *const file_operations,
-    ) -> *mut dentry;
-}
-extern "C" {
-    pub fn securityfs_create_dir(
-        name: *const core::ffi::c_char,
-        parent: *mut dentry,
-    ) -> *mut dentry;
-}
-extern "C" {
-    pub fn securityfs_create_symlink(
-        name: *const core::ffi::c_char,
-        parent: *mut dentry,
-        target: *const core::ffi::c_char,
-        iops: *const inode_operations,
-    ) -> *mut dentry;
-}
-extern "C" {
-    pub fn securityfs_remove(dentry: *mut dentry);
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct bpf_map {
-    _unused: [u8; 0],
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct bpf_prog_aux {
-    _unused: [u8; 0],
-}
-extern "C" {
-    pub fn security_bpf(
-        cmd: core::ffi::c_int,
-        attr: *mut bpf_attr,
-        size: core::ffi::c_uint,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_bpf_map(map: *mut bpf_map, fmode: fmode_t) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_bpf_prog(prog: *mut bpf_prog) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_bpf_map_alloc(map: *mut bpf_map) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_bpf_map_free(map: *mut bpf_map);
-}
-extern "C" {
-    pub fn security_bpf_prog_alloc(aux: *mut bpf_prog_aux) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_bpf_prog_free(aux: *mut bpf_prog_aux);
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct perf_event_attr {
-    _unused: [u8; 0],
-}
-extern "C" {
-    pub fn security_perf_event_open(
-        attr: *mut perf_event_attr,
-        type_: core::ffi::c_int,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_perf_event_alloc(event: *mut perf_event) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_perf_event_free(event: *mut perf_event);
-}
-extern "C" {
-    pub fn security_perf_event_read(event: *mut perf_event) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_perf_event_write(event: *mut perf_event) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_uring_override_creds(new: *const cred) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_uring_sqpoll() -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn security_uring_cmd(ioucmd: *mut io_uring_cmd) -> core::ffi::c_int;
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct mnt_namespace {
-    _unused: [u8; 0],
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct uts_namespace {
-    _unused: [u8; 0],
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct ipc_namespace {
-    _unused: [u8; 0],
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct cgroup_namespace {
-    _unused: [u8; 0],
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct nsproxy {
-    pub count: refcount_t,
-    pub uts_ns: *mut uts_namespace,
-    pub ipc_ns: *mut ipc_namespace,
-    pub mnt_ns: *mut mnt_namespace,
-    pub pid_ns_for_children: *mut pid_namespace,
-    pub net_ns: *mut net,
-    pub time_ns: *mut time_namespace,
-    pub time_ns_for_children: *mut time_namespace,
-    pub cgroup_ns: *mut cgroup_namespace,
-}
-impl Default for nsproxy {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-extern "C" {
-    pub static mut init_nsproxy: nsproxy;
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct nsset {
-    pub flags: core::ffi::c_uint,
-    pub nsproxy: *mut nsproxy,
-    pub fs: *mut fs_struct,
-    pub cred: *const cred,
-}
-impl Default for nsset {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-extern "C" {
-    pub fn copy_namespaces(flags: core::ffi::c_ulong, tsk: *mut task_struct) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn exit_task_namespaces(tsk: *mut task_struct);
-}
-extern "C" {
-    pub fn switch_task_namespaces(tsk: *mut task_struct, new: *mut nsproxy);
-}
-extern "C" {
-    pub fn exec_task_namespaces() -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn free_nsproxy(ns: *mut nsproxy);
-}
-extern "C" {
-    pub fn unshare_nsproxy_namespaces(
-        arg1: core::ffi::c_ulong,
-        arg2: *mut *mut nsproxy,
-        arg3: *mut cred,
-        arg4: *mut fs_struct,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn nsproxy_cache_init() -> core::ffi::c_int;
 }
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
@@ -59169,9 +62200,9 @@ pub struct nl_mmap_hdr {
     pub nm_uid: __u32,
     pub nm_gid: __u32,
 }
-pub const NETLINK_UNCONNECTED: _bindgen_ty_107 = 0;
-pub const NETLINK_CONNECTED: _bindgen_ty_107 = 1;
-pub type _bindgen_ty_107 = core::ffi::c_uint;
+pub const NETLINK_UNCONNECTED: _bindgen_ty_112 = 0;
+pub const NETLINK_CONNECTED: _bindgen_ty_112 = 1;
+pub type _bindgen_ty_112 = core::ffi::c_uint;
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
 pub struct nlattr {
@@ -60552,11 +63583,11 @@ pub const ethtool_phys_id_state_ETHTOOL_ID_ON: ethtool_phys_id_state = 2;
 pub const ethtool_phys_id_state_ETHTOOL_ID_OFF: ethtool_phys_id_state = 3;
 #[doc = " enum ethtool_phys_id_state - indicator state for physical identification\n @ETHTOOL_ID_INACTIVE: Physical ID indicator should be deactivated\n @ETHTOOL_ID_ACTIVE: Physical ID indicator should be activated\n @ETHTOOL_ID_ON: LED should be turned on (used iff %ETHTOOL_ID_ACTIVE\n\tis not supported)\n @ETHTOOL_ID_OFF: LED should be turned off (used iff %ETHTOOL_ID_ACTIVE\n\tis not supported)"]
 pub type ethtool_phys_id_state = core::ffi::c_uint;
-pub const ETH_RSS_HASH_TOP_BIT: _bindgen_ty_108 = 0;
-pub const ETH_RSS_HASH_XOR_BIT: _bindgen_ty_108 = 1;
-pub const ETH_RSS_HASH_CRC32_BIT: _bindgen_ty_108 = 2;
-pub const ETH_RSS_HASH_FUNCS_COUNT: _bindgen_ty_108 = 3;
-pub type _bindgen_ty_108 = core::ffi::c_uint;
+pub const ETH_RSS_HASH_TOP_BIT: _bindgen_ty_113 = 0;
+pub const ETH_RSS_HASH_XOR_BIT: _bindgen_ty_113 = 1;
+pub const ETH_RSS_HASH_CRC32_BIT: _bindgen_ty_113 = 2;
+pub const ETH_RSS_HASH_FUNCS_COUNT: _bindgen_ty_113 = 3;
+pub type _bindgen_ty_113 = core::ffi::c_uint;
 #[doc = " struct kernel_ethtool_ringparam - RX/TX ring configuration\n @rx_buf_len: Current length of buffers on the rx ring.\n @tcp_data_split: Scatter packet headers and data to separate buffers\n @tx_push: The flag of tx push mode\n @rx_push: The flag of rx push mode\n @cqe_size: Size of TX/RX completion queue event\n @tx_push_buf_len: Size of TX push buffer\n @tx_push_buf_max_len: Maximum allowed size of TX push buffer"]
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
@@ -61524,577 +64555,6 @@ extern "C" {
     #[doc = " ethtool_sprintf - Write formatted string to ethtool string data\n @data: Pointer to start of string to update\n @fmt: Format of string to write\n\n Write formatted string to data. Update data to point at start of\n next string."]
     pub fn ethtool_sprintf(data: *mut *mut u8_, fmt: *const core::ffi::c_char, ...);
 }
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct gpio_desc {
-    _unused: [u8; 0],
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct platform_device {
-    _unused: [u8; 0],
-}
-pub const led_brightness_LED_OFF: led_brightness = 0;
-pub const led_brightness_LED_ON: led_brightness = 1;
-pub const led_brightness_LED_HALF: led_brightness = 127;
-pub const led_brightness_LED_FULL: led_brightness = 255;
-pub type led_brightness = core::ffi::c_uint;
-pub const led_default_state_LEDS_DEFSTATE_OFF: led_default_state = 0;
-pub const led_default_state_LEDS_DEFSTATE_ON: led_default_state = 1;
-pub const led_default_state_LEDS_DEFSTATE_KEEP: led_default_state = 2;
-pub type led_default_state = core::ffi::c_uint;
-#[doc = " struct led_lookup_data - represents a single LED lookup entry\n\n @list: internal list of all LED lookup entries\n @provider: name of led_classdev providing the LED\n @dev_id: name of the device associated with this LED\n @con_id: name of the LED from the device's point of view"]
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct led_lookup_data {
-    pub list: list_head,
-    pub provider: *const core::ffi::c_char,
-    pub dev_id: *const core::ffi::c_char,
-    pub con_id: *const core::ffi::c_char,
-}
-impl Default for led_lookup_data {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct led_init_data {
-    pub fwnode: *mut fwnode_handle,
-    pub default_label: *const core::ffi::c_char,
-    pub devicename: *const core::ffi::c_char,
-    pub devname_mandatory: bool_,
-}
-impl Default for led_init_data {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-extern "C" {
-    pub fn led_init_default_state_get(fwnode: *mut fwnode_handle) -> led_default_state;
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct led_hw_trigger_type {
-    pub dummy: core::ffi::c_int,
-}
-#[repr(C)]
-#[derive(Copy, Clone)]
-pub struct led_classdev {
-    pub name: *const core::ffi::c_char,
-    pub brightness: core::ffi::c_uint,
-    pub max_brightness: core::ffi::c_uint,
-    pub color: core::ffi::c_uint,
-    pub flags: core::ffi::c_int,
-    pub work_flags: core::ffi::c_ulong,
-    pub brightness_set: ::core::option::Option<
-        unsafe extern "C" fn(led_cdev: *mut led_classdev, brightness: led_brightness),
-    >,
-    pub brightness_set_blocking: ::core::option::Option<
-        unsafe extern "C" fn(
-            led_cdev: *mut led_classdev,
-            brightness: led_brightness,
-        ) -> core::ffi::c_int,
-    >,
-    pub brightness_get:
-        ::core::option::Option<unsafe extern "C" fn(led_cdev: *mut led_classdev) -> led_brightness>,
-    pub blink_set: ::core::option::Option<
-        unsafe extern "C" fn(
-            led_cdev: *mut led_classdev,
-            delay_on: *mut core::ffi::c_ulong,
-            delay_off: *mut core::ffi::c_ulong,
-        ) -> core::ffi::c_int,
-    >,
-    pub pattern_set: ::core::option::Option<
-        unsafe extern "C" fn(
-            led_cdev: *mut led_classdev,
-            pattern: *mut led_pattern,
-            len: u32_,
-            repeat: core::ffi::c_int,
-        ) -> core::ffi::c_int,
-    >,
-    pub pattern_clear: ::core::option::Option<
-        unsafe extern "C" fn(led_cdev: *mut led_classdev) -> core::ffi::c_int,
-    >,
-    pub dev: *mut device,
-    pub groups: *mut *const attribute_group,
-    pub node: list_head,
-    pub default_trigger: *const core::ffi::c_char,
-    pub blink_delay_on: core::ffi::c_ulong,
-    pub blink_delay_off: core::ffi::c_ulong,
-    pub blink_timer: timer_list,
-    pub blink_brightness: core::ffi::c_int,
-    pub new_blink_brightness: core::ffi::c_int,
-    pub flash_resume: ::core::option::Option<unsafe extern "C" fn(led_cdev: *mut led_classdev)>,
-    pub set_brightness_work: work_struct,
-    pub delayed_set_value: core::ffi::c_int,
-    pub delayed_delay_on: core::ffi::c_ulong,
-    pub delayed_delay_off: core::ffi::c_ulong,
-    pub trigger_lock: rw_semaphore,
-    pub trigger: *mut led_trigger,
-    pub trig_list: list_head,
-    pub trigger_data: *mut core::ffi::c_void,
-    pub activated: bool_,
-    pub trigger_type: *mut led_hw_trigger_type,
-    pub hw_control_trigger: *const core::ffi::c_char,
-    pub hw_control_is_supported: ::core::option::Option<
-        unsafe extern "C" fn(
-            led_cdev: *mut led_classdev,
-            flags: core::ffi::c_ulong,
-        ) -> core::ffi::c_int,
-    >,
-    pub hw_control_set: ::core::option::Option<
-        unsafe extern "C" fn(
-            led_cdev: *mut led_classdev,
-            flags: core::ffi::c_ulong,
-        ) -> core::ffi::c_int,
-    >,
-    pub hw_control_get: ::core::option::Option<
-        unsafe extern "C" fn(
-            led_cdev: *mut led_classdev,
-            flags: *mut core::ffi::c_ulong,
-        ) -> core::ffi::c_int,
-    >,
-    pub hw_control_get_device:
-        ::core::option::Option<unsafe extern "C" fn(led_cdev: *mut led_classdev) -> *mut device>,
-    pub led_access: mutex,
-}
-impl Default for led_classdev {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-extern "C" {
-    #[doc = " led_classdev_register_ext - register a new object of LED class with\n\t\t\t       init data\n @parent: LED controller device this LED is driven by\n @led_cdev: the led_classdev structure for this device\n @init_data: the LED class device initialization data\n\n Register a new object of LED class, with name derived from init_data.\n\n Returns: 0 on success or negative error value on failure"]
-    pub fn led_classdev_register_ext(
-        parent: *mut device,
-        led_cdev: *mut led_classdev,
-        init_data: *mut led_init_data,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn devm_led_classdev_register_ext(
-        parent: *mut device,
-        led_cdev: *mut led_classdev,
-        init_data: *mut led_init_data,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn led_classdev_unregister(led_cdev: *mut led_classdev);
-}
-extern "C" {
-    pub fn devm_led_classdev_unregister(parent: *mut device, led_cdev: *mut led_classdev);
-}
-extern "C" {
-    pub fn led_classdev_suspend(led_cdev: *mut led_classdev);
-}
-extern "C" {
-    pub fn led_classdev_resume(led_cdev: *mut led_classdev);
-}
-extern "C" {
-    pub fn led_add_lookup(led_lookup: *mut led_lookup_data);
-}
-extern "C" {
-    pub fn led_remove_lookup(led_lookup: *mut led_lookup_data);
-}
-extern "C" {
-    #[must_use]
-    pub fn led_get(dev: *mut device, con_id: *mut core::ffi::c_char) -> *mut led_classdev;
-}
-extern "C" {
-    #[must_use]
-    pub fn devm_led_get(dev: *mut device, con_id: *mut core::ffi::c_char) -> *mut led_classdev;
-}
-extern "C" {
-    pub fn of_led_get(np: *mut device_node, index: core::ffi::c_int) -> *mut led_classdev;
-}
-extern "C" {
-    pub fn led_put(led_cdev: *mut led_classdev);
-}
-extern "C" {
-    #[must_use]
-    pub fn devm_of_led_get(dev: *mut device, index: core::ffi::c_int) -> *mut led_classdev;
-}
-extern "C" {
-    #[must_use]
-    pub fn devm_of_led_get_optional(dev: *mut device, index: core::ffi::c_int)
-        -> *mut led_classdev;
-}
-extern "C" {
-    #[doc = " led_blink_set - set blinking with software fallback\n @led_cdev: the LED to start blinking\n @delay_on: the time it should be on (in ms)\n @delay_off: the time it should ble off (in ms)\n\n This function makes the LED blink, attempting to use the\n hardware acceleration if possible, but falling back to\n software blinking if there is no hardware blinking or if\n the LED refuses the passed values.\n\n This function may sleep!\n\n Note that if software blinking is active, simply calling\n led_cdev->brightness_set() will not stop the blinking,\n use led_set_brightness() instead."]
-    pub fn led_blink_set(
-        led_cdev: *mut led_classdev,
-        delay_on: *mut core::ffi::c_ulong,
-        delay_off: *mut core::ffi::c_ulong,
-    );
-}
-extern "C" {
-    #[doc = " led_blink_set_nosleep - set blinking, guaranteed to not sleep\n @led_cdev: the LED to start blinking\n @delay_on: the time it should be on (in ms)\n @delay_off: the time it should ble off (in ms)\n\n This function makes the LED blink and is guaranteed to not sleep. Otherwise\n this is the same as led_blink_set(), see led_blink_set() for details."]
-    pub fn led_blink_set_nosleep(
-        led_cdev: *mut led_classdev,
-        delay_on: core::ffi::c_ulong,
-        delay_off: core::ffi::c_ulong,
-    );
-}
-extern "C" {
-    #[doc = " led_blink_set_oneshot - do a oneshot software blink\n @led_cdev: the LED to start blinking\n @delay_on: the time it should be on (in ms)\n @delay_off: the time it should ble off (in ms)\n @invert: blink off, then on, leaving the led on\n\n This function makes the LED blink one time for delay_on +\n delay_off time, ignoring the request if another one-shot\n blink is already in progress.\n\n If invert is set, led blinks for delay_off first, then for\n delay_on and leave the led on after the on-off cycle.\n\n This function is guaranteed not to sleep."]
-    pub fn led_blink_set_oneshot(
-        led_cdev: *mut led_classdev,
-        delay_on: *mut core::ffi::c_ulong,
-        delay_off: *mut core::ffi::c_ulong,
-        invert: core::ffi::c_int,
-    );
-}
-extern "C" {
-    #[doc = " led_set_brightness - set LED brightness\n @led_cdev: the LED to set\n @brightness: the brightness to set it to\n\n Set an LED's brightness, and, if necessary, cancel the\n software blink timer that implements blinking when the\n hardware doesn't. This function is guaranteed not to sleep."]
-    pub fn led_set_brightness(led_cdev: *mut led_classdev, brightness: core::ffi::c_uint);
-}
-extern "C" {
-    #[doc = " led_set_brightness_sync - set LED brightness synchronously\n @led_cdev: the LED to set\n @value: the brightness to set it to\n\n Set an LED's brightness immediately. This function will block\n the caller for the time required for accessing device registers,\n and it can sleep.\n\n Returns: 0 on success or negative error value on failure"]
-    pub fn led_set_brightness_sync(
-        led_cdev: *mut led_classdev,
-        value: core::ffi::c_uint,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    #[doc = " led_update_brightness - update LED brightness\n @led_cdev: the LED to query\n\n Get an LED's current brightness and update led_cdev->brightness\n member with the obtained value.\n\n Returns: 0 on success or negative error value on failure"]
-    pub fn led_update_brightness(led_cdev: *mut led_classdev) -> core::ffi::c_int;
-}
-extern "C" {
-    #[doc = " led_get_default_pattern - return default pattern\n\n @led_cdev: the LED to get default pattern for\n @size:     pointer for storing the number of elements in returned array,\n            modified only if return != NULL\n\n Return:    Allocated array of integers with default pattern from device tree\n            or NULL.  Caller is responsible for kfree()."]
-    pub fn led_get_default_pattern(
-        led_cdev: *mut led_classdev,
-        size: *mut core::ffi::c_uint,
-    ) -> *mut u32_;
-}
-extern "C" {
-    #[doc = " led_sysfs_disable - disable LED sysfs interface\n @led_cdev: the LED to set\n\n Disable the led_cdev's sysfs interface."]
-    pub fn led_sysfs_disable(led_cdev: *mut led_classdev);
-}
-extern "C" {
-    #[doc = " led_sysfs_enable - enable LED sysfs interface\n @led_cdev: the LED to set\n\n Enable the led_cdev's sysfs interface."]
-    pub fn led_sysfs_enable(led_cdev: *mut led_classdev);
-}
-extern "C" {
-    #[doc = " led_compose_name - compose LED class device name\n @dev: LED controller device object\n @init_data: the LED class device initialization data\n @led_classdev_name: composed LED class device name\n\n Create LED class device name basing on the provided init_data argument.\n The name can have <devicename:color:function> or <color:function>.\n form, depending on the init_data configuration.\n\n Returns: 0 on success or negative error value on failure"]
-    pub fn led_compose_name(
-        dev: *mut device,
-        init_data: *mut led_init_data,
-        led_classdev_name: *mut core::ffi::c_char,
-    ) -> core::ffi::c_int;
-}
-#[repr(C)]
-#[derive(Copy, Clone)]
-pub struct led_trigger {
-    pub name: *const core::ffi::c_char,
-    pub activate: ::core::option::Option<
-        unsafe extern "C" fn(led_cdev: *mut led_classdev) -> core::ffi::c_int,
-    >,
-    pub deactivate: ::core::option::Option<unsafe extern "C" fn(led_cdev: *mut led_classdev)>,
-    pub trigger_type: *mut led_hw_trigger_type,
-    pub leddev_list_lock: spinlock_t,
-    pub led_cdevs: list_head,
-    pub next_trig: list_head,
-    pub groups: *mut *const attribute_group,
-}
-impl Default for led_trigger {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-extern "C" {
-    pub fn led_trigger_register(trigger: *mut led_trigger) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn led_trigger_unregister(trigger: *mut led_trigger);
-}
-extern "C" {
-    pub fn devm_led_trigger_register(
-        dev: *mut device,
-        trigger: *mut led_trigger,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn led_trigger_register_simple(
-        name: *const core::ffi::c_char,
-        trigger: *mut *mut led_trigger,
-    );
-}
-extern "C" {
-    pub fn led_trigger_unregister_simple(trigger: *mut led_trigger);
-}
-extern "C" {
-    pub fn led_trigger_event(trigger: *mut led_trigger, event: led_brightness);
-}
-extern "C" {
-    pub fn led_trigger_blink(
-        trigger: *mut led_trigger,
-        delay_on: core::ffi::c_ulong,
-        delay_off: core::ffi::c_ulong,
-    );
-}
-extern "C" {
-    pub fn led_trigger_blink_oneshot(
-        trigger: *mut led_trigger,
-        delay_on: core::ffi::c_ulong,
-        delay_off: core::ffi::c_ulong,
-        invert: core::ffi::c_int,
-    );
-}
-extern "C" {
-    pub fn led_trigger_set_default(led_cdev: *mut led_classdev);
-}
-extern "C" {
-    pub fn led_trigger_set(
-        led_cdev: *mut led_classdev,
-        trigger: *mut led_trigger,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn led_trigger_remove(led_cdev: *mut led_classdev);
-}
-extern "C" {
-    #[doc = " led_trigger_rename_static - rename a trigger\n @name: the new trigger name\n @trig: the LED trigger to rename\n\n Change a LED trigger name by copying the string passed in\n name into current trigger name, which MUST be large\n enough for the new string.\n\n Note that name must NOT point to the same string used\n during LED registration, as that could lead to races.\n\n This is meant to be used on triggers with statically\n allocated name."]
-    pub fn led_trigger_rename_static(name: *const core::ffi::c_char, trig: *mut led_trigger);
-}
-pub const led_trigger_netdev_modes_TRIGGER_NETDEV_LINK: led_trigger_netdev_modes = 0;
-pub const led_trigger_netdev_modes_TRIGGER_NETDEV_LINK_10: led_trigger_netdev_modes = 1;
-pub const led_trigger_netdev_modes_TRIGGER_NETDEV_LINK_100: led_trigger_netdev_modes = 2;
-pub const led_trigger_netdev_modes_TRIGGER_NETDEV_LINK_1000: led_trigger_netdev_modes = 3;
-pub const led_trigger_netdev_modes_TRIGGER_NETDEV_HALF_DUPLEX: led_trigger_netdev_modes = 4;
-pub const led_trigger_netdev_modes_TRIGGER_NETDEV_FULL_DUPLEX: led_trigger_netdev_modes = 5;
-pub const led_trigger_netdev_modes_TRIGGER_NETDEV_TX: led_trigger_netdev_modes = 6;
-pub const led_trigger_netdev_modes_TRIGGER_NETDEV_RX: led_trigger_netdev_modes = 7;
-pub const led_trigger_netdev_modes___TRIGGER_NETDEV_MAX: led_trigger_netdev_modes = 8;
-pub type led_trigger_netdev_modes = core::ffi::c_uint;
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct led_info {
-    pub name: *const core::ffi::c_char,
-    pub default_trigger: *const core::ffi::c_char,
-    pub flags: core::ffi::c_int,
-}
-impl Default for led_info {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct led_platform_data {
-    pub num_leds: core::ffi::c_int,
-    pub leds: *mut led_info,
-}
-impl Default for led_platform_data {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct led_properties {
-    pub color: u32_,
-    pub color_present: bool_,
-    pub function: *const core::ffi::c_char,
-    pub func_enum: u32_,
-    pub func_enum_present: bool_,
-    pub label: *const core::ffi::c_char,
-}
-impl Default for led_properties {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-pub type gpio_blink_set_t = ::core::option::Option<
-    unsafe extern "C" fn(
-        desc: *mut gpio_desc,
-        state: core::ffi::c_int,
-        delay_on: *mut core::ffi::c_ulong,
-        delay_off: *mut core::ffi::c_ulong,
-    ) -> core::ffi::c_int,
->;
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct gpio_led {
-    pub name: *const core::ffi::c_char,
-    pub default_trigger: *const core::ffi::c_char,
-    pub gpio: core::ffi::c_uint,
-    pub _bitfield_align_1: [u8; 0],
-    pub _bitfield_1: __BindgenBitfieldUnit<[u8; 1usize]>,
-    pub gpiod: *mut gpio_desc,
-}
-impl Default for gpio_led {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-impl gpio_led {
-    #[inline]
-    pub fn active_low(&self) -> core::ffi::c_uint {
-        unsafe { ::core::mem::transmute(self._bitfield_1.get(0usize, 1u8) as u32) }
-    }
-    #[inline]
-    pub fn set_active_low(&mut self, val: core::ffi::c_uint) {
-        unsafe {
-            let val: u32 = ::core::mem::transmute(val);
-            self._bitfield_1.set(0usize, 1u8, val as u64)
-        }
-    }
-    #[inline]
-    pub fn retain_state_suspended(&self) -> core::ffi::c_uint {
-        unsafe { ::core::mem::transmute(self._bitfield_1.get(1usize, 1u8) as u32) }
-    }
-    #[inline]
-    pub fn set_retain_state_suspended(&mut self, val: core::ffi::c_uint) {
-        unsafe {
-            let val: u32 = ::core::mem::transmute(val);
-            self._bitfield_1.set(1usize, 1u8, val as u64)
-        }
-    }
-    #[inline]
-    pub fn panic_indicator(&self) -> core::ffi::c_uint {
-        unsafe { ::core::mem::transmute(self._bitfield_1.get(2usize, 1u8) as u32) }
-    }
-    #[inline]
-    pub fn set_panic_indicator(&mut self, val: core::ffi::c_uint) {
-        unsafe {
-            let val: u32 = ::core::mem::transmute(val);
-            self._bitfield_1.set(2usize, 1u8, val as u64)
-        }
-    }
-    #[inline]
-    pub fn default_state(&self) -> core::ffi::c_uint {
-        unsafe { ::core::mem::transmute(self._bitfield_1.get(3usize, 2u8) as u32) }
-    }
-    #[inline]
-    pub fn set_default_state(&mut self, val: core::ffi::c_uint) {
-        unsafe {
-            let val: u32 = ::core::mem::transmute(val);
-            self._bitfield_1.set(3usize, 2u8, val as u64)
-        }
-    }
-    #[inline]
-    pub fn retain_state_shutdown(&self) -> core::ffi::c_uint {
-        unsafe { ::core::mem::transmute(self._bitfield_1.get(5usize, 1u8) as u32) }
-    }
-    #[inline]
-    pub fn set_retain_state_shutdown(&mut self, val: core::ffi::c_uint) {
-        unsafe {
-            let val: u32 = ::core::mem::transmute(val);
-            self._bitfield_1.set(5usize, 1u8, val as u64)
-        }
-    }
-    #[inline]
-    pub fn new_bitfield_1(
-        active_low: core::ffi::c_uint,
-        retain_state_suspended: core::ffi::c_uint,
-        panic_indicator: core::ffi::c_uint,
-        default_state: core::ffi::c_uint,
-        retain_state_shutdown: core::ffi::c_uint,
-    ) -> __BindgenBitfieldUnit<[u8; 1usize]> {
-        let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 1usize]> = Default::default();
-        __bindgen_bitfield_unit.set(0usize, 1u8, {
-            let active_low: u32 = unsafe { ::core::mem::transmute(active_low) };
-            active_low as u64
-        });
-        __bindgen_bitfield_unit.set(1usize, 1u8, {
-            let retain_state_suspended: u32 =
-                unsafe { ::core::mem::transmute(retain_state_suspended) };
-            retain_state_suspended as u64
-        });
-        __bindgen_bitfield_unit.set(2usize, 1u8, {
-            let panic_indicator: u32 = unsafe { ::core::mem::transmute(panic_indicator) };
-            panic_indicator as u64
-        });
-        __bindgen_bitfield_unit.set(3usize, 2u8, {
-            let default_state: u32 = unsafe { ::core::mem::transmute(default_state) };
-            default_state as u64
-        });
-        __bindgen_bitfield_unit.set(5usize, 1u8, {
-            let retain_state_shutdown: u32 =
-                unsafe { ::core::mem::transmute(retain_state_shutdown) };
-            retain_state_shutdown as u64
-        });
-        __bindgen_bitfield_unit
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct gpio_led_platform_data {
-    pub num_leds: core::ffi::c_int,
-    pub leds: *const gpio_led,
-    pub gpio_blink_set: gpio_blink_set_t,
-}
-impl Default for gpio_led_platform_data {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-extern "C" {
-    pub fn gpio_led_register_device(
-        id: core::ffi::c_int,
-        pdata: *const gpio_led_platform_data,
-    ) -> *mut platform_device;
-}
-pub const cpu_led_event_CPU_LED_IDLE_START: cpu_led_event = 0;
-pub const cpu_led_event_CPU_LED_IDLE_END: cpu_led_event = 1;
-pub const cpu_led_event_CPU_LED_START: cpu_led_event = 2;
-pub const cpu_led_event_CPU_LED_STOP: cpu_led_event = 3;
-pub const cpu_led_event_CPU_LED_HALTED: cpu_led_event = 4;
-pub type cpu_led_event = core::ffi::c_uint;
-#[doc = " struct led_pattern - pattern interval settings\n @delta_t: pattern interval delay, in milliseconds\n @brightness: pattern interval brightness"]
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct led_pattern {
-    pub delta_t: u32_,
-    pub brightness: core::ffi::c_int,
-}
-pub const led_audio_LED_AUDIO_MUTE: led_audio = 0;
-pub const led_audio_LED_AUDIO_MICMUTE: led_audio = 1;
-pub const led_audio_NUM_AUDIO_LEDS: led_audio = 2;
-pub type led_audio = core::ffi::c_uint;
-extern "C" {
-    pub fn ledtrig_audio_get(type_: led_audio) -> led_brightness;
-}
-extern "C" {
-    pub fn ledtrig_audio_set(type_: led_audio, state: led_brightness);
-}
 extern "C" {
     pub fn linkmode_resolve_pause(
         local_adv: *const core::ffi::c_ulong,
@@ -62333,8 +64793,8 @@ impl Default for mei_connect_client_data_vtag {
     }
 }
 pub type kernel_ulong_t = core::ffi::c_ulong;
-pub const PCI_ID_F_VFIO_DRIVER_OVERRIDE: _bindgen_ty_109 = 1;
-pub type _bindgen_ty_109 = core::ffi::c_uint;
+pub const PCI_ID_F_VFIO_DRIVER_OVERRIDE: _bindgen_ty_114 = 1;
+pub type _bindgen_ty_114 = core::ffi::c_uint;
 #[doc = " struct pci_device_id - PCI device ID structure\n @vendor:\t\tVendor ID to match (or PCI_ANY_ID)\n @device:\t\tDevice ID to match (or PCI_ANY_ID)\n @subvendor:\t\tSubsystem vendor ID to match (or PCI_ANY_ID)\n @subdevice:\t\tSubsystem device ID to match (or PCI_ANY_ID)\n @class:\t\tDevice class, subclass, and \"interface\" to match.\n\t\t\tSee Appendix D of the PCI Local Bus Spec or\n\t\t\tinclude/linux/pci_ids.h for a full list of classes.\n\t\t\tMost drivers do not need to specify class/class_mask\n\t\t\tas vendor/device is normally sufficient.\n @class_mask:\t\tLimit which sub-fields of the class field are compared.\n\t\t\tSee drivers/scsi/sym53c8xx_2/ for example of usage.\n @driver_data:\tData private to the driver.\n\t\t\tMost drivers don't need to use driver_data field.\n\t\t\tBest practice is to use driver_data as an index\n\t\t\tinto a static list of equivalent device types,\n\t\t\tinstead of using it as a pointer.\n @override_only:\tMatch only when dev->driver_override is this driver."]
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
@@ -62945,8 +65405,8 @@ pub struct ishtp_device_id {
     pub guid: guid_t,
     pub driver_data: kernel_ulong_t,
 }
-pub const CDX_ID_F_VFIO_DRIVER_OVERRIDE: _bindgen_ty_110 = 1;
-pub type _bindgen_ty_110 = core::ffi::c_uint;
+pub const CDX_ID_F_VFIO_DRIVER_OVERRIDE: _bindgen_ty_115 = 1;
+pub type _bindgen_ty_115 = core::ffi::c_uint;
 #[doc = " struct cdx_device_id - CDX device identifier\n @vendor: Vendor ID\n @device: Device ID\n @override_only: Match only when dev->driver_override is this driver.\n\n Type of entries in the \"device Id\" table for CDX devices supported by\n a CDX device driver."]
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
@@ -62954,6 +65414,11 @@ pub struct cdx_device_id {
     pub vendor: __u16,
     pub device: __u16,
     pub override_only: __u32,
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct gpio_desc {
+    _unused: [u8; 0],
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -63289,6 +65754,775 @@ extern "C" {
 extern "C" {
     pub fn mdiobus_get_phy(bus: *mut mii_bus, addr: core::ffi::c_int) -> *mut phy_device;
 }
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct statfs {
+    pub f_type: __kernel_long_t,
+    pub f_bsize: __kernel_long_t,
+    pub f_blocks: __kernel_long_t,
+    pub f_bfree: __kernel_long_t,
+    pub f_bavail: __kernel_long_t,
+    pub f_files: __kernel_long_t,
+    pub f_ffree: __kernel_long_t,
+    pub f_fsid: __kernel_fsid_t,
+    pub f_namelen: __kernel_long_t,
+    pub f_frsize: __kernel_long_t,
+    pub f_flags: __kernel_long_t,
+    pub f_spare: [__kernel_long_t; 4usize],
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct statfs64 {
+    pub f_type: __kernel_long_t,
+    pub f_bsize: __kernel_long_t,
+    pub f_blocks: __u64,
+    pub f_bfree: __u64,
+    pub f_bavail: __u64,
+    pub f_files: __u64,
+    pub f_ffree: __u64,
+    pub f_fsid: __kernel_fsid_t,
+    pub f_namelen: __kernel_long_t,
+    pub f_frsize: __kernel_long_t,
+    pub f_flags: __kernel_long_t,
+    pub f_spare: [__kernel_long_t; 4usize],
+}
+#[repr(C, packed(4))]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct compat_statfs64 {
+    pub f_type: __u32,
+    pub f_bsize: __u32,
+    pub f_blocks: __u64,
+    pub f_bfree: __u64,
+    pub f_bavail: __u64,
+    pub f_files: __u64,
+    pub f_ffree: __u64,
+    pub f_fsid: __kernel_fsid_t,
+    pub f_namelen: __u32,
+    pub f_frsize: __u32,
+    pub f_flags: __u32,
+    pub f_spare: [__u32; 4usize],
+}
+pub type fsid_t = __kernel_fsid_t;
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct kstatfs {
+    pub f_type: core::ffi::c_long,
+    pub f_bsize: core::ffi::c_long,
+    pub f_blocks: u64_,
+    pub f_bfree: u64_,
+    pub f_bavail: u64_,
+    pub f_files: u64_,
+    pub f_ffree: u64_,
+    pub f_fsid: __kernel_fsid_t,
+    pub f_namelen: core::ffi::c_long,
+    pub f_frsize: core::ffi::c_long,
+    pub f_flags: core::ffi::c_long,
+    pub f_spare: [core::ffi::c_long; 4usize],
+}
+extern "C" {
+    pub fn vfs_get_fsid(dentry: *mut dentry, fsid: *mut __kernel_fsid_t) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn errname(err: core::ffi::c_int) -> *const core::ffi::c_char;
+}
+extern "C" {
+    pub fn set_memory_ro(addr: core::ffi::c_ulong, numpages: core::ffi::c_int) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn set_memory_rw(addr: core::ffi::c_ulong, numpages: core::ffi::c_int) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn set_memory_x(addr: core::ffi::c_ulong, numpages: core::ffi::c_int) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn set_memory_nx(addr: core::ffi::c_ulong, numpages: core::ffi::c_int) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn set_memory_rox(addr: core::ffi::c_ulong, numpages: core::ffi::c_int)
+        -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn __set_memory_prot(
+        addr: core::ffi::c_ulong,
+        numpages: core::ffi::c_int,
+        prot: pgprot_t,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn _set_memory_uc(addr: core::ffi::c_ulong, numpages: core::ffi::c_int)
+        -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn _set_memory_wc(addr: core::ffi::c_ulong, numpages: core::ffi::c_int)
+        -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn _set_memory_wt(addr: core::ffi::c_ulong, numpages: core::ffi::c_int)
+        -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn _set_memory_wb(addr: core::ffi::c_ulong, numpages: core::ffi::c_int)
+        -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn set_memory_uc(addr: core::ffi::c_ulong, numpages: core::ffi::c_int) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn set_memory_wc(addr: core::ffi::c_ulong, numpages: core::ffi::c_int) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn set_memory_wb(addr: core::ffi::c_ulong, numpages: core::ffi::c_int) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn set_memory_np(addr: core::ffi::c_ulong, numpages: core::ffi::c_int) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn set_memory_4k(addr: core::ffi::c_ulong, numpages: core::ffi::c_int) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn set_memory_encrypted(
+        addr: core::ffi::c_ulong,
+        numpages: core::ffi::c_int,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn set_memory_decrypted(
+        addr: core::ffi::c_ulong,
+        numpages: core::ffi::c_int,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn set_memory_np_noalias(
+        addr: core::ffi::c_ulong,
+        numpages: core::ffi::c_int,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn set_memory_nonglobal(
+        addr: core::ffi::c_ulong,
+        numpages: core::ffi::c_int,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn set_memory_global(
+        addr: core::ffi::c_ulong,
+        numpages: core::ffi::c_int,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn set_pages_array_uc(
+        pages: *mut *mut page,
+        addrinarray: core::ffi::c_int,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn set_pages_array_wc(
+        pages: *mut *mut page,
+        addrinarray: core::ffi::c_int,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn set_pages_array_wb(
+        pages: *mut *mut page,
+        addrinarray: core::ffi::c_int,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn set_pages_uc(page: *mut page, numpages: core::ffi::c_int) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn set_pages_wb(page: *mut page, numpages: core::ffi::c_int) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn set_pages_ro(page: *mut page, numpages: core::ffi::c_int) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn set_pages_rw(page: *mut page, numpages: core::ffi::c_int) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn set_direct_map_invalid_noflush(page: *mut page) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn set_direct_map_default_noflush(page: *mut page) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn kernel_page_present(page: *mut page) -> bool_;
+}
+extern "C" {
+    pub static mut kernel_set_to_readonly: core::ffi::c_int;
+}
+extern "C" {
+    pub fn set_mce_nospec(pfn: core::ffi::c_ulong) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn clear_mce_nospec(pfn: core::ffi::c_ulong) -> core::ffi::c_int;
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct platform_device {
+    _unused: [u8; 0],
+}
+pub const led_brightness_LED_OFF: led_brightness = 0;
+pub const led_brightness_LED_ON: led_brightness = 1;
+pub const led_brightness_LED_HALF: led_brightness = 127;
+pub const led_brightness_LED_FULL: led_brightness = 255;
+pub type led_brightness = core::ffi::c_uint;
+pub const led_default_state_LEDS_DEFSTATE_OFF: led_default_state = 0;
+pub const led_default_state_LEDS_DEFSTATE_ON: led_default_state = 1;
+pub const led_default_state_LEDS_DEFSTATE_KEEP: led_default_state = 2;
+pub type led_default_state = core::ffi::c_uint;
+#[doc = " struct led_lookup_data - represents a single LED lookup entry\n\n @list: internal list of all LED lookup entries\n @provider: name of led_classdev providing the LED\n @dev_id: name of the device associated with this LED\n @con_id: name of the LED from the device's point of view"]
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct led_lookup_data {
+    pub list: list_head,
+    pub provider: *const core::ffi::c_char,
+    pub dev_id: *const core::ffi::c_char,
+    pub con_id: *const core::ffi::c_char,
+}
+impl Default for led_lookup_data {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct led_init_data {
+    pub fwnode: *mut fwnode_handle,
+    pub default_label: *const core::ffi::c_char,
+    pub devicename: *const core::ffi::c_char,
+    pub devname_mandatory: bool_,
+}
+impl Default for led_init_data {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+extern "C" {
+    pub fn led_init_default_state_get(fwnode: *mut fwnode_handle) -> led_default_state;
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct led_hw_trigger_type {
+    pub dummy: core::ffi::c_int,
+}
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub struct led_classdev {
+    pub name: *const core::ffi::c_char,
+    pub brightness: core::ffi::c_uint,
+    pub max_brightness: core::ffi::c_uint,
+    pub color: core::ffi::c_uint,
+    pub flags: core::ffi::c_int,
+    pub work_flags: core::ffi::c_ulong,
+    pub brightness_set: ::core::option::Option<
+        unsafe extern "C" fn(led_cdev: *mut led_classdev, brightness: led_brightness),
+    >,
+    pub brightness_set_blocking: ::core::option::Option<
+        unsafe extern "C" fn(
+            led_cdev: *mut led_classdev,
+            brightness: led_brightness,
+        ) -> core::ffi::c_int,
+    >,
+    pub brightness_get:
+        ::core::option::Option<unsafe extern "C" fn(led_cdev: *mut led_classdev) -> led_brightness>,
+    pub blink_set: ::core::option::Option<
+        unsafe extern "C" fn(
+            led_cdev: *mut led_classdev,
+            delay_on: *mut core::ffi::c_ulong,
+            delay_off: *mut core::ffi::c_ulong,
+        ) -> core::ffi::c_int,
+    >,
+    pub pattern_set: ::core::option::Option<
+        unsafe extern "C" fn(
+            led_cdev: *mut led_classdev,
+            pattern: *mut led_pattern,
+            len: u32_,
+            repeat: core::ffi::c_int,
+        ) -> core::ffi::c_int,
+    >,
+    pub pattern_clear: ::core::option::Option<
+        unsafe extern "C" fn(led_cdev: *mut led_classdev) -> core::ffi::c_int,
+    >,
+    pub dev: *mut device,
+    pub groups: *mut *const attribute_group,
+    pub node: list_head,
+    pub default_trigger: *const core::ffi::c_char,
+    pub blink_delay_on: core::ffi::c_ulong,
+    pub blink_delay_off: core::ffi::c_ulong,
+    pub blink_timer: timer_list,
+    pub blink_brightness: core::ffi::c_int,
+    pub new_blink_brightness: core::ffi::c_int,
+    pub flash_resume: ::core::option::Option<unsafe extern "C" fn(led_cdev: *mut led_classdev)>,
+    pub set_brightness_work: work_struct,
+    pub delayed_set_value: core::ffi::c_int,
+    pub delayed_delay_on: core::ffi::c_ulong,
+    pub delayed_delay_off: core::ffi::c_ulong,
+    pub trigger_lock: rw_semaphore,
+    pub trigger: *mut led_trigger,
+    pub trig_list: list_head,
+    pub trigger_data: *mut core::ffi::c_void,
+    pub activated: bool_,
+    pub trigger_type: *mut led_hw_trigger_type,
+    pub hw_control_trigger: *const core::ffi::c_char,
+    pub hw_control_is_supported: ::core::option::Option<
+        unsafe extern "C" fn(
+            led_cdev: *mut led_classdev,
+            flags: core::ffi::c_ulong,
+        ) -> core::ffi::c_int,
+    >,
+    pub hw_control_set: ::core::option::Option<
+        unsafe extern "C" fn(
+            led_cdev: *mut led_classdev,
+            flags: core::ffi::c_ulong,
+        ) -> core::ffi::c_int,
+    >,
+    pub hw_control_get: ::core::option::Option<
+        unsafe extern "C" fn(
+            led_cdev: *mut led_classdev,
+            flags: *mut core::ffi::c_ulong,
+        ) -> core::ffi::c_int,
+    >,
+    pub hw_control_get_device:
+        ::core::option::Option<unsafe extern "C" fn(led_cdev: *mut led_classdev) -> *mut device>,
+    pub led_access: mutex,
+}
+impl Default for led_classdev {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+extern "C" {
+    #[doc = " led_classdev_register_ext - register a new object of LED class with\n\t\t\t       init data\n @parent: LED controller device this LED is driven by\n @led_cdev: the led_classdev structure for this device\n @init_data: the LED class device initialization data\n\n Register a new object of LED class, with name derived from init_data.\n\n Returns: 0 on success or negative error value on failure"]
+    pub fn led_classdev_register_ext(
+        parent: *mut device,
+        led_cdev: *mut led_classdev,
+        init_data: *mut led_init_data,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn devm_led_classdev_register_ext(
+        parent: *mut device,
+        led_cdev: *mut led_classdev,
+        init_data: *mut led_init_data,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn led_classdev_unregister(led_cdev: *mut led_classdev);
+}
+extern "C" {
+    pub fn devm_led_classdev_unregister(parent: *mut device, led_cdev: *mut led_classdev);
+}
+extern "C" {
+    pub fn led_classdev_suspend(led_cdev: *mut led_classdev);
+}
+extern "C" {
+    pub fn led_classdev_resume(led_cdev: *mut led_classdev);
+}
+extern "C" {
+    pub fn led_add_lookup(led_lookup: *mut led_lookup_data);
+}
+extern "C" {
+    pub fn led_remove_lookup(led_lookup: *mut led_lookup_data);
+}
+extern "C" {
+    #[must_use]
+    pub fn led_get(dev: *mut device, con_id: *mut core::ffi::c_char) -> *mut led_classdev;
+}
+extern "C" {
+    #[must_use]
+    pub fn devm_led_get(dev: *mut device, con_id: *mut core::ffi::c_char) -> *mut led_classdev;
+}
+extern "C" {
+    pub fn of_led_get(np: *mut device_node, index: core::ffi::c_int) -> *mut led_classdev;
+}
+extern "C" {
+    pub fn led_put(led_cdev: *mut led_classdev);
+}
+extern "C" {
+    #[must_use]
+    pub fn devm_of_led_get(dev: *mut device, index: core::ffi::c_int) -> *mut led_classdev;
+}
+extern "C" {
+    #[must_use]
+    pub fn devm_of_led_get_optional(dev: *mut device, index: core::ffi::c_int)
+        -> *mut led_classdev;
+}
+extern "C" {
+    #[doc = " led_blink_set - set blinking with software fallback\n @led_cdev: the LED to start blinking\n @delay_on: the time it should be on (in ms)\n @delay_off: the time it should ble off (in ms)\n\n This function makes the LED blink, attempting to use the\n hardware acceleration if possible, but falling back to\n software blinking if there is no hardware blinking or if\n the LED refuses the passed values.\n\n This function may sleep!\n\n Note that if software blinking is active, simply calling\n led_cdev->brightness_set() will not stop the blinking,\n use led_set_brightness() instead."]
+    pub fn led_blink_set(
+        led_cdev: *mut led_classdev,
+        delay_on: *mut core::ffi::c_ulong,
+        delay_off: *mut core::ffi::c_ulong,
+    );
+}
+extern "C" {
+    #[doc = " led_blink_set_nosleep - set blinking, guaranteed to not sleep\n @led_cdev: the LED to start blinking\n @delay_on: the time it should be on (in ms)\n @delay_off: the time it should ble off (in ms)\n\n This function makes the LED blink and is guaranteed to not sleep. Otherwise\n this is the same as led_blink_set(), see led_blink_set() for details."]
+    pub fn led_blink_set_nosleep(
+        led_cdev: *mut led_classdev,
+        delay_on: core::ffi::c_ulong,
+        delay_off: core::ffi::c_ulong,
+    );
+}
+extern "C" {
+    #[doc = " led_blink_set_oneshot - do a oneshot software blink\n @led_cdev: the LED to start blinking\n @delay_on: the time it should be on (in ms)\n @delay_off: the time it should ble off (in ms)\n @invert: blink off, then on, leaving the led on\n\n This function makes the LED blink one time for delay_on +\n delay_off time, ignoring the request if another one-shot\n blink is already in progress.\n\n If invert is set, led blinks for delay_off first, then for\n delay_on and leave the led on after the on-off cycle.\n\n This function is guaranteed not to sleep."]
+    pub fn led_blink_set_oneshot(
+        led_cdev: *mut led_classdev,
+        delay_on: *mut core::ffi::c_ulong,
+        delay_off: *mut core::ffi::c_ulong,
+        invert: core::ffi::c_int,
+    );
+}
+extern "C" {
+    #[doc = " led_set_brightness - set LED brightness\n @led_cdev: the LED to set\n @brightness: the brightness to set it to\n\n Set an LED's brightness, and, if necessary, cancel the\n software blink timer that implements blinking when the\n hardware doesn't. This function is guaranteed not to sleep."]
+    pub fn led_set_brightness(led_cdev: *mut led_classdev, brightness: core::ffi::c_uint);
+}
+extern "C" {
+    #[doc = " led_set_brightness_sync - set LED brightness synchronously\n @led_cdev: the LED to set\n @value: the brightness to set it to\n\n Set an LED's brightness immediately. This function will block\n the caller for the time required for accessing device registers,\n and it can sleep.\n\n Returns: 0 on success or negative error value on failure"]
+    pub fn led_set_brightness_sync(
+        led_cdev: *mut led_classdev,
+        value: core::ffi::c_uint,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    #[doc = " led_update_brightness - update LED brightness\n @led_cdev: the LED to query\n\n Get an LED's current brightness and update led_cdev->brightness\n member with the obtained value.\n\n Returns: 0 on success or negative error value on failure"]
+    pub fn led_update_brightness(led_cdev: *mut led_classdev) -> core::ffi::c_int;
+}
+extern "C" {
+    #[doc = " led_get_default_pattern - return default pattern\n\n @led_cdev: the LED to get default pattern for\n @size:     pointer for storing the number of elements in returned array,\n            modified only if return != NULL\n\n Return:    Allocated array of integers with default pattern from device tree\n            or NULL.  Caller is responsible for kfree()."]
+    pub fn led_get_default_pattern(
+        led_cdev: *mut led_classdev,
+        size: *mut core::ffi::c_uint,
+    ) -> *mut u32_;
+}
+extern "C" {
+    #[doc = " led_sysfs_disable - disable LED sysfs interface\n @led_cdev: the LED to set\n\n Disable the led_cdev's sysfs interface."]
+    pub fn led_sysfs_disable(led_cdev: *mut led_classdev);
+}
+extern "C" {
+    #[doc = " led_sysfs_enable - enable LED sysfs interface\n @led_cdev: the LED to set\n\n Enable the led_cdev's sysfs interface."]
+    pub fn led_sysfs_enable(led_cdev: *mut led_classdev);
+}
+extern "C" {
+    #[doc = " led_compose_name - compose LED class device name\n @dev: LED controller device object\n @init_data: the LED class device initialization data\n @led_classdev_name: composed LED class device name\n\n Create LED class device name basing on the provided init_data argument.\n The name can have <devicename:color:function> or <color:function>.\n form, depending on the init_data configuration.\n\n Returns: 0 on success or negative error value on failure"]
+    pub fn led_compose_name(
+        dev: *mut device,
+        init_data: *mut led_init_data,
+        led_classdev_name: *mut core::ffi::c_char,
+    ) -> core::ffi::c_int;
+}
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub struct led_trigger {
+    pub name: *const core::ffi::c_char,
+    pub activate: ::core::option::Option<
+        unsafe extern "C" fn(led_cdev: *mut led_classdev) -> core::ffi::c_int,
+    >,
+    pub deactivate: ::core::option::Option<unsafe extern "C" fn(led_cdev: *mut led_classdev)>,
+    pub trigger_type: *mut led_hw_trigger_type,
+    pub leddev_list_lock: spinlock_t,
+    pub led_cdevs: list_head,
+    pub next_trig: list_head,
+    pub groups: *mut *const attribute_group,
+}
+impl Default for led_trigger {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+extern "C" {
+    pub fn led_trigger_register(trigger: *mut led_trigger) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn led_trigger_unregister(trigger: *mut led_trigger);
+}
+extern "C" {
+    pub fn devm_led_trigger_register(
+        dev: *mut device,
+        trigger: *mut led_trigger,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn led_trigger_register_simple(
+        name: *const core::ffi::c_char,
+        trigger: *mut *mut led_trigger,
+    );
+}
+extern "C" {
+    pub fn led_trigger_unregister_simple(trigger: *mut led_trigger);
+}
+extern "C" {
+    pub fn led_trigger_event(trigger: *mut led_trigger, event: led_brightness);
+}
+extern "C" {
+    pub fn led_trigger_blink(
+        trigger: *mut led_trigger,
+        delay_on: core::ffi::c_ulong,
+        delay_off: core::ffi::c_ulong,
+    );
+}
+extern "C" {
+    pub fn led_trigger_blink_oneshot(
+        trigger: *mut led_trigger,
+        delay_on: core::ffi::c_ulong,
+        delay_off: core::ffi::c_ulong,
+        invert: core::ffi::c_int,
+    );
+}
+extern "C" {
+    pub fn led_trigger_set_default(led_cdev: *mut led_classdev);
+}
+extern "C" {
+    pub fn led_trigger_set(
+        led_cdev: *mut led_classdev,
+        trigger: *mut led_trigger,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn led_trigger_remove(led_cdev: *mut led_classdev);
+}
+extern "C" {
+    #[doc = " led_trigger_rename_static - rename a trigger\n @name: the new trigger name\n @trig: the LED trigger to rename\n\n Change a LED trigger name by copying the string passed in\n name into current trigger name, which MUST be large\n enough for the new string.\n\n Note that name must NOT point to the same string used\n during LED registration, as that could lead to races.\n\n This is meant to be used on triggers with statically\n allocated name."]
+    pub fn led_trigger_rename_static(name: *const core::ffi::c_char, trig: *mut led_trigger);
+}
+pub const led_trigger_netdev_modes_TRIGGER_NETDEV_LINK: led_trigger_netdev_modes = 0;
+pub const led_trigger_netdev_modes_TRIGGER_NETDEV_LINK_10: led_trigger_netdev_modes = 1;
+pub const led_trigger_netdev_modes_TRIGGER_NETDEV_LINK_100: led_trigger_netdev_modes = 2;
+pub const led_trigger_netdev_modes_TRIGGER_NETDEV_LINK_1000: led_trigger_netdev_modes = 3;
+pub const led_trigger_netdev_modes_TRIGGER_NETDEV_HALF_DUPLEX: led_trigger_netdev_modes = 4;
+pub const led_trigger_netdev_modes_TRIGGER_NETDEV_FULL_DUPLEX: led_trigger_netdev_modes = 5;
+pub const led_trigger_netdev_modes_TRIGGER_NETDEV_TX: led_trigger_netdev_modes = 6;
+pub const led_trigger_netdev_modes_TRIGGER_NETDEV_RX: led_trigger_netdev_modes = 7;
+pub const led_trigger_netdev_modes___TRIGGER_NETDEV_MAX: led_trigger_netdev_modes = 8;
+pub type led_trigger_netdev_modes = core::ffi::c_uint;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct led_info {
+    pub name: *const core::ffi::c_char,
+    pub default_trigger: *const core::ffi::c_char,
+    pub flags: core::ffi::c_int,
+}
+impl Default for led_info {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct led_platform_data {
+    pub num_leds: core::ffi::c_int,
+    pub leds: *mut led_info,
+}
+impl Default for led_platform_data {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct led_properties {
+    pub color: u32_,
+    pub color_present: bool_,
+    pub function: *const core::ffi::c_char,
+    pub func_enum: u32_,
+    pub func_enum_present: bool_,
+    pub label: *const core::ffi::c_char,
+}
+impl Default for led_properties {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub type gpio_blink_set_t = ::core::option::Option<
+    unsafe extern "C" fn(
+        desc: *mut gpio_desc,
+        state: core::ffi::c_int,
+        delay_on: *mut core::ffi::c_ulong,
+        delay_off: *mut core::ffi::c_ulong,
+    ) -> core::ffi::c_int,
+>;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct gpio_led {
+    pub name: *const core::ffi::c_char,
+    pub default_trigger: *const core::ffi::c_char,
+    pub gpio: core::ffi::c_uint,
+    pub _bitfield_align_1: [u8; 0],
+    pub _bitfield_1: __BindgenBitfieldUnit<[u8; 1usize]>,
+    pub gpiod: *mut gpio_desc,
+}
+impl Default for gpio_led {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+impl gpio_led {
+    #[inline]
+    pub fn active_low(&self) -> core::ffi::c_uint {
+        unsafe { ::core::mem::transmute(self._bitfield_1.get(0usize, 1u8) as u32) }
+    }
+    #[inline]
+    pub fn set_active_low(&mut self, val: core::ffi::c_uint) {
+        unsafe {
+            let val: u32 = ::core::mem::transmute(val);
+            self._bitfield_1.set(0usize, 1u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn retain_state_suspended(&self) -> core::ffi::c_uint {
+        unsafe { ::core::mem::transmute(self._bitfield_1.get(1usize, 1u8) as u32) }
+    }
+    #[inline]
+    pub fn set_retain_state_suspended(&mut self, val: core::ffi::c_uint) {
+        unsafe {
+            let val: u32 = ::core::mem::transmute(val);
+            self._bitfield_1.set(1usize, 1u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn panic_indicator(&self) -> core::ffi::c_uint {
+        unsafe { ::core::mem::transmute(self._bitfield_1.get(2usize, 1u8) as u32) }
+    }
+    #[inline]
+    pub fn set_panic_indicator(&mut self, val: core::ffi::c_uint) {
+        unsafe {
+            let val: u32 = ::core::mem::transmute(val);
+            self._bitfield_1.set(2usize, 1u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn default_state(&self) -> core::ffi::c_uint {
+        unsafe { ::core::mem::transmute(self._bitfield_1.get(3usize, 2u8) as u32) }
+    }
+    #[inline]
+    pub fn set_default_state(&mut self, val: core::ffi::c_uint) {
+        unsafe {
+            let val: u32 = ::core::mem::transmute(val);
+            self._bitfield_1.set(3usize, 2u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn retain_state_shutdown(&self) -> core::ffi::c_uint {
+        unsafe { ::core::mem::transmute(self._bitfield_1.get(5usize, 1u8) as u32) }
+    }
+    #[inline]
+    pub fn set_retain_state_shutdown(&mut self, val: core::ffi::c_uint) {
+        unsafe {
+            let val: u32 = ::core::mem::transmute(val);
+            self._bitfield_1.set(5usize, 1u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn new_bitfield_1(
+        active_low: core::ffi::c_uint,
+        retain_state_suspended: core::ffi::c_uint,
+        panic_indicator: core::ffi::c_uint,
+        default_state: core::ffi::c_uint,
+        retain_state_shutdown: core::ffi::c_uint,
+    ) -> __BindgenBitfieldUnit<[u8; 1usize]> {
+        let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 1usize]> = Default::default();
+        __bindgen_bitfield_unit.set(0usize, 1u8, {
+            let active_low: u32 = unsafe { ::core::mem::transmute(active_low) };
+            active_low as u64
+        });
+        __bindgen_bitfield_unit.set(1usize, 1u8, {
+            let retain_state_suspended: u32 =
+                unsafe { ::core::mem::transmute(retain_state_suspended) };
+            retain_state_suspended as u64
+        });
+        __bindgen_bitfield_unit.set(2usize, 1u8, {
+            let panic_indicator: u32 = unsafe { ::core::mem::transmute(panic_indicator) };
+            panic_indicator as u64
+        });
+        __bindgen_bitfield_unit.set(3usize, 2u8, {
+            let default_state: u32 = unsafe { ::core::mem::transmute(default_state) };
+            default_state as u64
+        });
+        __bindgen_bitfield_unit.set(5usize, 1u8, {
+            let retain_state_shutdown: u32 =
+                unsafe { ::core::mem::transmute(retain_state_shutdown) };
+            retain_state_shutdown as u64
+        });
+        __bindgen_bitfield_unit
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct gpio_led_platform_data {
+    pub num_leds: core::ffi::c_int,
+    pub leds: *const gpio_led,
+    pub gpio_blink_set: gpio_blink_set_t,
+}
+impl Default for gpio_led_platform_data {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+extern "C" {
+    pub fn gpio_led_register_device(
+        id: core::ffi::c_int,
+        pdata: *const gpio_led_platform_data,
+    ) -> *mut platform_device;
+}
+pub const cpu_led_event_CPU_LED_IDLE_START: cpu_led_event = 0;
+pub const cpu_led_event_CPU_LED_IDLE_END: cpu_led_event = 1;
+pub const cpu_led_event_CPU_LED_START: cpu_led_event = 2;
+pub const cpu_led_event_CPU_LED_STOP: cpu_led_event = 3;
+pub const cpu_led_event_CPU_LED_HALTED: cpu_led_event = 4;
+pub type cpu_led_event = core::ffi::c_uint;
+#[doc = " struct led_pattern - pattern interval settings\n @delta_t: pattern interval delay, in milliseconds\n @brightness: pattern interval brightness"]
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct led_pattern {
+    pub delta_t: u32_,
+    pub brightness: core::ffi::c_int,
+}
+pub const led_audio_LED_AUDIO_MUTE: led_audio = 0;
+pub const led_audio_LED_AUDIO_MICMUTE: led_audio = 1;
+pub const led_audio_NUM_AUDIO_LEDS: led_audio = 2;
+pub type led_audio = core::ffi::c_uint;
+extern "C" {
+    pub fn ledtrig_audio_get(type_: led_audio) -> led_brightness;
+}
+extern "C" {
+    pub fn ledtrig_audio_set(type_: led_audio, state: led_brightness);
+}
 #[doc = " struct mii_timestamper - Callback interface to MII time stamping devices.\n\n @rxtstamp:\tRequests a Rx timestamp for 'skb'.  If the skb is accepted,\n\t\tthe MII time stamping device promises to deliver it using\n\t\tnetif_rx() as soon as a timestamp becomes available. One of\n\t\tthe PTP_CLASS_ values is passed in 'type'.  The function\n\t\tmust return true if the skb is accepted for delivery.\n\n @txtstamp:\tRequests a Tx timestamp for 'skb'.  The MII time stamping\n\t\tdevice promises to deliver it using skb_complete_tx_timestamp()\n\t\tas soon as a timestamp becomes available. One of the PTP_CLASS_\n\t\tvalues is passed in 'type'.\n\n @hwtstamp:\tHandles SIOCSHWTSTAMP ioctl for hardware time stamping.\n\n @link_state: Allows the device to respond to changes in the link\n\t\tstate.  The caller invokes this function while holding\n\t\tthe phy_device mutex.\n\n @ts_info:\tHandles ethtool queries for hardware time stamping.\n @device:\tRemembers the device to which the instance belongs.\n\n Drivers for PHY time stamping devices should embed their\n mii_timestamper within a private structure, obtaining a reference\n to it using container_of().\n\n Drivers for non-PHY time stamping devices should return a pointer\n to a mii_timestamper from the probe_channel() callback of their\n mii_timestamping_ctrl interface."]
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -63537,12 +66771,12 @@ extern "C" {
         size: core::ffi::c_ulong,
     ) -> core::ffi::c_int;
 }
-pub const MEMREMAP_WB: _bindgen_ty_111 = 1;
-pub const MEMREMAP_WT: _bindgen_ty_111 = 2;
-pub const MEMREMAP_WC: _bindgen_ty_111 = 4;
-pub const MEMREMAP_ENC: _bindgen_ty_111 = 8;
-pub const MEMREMAP_DEC: _bindgen_ty_111 = 16;
-pub type _bindgen_ty_111 = core::ffi::c_uint;
+pub const MEMREMAP_WB: _bindgen_ty_116 = 1;
+pub const MEMREMAP_WT: _bindgen_ty_116 = 2;
+pub const MEMREMAP_WC: _bindgen_ty_116 = 4;
+pub const MEMREMAP_ENC: _bindgen_ty_116 = 8;
+pub const MEMREMAP_DEC: _bindgen_ty_116 = 16;
+pub type _bindgen_ty_116 = core::ffi::c_uint;
 extern "C" {
     pub fn memremap(
         offset: resource_size_t,
@@ -65378,1912 +68612,6 @@ extern "C" {
 extern "C" {
     pub fn phy_driver_is_genphy_10g(phydev: *mut phy_device) -> bool_;
 }
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct cgroup_subsys_state {
-    _unused: [u8; 0],
-}
-pub type bio_end_io_t = ::core::option::Option<unsafe extern "C" fn(arg1: *mut bio)>;
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct bio_crypt_ctx {
-    _unused: [u8; 0],
-}
-#[repr(C)]
-#[derive(Copy, Clone)]
-pub struct block_device {
-    pub bd_start_sect: sector_t,
-    pub bd_nr_sectors: sector_t,
-    pub bd_disk: *mut gendisk,
-    pub bd_queue: *mut request_queue,
-    pub bd_stats: *mut disk_stats,
-    pub bd_stamp: core::ffi::c_ulong,
-    pub bd_read_only: bool_,
-    pub bd_partno: u8_,
-    pub bd_write_holder: bool_,
-    pub bd_has_submit_bio: bool_,
-    pub bd_dev: dev_t,
-    pub bd_openers: atomic_t,
-    pub bd_size_lock: spinlock_t,
-    pub bd_inode: *mut inode,
-    pub bd_claiming: *mut core::ffi::c_void,
-    pub bd_holder: *mut core::ffi::c_void,
-    pub bd_holder_ops: *const blk_holder_ops,
-    pub bd_holder_lock: mutex,
-    pub bd_fsfreeze_count: core::ffi::c_int,
-    pub bd_holders: core::ffi::c_int,
-    pub bd_holder_dir: *mut kobject,
-    pub bd_fsfreeze_mutex: mutex,
-    pub bd_fsfreeze_sb: *mut super_block,
-    pub bd_meta_info: *mut partition_meta_info,
-    pub bd_device: device,
-}
-impl Default for block_device {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-pub type blk_status_t = u8_;
-pub type blk_short_t = u16_;
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct bio_issue {
-    pub value: u64_,
-}
-pub type blk_opf_t = __u32;
-pub type blk_qc_t = core::ffi::c_uint;
-#[repr(C)]
-pub struct bio {
-    pub bi_next: *mut bio,
-    pub bi_bdev: *mut block_device,
-    pub bi_opf: blk_opf_t,
-    pub bi_flags: core::ffi::c_ushort,
-    pub bi_ioprio: core::ffi::c_ushort,
-    pub bi_status: blk_status_t,
-    pub __bi_remaining: atomic_t,
-    pub bi_iter: bvec_iter,
-    pub bi_cookie: blk_qc_t,
-    pub bi_end_io: bio_end_io_t,
-    pub bi_private: *mut core::ffi::c_void,
-    pub bi_blkg: *mut blkcg_gq,
-    pub bi_issue: bio_issue,
-    pub __bindgen_anon_1: bio__bindgen_ty_1,
-    pub bi_vcnt: core::ffi::c_ushort,
-    pub bi_max_vecs: core::ffi::c_ushort,
-    pub __bi_cnt: atomic_t,
-    pub bi_io_vec: *mut bio_vec,
-    pub bi_pool: *mut bio_set,
-    pub bi_inline_vecs: __IncompleteArrayField<bio_vec>,
-}
-#[repr(C)]
-#[derive(Copy, Clone)]
-pub union bio__bindgen_ty_1 {
-    pub bi_integrity: *mut bio_integrity_payload,
-}
-impl Default for bio__bindgen_ty_1 {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-impl Default for bio {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-pub const BIO_PAGE_PINNED: _bindgen_ty_112 = 0;
-pub const BIO_CLONED: _bindgen_ty_112 = 1;
-pub const BIO_BOUNCED: _bindgen_ty_112 = 2;
-pub const BIO_QUIET: _bindgen_ty_112 = 3;
-pub const BIO_CHAIN: _bindgen_ty_112 = 4;
-pub const BIO_REFFED: _bindgen_ty_112 = 5;
-pub const BIO_BPS_THROTTLED: _bindgen_ty_112 = 6;
-pub const BIO_TRACE_COMPLETION: _bindgen_ty_112 = 7;
-pub const BIO_CGROUP_ACCT: _bindgen_ty_112 = 8;
-pub const BIO_QOS_THROTTLED: _bindgen_ty_112 = 9;
-pub const BIO_QOS_MERGED: _bindgen_ty_112 = 10;
-pub const BIO_REMAPPED: _bindgen_ty_112 = 11;
-pub const BIO_ZONE_WRITE_LOCKED: _bindgen_ty_112 = 12;
-pub const BIO_FLAG_LAST: _bindgen_ty_112 = 13;
-pub type _bindgen_ty_112 = core::ffi::c_uint;
-pub type blk_mq_req_flags_t = __u32;
-pub const req_op_REQ_OP_READ: req_op = 0;
-pub const req_op_REQ_OP_WRITE: req_op = 1;
-pub const req_op_REQ_OP_FLUSH: req_op = 2;
-pub const req_op_REQ_OP_DISCARD: req_op = 3;
-pub const req_op_REQ_OP_SECURE_ERASE: req_op = 5;
-pub const req_op_REQ_OP_WRITE_ZEROES: req_op = 9;
-pub const req_op_REQ_OP_ZONE_OPEN: req_op = 10;
-pub const req_op_REQ_OP_ZONE_CLOSE: req_op = 11;
-pub const req_op_REQ_OP_ZONE_FINISH: req_op = 12;
-pub const req_op_REQ_OP_ZONE_APPEND: req_op = 13;
-pub const req_op_REQ_OP_ZONE_RESET: req_op = 15;
-pub const req_op_REQ_OP_ZONE_RESET_ALL: req_op = 17;
-pub const req_op_REQ_OP_DRV_IN: req_op = 34;
-pub const req_op_REQ_OP_DRV_OUT: req_op = 35;
-pub const req_op_REQ_OP_LAST: req_op = 36;
-#[doc = " enum req_op - Operations common to the bio and request structures.\n We use 8 bits for encoding the operation, and the remaining 24 for flags.\n\n The least significant bit of the operation number indicates the data\n transfer direction:\n\n   - if the least significant bit is set transfers are TO the device\n   - if the least significant bit is not set transfers are FROM the device\n\n If a operation does not transfer data the least significant bit has no\n meaning."]
-pub type req_op = core::ffi::c_uint;
-pub const req_flag_bits___REQ_FAILFAST_DEV: req_flag_bits = 8;
-pub const req_flag_bits___REQ_FAILFAST_TRANSPORT: req_flag_bits = 9;
-pub const req_flag_bits___REQ_FAILFAST_DRIVER: req_flag_bits = 10;
-pub const req_flag_bits___REQ_SYNC: req_flag_bits = 11;
-pub const req_flag_bits___REQ_META: req_flag_bits = 12;
-pub const req_flag_bits___REQ_PRIO: req_flag_bits = 13;
-pub const req_flag_bits___REQ_NOMERGE: req_flag_bits = 14;
-pub const req_flag_bits___REQ_IDLE: req_flag_bits = 15;
-pub const req_flag_bits___REQ_INTEGRITY: req_flag_bits = 16;
-pub const req_flag_bits___REQ_FUA: req_flag_bits = 17;
-pub const req_flag_bits___REQ_PREFLUSH: req_flag_bits = 18;
-pub const req_flag_bits___REQ_RAHEAD: req_flag_bits = 19;
-pub const req_flag_bits___REQ_BACKGROUND: req_flag_bits = 20;
-pub const req_flag_bits___REQ_NOWAIT: req_flag_bits = 21;
-pub const req_flag_bits___REQ_POLLED: req_flag_bits = 22;
-pub const req_flag_bits___REQ_ALLOC_CACHE: req_flag_bits = 23;
-pub const req_flag_bits___REQ_SWAP: req_flag_bits = 24;
-pub const req_flag_bits___REQ_DRV: req_flag_bits = 25;
-pub const req_flag_bits___REQ_FS_PRIVATE: req_flag_bits = 26;
-pub const req_flag_bits___REQ_NOUNMAP: req_flag_bits = 27;
-pub const req_flag_bits___REQ_NR_BITS: req_flag_bits = 28;
-pub type req_flag_bits = core::ffi::c_uint;
-pub const stat_group_STAT_READ: stat_group = 0;
-pub const stat_group_STAT_WRITE: stat_group = 1;
-pub const stat_group_STAT_DISCARD: stat_group = 2;
-pub const stat_group_STAT_FLUSH: stat_group = 3;
-pub const stat_group_NR_STAT_GROUPS: stat_group = 4;
-pub type stat_group = core::ffi::c_uint;
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct blk_rq_stat {
-    pub mean: u64_,
-    pub min: u64_,
-    pub max: u64_,
-    pub nr_samples: u32_,
-    pub batch: u64_,
-}
-pub type mempool_alloc_t = ::core::option::Option<
-    unsafe extern "C" fn(
-        gfp_mask: gfp_t,
-        pool_data: *mut core::ffi::c_void,
-    ) -> *mut core::ffi::c_void,
->;
-pub type mempool_free_t = ::core::option::Option<
-    unsafe extern "C" fn(element: *mut core::ffi::c_void, pool_data: *mut core::ffi::c_void),
->;
-#[repr(C)]
-#[derive(Copy, Clone)]
-pub struct mempool_s {
-    pub lock: spinlock_t,
-    pub min_nr: core::ffi::c_int,
-    pub curr_nr: core::ffi::c_int,
-    pub elements: *mut *mut core::ffi::c_void,
-    pub pool_data: *mut core::ffi::c_void,
-    pub alloc: mempool_alloc_t,
-    pub free: mempool_free_t,
-    pub wait: wait_queue_head_t,
-}
-impl Default for mempool_s {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-pub type mempool_t = mempool_s;
-extern "C" {
-    pub fn mempool_exit(pool: *mut mempool_t);
-}
-extern "C" {
-    pub fn mempool_init_node(
-        pool: *mut mempool_t,
-        min_nr: core::ffi::c_int,
-        alloc_fn: mempool_alloc_t,
-        free_fn: mempool_free_t,
-        pool_data: *mut core::ffi::c_void,
-        gfp_mask: gfp_t,
-        node_id: core::ffi::c_int,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn mempool_init(
-        pool: *mut mempool_t,
-        min_nr: core::ffi::c_int,
-        alloc_fn: mempool_alloc_t,
-        free_fn: mempool_free_t,
-        pool_data: *mut core::ffi::c_void,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn mempool_create(
-        min_nr: core::ffi::c_int,
-        alloc_fn: mempool_alloc_t,
-        free_fn: mempool_free_t,
-        pool_data: *mut core::ffi::c_void,
-    ) -> *mut mempool_t;
-}
-extern "C" {
-    pub fn mempool_create_node(
-        min_nr: core::ffi::c_int,
-        alloc_fn: mempool_alloc_t,
-        free_fn: mempool_free_t,
-        pool_data: *mut core::ffi::c_void,
-        gfp_mask: gfp_t,
-        nid: core::ffi::c_int,
-    ) -> *mut mempool_t;
-}
-extern "C" {
-    pub fn mempool_resize(pool: *mut mempool_t, new_min_nr: core::ffi::c_int) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn mempool_destroy(pool: *mut mempool_t);
-}
-extern "C" {
-    pub fn mempool_alloc(pool: *mut mempool_t, gfp_mask: gfp_t) -> *mut core::ffi::c_void;
-}
-extern "C" {
-    pub fn mempool_free(element: *mut core::ffi::c_void, pool: *mut mempool_t);
-}
-extern "C" {
-    pub fn mempool_alloc_slab(
-        gfp_mask: gfp_t,
-        pool_data: *mut core::ffi::c_void,
-    ) -> *mut core::ffi::c_void;
-}
-extern "C" {
-    pub fn mempool_free_slab(element: *mut core::ffi::c_void, pool_data: *mut core::ffi::c_void);
-}
-extern "C" {
-    pub fn mempool_kmalloc(
-        gfp_mask: gfp_t,
-        pool_data: *mut core::ffi::c_void,
-    ) -> *mut core::ffi::c_void;
-}
-extern "C" {
-    pub fn mempool_kfree(element: *mut core::ffi::c_void, pool_data: *mut core::ffi::c_void);
-}
-extern "C" {
-    pub fn mempool_alloc_pages(
-        gfp_mask: gfp_t,
-        pool_data: *mut core::ffi::c_void,
-    ) -> *mut core::ffi::c_void;
-}
-extern "C" {
-    pub fn mempool_free_pages(element: *mut core::ffi::c_void, pool_data: *mut core::ffi::c_void);
-}
-extern "C" {
-    pub fn __bio_advance(arg1: *mut bio, bytes: core::ffi::c_uint);
-}
-#[doc = " struct folio_iter - State for iterating all folios in a bio.\n @folio: The current folio we're iterating.  NULL after the last folio.\n @offset: The byte offset within the current folio.\n @length: The number of bytes in this iteration (will not cross folio\n\tboundary)."]
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct folio_iter {
-    pub folio: *mut folio,
-    pub offset: usize,
-    pub length: usize,
-    pub _next: *mut folio,
-    pub _seg_count: usize,
-    pub _i: core::ffi::c_int,
-}
-impl Default for folio_iter {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-pub const bip_flags_BIP_BLOCK_INTEGRITY: bip_flags = 1;
-pub const bip_flags_BIP_MAPPED_INTEGRITY: bip_flags = 2;
-pub const bip_flags_BIP_CTRL_NOCHECK: bip_flags = 4;
-pub const bip_flags_BIP_DISK_NOCHECK: bip_flags = 8;
-pub const bip_flags_BIP_IP_CHECKSUM: bip_flags = 16;
-pub type bip_flags = core::ffi::c_uint;
-#[repr(C)]
-#[derive(Debug)]
-pub struct bio_integrity_payload {
-    pub bip_bio: *mut bio,
-    pub bip_iter: bvec_iter,
-    pub bip_vcnt: core::ffi::c_ushort,
-    pub bip_max_vcnt: core::ffi::c_ushort,
-    pub bip_flags: core::ffi::c_ushort,
-    pub bio_iter: bvec_iter,
-    pub bip_work: work_struct,
-    pub bip_vec: *mut bio_vec,
-    pub bip_inline_vecs: __IncompleteArrayField<bio_vec>,
-}
-impl Default for bio_integrity_payload {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-extern "C" {
-    pub fn bio_trim(bio: *mut bio, offset: sector_t, size: sector_t);
-}
-extern "C" {
-    pub fn bio_split(
-        bio: *mut bio,
-        sectors: core::ffi::c_int,
-        gfp: gfp_t,
-        bs: *mut bio_set,
-    ) -> *mut bio;
-}
-extern "C" {
-    pub fn bio_split_rw(
-        bio: *mut bio,
-        lim: *const queue_limits,
-        segs: *mut core::ffi::c_uint,
-        bs: *mut bio_set,
-        max_bytes: core::ffi::c_uint,
-    ) -> *mut bio;
-}
-pub const BIOSET_NEED_BVECS: _bindgen_ty_113 = 1;
-pub const BIOSET_NEED_RESCUER: _bindgen_ty_113 = 2;
-pub const BIOSET_PERCPU_CACHE: _bindgen_ty_113 = 4;
-pub type _bindgen_ty_113 = core::ffi::c_uint;
-extern "C" {
-    pub fn bioset_init(
-        arg1: *mut bio_set,
-        arg2: core::ffi::c_uint,
-        arg3: core::ffi::c_uint,
-        flags: core::ffi::c_int,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn bioset_exit(arg1: *mut bio_set);
-}
-extern "C" {
-    pub fn biovec_init_pool(
-        pool: *mut mempool_t,
-        pool_entries: core::ffi::c_int,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn bio_alloc_bioset(
-        bdev: *mut block_device,
-        nr_vecs: core::ffi::c_ushort,
-        opf: blk_opf_t,
-        gfp_mask: gfp_t,
-        bs: *mut bio_set,
-    ) -> *mut bio;
-}
-extern "C" {
-    pub fn bio_kmalloc(nr_vecs: core::ffi::c_ushort, gfp_mask: gfp_t) -> *mut bio;
-}
-extern "C" {
-    pub fn bio_put(arg1: *mut bio);
-}
-extern "C" {
-    pub fn bio_alloc_clone(
-        bdev: *mut block_device,
-        bio_src: *mut bio,
-        gfp: gfp_t,
-        bs: *mut bio_set,
-    ) -> *mut bio;
-}
-extern "C" {
-    pub fn bio_init_clone(
-        bdev: *mut block_device,
-        bio: *mut bio,
-        bio_src: *mut bio,
-        gfp: gfp_t,
-    ) -> core::ffi::c_int;
-}
-#[repr(C)]
-#[derive(Copy, Clone)]
-pub struct bio_set {
-    pub bio_slab: *mut kmem_cache,
-    pub front_pad: core::ffi::c_uint,
-    pub cache: *mut bio_alloc_cache,
-    pub bio_pool: mempool_t,
-    pub bvec_pool: mempool_t,
-    pub bio_integrity_pool: mempool_t,
-    pub bvec_integrity_pool: mempool_t,
-    pub back_pad: core::ffi::c_uint,
-    pub rescue_lock: spinlock_t,
-    pub rescue_list: bio_list,
-    pub rescue_work: work_struct,
-    pub rescue_workqueue: *mut workqueue_struct,
-    pub cpuhp_dead: hlist_node,
-}
-impl Default for bio_set {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-extern "C" {
-    pub static mut fs_bio_set: bio_set;
-}
-extern "C" {
-    pub fn submit_bio(bio: *mut bio);
-}
-extern "C" {
-    pub fn bio_endio(arg1: *mut bio);
-}
-extern "C" {
-    pub fn submit_bio_wait(bio: *mut bio) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn bio_init(
-        bio: *mut bio,
-        bdev: *mut block_device,
-        table: *mut bio_vec,
-        max_vecs: core::ffi::c_ushort,
-        opf: blk_opf_t,
-    );
-}
-extern "C" {
-    pub fn bio_uninit(arg1: *mut bio);
-}
-extern "C" {
-    pub fn bio_reset(bio: *mut bio, bdev: *mut block_device, opf: blk_opf_t);
-}
-extern "C" {
-    pub fn bio_chain(arg1: *mut bio, arg2: *mut bio);
-}
-extern "C" {
-    #[must_use]
-    pub fn bio_add_page(
-        bio: *mut bio,
-        page: *mut page,
-        len: core::ffi::c_uint,
-        off: core::ffi::c_uint,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    #[must_use]
-    pub fn bio_add_folio(bio: *mut bio, folio: *mut folio, len: usize, off: usize) -> bool_;
-}
-extern "C" {
-    pub fn bio_add_pc_page(
-        arg1: *mut request_queue,
-        arg2: *mut bio,
-        arg3: *mut page,
-        arg4: core::ffi::c_uint,
-        arg5: core::ffi::c_uint,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn bio_add_zone_append_page(
-        bio: *mut bio,
-        page: *mut page,
-        len: core::ffi::c_uint,
-        offset: core::ffi::c_uint,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn __bio_add_page(
-        bio: *mut bio,
-        page: *mut page,
-        len: core::ffi::c_uint,
-        off: core::ffi::c_uint,
-    );
-}
-extern "C" {
-    pub fn bio_add_folio_nofail(bio: *mut bio, folio: *mut folio, len: usize, off: usize);
-}
-extern "C" {
-    pub fn bio_iov_iter_get_pages(bio: *mut bio, iter: *mut iov_iter) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn bio_iov_bvec_set(bio: *mut bio, iter: *mut iov_iter);
-}
-extern "C" {
-    pub fn __bio_release_pages(bio: *mut bio, mark_dirty: bool_);
-}
-extern "C" {
-    pub fn bio_set_pages_dirty(bio: *mut bio);
-}
-extern "C" {
-    pub fn bio_check_pages_dirty(bio: *mut bio);
-}
-extern "C" {
-    pub fn bio_copy_data_iter(
-        dst: *mut bio,
-        dst_iter: *mut bvec_iter,
-        src: *mut bio,
-        src_iter: *mut bvec_iter,
-    );
-}
-extern "C" {
-    pub fn bio_copy_data(dst: *mut bio, src: *mut bio);
-}
-extern "C" {
-    pub fn bio_free_pages(bio: *mut bio);
-}
-extern "C" {
-    pub fn guard_bio_eod(bio: *mut bio);
-}
-extern "C" {
-    pub fn zero_fill_bio_iter(bio: *mut bio, iter: bvec_iter);
-}
-extern "C" {
-    pub fn bio_associate_blkg(bio: *mut bio);
-}
-extern "C" {
-    pub fn bio_associate_blkg_from_css(bio: *mut bio, css: *mut cgroup_subsys_state);
-}
-extern "C" {
-    pub fn bio_clone_blkg_association(dst: *mut bio, src: *mut bio);
-}
-extern "C" {
-    pub fn blkcg_punt_bio_submit(bio: *mut bio);
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct bio_list {
-    pub head: *mut bio,
-    pub tail: *mut bio,
-}
-impl Default for bio_list {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-extern "C" {
-    pub fn bio_integrity_alloc(
-        arg1: *mut bio,
-        arg2: gfp_t,
-        arg3: core::ffi::c_uint,
-    ) -> *mut bio_integrity_payload;
-}
-extern "C" {
-    pub fn bio_integrity_add_page(
-        arg1: *mut bio,
-        arg2: *mut page,
-        arg3: core::ffi::c_uint,
-        arg4: core::ffi::c_uint,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn bio_integrity_prep(arg1: *mut bio) -> bool_;
-}
-extern "C" {
-    pub fn bio_integrity_advance(arg1: *mut bio, arg2: core::ffi::c_uint);
-}
-extern "C" {
-    pub fn bio_integrity_trim(arg1: *mut bio);
-}
-extern "C" {
-    pub fn bio_integrity_clone(arg1: *mut bio, arg2: *mut bio, arg3: gfp_t) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn bioset_integrity_create(arg1: *mut bio_set, arg2: core::ffi::c_int) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn bioset_integrity_free(arg1: *mut bio_set);
-}
-extern "C" {
-    pub fn bio_integrity_init();
-}
-extern "C" {
-    pub fn blk_next_bio(
-        bio: *mut bio,
-        bdev: *mut block_device,
-        nr_pages: core::ffi::c_uint,
-        opf: blk_opf_t,
-        gfp: gfp_t,
-    ) -> *mut bio;
-}
-pub const blk_zone_type_BLK_ZONE_TYPE_CONVENTIONAL: blk_zone_type = 1;
-pub const blk_zone_type_BLK_ZONE_TYPE_SEQWRITE_REQ: blk_zone_type = 2;
-pub const blk_zone_type_BLK_ZONE_TYPE_SEQWRITE_PREF: blk_zone_type = 3;
-#[doc = " enum blk_zone_type - Types of zones allowed in a zoned device.\n\n @BLK_ZONE_TYPE_CONVENTIONAL: The zone has no write pointer and can be writen\n                              randomly. Zone reset has no effect on the zone.\n @BLK_ZONE_TYPE_SEQWRITE_REQ: The zone must be written sequentially\n @BLK_ZONE_TYPE_SEQWRITE_PREF: The zone can be written non-sequentially\n\n Any other value not defined is reserved and must be considered as invalid."]
-pub type blk_zone_type = core::ffi::c_uint;
-pub const blk_zone_cond_BLK_ZONE_COND_NOT_WP: blk_zone_cond = 0;
-pub const blk_zone_cond_BLK_ZONE_COND_EMPTY: blk_zone_cond = 1;
-pub const blk_zone_cond_BLK_ZONE_COND_IMP_OPEN: blk_zone_cond = 2;
-pub const blk_zone_cond_BLK_ZONE_COND_EXP_OPEN: blk_zone_cond = 3;
-pub const blk_zone_cond_BLK_ZONE_COND_CLOSED: blk_zone_cond = 4;
-pub const blk_zone_cond_BLK_ZONE_COND_READONLY: blk_zone_cond = 13;
-pub const blk_zone_cond_BLK_ZONE_COND_FULL: blk_zone_cond = 14;
-pub const blk_zone_cond_BLK_ZONE_COND_OFFLINE: blk_zone_cond = 15;
-#[doc = " enum blk_zone_cond - Condition [state] of a zone in a zoned device.\n\n @BLK_ZONE_COND_NOT_WP: The zone has no write pointer, it is conventional.\n @BLK_ZONE_COND_EMPTY: The zone is empty.\n @BLK_ZONE_COND_IMP_OPEN: The zone is open, but not explicitly opened.\n @BLK_ZONE_COND_EXP_OPEN: The zones was explicitly opened by an\n                          OPEN ZONE command.\n @BLK_ZONE_COND_CLOSED: The zone was [explicitly] closed after writing.\n @BLK_ZONE_COND_FULL: The zone is marked as full, possibly by a zone\n                      FINISH ZONE command.\n @BLK_ZONE_COND_READONLY: The zone is read-only.\n @BLK_ZONE_COND_OFFLINE: The zone is offline (sectors cannot be read/written).\n\n The Zone Condition state machine in the ZBC/ZAC standards maps the above\n deinitions as:\n   - ZC1: Empty         | BLK_ZONE_COND_EMPTY\n   - ZC2: Implicit Open | BLK_ZONE_COND_IMP_OPEN\n   - ZC3: Explicit Open | BLK_ZONE_COND_EXP_OPEN\n   - ZC4: Closed        | BLK_ZONE_COND_CLOSED\n   - ZC5: Full          | BLK_ZONE_COND_FULL\n   - ZC6: Read Only     | BLK_ZONE_COND_READONLY\n   - ZC7: Offline       | BLK_ZONE_COND_OFFLINE\n\n Conditions 0x5 to 0xC are reserved by the current ZBC/ZAC spec and should\n be considered invalid."]
-pub type blk_zone_cond = core::ffi::c_uint;
-pub const blk_zone_report_flags_BLK_ZONE_REP_CAPACITY: blk_zone_report_flags = 1;
-#[doc = " enum blk_zone_report_flags - Feature flags of reported zone descriptors.\n\n @BLK_ZONE_REP_CAPACITY: Zone descriptor has capacity field."]
-pub type blk_zone_report_flags = core::ffi::c_uint;
-#[doc = " struct blk_zone - Zone descriptor for BLKREPORTZONE ioctl.\n\n @start: Zone start in 512 B sector units\n @len: Zone length in 512 B sector units\n @wp: Zone write pointer location in 512 B sector units\n @type: see enum blk_zone_type for possible values\n @cond: see enum blk_zone_cond for possible values\n @non_seq: Flag indicating that the zone is using non-sequential resources\n           (for host-aware zoned block devices only).\n @reset: Flag indicating that a zone reset is recommended.\n @resv: Padding for 8B alignment.\n @capacity: Zone usable capacity in 512 B sector units\n @reserved: Padding to 64 B to match the ZBC, ZAC and ZNS defined zone\n            descriptor size.\n\n start, len, capacity and wp use the regular 512 B sector unit, regardless\n of the device logical block size. The overall structure size is 64 B to\n match the ZBC, ZAC and ZNS defined zone descriptor and allow support for\n future additional zone information."]
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct blk_zone {
-    pub start: __u64,
-    pub len: __u64,
-    pub wp: __u64,
-    pub type_: __u8,
-    pub cond: __u8,
-    pub non_seq: __u8,
-    pub reset: __u8,
-    pub resv: [__u8; 4usize],
-    pub capacity: __u64,
-    pub reserved: [__u8; 24usize],
-}
-#[doc = " struct blk_zone_report - BLKREPORTZONE ioctl request/reply\n\n @sector: starting sector of report\n @nr_zones: IN maximum / OUT actual\n @flags: one or more flags as defined by enum blk_zone_report_flags.\n @zones: Space to hold @nr_zones @zones entries on reply.\n\n The array of at most @nr_zones must follow this structure in memory."]
-#[repr(C)]
-#[derive(Debug, Default)]
-pub struct blk_zone_report {
-    pub sector: __u64,
-    pub nr_zones: __u32,
-    pub flags: __u32,
-    pub zones: __IncompleteArrayField<blk_zone>,
-}
-#[doc = " struct blk_zone_range - BLKRESETZONE/BLKOPENZONE/\n                         BLKCLOSEZONE/BLKFINISHZONE ioctl\n                         requests\n @sector: Starting sector of the first zone to operate on.\n @nr_sectors: Total number of sectors of all zones to operate on."]
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct blk_zone_range {
-    pub sector: __u64,
-    pub nr_sectors: __u64,
-}
-#[doc = " struct sbitmap_word - Word in a &struct sbitmap."]
-#[repr(C)]
-#[repr(align(64))]
-#[derive(Debug, Copy, Clone)]
-pub struct sbitmap_word {
-    #[doc = " @word: word holding free bits"]
-    pub word: core::ffi::c_ulong,
-    pub __bindgen_padding_0: [u64; 7usize],
-    #[doc = " @cleared: word holding cleared bits"]
-    pub cleared: core::ffi::c_ulong,
-}
-impl Default for sbitmap_word {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[doc = " struct sbitmap - Scalable bitmap.\n\n A &struct sbitmap is spread over multiple cachelines to avoid ping-pong. This\n trades off higher memory usage for better scalability."]
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct sbitmap {
-    #[doc = " @depth: Number of bits used in the whole bitmap."]
-    pub depth: core::ffi::c_uint,
-    #[doc = " @shift: log2(number of bits used per word)"]
-    pub shift: core::ffi::c_uint,
-    #[doc = " @map_nr: Number of words (cachelines) being used for the bitmap."]
-    pub map_nr: core::ffi::c_uint,
-    #[doc = " @round_robin: Allocate bits in strict round-robin order."]
-    pub round_robin: bool_,
-    #[doc = " @map: Allocated bitmap."]
-    pub map: *mut sbitmap_word,
-    pub alloc_hint: *mut core::ffi::c_uint,
-}
-impl Default for sbitmap {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[doc = " struct sbq_wait_state - Wait queue in a &struct sbitmap_queue."]
-#[repr(C)]
-#[repr(align(64))]
-#[derive(Copy, Clone)]
-pub struct sbq_wait_state {
-    #[doc = " @wait: Wait queue."]
-    pub wait: wait_queue_head_t,
-}
-impl Default for sbq_wait_state {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[doc = " struct sbitmap_queue - Scalable bitmap with the added ability to wait on free\n bits.\n\n A &struct sbitmap_queue uses multiple wait queues and rolling wakeups to\n avoid contention on the wait queue spinlock. This ensures that we don't hit a\n scalability wall when we run out of free bits and have to start putting tasks\n to sleep."]
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct sbitmap_queue {
-    #[doc = " @sb: Scalable bitmap."]
-    pub sb: sbitmap,
-    #[doc = " @wake_batch: Number of bits which must be freed before we wake up any\n waiters."]
-    pub wake_batch: core::ffi::c_uint,
-    #[doc = " @wake_index: Next wait queue in @ws to wake up."]
-    pub wake_index: atomic_t,
-    #[doc = " @ws: Wait queues."]
-    pub ws: *mut sbq_wait_state,
-    pub ws_active: atomic_t,
-    #[doc = " @min_shallow_depth: The minimum shallow depth which may be passed to\n sbitmap_queue_get_shallow()"]
-    pub min_shallow_depth: core::ffi::c_uint,
-    #[doc = " @completion_cnt: Number of bits cleared passed to the\n wakeup function."]
-    pub completion_cnt: atomic_t,
-    #[doc = " @wakeup_cnt: Number of thread wake ups issued."]
-    pub wakeup_cnt: atomic_t,
-}
-impl Default for sbitmap_queue {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-extern "C" {
-    #[doc = " sbitmap_init_node() - Initialize a &struct sbitmap on a specific memory node.\n @sb: Bitmap to initialize.\n @depth: Number of bits to allocate.\n @shift: Use 2^@shift bits per word in the bitmap; if a negative number if\n         given, a good default is chosen.\n @flags: Allocation flags.\n @node: Memory node to allocate on.\n @round_robin: If true, be stricter about allocation order; always allocate\n               starting from the last allocated bit. This is less efficient\n               than the default behavior (false).\n @alloc_hint: If true, apply percpu hint for where to start searching for\n              a free bit.\n\n Return: Zero on success or negative errno on failure."]
-    pub fn sbitmap_init_node(
-        sb: *mut sbitmap,
-        depth: core::ffi::c_uint,
-        shift: core::ffi::c_int,
-        flags: gfp_t,
-        node: core::ffi::c_int,
-        round_robin: bool_,
-        alloc_hint: bool_,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    #[doc = " sbitmap_resize() - Resize a &struct sbitmap.\n @sb: Bitmap to resize.\n @depth: New number of bits to resize to.\n\n Doesn't reallocate anything. It's up to the caller to ensure that the new\n depth doesn't exceed the depth that the sb was initialized with."]
-    pub fn sbitmap_resize(sb: *mut sbitmap, depth: core::ffi::c_uint);
-}
-extern "C" {
-    #[doc = " sbitmap_get() - Try to allocate a free bit from a &struct sbitmap.\n @sb: Bitmap to allocate from.\n\n This operation provides acquire barrier semantics if it succeeds.\n\n Return: Non-negative allocated bit number if successful, -1 otherwise."]
-    pub fn sbitmap_get(sb: *mut sbitmap) -> core::ffi::c_int;
-}
-extern "C" {
-    #[doc = " sbitmap_get_shallow() - Try to allocate a free bit from a &struct sbitmap,\n limiting the depth used from each word.\n @sb: Bitmap to allocate from.\n @shallow_depth: The maximum number of bits to allocate from a single word.\n\n This rather specific operation allows for having multiple users with\n different allocation limits. E.g., there can be a high-priority class that\n uses sbitmap_get() and a low-priority class that uses sbitmap_get_shallow()\n with a @shallow_depth of (1 << (@sb->shift - 1)). Then, the low-priority\n class can only allocate half of the total bits in the bitmap, preventing it\n from starving out the high-priority class.\n\n Return: Non-negative allocated bit number if successful, -1 otherwise."]
-    pub fn sbitmap_get_shallow(
-        sb: *mut sbitmap,
-        shallow_depth: core::ffi::c_ulong,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    #[doc = " sbitmap_any_bit_set() - Check for a set bit in a &struct sbitmap.\n @sb: Bitmap to check.\n\n Return: true if any bit in the bitmap is set, false otherwise."]
-    pub fn sbitmap_any_bit_set(sb: *const sbitmap) -> bool_;
-}
-pub type sb_for_each_fn = ::core::option::Option<
-    unsafe extern "C" fn(
-        arg1: *mut sbitmap,
-        arg2: core::ffi::c_uint,
-        arg3: *mut core::ffi::c_void,
-    ) -> bool_,
->;
-extern "C" {
-    #[doc = " sbitmap_show() - Dump &struct sbitmap information to a &struct seq_file.\n @sb: Bitmap to show.\n @m: struct seq_file to write to.\n\n This is intended for debugging. The format may change at any time."]
-    pub fn sbitmap_show(sb: *mut sbitmap, m: *mut seq_file);
-}
-extern "C" {
-    #[doc = " sbitmap_weight() - Return how many set and not cleared bits in a &struct\n sbitmap.\n @sb: Bitmap to check.\n\n Return: How many set and not cleared bits set"]
-    pub fn sbitmap_weight(sb: *const sbitmap) -> core::ffi::c_uint;
-}
-extern "C" {
-    #[doc = " sbitmap_bitmap_show() - Write a hex dump of a &struct sbitmap to a &struct\n seq_file.\n @sb: Bitmap to show.\n @m: struct seq_file to write to.\n\n This is intended for debugging. The output isn't guaranteed to be internally\n consistent."]
-    pub fn sbitmap_bitmap_show(sb: *mut sbitmap, m: *mut seq_file);
-}
-extern "C" {
-    #[doc = " sbitmap_queue_init_node() - Initialize a &struct sbitmap_queue on a specific\n memory node.\n @sbq: Bitmap queue to initialize.\n @depth: See sbitmap_init_node().\n @shift: See sbitmap_init_node().\n @round_robin: See sbitmap_get().\n @flags: Allocation flags.\n @node: Memory node to allocate on.\n\n Return: Zero on success or negative errno on failure."]
-    pub fn sbitmap_queue_init_node(
-        sbq: *mut sbitmap_queue,
-        depth: core::ffi::c_uint,
-        shift: core::ffi::c_int,
-        round_robin: bool_,
-        flags: gfp_t,
-        node: core::ffi::c_int,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    #[doc = " sbitmap_queue_recalculate_wake_batch() - Recalculate wake batch\n @sbq: Bitmap queue to recalculate wake batch.\n @users: Number of shares.\n\n Like sbitmap_queue_update_wake_batch(), this will calculate wake batch\n by depth. This interface is for HCTX shared tags or queue shared tags."]
-    pub fn sbitmap_queue_recalculate_wake_batch(sbq: *mut sbitmap_queue, users: core::ffi::c_uint);
-}
-extern "C" {
-    #[doc = " sbitmap_queue_resize() - Resize a &struct sbitmap_queue.\n @sbq: Bitmap queue to resize.\n @depth: New number of bits to resize to.\n\n Like sbitmap_resize(), this doesn't reallocate anything. It has to do\n some extra work on the &struct sbitmap_queue, so it's not safe to just\n resize the underlying &struct sbitmap."]
-    pub fn sbitmap_queue_resize(sbq: *mut sbitmap_queue, depth: core::ffi::c_uint);
-}
-extern "C" {
-    #[doc = " __sbitmap_queue_get() - Try to allocate a free bit from a &struct\n sbitmap_queue with preemption already disabled.\n @sbq: Bitmap queue to allocate from.\n\n Return: Non-negative allocated bit number if successful, -1 otherwise."]
-    pub fn __sbitmap_queue_get(sbq: *mut sbitmap_queue) -> core::ffi::c_int;
-}
-extern "C" {
-    #[doc = " __sbitmap_queue_get_batch() - Try to allocate a batch of free bits\n @sbq: Bitmap queue to allocate from.\n @nr_tags: number of tags requested\n @offset: offset to add to returned bits\n\n Return: Mask of allocated tags, 0 if none are found. Each tag allocated is\n a bit in the mask returned, and the caller must add @offset to the value to\n get the absolute tag value."]
-    pub fn __sbitmap_queue_get_batch(
-        sbq: *mut sbitmap_queue,
-        nr_tags: core::ffi::c_int,
-        offset: *mut core::ffi::c_uint,
-    ) -> core::ffi::c_ulong;
-}
-extern "C" {
-    #[doc = " sbitmap_queue_get_shallow() - Try to allocate a free bit from a &struct\n sbitmap_queue, limiting the depth used from each word, with preemption\n already disabled.\n @sbq: Bitmap queue to allocate from.\n @shallow_depth: The maximum number of bits to allocate from a single word.\n See sbitmap_get_shallow().\n\n If you call this, make sure to call sbitmap_queue_min_shallow_depth() after\n initializing @sbq.\n\n Return: Non-negative allocated bit number if successful, -1 otherwise."]
-    pub fn sbitmap_queue_get_shallow(
-        sbq: *mut sbitmap_queue,
-        shallow_depth: core::ffi::c_uint,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    #[doc = " sbitmap_queue_min_shallow_depth() - Inform a &struct sbitmap_queue of the\n minimum shallow depth that will be used.\n @sbq: Bitmap queue in question.\n @min_shallow_depth: The minimum shallow depth that will be passed to\n sbitmap_queue_get_shallow() or __sbitmap_queue_get_shallow().\n\n sbitmap_queue_clear() batches wakeups as an optimization. The batch size\n depends on the depth of the bitmap. Since the shallow allocation functions\n effectively operate with a different depth, the shallow depth must be taken\n into account when calculating the batch size. This function must be called\n with the minimum shallow depth that will be used. Failure to do so can result\n in missed wakeups."]
-    pub fn sbitmap_queue_min_shallow_depth(
-        sbq: *mut sbitmap_queue,
-        min_shallow_depth: core::ffi::c_uint,
-    );
-}
-extern "C" {
-    #[doc = " sbitmap_queue_clear() - Free an allocated bit and wake up waiters on a\n &struct sbitmap_queue.\n @sbq: Bitmap to free from.\n @nr: Bit number to free.\n @cpu: CPU the bit was allocated on."]
-    pub fn sbitmap_queue_clear(
-        sbq: *mut sbitmap_queue,
-        nr: core::ffi::c_uint,
-        cpu: core::ffi::c_uint,
-    );
-}
-extern "C" {
-    #[doc = " sbitmap_queue_clear_batch() - Free a batch of allocated bits\n &struct sbitmap_queue.\n @sbq: Bitmap to free from.\n @offset: offset for each tag in array\n @tags: array of tags\n @nr_tags: number of tags in array"]
-    pub fn sbitmap_queue_clear_batch(
-        sbq: *mut sbitmap_queue,
-        offset: core::ffi::c_int,
-        tags: *mut core::ffi::c_int,
-        nr_tags: core::ffi::c_int,
-    );
-}
-extern "C" {
-    #[doc = " sbitmap_queue_wake_all() - Wake up everything waiting on a &struct\n sbitmap_queue.\n @sbq: Bitmap queue to wake up."]
-    pub fn sbitmap_queue_wake_all(sbq: *mut sbitmap_queue);
-}
-extern "C" {
-    #[doc = " sbitmap_queue_wake_up() - Wake up some of waiters in one waitqueue\n on a &struct sbitmap_queue.\n @sbq: Bitmap queue to wake up.\n @nr: Number of bits cleared."]
-    pub fn sbitmap_queue_wake_up(sbq: *mut sbitmap_queue, nr: core::ffi::c_int);
-}
-extern "C" {
-    #[doc = " sbitmap_queue_show() - Dump &struct sbitmap_queue information to a &struct\n seq_file.\n @sbq: Bitmap queue to show.\n @m: struct seq_file to write to.\n\n This is intended for debugging. The format may change at any time."]
-    pub fn sbitmap_queue_show(sbq: *mut sbitmap_queue, m: *mut seq_file);
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct sbq_wait {
-    pub sbq: *mut sbitmap_queue,
-    pub wait: wait_queue_entry,
-}
-impl Default for sbq_wait {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-extern "C" {
-    pub fn sbitmap_prepare_to_wait(
-        sbq: *mut sbitmap_queue,
-        ws: *mut sbq_wait_state,
-        sbq_wait: *mut sbq_wait,
-        state: core::ffi::c_int,
-    );
-}
-extern "C" {
-    pub fn sbitmap_finish_wait(
-        sbq: *mut sbitmap_queue,
-        ws: *mut sbq_wait_state,
-        sbq_wait: *mut sbq_wait,
-    );
-}
-extern "C" {
-    pub fn sbitmap_add_wait_queue(
-        sbq: *mut sbitmap_queue,
-        ws: *mut sbq_wait_state,
-        sbq_wait: *mut sbq_wait,
-    );
-}
-extern "C" {
-    pub fn sbitmap_del_wait_queue(sbq_wait: *mut sbq_wait);
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct elevator_queue {
-    _unused: [u8; 0],
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct blk_trace {
-    _unused: [u8; 0],
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct sg_io_hdr {
-    _unused: [u8; 0],
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct blkcg_gq {
-    _unused: [u8; 0],
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct blk_flush_queue {
-    _unused: [u8; 0],
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct pr_ops {
-    _unused: [u8; 0],
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct rq_qos {
-    _unused: [u8; 0],
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct blk_queue_stats {
-    _unused: [u8; 0],
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct blk_stat_callback {
-    _unused: [u8; 0],
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct blk_crypto_profile {
-    _unused: [u8; 0],
-}
-extern "C" {
-    pub static disk_type: device_type;
-}
-extern "C" {
-    pub static part_type: device_type;
-}
-extern "C" {
-    pub static mut block_class: class;
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct partition_meta_info {
-    pub uuid: [core::ffi::c_char; 37usize],
-    pub volname: [u8_; 64usize],
-}
-impl Default for partition_meta_info {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-pub const GENHD_FL_REMOVABLE: _bindgen_ty_114 = 1;
-pub const GENHD_FL_HIDDEN: _bindgen_ty_114 = 2;
-pub const GENHD_FL_NO_PART: _bindgen_ty_114 = 4;
-#[doc = " DOC: genhd capability flags\n\n ``GENHD_FL_REMOVABLE``: indicates that the block device gives access to\n removable media.  When set, the device remains present even when media is not\n inserted.  Shall not be set for devices which are removed entirely when the\n media is removed.\n\n ``GENHD_FL_HIDDEN``: the block device is hidden; it doesn't produce events,\n doesn't appear in sysfs, and can't be opened from userspace or using\n blkdev_get*. Used for the underlying components of multipath devices.\n\n ``GENHD_FL_NO_PART``: partition support is disabled.  The kernel will not\n scan for partitions from add_disk, and users can't add partitions manually.\n"]
-pub type _bindgen_ty_114 = core::ffi::c_uint;
-pub const DISK_EVENT_MEDIA_CHANGE: _bindgen_ty_115 = 1;
-pub const DISK_EVENT_EJECT_REQUEST: _bindgen_ty_115 = 2;
-pub type _bindgen_ty_115 = core::ffi::c_uint;
-pub const DISK_EVENT_FLAG_POLL: _bindgen_ty_116 = 1;
-pub const DISK_EVENT_FLAG_UEVENT: _bindgen_ty_116 = 2;
-pub const DISK_EVENT_FLAG_BLOCK_ON_EXCL_WRITE: _bindgen_ty_116 = 4;
-pub type _bindgen_ty_116 = core::ffi::c_uint;
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct disk_events {
-    _unused: [u8; 0],
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct badblocks {
-    _unused: [u8; 0],
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct blk_integrity {
-    pub profile: *mut blk_integrity_profile,
-    pub flags: core::ffi::c_uchar,
-    pub tuple_size: core::ffi::c_uchar,
-    pub interval_exp: core::ffi::c_uchar,
-    pub tag_size: core::ffi::c_uchar,
-}
-impl Default for blk_integrity {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-pub type blk_mode_t = core::ffi::c_uint;
-#[repr(C)]
-#[derive(Copy, Clone)]
-pub struct gendisk {
-    pub major: core::ffi::c_int,
-    pub first_minor: core::ffi::c_int,
-    pub minors: core::ffi::c_int,
-    pub disk_name: [core::ffi::c_char; 32usize],
-    pub events: core::ffi::c_ushort,
-    pub event_flags: core::ffi::c_ushort,
-    pub part_tbl: xarray,
-    pub part0: *mut block_device,
-    pub fops: *const block_device_operations,
-    pub queue: *mut request_queue,
-    pub private_data: *mut core::ffi::c_void,
-    pub bio_split: bio_set,
-    pub flags: core::ffi::c_int,
-    pub state: core::ffi::c_ulong,
-    pub open_mutex: mutex,
-    pub open_partitions: core::ffi::c_uint,
-    pub bdi: *mut backing_dev_info,
-    pub queue_kobj: kobject,
-    pub slave_dir: *mut kobject,
-    pub slave_bdevs: list_head,
-    pub random: *mut timer_rand_state,
-    pub sync_io: atomic_t,
-    pub ev: *mut disk_events,
-    pub nr_zones: core::ffi::c_uint,
-    pub max_open_zones: core::ffi::c_uint,
-    pub max_active_zones: core::ffi::c_uint,
-    pub conv_zones_bitmap: *mut core::ffi::c_ulong,
-    pub seq_zones_wlock: *mut core::ffi::c_ulong,
-    pub cdi: *mut cdrom_device_info,
-    pub node_id: core::ffi::c_int,
-    pub bb: *mut badblocks,
-    pub lockdep_map: lockdep_map,
-    pub diskseq: u64_,
-    pub open_mode: blk_mode_t,
-    pub ia_ranges: *mut blk_independent_access_ranges,
-}
-impl Default for gendisk {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-pub const blk_zoned_model_BLK_ZONED_NONE: blk_zoned_model = 0;
-pub const blk_zoned_model_BLK_ZONED_HA: blk_zoned_model = 1;
-pub const blk_zoned_model_BLK_ZONED_HM: blk_zoned_model = 2;
-pub type blk_zoned_model = core::ffi::c_uint;
-pub const blk_bounce_BLK_BOUNCE_NONE: blk_bounce = 0;
-pub const blk_bounce_BLK_BOUNCE_HIGH: blk_bounce = 1;
-pub type blk_bounce = core::ffi::c_uint;
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct queue_limits {
-    pub bounce: blk_bounce,
-    pub seg_boundary_mask: core::ffi::c_ulong,
-    pub virt_boundary_mask: core::ffi::c_ulong,
-    pub max_hw_sectors: core::ffi::c_uint,
-    pub max_dev_sectors: core::ffi::c_uint,
-    pub chunk_sectors: core::ffi::c_uint,
-    pub max_sectors: core::ffi::c_uint,
-    pub max_user_sectors: core::ffi::c_uint,
-    pub max_segment_size: core::ffi::c_uint,
-    pub physical_block_size: core::ffi::c_uint,
-    pub logical_block_size: core::ffi::c_uint,
-    pub alignment_offset: core::ffi::c_uint,
-    pub io_min: core::ffi::c_uint,
-    pub io_opt: core::ffi::c_uint,
-    pub max_discard_sectors: core::ffi::c_uint,
-    pub max_hw_discard_sectors: core::ffi::c_uint,
-    pub max_secure_erase_sectors: core::ffi::c_uint,
-    pub max_write_zeroes_sectors: core::ffi::c_uint,
-    pub max_zone_append_sectors: core::ffi::c_uint,
-    pub discard_granularity: core::ffi::c_uint,
-    pub discard_alignment: core::ffi::c_uint,
-    pub zone_write_granularity: core::ffi::c_uint,
-    pub max_segments: core::ffi::c_ushort,
-    pub max_integrity_segments: core::ffi::c_ushort,
-    pub max_discard_segments: core::ffi::c_ushort,
-    pub misaligned: core::ffi::c_uchar,
-    pub discard_misaligned: core::ffi::c_uchar,
-    pub raid_partial_stripes_expensive: core::ffi::c_uchar,
-    pub zoned: blk_zoned_model,
-    pub dma_alignment: core::ffi::c_uint,
-}
-impl Default for queue_limits {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-pub type report_zones_cb = ::core::option::Option<
-    unsafe extern "C" fn(
-        zone: *mut blk_zone,
-        idx: core::ffi::c_uint,
-        data: *mut core::ffi::c_void,
-    ) -> core::ffi::c_int,
->;
-extern "C" {
-    pub fn disk_set_zoned(disk: *mut gendisk, model: blk_zoned_model);
-}
-extern "C" {
-    pub fn blkdev_report_zones(
-        bdev: *mut block_device,
-        sector: sector_t,
-        nr_zones: core::ffi::c_uint,
-        cb: report_zones_cb,
-        data: *mut core::ffi::c_void,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn bdev_nr_zones(bdev: *mut block_device) -> core::ffi::c_uint;
-}
-extern "C" {
-    pub fn blkdev_zone_mgmt(
-        bdev: *mut block_device,
-        op: req_op,
-        sectors: sector_t,
-        nr_sectors: sector_t,
-        gfp_mask: gfp_t,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn blk_revalidate_disk_zones(
-        disk: *mut gendisk,
-        update_driver_data: ::core::option::Option<unsafe extern "C" fn(disk: *mut gendisk)>,
-    ) -> core::ffi::c_int;
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct blk_independent_access_range {
-    pub kobj: kobject,
-    pub sector: sector_t,
-    pub nr_sectors: sector_t,
-}
-impl Default for blk_independent_access_range {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug)]
-pub struct blk_independent_access_ranges {
-    pub kobj: kobject,
-    pub sysfs_registered: bool_,
-    pub nr_ia_ranges: core::ffi::c_uint,
-    pub ia_range: __IncompleteArrayField<blk_independent_access_range>,
-}
-impl Default for blk_independent_access_ranges {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Copy, Clone)]
-pub struct request_queue {
-    pub last_merge: *mut request,
-    pub elevator: *mut elevator_queue,
-    pub q_usage_counter: percpu_ref,
-    pub stats: *mut blk_queue_stats,
-    pub rq_qos: *mut rq_qos,
-    pub rq_qos_mutex: mutex,
-    pub mq_ops: *const blk_mq_ops,
-    pub queue_ctx: *mut blk_mq_ctx,
-    pub queue_depth: core::ffi::c_uint,
-    pub hctx_table: xarray,
-    pub nr_hw_queues: core::ffi::c_uint,
-    pub queuedata: *mut core::ffi::c_void,
-    pub queue_flags: core::ffi::c_ulong,
-    pub pm_only: atomic_t,
-    pub id: core::ffi::c_int,
-    pub queue_lock: spinlock_t,
-    pub disk: *mut gendisk,
-    pub refs: refcount_t,
-    pub mq_kobj: *mut kobject,
-    pub integrity: blk_integrity,
-    pub dev: *mut device,
-    pub rpm_status: rpm_status,
-    pub nr_requests: core::ffi::c_ulong,
-    pub dma_pad_mask: core::ffi::c_uint,
-    pub rq_timeout: core::ffi::c_uint,
-    pub timeout: timer_list,
-    pub timeout_work: work_struct,
-    pub nr_active_requests_shared_tags: atomic_t,
-    pub sched_shared_tags: *mut blk_mq_tags,
-    pub icq_list: list_head,
-    pub blkcg_pols: [core::ffi::c_ulong; 1usize],
-    pub root_blkg: *mut blkcg_gq,
-    pub blkg_list: list_head,
-    pub blkcg_mutex: mutex,
-    pub limits: queue_limits,
-    pub required_elevator_features: core::ffi::c_uint,
-    pub node: core::ffi::c_int,
-    pub blk_trace: *mut blk_trace,
-    pub fq: *mut blk_flush_queue,
-    pub flush_list: list_head,
-    pub requeue_list: list_head,
-    pub requeue_lock: spinlock_t,
-    pub requeue_work: delayed_work,
-    pub sysfs_lock: mutex,
-    pub sysfs_dir_lock: mutex,
-    pub unused_hctx_list: list_head,
-    pub unused_hctx_lock: spinlock_t,
-    pub mq_freeze_depth: core::ffi::c_int,
-    pub td: *mut throtl_data,
-    pub callback_head: callback_head,
-    pub mq_freeze_wq: wait_queue_head_t,
-    pub mq_freeze_lock: mutex,
-    pub quiesce_depth: core::ffi::c_int,
-    pub tag_set: *mut blk_mq_tag_set,
-    pub tag_set_list: list_head,
-    pub debugfs_dir: *mut dentry,
-    pub sched_debugfs_dir: *mut dentry,
-    pub rqos_debugfs_dir: *mut dentry,
-    pub debugfs_mutex: mutex,
-    pub mq_sysfs_init_done: bool_,
-}
-impl Default for request_queue {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-extern "C" {
-    pub fn blk_queue_flag_set(flag: core::ffi::c_uint, q: *mut request_queue);
-}
-extern "C" {
-    pub fn blk_queue_flag_clear(flag: core::ffi::c_uint, q: *mut request_queue);
-}
-extern "C" {
-    pub fn blk_queue_flag_test_and_set(flag: core::ffi::c_uint, q: *mut request_queue) -> bool_;
-}
-extern "C" {
-    pub fn blk_set_pm_only(q: *mut request_queue);
-}
-extern "C" {
-    pub fn blk_clear_pm_only(q: *mut request_queue);
-}
-extern "C" {
-    #[must_use]
-    pub fn device_add_disk(
-        parent: *mut device,
-        disk: *mut gendisk,
-        groups: *mut *const attribute_group,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn del_gendisk(gp: *mut gendisk);
-}
-extern "C" {
-    pub fn invalidate_disk(disk: *mut gendisk);
-}
-extern "C" {
-    pub fn set_disk_ro(disk: *mut gendisk, read_only: bool_);
-}
-extern "C" {
-    pub fn disk_uevent(disk: *mut gendisk, action: kobject_action);
-}
-extern "C" {
-    pub fn set_capacity_and_notify(disk: *mut gendisk, size: sector_t) -> bool_;
-}
-extern "C" {
-    pub fn disk_force_media_change(disk: *mut gendisk);
-}
-extern "C" {
-    pub fn bdev_mark_dead(bdev: *mut block_device, surprise: bool_);
-}
-extern "C" {
-    pub fn add_disk_randomness(disk: *mut gendisk);
-}
-extern "C" {
-    pub fn rand_initialize_disk(disk: *mut gendisk);
-}
-extern "C" {
-    pub fn bdev_disk_changed(disk: *mut gendisk, invalidate: bool_) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn put_disk(disk: *mut gendisk);
-}
-extern "C" {
-    pub fn __blk_alloc_disk(node: core::ffi::c_int, lkclass: *mut lock_class_key) -> *mut gendisk;
-}
-extern "C" {
-    pub fn __register_blkdev(
-        major: core::ffi::c_uint,
-        name: *const core::ffi::c_char,
-        probe: ::core::option::Option<unsafe extern "C" fn(devt: dev_t)>,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn unregister_blkdev(major: core::ffi::c_uint, name: *const core::ffi::c_char);
-}
-extern "C" {
-    pub fn disk_check_media_change(disk: *mut gendisk) -> bool_;
-}
-extern "C" {
-    pub fn set_capacity(disk: *mut gendisk, size: sector_t);
-}
-extern "C" {
-    pub fn bd_link_disk_holder(bdev: *mut block_device, disk: *mut gendisk) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn bd_unlink_disk_holder(bdev: *mut block_device, disk: *mut gendisk);
-}
-extern "C" {
-    pub fn part_devt(disk: *mut gendisk, partno: u8_) -> dev_t;
-}
-extern "C" {
-    pub fn inc_diskseq(disk: *mut gendisk);
-}
-extern "C" {
-    pub fn blk_request_module(devt: dev_t);
-}
-extern "C" {
-    pub fn blk_register_queue(disk: *mut gendisk) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn blk_unregister_queue(disk: *mut gendisk);
-}
-extern "C" {
-    pub fn submit_bio_noacct(bio: *mut bio);
-}
-extern "C" {
-    pub fn bio_split_to_limits(bio: *mut bio) -> *mut bio;
-}
-extern "C" {
-    pub fn blk_lld_busy(q: *mut request_queue) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn blk_queue_enter(q: *mut request_queue, flags: blk_mq_req_flags_t) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn blk_queue_exit(q: *mut request_queue);
-}
-extern "C" {
-    pub fn blk_sync_queue(q: *mut request_queue);
-}
-extern "C" {
-    pub fn blk_op_str(op: req_op) -> *const core::ffi::c_char;
-}
-extern "C" {
-    pub fn blk_status_to_errno(status: blk_status_t) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn errno_to_blk_status(errno: core::ffi::c_int) -> blk_status_t;
-}
-extern "C" {
-    pub fn blk_status_to_str(status: blk_status_t) -> *const core::ffi::c_char;
-}
-extern "C" {
-    pub fn bio_poll(
-        bio: *mut bio,
-        iob: *mut io_comp_batch,
-        flags: core::ffi::c_uint,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn iocb_bio_iopoll(
-        kiocb: *mut kiocb,
-        iob: *mut io_comp_batch,
-        flags: core::ffi::c_uint,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn blk_zone_cond_str(zone_cond: blk_zone_cond) -> *const core::ffi::c_char;
-}
-extern "C" {
-    pub fn blk_queue_bounce_limit(q: *mut request_queue, limit: blk_bounce);
-}
-extern "C" {
-    pub fn blk_queue_max_hw_sectors(arg1: *mut request_queue, arg2: core::ffi::c_uint);
-}
-extern "C" {
-    pub fn blk_queue_chunk_sectors(arg1: *mut request_queue, arg2: core::ffi::c_uint);
-}
-extern "C" {
-    pub fn blk_queue_max_segments(arg1: *mut request_queue, arg2: core::ffi::c_ushort);
-}
-extern "C" {
-    pub fn blk_queue_max_discard_segments(arg1: *mut request_queue, arg2: core::ffi::c_ushort);
-}
-extern "C" {
-    pub fn blk_queue_max_secure_erase_sectors(
-        q: *mut request_queue,
-        max_sectors: core::ffi::c_uint,
-    );
-}
-extern "C" {
-    pub fn blk_queue_max_segment_size(arg1: *mut request_queue, arg2: core::ffi::c_uint);
-}
-extern "C" {
-    pub fn blk_queue_max_discard_sectors(
-        q: *mut request_queue,
-        max_discard_sectors: core::ffi::c_uint,
-    );
-}
-extern "C" {
-    pub fn blk_queue_max_write_zeroes_sectors(
-        q: *mut request_queue,
-        max_write_same_sectors: core::ffi::c_uint,
-    );
-}
-extern "C" {
-    pub fn blk_queue_logical_block_size(arg1: *mut request_queue, arg2: core::ffi::c_uint);
-}
-extern "C" {
-    pub fn blk_queue_max_zone_append_sectors(
-        q: *mut request_queue,
-        max_zone_append_sectors: core::ffi::c_uint,
-    );
-}
-extern "C" {
-    pub fn blk_queue_physical_block_size(arg1: *mut request_queue, arg2: core::ffi::c_uint);
-}
-extern "C" {
-    pub fn blk_queue_zone_write_granularity(q: *mut request_queue, size: core::ffi::c_uint);
-}
-extern "C" {
-    pub fn blk_queue_alignment_offset(q: *mut request_queue, alignment: core::ffi::c_uint);
-}
-extern "C" {
-    pub fn disk_update_readahead(disk: *mut gendisk);
-}
-extern "C" {
-    pub fn blk_limits_io_min(limits: *mut queue_limits, min: core::ffi::c_uint);
-}
-extern "C" {
-    pub fn blk_queue_io_min(q: *mut request_queue, min: core::ffi::c_uint);
-}
-extern "C" {
-    pub fn blk_limits_io_opt(limits: *mut queue_limits, opt: core::ffi::c_uint);
-}
-extern "C" {
-    pub fn blk_queue_io_opt(q: *mut request_queue, opt: core::ffi::c_uint);
-}
-extern "C" {
-    pub fn blk_set_queue_depth(q: *mut request_queue, depth: core::ffi::c_uint);
-}
-extern "C" {
-    pub fn blk_set_stacking_limits(lim: *mut queue_limits);
-}
-extern "C" {
-    pub fn blk_stack_limits(
-        t: *mut queue_limits,
-        b: *mut queue_limits,
-        offset: sector_t,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn disk_stack_limits(disk: *mut gendisk, bdev: *mut block_device, offset: sector_t);
-}
-extern "C" {
-    pub fn blk_queue_update_dma_pad(arg1: *mut request_queue, arg2: core::ffi::c_uint);
-}
-extern "C" {
-    pub fn blk_queue_segment_boundary(arg1: *mut request_queue, arg2: core::ffi::c_ulong);
-}
-extern "C" {
-    pub fn blk_queue_virt_boundary(arg1: *mut request_queue, arg2: core::ffi::c_ulong);
-}
-extern "C" {
-    pub fn blk_queue_dma_alignment(arg1: *mut request_queue, arg2: core::ffi::c_int);
-}
-extern "C" {
-    pub fn blk_queue_update_dma_alignment(arg1: *mut request_queue, arg2: core::ffi::c_int);
-}
-extern "C" {
-    pub fn blk_queue_rq_timeout(arg1: *mut request_queue, arg2: core::ffi::c_uint);
-}
-extern "C" {
-    pub fn blk_queue_write_cache(q: *mut request_queue, enabled: bool_, fua: bool_);
-}
-extern "C" {
-    pub fn disk_alloc_independent_access_ranges(
-        disk: *mut gendisk,
-        nr_ia_ranges: core::ffi::c_int,
-    ) -> *mut blk_independent_access_ranges;
-}
-extern "C" {
-    pub fn disk_set_independent_access_ranges(
-        disk: *mut gendisk,
-        iars: *mut blk_independent_access_ranges,
-    );
-}
-extern "C" {
-    pub fn blk_queue_required_elevator_features(q: *mut request_queue, features: core::ffi::c_uint);
-}
-extern "C" {
-    pub fn blk_queue_can_use_dma_map_merging(q: *mut request_queue, dev: *mut device) -> bool_;
-}
-extern "C" {
-    #[must_use]
-    pub fn blk_get_queue(arg1: *mut request_queue) -> bool_;
-}
-extern "C" {
-    pub fn blk_put_queue(arg1: *mut request_queue);
-}
-extern "C" {
-    pub fn blk_mark_disk_dead(disk: *mut gendisk);
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct blk_plug {
-    pub mq_list: *mut request,
-    pub cached_rq: *mut request,
-    pub nr_ios: core::ffi::c_ushort,
-    pub rq_count: core::ffi::c_ushort,
-    pub multiple_queues: bool_,
-    pub has_elevator: bool_,
-    pub cb_list: list_head,
-}
-impl Default for blk_plug {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-pub type blk_plug_cb_fn =
-    ::core::option::Option<unsafe extern "C" fn(arg1: *mut blk_plug_cb, arg2: bool_)>;
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct blk_plug_cb {
-    pub list: list_head,
-    pub callback: blk_plug_cb_fn,
-    pub data: *mut core::ffi::c_void,
-}
-impl Default for blk_plug_cb {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-extern "C" {
-    pub fn blk_check_plugged(
-        unplug: blk_plug_cb_fn,
-        data: *mut core::ffi::c_void,
-        size: core::ffi::c_int,
-    ) -> *mut blk_plug_cb;
-}
-extern "C" {
-    pub fn blk_start_plug(arg1: *mut blk_plug);
-}
-extern "C" {
-    pub fn blk_start_plug_nr_ios(arg1: *mut blk_plug, arg2: core::ffi::c_ushort);
-}
-extern "C" {
-    pub fn blk_finish_plug(arg1: *mut blk_plug);
-}
-extern "C" {
-    pub fn __blk_flush_plug(plug: *mut blk_plug, from_schedule: bool_);
-}
-extern "C" {
-    pub fn blkdev_issue_flush(bdev: *mut block_device) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn nr_blockdev_pages() -> core::ffi::c_long;
-}
-extern "C" {
-    pub fn blk_io_schedule();
-}
-extern "C" {
-    pub fn blkdev_issue_discard(
-        bdev: *mut block_device,
-        sector: sector_t,
-        nr_sects: sector_t,
-        gfp_mask: gfp_t,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn __blkdev_issue_discard(
-        bdev: *mut block_device,
-        sector: sector_t,
-        nr_sects: sector_t,
-        gfp_mask: gfp_t,
-        biop: *mut *mut bio,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn blkdev_issue_secure_erase(
-        bdev: *mut block_device,
-        sector: sector_t,
-        nr_sects: sector_t,
-        gfp: gfp_t,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn __blkdev_issue_zeroout(
-        bdev: *mut block_device,
-        sector: sector_t,
-        nr_sects: sector_t,
-        gfp_mask: gfp_t,
-        biop: *mut *mut bio,
-        flags: core::ffi::c_uint,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn blkdev_issue_zeroout(
-        bdev: *mut block_device,
-        sector: sector_t,
-        nr_sects: sector_t,
-        gfp_mask: gfp_t,
-        flags: core::ffi::c_uint,
-    ) -> core::ffi::c_int;
-}
-pub const blk_default_limits_BLK_MAX_SEGMENTS: blk_default_limits = 128;
-pub const blk_default_limits_BLK_SAFE_MAX_SECTORS: blk_default_limits = 255;
-pub const blk_default_limits_BLK_MAX_SEGMENT_SIZE: blk_default_limits = 65536;
-pub const blk_default_limits_BLK_SEG_BOUNDARY_MASK: blk_default_limits = 4294967295;
-pub type blk_default_limits = core::ffi::c_uint;
-extern "C" {
-    pub fn bdev_alignment_offset(bdev: *mut block_device) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn bdev_discard_alignment(bdev: *mut block_device) -> core::ffi::c_uint;
-}
-extern "C" {
-    pub fn kblockd_schedule_work(work: *mut work_struct) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn kblockd_mod_delayed_work_on(
-        cpu: core::ffi::c_int,
-        dwork: *mut delayed_work,
-        delay: core::ffi::c_ulong,
-    ) -> core::ffi::c_int;
-}
-pub const blk_unique_id_BLK_UID_T10: blk_unique_id = 1;
-pub const blk_unique_id_BLK_UID_EUI64: blk_unique_id = 2;
-pub const blk_unique_id_BLK_UID_NAA: blk_unique_id = 3;
-pub type blk_unique_id = core::ffi::c_uint;
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct block_device_operations {
-    pub submit_bio: ::core::option::Option<unsafe extern "C" fn(bio: *mut bio)>,
-    pub poll_bio: ::core::option::Option<
-        unsafe extern "C" fn(
-            bio: *mut bio,
-            iob: *mut io_comp_batch,
-            flags: core::ffi::c_uint,
-        ) -> core::ffi::c_int,
-    >,
-    pub open: ::core::option::Option<
-        unsafe extern "C" fn(disk: *mut gendisk, mode: blk_mode_t) -> core::ffi::c_int,
-    >,
-    pub release: ::core::option::Option<unsafe extern "C" fn(disk: *mut gendisk)>,
-    pub ioctl: ::core::option::Option<
-        unsafe extern "C" fn(
-            bdev: *mut block_device,
-            mode: blk_mode_t,
-            cmd: core::ffi::c_uint,
-            arg: core::ffi::c_ulong,
-        ) -> core::ffi::c_int,
-    >,
-    pub compat_ioctl: ::core::option::Option<
-        unsafe extern "C" fn(
-            bdev: *mut block_device,
-            mode: blk_mode_t,
-            cmd: core::ffi::c_uint,
-            arg: core::ffi::c_ulong,
-        ) -> core::ffi::c_int,
-    >,
-    pub check_events: ::core::option::Option<
-        unsafe extern "C" fn(disk: *mut gendisk, clearing: core::ffi::c_uint) -> core::ffi::c_uint,
-    >,
-    pub unlock_native_capacity: ::core::option::Option<unsafe extern "C" fn(arg1: *mut gendisk)>,
-    pub getgeo: ::core::option::Option<
-        unsafe extern "C" fn(arg1: *mut block_device, arg2: *mut hd_geometry) -> core::ffi::c_int,
-    >,
-    pub set_read_only: ::core::option::Option<
-        unsafe extern "C" fn(bdev: *mut block_device, ro: bool_) -> core::ffi::c_int,
-    >,
-    pub free_disk: ::core::option::Option<unsafe extern "C" fn(disk: *mut gendisk)>,
-    pub swap_slot_free_notify: ::core::option::Option<
-        unsafe extern "C" fn(arg1: *mut block_device, arg2: core::ffi::c_ulong),
-    >,
-    pub report_zones: ::core::option::Option<
-        unsafe extern "C" fn(
-            arg1: *mut gendisk,
-            sector: sector_t,
-            nr_zones: core::ffi::c_uint,
-            cb: report_zones_cb,
-            data: *mut core::ffi::c_void,
-        ) -> core::ffi::c_int,
-    >,
-    pub devnode: ::core::option::Option<
-        unsafe extern "C" fn(disk: *mut gendisk, mode: *mut umode_t) -> *mut core::ffi::c_char,
-    >,
-    pub get_unique_id: ::core::option::Option<
-        unsafe extern "C" fn(
-            disk: *mut gendisk,
-            id: *mut u8_,
-            id_type: blk_unique_id,
-        ) -> core::ffi::c_int,
-    >,
-    pub owner: *mut module,
-    pub pr_ops: *const pr_ops,
-    pub alternative_gpt_sector: ::core::option::Option<
-        unsafe extern "C" fn(disk: *mut gendisk, sector: *mut sector_t) -> core::ffi::c_int,
-    >,
-}
-impl Default for block_device_operations {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-extern "C" {
-    pub fn blkdev_compat_ptr_ioctl(
-        arg1: *mut block_device,
-        arg2: blk_mode_t,
-        arg3: core::ffi::c_uint,
-        arg4: core::ffi::c_ulong,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn bdev_start_io_acct(
-        bdev: *mut block_device,
-        op: req_op,
-        start_time: core::ffi::c_ulong,
-    ) -> core::ffi::c_ulong;
-}
-extern "C" {
-    pub fn bdev_end_io_acct(
-        bdev: *mut block_device,
-        op: req_op,
-        sectors: core::ffi::c_uint,
-        start_time: core::ffi::c_ulong,
-    );
-}
-extern "C" {
-    pub fn bio_start_io_acct(bio: *mut bio) -> core::ffi::c_ulong;
-}
-extern "C" {
-    pub fn bio_end_io_acct_remapped(
-        bio: *mut bio,
-        start_time: core::ffi::c_ulong,
-        orig_bdev: *mut block_device,
-    );
-}
-extern "C" {
-    pub fn set_blocksize(bdev: *mut block_device, size: core::ffi::c_int) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn lookup_bdev(pathname: *const core::ffi::c_char, dev: *mut dev_t) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn blkdev_show(seqf: *mut seq_file, offset: off_t);
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct blk_holder_ops {
-    pub mark_dead:
-        ::core::option::Option<unsafe extern "C" fn(bdev: *mut block_device, surprise: bool_)>,
-    pub sync: ::core::option::Option<unsafe extern "C" fn(bdev: *mut block_device)>,
-}
-extern "C" {
-    pub static fs_holder_ops: blk_holder_ops;
-}
-extern "C" {
-    pub fn blkdev_get_by_dev(
-        dev: dev_t,
-        mode: blk_mode_t,
-        holder: *mut core::ffi::c_void,
-        hops: *const blk_holder_ops,
-    ) -> *mut block_device;
-}
-extern "C" {
-    pub fn blkdev_get_by_path(
-        path: *const core::ffi::c_char,
-        mode: blk_mode_t,
-        holder: *mut core::ffi::c_void,
-        hops: *const blk_holder_ops,
-    ) -> *mut block_device;
-}
-extern "C" {
-    pub fn bd_prepare_to_claim(
-        bdev: *mut block_device,
-        holder: *mut core::ffi::c_void,
-        hops: *const blk_holder_ops,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn bd_abort_claiming(bdev: *mut block_device, holder: *mut core::ffi::c_void);
-}
-extern "C" {
-    pub fn blkdev_put(bdev: *mut block_device, holder: *mut core::ffi::c_void);
-}
-extern "C" {
-    pub fn blkdev_get_no_open(dev: dev_t) -> *mut block_device;
-}
-extern "C" {
-    pub fn blkdev_put_no_open(bdev: *mut block_device);
-}
-extern "C" {
-    pub fn I_BDEV(inode: *mut inode) -> *mut block_device;
-}
-extern "C" {
-    pub fn invalidate_bdev(bdev: *mut block_device);
-}
-extern "C" {
-    pub fn sync_blockdev(bdev: *mut block_device) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn sync_blockdev_range(
-        bdev: *mut block_device,
-        lstart: loff_t,
-        lend: loff_t,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn sync_blockdev_nowait(bdev: *mut block_device) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn sync_bdevs(wait: bool_);
-}
-extern "C" {
-    pub fn bdev_statx_dioalign(inode: *mut inode, stat: *mut kstat);
-}
-extern "C" {
-    pub fn printk_all_partitions();
-}
-extern "C" {
-    pub fn early_lookup_bdev(
-        pathname: *const core::ffi::c_char,
-        dev: *mut dev_t,
-    ) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn freeze_bdev(bdev: *mut block_device) -> core::ffi::c_int;
-}
-extern "C" {
-    pub fn thaw_bdev(bdev: *mut block_device) -> core::ffi::c_int;
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct io_comp_batch {
-    pub req_list: *mut request,
-    pub need_ts: bool_,
-    pub complete: ::core::option::Option<unsafe extern "C" fn(arg1: *mut io_comp_batch)>,
-}
-impl Default for io_comp_batch {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
 pub const rq_end_io_ret_RQ_END_IO_NONE: rq_end_io_ret = 0;
 pub const rq_end_io_ret_RQ_END_IO_FREE: rq_end_io_ret = 1;
 pub type rq_end_io_ret = core::ffi::c_uint;
@@ -68034,6 +69362,460 @@ extern "C" {
 extern "C" {
     pub fn __blk_req_zone_write_unlock(rq: *mut request);
 }
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct folio_batch {
+    _unused: [u8; 0],
+}
+extern "C" {
+    pub fn invalidate_mapping_pages(
+        mapping: *mut address_space,
+        start: core::ffi::c_ulong,
+        end: core::ffi::c_ulong,
+    ) -> core::ffi::c_ulong;
+}
+extern "C" {
+    pub fn invalidate_inode_pages2(mapping: *mut address_space) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn invalidate_inode_pages2_range(
+        mapping: *mut address_space,
+        start: core::ffi::c_ulong,
+        end: core::ffi::c_ulong,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn kiocb_invalidate_pages(iocb: *mut kiocb, count: usize) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn kiocb_invalidate_post_direct_write(iocb: *mut kiocb, count: usize);
+}
+extern "C" {
+    pub fn write_inode_now(arg1: *mut inode, sync: core::ffi::c_int) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn filemap_fdatawrite(arg1: *mut address_space) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn filemap_flush(arg1: *mut address_space) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn filemap_fdatawait_keep_errors(mapping: *mut address_space) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn filemap_fdatawait_range(
+        arg1: *mut address_space,
+        lstart: loff_t,
+        lend: loff_t,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn filemap_fdatawait_range_keep_errors(
+        mapping: *mut address_space,
+        start_byte: loff_t,
+        end_byte: loff_t,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn filemap_range_has_page(arg1: *mut address_space, lstart: loff_t, lend: loff_t) -> bool_;
+}
+extern "C" {
+    pub fn filemap_write_and_wait_range(
+        mapping: *mut address_space,
+        lstart: loff_t,
+        lend: loff_t,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn __filemap_fdatawrite_range(
+        mapping: *mut address_space,
+        start: loff_t,
+        end: loff_t,
+        sync_mode: core::ffi::c_int,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn filemap_fdatawrite_range(
+        mapping: *mut address_space,
+        start: loff_t,
+        end: loff_t,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn filemap_check_errors(mapping: *mut address_space) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn __filemap_set_wb_err(mapping: *mut address_space, err: core::ffi::c_int);
+}
+extern "C" {
+    pub fn filemap_fdatawrite_wbc(
+        mapping: *mut address_space,
+        wbc: *mut writeback_control,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn kiocb_write_and_wait(iocb: *mut kiocb, count: usize) -> core::ffi::c_int;
+}
+pub const mapping_flags_AS_EIO: mapping_flags = 0;
+pub const mapping_flags_AS_ENOSPC: mapping_flags = 1;
+pub const mapping_flags_AS_MM_ALL_LOCKS: mapping_flags = 2;
+pub const mapping_flags_AS_UNEVICTABLE: mapping_flags = 3;
+pub const mapping_flags_AS_EXITING: mapping_flags = 4;
+pub const mapping_flags_AS_NO_WRITEBACK_TAGS: mapping_flags = 5;
+pub const mapping_flags_AS_LARGE_FOLIO_SUPPORT: mapping_flags = 6;
+pub const mapping_flags_AS_RELEASE_ALWAYS: mapping_flags = 7;
+pub type mapping_flags = core::ffi::c_uint;
+extern "C" {
+    pub fn page_mapping(arg1: *mut page) -> *mut address_space;
+}
+extern "C" {
+    pub fn folio_mapping(arg1: *mut folio) -> *mut address_space;
+}
+extern "C" {
+    pub fn swapcache_mapping(arg1: *mut folio) -> *mut address_space;
+}
+extern "C" {
+    pub fn filemap_alloc_folio(gfp: gfp_t, order: core::ffi::c_uint) -> *mut folio;
+}
+pub type filler_t = ::core::option::Option<
+    unsafe extern "C" fn(arg1: *mut file, arg2: *mut folio) -> core::ffi::c_int,
+>;
+extern "C" {
+    pub fn page_cache_next_miss(
+        mapping: *mut address_space,
+        index: core::ffi::c_ulong,
+        max_scan: core::ffi::c_ulong,
+    ) -> core::ffi::c_ulong;
+}
+extern "C" {
+    pub fn page_cache_prev_miss(
+        mapping: *mut address_space,
+        index: core::ffi::c_ulong,
+        max_scan: core::ffi::c_ulong,
+    ) -> core::ffi::c_ulong;
+}
+#[doc = " typedef fgf_t - Flags for getting folios from the page cache.\n\n Most users of the page cache will not need to use these flags;\n there are convenience functions such as filemap_get_folio() and\n filemap_lock_folio().  For users which need more control over exactly\n what is done with the folios, these flags to __filemap_get_folio()\n are available.\n\n * %FGP_ACCESSED - The folio will be marked accessed.\n * %FGP_LOCK - The folio is returned locked.\n * %FGP_CREAT - If no folio is present then a new folio is allocated,\n   added to the page cache and the VM's LRU list.  The folio is\n   returned locked.\n * %FGP_FOR_MMAP - The caller wants to do its own locking dance if the\n   folio is already in cache.  If the folio was allocated, unlock it\n   before returning so the caller can do the same dance.\n * %FGP_WRITE - The folio will be written to by the caller.\n * %FGP_NOFS - __GFP_FS will get cleared in gfp.\n * %FGP_NOWAIT - Don't block on the folio lock.\n * %FGP_STABLE - Wait for the folio to be stable (finished writeback)\n * %FGP_WRITEBEGIN - The flags to use in a filesystem write_begin()\n   implementation."]
+pub type fgf_t = core::ffi::c_uint;
+extern "C" {
+    pub fn filemap_get_entry(
+        mapping: *mut address_space,
+        index: core::ffi::c_ulong,
+    ) -> *mut core::ffi::c_void;
+}
+extern "C" {
+    pub fn __filemap_get_folio(
+        mapping: *mut address_space,
+        index: core::ffi::c_ulong,
+        fgp_flags: fgf_t,
+        gfp: gfp_t,
+    ) -> *mut folio;
+}
+extern "C" {
+    pub fn pagecache_get_page(
+        mapping: *mut address_space,
+        index: core::ffi::c_ulong,
+        fgp_flags: fgf_t,
+        gfp: gfp_t,
+    ) -> *mut page;
+}
+extern "C" {
+    pub fn filemap_get_folios(
+        mapping: *mut address_space,
+        start: *mut core::ffi::c_ulong,
+        end: core::ffi::c_ulong,
+        fbatch: *mut folio_batch,
+    ) -> core::ffi::c_uint;
+}
+extern "C" {
+    pub fn filemap_get_folios_contig(
+        mapping: *mut address_space,
+        start: *mut core::ffi::c_ulong,
+        end: core::ffi::c_ulong,
+        fbatch: *mut folio_batch,
+    ) -> core::ffi::c_uint;
+}
+extern "C" {
+    pub fn filemap_get_folios_tag(
+        mapping: *mut address_space,
+        start: *mut core::ffi::c_ulong,
+        end: core::ffi::c_ulong,
+        tag: xa_mark_t,
+        fbatch: *mut folio_batch,
+    ) -> core::ffi::c_uint;
+}
+extern "C" {
+    pub fn grab_cache_page_write_begin(
+        mapping: *mut address_space,
+        index: core::ffi::c_ulong,
+    ) -> *mut page;
+}
+extern "C" {
+    pub fn read_cache_folio(
+        arg1: *mut address_space,
+        index: core::ffi::c_ulong,
+        filler: filler_t,
+        file: *mut file,
+    ) -> *mut folio;
+}
+extern "C" {
+    pub fn mapping_read_folio_gfp(
+        arg1: *mut address_space,
+        index: core::ffi::c_ulong,
+        flags: gfp_t,
+    ) -> *mut folio;
+}
+extern "C" {
+    pub fn read_cache_page(
+        arg1: *mut address_space,
+        index: core::ffi::c_ulong,
+        filler: filler_t,
+        file: *mut file,
+    ) -> *mut page;
+}
+extern "C" {
+    pub fn read_cache_page_gfp(
+        mapping: *mut address_space,
+        index: core::ffi::c_ulong,
+        gfp_mask: gfp_t,
+    ) -> *mut page;
+}
+extern "C" {
+    pub fn hugetlb_basepage_index(page: *mut page) -> core::ffi::c_ulong;
+}
+extern "C" {
+    pub fn linear_hugepage_index(
+        vma: *mut vm_area_struct,
+        address: core::ffi::c_ulong,
+    ) -> core::ffi::c_ulong;
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct wait_page_key {
+    pub folio: *mut folio,
+    pub bit_nr: core::ffi::c_int,
+    pub page_match: core::ffi::c_int,
+}
+impl Default for wait_page_key {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct wait_page_queue {
+    pub folio: *mut folio,
+    pub bit_nr: core::ffi::c_int,
+    pub wait: wait_queue_entry_t,
+}
+impl Default for wait_page_queue {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+extern "C" {
+    pub fn __folio_lock(folio: *mut folio);
+}
+extern "C" {
+    pub fn __folio_lock_killable(folio: *mut folio) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn __folio_lock_or_retry(folio: *mut folio, vmf: *mut vm_fault) -> vm_fault_t;
+}
+extern "C" {
+    pub fn unlock_page(page: *mut page);
+}
+extern "C" {
+    pub fn folio_unlock(folio: *mut folio);
+}
+extern "C" {
+    pub fn folio_wait_bit(folio: *mut folio, bit_nr: core::ffi::c_int);
+}
+extern "C" {
+    pub fn folio_wait_bit_killable(folio: *mut folio, bit_nr: core::ffi::c_int)
+        -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn wait_on_page_writeback(page: *mut page);
+}
+extern "C" {
+    pub fn folio_wait_writeback(folio: *mut folio);
+}
+extern "C" {
+    pub fn folio_wait_writeback_killable(folio: *mut folio) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn end_page_writeback(page: *mut page);
+}
+extern "C" {
+    pub fn folio_end_writeback(folio: *mut folio);
+}
+extern "C" {
+    pub fn wait_for_stable_page(page: *mut page);
+}
+extern "C" {
+    pub fn folio_wait_stable(folio: *mut folio);
+}
+extern "C" {
+    pub fn __folio_mark_dirty(folio: *mut folio, arg1: *mut address_space, warn: core::ffi::c_int);
+}
+extern "C" {
+    pub fn folio_account_cleaned(folio: *mut folio, wb: *mut bdi_writeback);
+}
+extern "C" {
+    pub fn __folio_cancel_dirty(folio: *mut folio);
+}
+extern "C" {
+    pub fn folio_clear_dirty_for_io(folio: *mut folio) -> bool_;
+}
+extern "C" {
+    pub fn clear_page_dirty_for_io(page: *mut page) -> bool_;
+}
+extern "C" {
+    pub fn folio_invalidate(folio: *mut folio, offset: usize, length: usize);
+}
+extern "C" {
+    pub fn __set_page_dirty_nobuffers(page: *mut page) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn noop_dirty_folio(mapping: *mut address_space, folio: *mut folio) -> bool_;
+}
+extern "C" {
+    pub fn filemap_migrate_folio(
+        mapping: *mut address_space,
+        dst: *mut folio,
+        src: *mut folio,
+        mode: migrate_mode,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn folio_end_private_2(folio: *mut folio);
+}
+extern "C" {
+    pub fn folio_wait_private_2(folio: *mut folio);
+}
+extern "C" {
+    pub fn folio_wait_private_2_killable(folio: *mut folio) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn folio_add_wait_queue(folio: *mut folio, waiter: *mut wait_queue_entry_t);
+}
+extern "C" {
+    pub fn fault_in_writeable(uaddr: *mut core::ffi::c_char, size: usize) -> usize;
+}
+extern "C" {
+    pub fn fault_in_subpage_writeable(uaddr: *mut core::ffi::c_char, size: usize) -> usize;
+}
+extern "C" {
+    pub fn fault_in_safe_writeable(uaddr: *const core::ffi::c_char, size: usize) -> usize;
+}
+extern "C" {
+    pub fn fault_in_readable(uaddr: *const core::ffi::c_char, size: usize) -> usize;
+}
+extern "C" {
+    pub fn add_to_page_cache_lru(
+        page: *mut page,
+        mapping: *mut address_space,
+        index: core::ffi::c_ulong,
+        gfp: gfp_t,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn filemap_add_folio(
+        mapping: *mut address_space,
+        folio: *mut folio,
+        index: core::ffi::c_ulong,
+        gfp: gfp_t,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn filemap_remove_folio(folio: *mut folio);
+}
+extern "C" {
+    pub fn __filemap_remove_folio(folio: *mut folio, shadow: *mut core::ffi::c_void);
+}
+extern "C" {
+    pub fn replace_page_cache_folio(old: *mut folio, new: *mut folio);
+}
+extern "C" {
+    pub fn delete_from_page_cache_batch(mapping: *mut address_space, fbatch: *mut folio_batch);
+}
+extern "C" {
+    pub fn filemap_release_folio(folio: *mut folio, gfp: gfp_t) -> bool_;
+}
+extern "C" {
+    pub fn mapping_seek_hole_data(
+        arg1: *mut address_space,
+        start: loff_t,
+        end: loff_t,
+        whence: core::ffi::c_int,
+    ) -> loff_t;
+}
+extern "C" {
+    pub fn __filemap_add_folio(
+        mapping: *mut address_space,
+        folio: *mut folio,
+        index: core::ffi::c_ulong,
+        gfp: gfp_t,
+        shadowp: *mut *mut core::ffi::c_void,
+    ) -> core::ffi::c_int;
+}
+extern "C" {
+    pub fn filemap_range_has_writeback(
+        mapping: *mut address_space,
+        start_byte: loff_t,
+        end_byte: loff_t,
+    ) -> bool_;
+}
+#[doc = " struct readahead_control - Describes a readahead request.\n\n A readahead request is for consecutive pages.  Filesystems which\n implement the ->readahead method should call readahead_page() or\n readahead_page_batch() in a loop and attempt to start I/O against\n each page in the request.\n\n Most of the fields in this struct are private and should be accessed\n by the functions below.\n\n @file: The file, used primarily by network filesystems for authentication.\n\t  May be NULL if invoked internally by the filesystem.\n @mapping: Readahead this filesystem object.\n @ra: File readahead state.  May be NULL."]
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct readahead_control {
+    pub file: *mut file,
+    pub mapping: *mut address_space,
+    pub ra: *mut file_ra_state,
+    pub _index: core::ffi::c_ulong,
+    pub _nr_pages: core::ffi::c_uint,
+    pub _batch_count: core::ffi::c_uint,
+    pub _workingset: bool_,
+    pub _pflags: core::ffi::c_ulong,
+}
+impl Default for readahead_control {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+extern "C" {
+    pub fn page_cache_ra_unbounded(
+        arg1: *mut readahead_control,
+        nr_to_read: core::ffi::c_ulong,
+        lookahead_count: core::ffi::c_ulong,
+    );
+}
+extern "C" {
+    pub fn page_cache_sync_ra(arg1: *mut readahead_control, req_count: core::ffi::c_ulong);
+}
+extern "C" {
+    pub fn page_cache_async_ra(
+        arg1: *mut readahead_control,
+        arg2: *mut folio,
+        req_count: core::ffi::c_ulong,
+    );
+}
+extern "C" {
+    pub fn readahead_expand(ractl: *mut readahead_control, new_start: loff_t, new_len: usize);
+}
 pub const BINDINGS_GFP_KERNEL: gfp_t = 3264;
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
@@ -68240,48 +70022,12 @@ pub struct tty_audit_buf {
 }
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
-pub struct wait_page_queue {
-    pub _address: u8,
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
 pub struct file_lock_context {
     pub _address: u8,
 }
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
-pub struct xattr_handler {
-    pub _address: u8,
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
 pub struct mtd_info {
-    pub _address: u8,
-}
-pub type dev_dma_attr = i32;
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct bpf_flow_keys {
-    pub _address: u8,
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct time_namespace {
-    pub _address: u8,
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct nla_policy {
-    pub _address: u8,
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct flow_rule {
-    pub _address: u8,
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct pse_control {
     pub _address: u8,
 }
 #[repr(C)]
@@ -68317,5 +70063,36 @@ pub struct blk_mq_ctx {
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
 pub struct throtl_data {
+    pub _address: u8,
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct dax_device {
+    pub _address: u8,
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct time_namespace {
+    pub _address: u8,
+}
+pub type dev_dma_attr = i32;
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct bpf_flow_keys {
+    pub _address: u8,
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct nla_policy {
+    pub _address: u8,
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct flow_rule {
+    pub _address: u8,
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct pse_control {
     pub _address: u8,
 }

@@ -44,6 +44,13 @@ impl Error {
     pub fn to_errno(&self) -> core::ffi::c_int {
         self.0
     }
+
+    /// Returns the error encoded as a pointer.
+    pub(crate) fn to_ptr<T>(self) -> *mut T {
+        // SAFETY: `self.0` is a valid error due to its invariant.
+        unsafe { bindings::ERR_PTR(self.0.into()) as *mut _ }
+    }
+
     /// Returns a string representing the error, if one exists.
     pub fn name(&self) -> Option<&'static CStr> {
         // SAFETY: Just an FFI call, there are no extra safety requirements.
@@ -140,6 +147,11 @@ pub mod linux_err {
     declare_err!(EIOCBQUEUED, "iocb queued, will get completion event.");
     declare_err!(ERECALLCONFLICT, "Conflict with recalled state.");
     declare_err!(ENOGRACE, "NFS file lock reclaim refused.");
+    declare_err!(ENODATA, "No data available.");
+    declare_err!(EOPNOTSUPP, "Operation not supported on transport endpoint.");
+    declare_err!(ENOSYS, "Invalid system call number.");
+    declare_err!(ESTALE, "Stale file handle.");
+    declare_err!(EUCLEAN, "Structure needs cleaning.");
 }
 
 impl From<AllocError> for Error {

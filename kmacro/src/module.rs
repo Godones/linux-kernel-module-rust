@@ -530,7 +530,8 @@ pub(crate) fn module(ts: TokenStream) -> TokenStream {
             #[used]
             static __IS_RUST_MODULE: () = ();
 
-            static mut __MOD: Option<{type_}> = None;
+            // static mut __MOD: Option<{type_}> = None;
+            static mut __MOD: core::mem::MaybeUninit<{type_}> = core::mem::MaybeUninit::uninit();
 
             // SAFETY: `__this_module` is constructed by the kernel at load time and will not be
             // freed until the module is unloaded.
@@ -592,23 +593,18 @@ pub(crate) fn module(ts: TokenStream) -> TokenStream {
             }}
 
             fn __init() -> core::ffi::c_int {{
-                match <{type_} as kernel::Module>::init(&THIS_MODULE) {{
-                    Ok(m) => {{
-                        unsafe {{
-                            __MOD = Some(m);
-                        }}
-                        return 0;
-                    }}
-                    Err(e) => {{
-                        return e.to_errno();
-                    }}
+                use kernel::PinInit;
+                let initer = <{type_} as kernel::module::InPlaceModule>::init(&THIS_MODULE);
+                match unsafe {{ initer.__pinned_init(__MOD.as_mut_ptr()) }} {{
+                    Ok(m) => 0,
+                    Err(e) => e.to_errno(),
                 }}
             }}
 
             fn __exit() {{
                 unsafe {{
                     // Invokes `drop()` on `__MOD`, which should be used for cleanup.
-                    __MOD = None;
+                    __MOD.assume_init_drop();
                 }}
             }}
 

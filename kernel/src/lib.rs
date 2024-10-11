@@ -10,7 +10,8 @@ pub mod bindings;
 pub mod block;
 pub mod buf;
 mod build_assert;
-pub mod chrdev;
+
+pub mod device;
 pub mod env;
 pub mod error;
 pub mod fs;
@@ -29,9 +30,9 @@ pub mod time;
 pub mod types;
 
 pub use error::linux_err as code;
+pub use init::PinInit;
 pub(crate) use mm::cache_padded::CachePadded;
 pub use module::{param as module_param, Module, ThisModule};
-
 /// Page size defined in terms of the `PAGE_SHIFT` macro from C.
 ///
 /// [`PAGE_SHIFT`]: ../../../include/asm-generic/page.h
@@ -55,4 +56,37 @@ fn panic(info: &core::panic::PanicInfo) -> ! {
 }
 extern "C" {
     fn bug_helper() -> !;
+}
+
+/// Produces a pointer to an object from a pointer to one of its fields.
+///
+/// # Safety
+///
+/// The pointer passed to this macro, and the pointer returned by this macro, must both be in
+/// bounds of the same allocation.
+///
+/// # Examples
+///
+/// ```
+/// # use kernel::container_of;
+/// struct Test {
+///     a: u64,
+///     b: u32,
+/// }
+///
+/// let test = Test { a: 10, b: 20 };
+/// let b_ptr = &test.b;
+/// // SAFETY: The pointer points at the `b` field of a `Test`, so the resulting pointer will be
+/// // in-bounds of the same allocation as `b_ptr`.
+/// let test_alias = unsafe { container_of!(b_ptr, Test, b) };
+/// assert!(core::ptr::eq(&test, test_alias));
+/// ```
+#[macro_export]
+macro_rules! container_of {
+    ($ptr:expr, $type:ty, $($f:tt)*) => {{
+        let ptr = $ptr as *const _ as *const u8;
+        let offset: usize = ::core::mem::offset_of!($type, $($f)*);
+        $crate::build_assert!(offset <= isize::MAX as usize);
+        ptr.wrapping_sub(offset) as *const $type
+    }}
 }

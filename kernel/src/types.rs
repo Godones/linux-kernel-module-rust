@@ -348,6 +348,18 @@ impl<T> Opaque<T> {
         }
     }
 
+    /// Similar to [`Self::ffi_init`], except that the closure can fail.
+    ///
+    /// To avoid leaks on failure, the closure must drop any fields it has initialised before the
+    /// failure.
+    pub fn try_ffi_init<E>(
+        init_func: impl FnOnce(*mut T) -> Result<(), E>,
+    ) -> impl PinInit<Self, E> {
+        // SAFETY: We contain a `MaybeUninit`, so it is OK for the `init_func` to not fully
+        // initialize the `T`.
+        unsafe { init::pin_init_from_closure(|slot| init_func(Self::raw_get(slot))) }
+    }
+
     /// Returns a raw pointer to the opaque data.
     pub fn get(&self) -> *mut T {
         UnsafeCell::get(&self.value).cast::<T>()
@@ -488,6 +500,100 @@ impl<T: AlwaysRefCounted> Drop for ARef<T> {
     }
 }
 
+/// A lockable object.
+///
+/// Implementers must implement [`Lockable::raw_lock`] and [`Lockable::unlock`], and they'll get a
+/// `lock` method that returns a guard that can be used to access the locked object and unlocks it
+/// automatically when it goes out of scope.
+///
+/// `M` is a tag that may be used to speficy which mode to lock/unlock when an object may be
+/// locked in multiple ways. For example, inodes have `i_lock` and `i_rwsem` so they can be locked
+/// in 3 different modes. If an implementer can be locked in only one way, the default unit type
+/// can be omitted for brevity.
+///
+/// # Safety
+///
+/// The [`Lockable::raw_lock`] function must indeed lock the object, otherwise we may run into UB
+/// if multiple instances believe they have properly serialised access.
+pub unsafe trait Lockable<M = ()> {
+    /// Locks the object.
+    ///
+    /// The returned guard will automatically unlock the object when it goes out of scope.
+    fn lock(&self) -> Locked<&Self, M> {
+        self.raw_lock();
+
+        // SAFETY: The object was locked above, so responsibility to unlock is transferred to the
+        // `Locked` instance.
+        unsafe { Locked::new(self) }
+    }
+
+    /// Locks the object.
+    fn raw_lock(&self);
+
+    /// Unlocks the object.
+    ///
+    /// # Safety
+    ///
+    /// The object must be locked. And it must not be used again as a locked object before another
+    /// call to [`Self::raw_lock`].
+    unsafe fn unlock(&self);
+}
+
+/// A locked version of an existing type.
+///
+/// # Invariants
+///
+/// The object is locked and the responsibility to unlock it belongs to the [`Locked`] instance.
+#[repr(transparent)]
+pub struct Locked<T: Deref, M = ()>(T, PhantomData<M>)
+where
+    T::Target: Lockable<M>;
+
+impl<T: Deref, M> Locked<T, M>
+where
+    T::Target: Lockable<M>,
+{
+    /// Creates a new instance of [`Locked`].
+    ///
+    /// # Safety
+    ///
+    /// The instance of `T` must be locked and the responsibility to unlock it is transferred to
+    /// the returned instance of [`Locked`].
+    pub unsafe fn new(v: T) -> Self {
+        // INVARIANT: The safety requirements ensure that the invariants hold.
+        Self(v, PhantomData)
+    }
+}
+
+impl<T: Deref, M> Deref for Locked<T, M>
+where
+    T::Target: Lockable<M>,
+{
+    type Target = T::Target;
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+
+impl<T: Deref, M> Drop for Locked<T, M>
+where
+    T::Target: Lockable<M>,
+{
+    fn drop(&mut self) {
+        // SAFETY: The type invariants guarantee that the object is locked.
+        unsafe { self.0.unlock() }
+    }
+}
+
+impl<T: Lockable<M> + AlwaysRefCounted, M> From<Locked<&T, M>> for Locked<ARef<T>, M> {
+    fn from(value: Locked<&T, M>) -> Self {
+        let aref = ARef::<T>::from(value.deref());
+        core::mem::forget(value);
+        // SAFETY: We forgot the locked value above, so responsibility is transferred to new
+        // instance of [`Locked`].
+        unsafe { Locked::new(aref) }
+    }
+}
 /// A sum type that always holds either a value of type `L` or `R`.
 pub enum Either<L, R> {
     /// Constructs an instance of [`Either`] containing a value of type `L`.
@@ -495,4 +601,170 @@ pub enum Either<L, R> {
 
     /// Constructs an instance of [`Either`] containing a value of type `R`.
     Right(R),
+}
+/// A type that can be represented in little-endian bytes.
+pub trait LittleEndian {
+    /// Converts from native to little-endian encoding.
+    fn to_le(self) -> Self;
+
+    /// Converts from little-endian to the CPU's encoding.
+    fn to_cpu(self) -> Self;
+}
+
+macro_rules! define_le {
+    ($($t:ty),+) => {
+        $(
+        impl LittleEndian for $t {
+            fn to_le(self) -> Self {
+                Self::to_le(self)
+            }
+
+            fn to_cpu(self) -> Self {
+                Self::from_le(self)
+            }
+        }
+        )*
+    };
+}
+
+define_le!(u8, u16, u32, u64, i8, i16, i32, i64);
+
+/// A little-endian representation of `T`.
+///
+/// # Examples
+///
+/// ```
+/// use kernel::types::LE;
+///
+/// struct Example {
+///     a: LE<u32>,
+///     b: LE<u32>,
+/// }
+///
+/// fn new(x: u32, y: u32) -> Example {
+///     Example {
+///         a: x.into(), // Converts to LE.
+///         b: y.into(), // Converts to LE.
+///     }
+/// }
+///
+/// fn sum(e: &Example) -> u32 {
+///     // `value` extracts the value in cpu representation.
+///     e.a.value() + e.b.value()
+/// }
+/// ```
+#[derive(Clone, Copy)]
+#[repr(transparent)]
+pub struct LE<T: LittleEndian + Copy>(T);
+
+impl<T: LittleEndian + Copy> LE<T> {
+    /// Returns the native-endian value.
+    pub fn value(&self) -> T {
+        self.0.to_cpu()
+    }
+}
+
+impl<T: LittleEndian + Copy> core::convert::From<T> for LE<T> {
+    fn from(value: T) -> LE<T> {
+        LE(value.to_le())
+    }
+}
+
+/// Specifies that a type is safely readable from byte slices.
+///
+/// Not all types can be safely read from byte slices; examples from
+/// <https://doc.rust-lang.org/reference/behavior-considered-undefined.html> include [`bool`] that
+/// must be either `0` or `1`, and [`char`] that cannot be a surrogate or above [`char::MAX`].
+///
+/// # Safety
+///
+/// Implementers must ensure that any bit pattern is valid for this type.
+pub unsafe trait FromBytes: Sized {
+    /// Converts the given byte slice into a shared reference to [`Self`].
+    ///
+    /// It fails if the size or alignment requirements are not satisfied.
+    fn from_bytes(data: &[u8], offset: usize) -> Option<&Self> {
+        if offset > data.len() {
+            return None;
+        }
+        let data = &data[offset..];
+        let ptr = data.as_ptr();
+        if ptr as usize % align_of::<Self>() != 0 || data.len() < size_of::<Self>() {
+            return None;
+        }
+        // SAFETY: The memory is valid for read because we have a reference to it. We have just
+        // checked the minimum size and alignment as well.
+        Some(unsafe { &*ptr.cast() })
+    }
+
+    /// Converts the given byte slice into a shared slice of [`Self`].
+    ///
+    /// It fails if the size or alignment requirements are not satisfied.
+    fn from_bytes_to_slice(data: &[u8]) -> Option<&[Self]> {
+        let ptr = data.as_ptr();
+        if ptr as usize % align_of::<Self>() != 0 {
+            return None;
+        }
+        // SAFETY: The memory is valid for read because we have a reference to it. We have just
+        // checked the minimum alignment as well, and the length of the slice is calculated from
+        // the length of `Self`.
+        Some(unsafe { core::slice::from_raw_parts(ptr.cast(), data.len() / size_of::<Self>()) })
+    }
+}
+
+// SAFETY: All bit patterns are acceptable values of the types below.
+unsafe impl FromBytes for u8 {}
+unsafe impl FromBytes for u16 {}
+unsafe impl FromBytes for u32 {}
+unsafe impl FromBytes for u64 {}
+unsafe impl FromBytes for usize {}
+unsafe impl FromBytes for i8 {}
+unsafe impl FromBytes for i16 {}
+unsafe impl FromBytes for i32 {}
+unsafe impl FromBytes for i64 {}
+unsafe impl FromBytes for isize {}
+unsafe impl<const N: usize, T: FromBytes> FromBytes for [T; N] {}
+unsafe impl<T: FromBytes + Copy + LittleEndian> FromBytes for LE<T> {}
+
+/// Derive [`FromBytes`] for the structs defined in the block.
+///
+/// # Examples
+///
+/// ```
+/// kernel::derive_readable_from_bytes! {
+///     #[repr(C)]
+///     struct SuperBlock {
+///         a: u16,
+///         _padding: [u8; 6],
+///         b: u64,
+///     }
+///
+///     #[repr(C)]
+///     struct Inode {
+///         a: u16,
+///         b: u16,
+///         c: u32,
+///     }
+/// }
+/// ```
+#[macro_export]
+macro_rules! derive_readable_from_bytes {
+    ($($(#[$outer:meta])* $outerv:vis struct $name:ident {
+        $($(#[$m:meta])* $v:vis $id:ident : $t:ty),* $(,)?
+    })*)=> {
+        $(
+            $(#[$outer])*
+            $outerv struct $name {
+                $(
+                    $(#[$m])*
+                    $v $id: $t,
+                )*
+            }
+            unsafe impl $crate::types::FromBytes for $name {}
+            const _: () = {
+                const fn is_readable_from_bytes<T: $crate::types::FromBytes>() {}
+                $(is_readable_from_bytes::<$t>();)*
+            };
+        )*
+    };
 }

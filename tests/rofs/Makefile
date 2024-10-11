@@ -1,5 +1,5 @@
 export KDIR ?= /lib/modules/$(shell uname -r)/build
-module-name := chrdev
+module-name := rofs
 CLANG ?= clang
 ifeq ($(origin CC),default)
 CC := ${CLANG}

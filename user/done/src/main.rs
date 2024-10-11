@@ -12,7 +12,7 @@ fn main() {
     let option = argv[1].as_str();
     match option {
         "new" => {
-           update_to_new();
+            update_to_new();
         }
         "test" => {
             println!("Run null device domain test");

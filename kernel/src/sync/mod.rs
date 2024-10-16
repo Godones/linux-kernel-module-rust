@@ -6,21 +6,17 @@
 //! wrapped for usage by Rust code in the kernel.
 
 use crate::types::Opaque;
-
-// mod arc;
-// mod condvar;
 pub mod lock;
 mod locked_by;
 mod per_cpu;
 mod rcu;
-
-// pub use arc::{Arc, ArcBorrow, UniqueArc};
-// pub use condvar::CondVar;
+mod srcu;
 
 pub use lock::{mutex::Mutex, spinlock::SpinLock};
 pub use locked_by::LockedBy;
 pub use per_cpu::*;
 pub use rcu::RcuData;
+pub use srcu::SRcuData;
 
 use crate::bindings;
 /// Represents a lockdep class. It's a wrapper around C's `lock_class_key`.

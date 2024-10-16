@@ -10,7 +10,6 @@ use core::{
 
 use crate::{bindings, pr_warn};
 
-// pub type KernelResult<T> = Result<T, Error>;
 pub type KernelResult<T = (), E = Error> = Result<T, E>;
 
 pub struct Error(core::ffi::c_int);
@@ -238,13 +237,7 @@ where
     T: From<i16>,
     F: FnOnce() -> KernelResult<T>,
 {
-    match f() {
-        Ok(v) => v,
-        // NO-OVERFLOW: negative `errno`s are no smaller than `-bindings::MAX_ERRNO`,
-        // `-bindings::MAX_ERRNO` fits in an `i16` as per invariant above,
-        // therefore a negative `errno` always fits in an `i16` and will not overflow.
-        Err(e) => T::from(e.to_errno() as i16),
-    }
+    f().unwrap_or_else(|e| T::from(e.to_errno() as i16))
 }
 
 /// Error message for calling a default function of a [`#[vtable]`](macros::vtable) trait.

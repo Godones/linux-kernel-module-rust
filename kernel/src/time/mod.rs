@@ -39,6 +39,7 @@ pub struct Ktime {
 impl Ktime {
     /// Create a `Ktime` from a raw `ktime_t`.
     #[inline]
+
     pub fn from_raw(inner: bindings::ktime_t) -> Self {
         Self { inner }
     }

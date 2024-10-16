@@ -9,6 +9,6 @@ pod = { git = "https://github.com/asterinas/pod", rev = "d7dba56" }
 pconst = { git = "https://github.com/os-module/pconst.git", features = ["special_error"] }
 downcast-rs = { version = "1.2.0", default-features = false }
 
-
+kbind = { path = "../../kbind" }
 [features]
 domain = []

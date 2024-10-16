@@ -20,6 +20,9 @@
 #include <linux/radix-tree.h>
 #include <linux/fs.h>
 #include <linux/pagemap.h>
+#include <linux/srcu.h>
+
+
 void bug_helper(void) { BUG(); }
 
 int access_ok_helper(const void __user *addr, unsigned long n) {
@@ -272,4 +275,10 @@ unsigned int rust_helper_memalloc_nofs_save(void)
 void rust_helper_memalloc_nofs_restore(unsigned int flags)
 {
     memalloc_nofs_restore(flags);
+}
+
+// srcu
+
+void * rust_helper_srcu_dereference(struct rcudata *p,const struct srcu_struct *ssp) {
+    return srcu_dereference(p->a, ssp);
 }

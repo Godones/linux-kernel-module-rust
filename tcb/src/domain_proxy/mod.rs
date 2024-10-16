@@ -5,6 +5,7 @@ use corelib::LinuxResult;
 
 use crate::domain_loader::loader::DomainLoader;
 
+pub mod block_device;
 pub mod empty_device;
 pub mod logger;
 

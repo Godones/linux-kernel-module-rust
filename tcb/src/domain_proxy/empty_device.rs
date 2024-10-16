@@ -5,7 +5,7 @@ use corelib::{LinuxError, LinuxResult};
 use interface::{empty_device::EmptyDeviceDomain, Basic};
 use kernel::{
     init::InPlaceInit,
-    sync::{LongLongPerCpu, Mutex, RcuData, SpinLock},
+    sync::{LongLongPerCpu, Mutex, RcuData},
 };
 use rref::{RRefVec, SharedData};
 

@@ -10,7 +10,7 @@ use core::{
 use kernel::{
     init::InPlaceInit,
     module, new_mutex, new_spinlock, println,
-    sync::{Mutex, RcuData, SpinLock},
+    sync::{Mutex, RcuData, SRcuData, SpinLock},
     Module, ThisModule,
 };
 use spin::Lazy;
@@ -55,6 +55,30 @@ fn rcu_example() {
     println!("rcu_example done");
 }
 
+fn srcu_example() {
+    let mut data = SRcuData::new(10);
+    data.read(|v| {
+        println!("SRcuData is {}", v);
+    });
+
+    data.update(20);
+    data.read(|v| {
+        println!("New SRcuData is {}", v);
+    });
+
+    let data = RcuData::new(return_dyn_data());
+    data.read(|v| {
+        println!("SRcuData is {:?}", v);
+    });
+
+    data.update(return_dyn_data());
+    data.read(|v| {
+        println!("New SRcuData is {:?}", v);
+    });
+
+    println!("srcu_example done");
+}
+
 fn lock_example() {
     global_synchronization_example();
     let spinlock_data = Box::pin_init(new_spinlock!(10)).unwrap();
@@ -71,6 +95,7 @@ impl Module for SyncModule {
         println!("Test kernel sync primitives");
         lock_example();
         rcu_example();
+        srcu_example();
         Ok(SyncModule)
     }
 }

@@ -4,13 +4,14 @@ extern crate alloc;
 
 pub mod empty_device;
 pub mod logger;
+pub mod null_block;
 
 use alloc::sync::Arc;
 use core::{any::Any, fmt::Debug};
 
 pub use pconst::LinuxErrno;
 
-use crate::{empty_device::EmptyDeviceDomain, logger::LogDomain};
+use crate::{empty_device::EmptyDeviceDomain, logger::LogDomain, null_block::BlockDeviceDomain};
 
 type LinuxResult<T> = Result<T, LinuxErrno>;
 
@@ -22,6 +23,7 @@ pub trait Basic: Send + Sync + Debug + Any {
 pub enum DomainType {
     EmptyDeviceDomain(Arc<dyn EmptyDeviceDomain>),
     LogDomain(Arc<dyn LogDomain>),
+    BlockDeviceDomain(Arc<dyn BlockDeviceDomain>),
 }
 
 impl DomainType {
@@ -29,12 +31,14 @@ impl DomainType {
         match self {
             DomainType::EmptyDeviceDomain(_) => DomainTypeRaw::EmptyDeviceDomain,
             DomainType::LogDomain(_) => DomainTypeRaw::LogDomain,
+            DomainType::BlockDeviceDomain(_) => DomainTypeRaw::BlockDeviceDomain,
         }
     }
     pub fn domain_id(&self) -> u64 {
         match self {
             DomainType::EmptyDeviceDomain(d) => d.domain_id(),
             DomainType::LogDomain(d) => d.domain_id(),
+            DomainType::BlockDeviceDomain(d) => d.domain_id(),
         }
     }
 }
@@ -44,6 +48,7 @@ impl DomainType {
 pub enum DomainTypeRaw {
     EmptyDeviceDomain = 1,
     LogDomain = 2,
+    BlockDeviceDomain = 3,
 }
 
 impl TryFrom<u8> for DomainTypeRaw {
@@ -53,6 +58,7 @@ impl TryFrom<u8> for DomainTypeRaw {
         match value {
             1 => Ok(DomainTypeRaw::EmptyDeviceDomain),
             2 => Ok(DomainTypeRaw::LogDomain),
+            3 => Ok(DomainTypeRaw::BlockDeviceDomain),
             _ => Err(()),
         }
     }

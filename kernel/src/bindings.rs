@@ -8,42 +8,31 @@
     unreachable_pub,
     unsafe_op_in_unsafe_fn
 )]
+pub use kbind::*;
 
-mod bindings {
-    include!("bindings_c.rs");
-}
-pub use bindings::*;
-
-pub const GFP_KERNEL: gfp_t = BINDINGS_GFP_KERNEL;
-pub const BINDINGS_GFP_ATOMIC: gfp_t = 2080;
-pub const BINDINGS___GFP_ZERO: gfp_t = 256;
-pub const GFP_ATOMIC: gfp_t = BINDINGS_GFP_ATOMIC;
-pub const __GFP_ZERO: gfp_t = BINDINGS___GFP_ZERO;
-
-// wait to remove
-pub const SLAB_RECLAIM_ACCOUNT: slab_flags_t = 32768;
-pub const SLAB_ACCOUNT: slab_flags_t = 8192;
-pub const MAX_LFS_FILESIZE: loff_t = 9223372036854775807;
-pub const PAGE_SIZE: usize = 4096;
-pub const SB_RDONLY: core::ffi::c_ulong = 1;
-
-pub(crate) fn rust_helper_errname(_err: core::ffi::c_int) -> *const core::ffi::c_char {
+pub fn rust_helper_errname(_err: core::ffi::c_int) -> *const core::ffi::c_char {
     core::ptr::null()
 }
 
 extern "C" {
     #[link_name = "rust_helper_ERR_PTR"]
     pub fn ERR_PTR(err: core::ffi::c_long) -> *mut core::ffi::c_void;
-    pub(crate) fn rust_helper_rcu_read_unlock();
+    pub fn rust_helper_rcu_read_unlock();
 
-    pub(crate) fn rust_helper_rcu_read_lock();
-    pub(crate) fn rust_helper_synchronize_rcu();
-    pub(crate) fn rust_helper_rcu_assign_pointer(
+    pub fn rust_helper_rcu_read_lock();
+    pub fn rust_helper_synchronize_rcu();
+    pub fn rust_helper_rcu_assign_pointer(
         rcu_data: *const CRcuData,
         new_ptr: *const core::ffi::c_void,
     );
-    pub(crate) fn rust_helper_rcu_dereference(
-        rcu_data: *const CRcuData,
+    pub fn rust_helper_rcu_dereference(rcu_data: *const CRcuData) -> *const core::ffi::c_void;
+
+    // srcu
+    // void * rust_helper_srcu_dereference(struct rcudata *p,const struct srcu_struct *ssp) {
+    #[link_name = "rust_helper_srcu_dereference"]
+    pub fn srcu_dereference(
+        p: *const CRcuData,
+        ssp: *const srcu_struct,
     ) -> *const core::ffi::c_void;
 
     #[link_name = "rust_helper_spin_lock_init"]
@@ -62,34 +51,34 @@ extern "C" {
     pub fn spin_lock_irqsave(lock: *mut spinlock_t) -> core::ffi::c_ulong;
 
     #[link_name = "rust_helper_get_current"]
-    pub(crate) fn get_current() -> *mut task_struct;
+    pub fn get_current() -> *mut task_struct;
     #[link_name = "rust_helper_get_task_struct"]
-    pub(crate) fn get_task_struct(t: *mut task_struct);
+    pub fn get_task_struct(t: *mut task_struct);
     #[link_name = "rust_helper_put_task_struct"]
-    pub(crate) fn put_task_struct(t: *mut task_struct);
+    pub fn put_task_struct(t: *mut task_struct);
     #[link_name = "rust_helper_signal_pending"]
-    pub(crate) fn signal_pending(t: *mut task_struct) -> core::ffi::c_int;
+    pub fn signal_pending(t: *mut task_struct) -> core::ffi::c_int;
 
     // error
     #[link_name = "rust_helper_IS_ERR"]
-    pub(crate) fn is_err(ptr: *const core::ffi::c_void) -> bool_;
+    pub fn is_err(ptr: *const core::ffi::c_void) -> bool_;
     #[link_name = "rust_helper_PTR_ERR"]
-    pub(crate) fn ptr_err(ptr: *const core::ffi::c_void) -> core::ffi::c_long;
+    pub fn ptr_err(ptr: *const core::ffi::c_void) -> core::ffi::c_long;
     // error end
 
     // Per-cpu
     #[link_name = "rust_helper_num_online_cpus"]
-    pub(crate) fn num_online_cpus() -> core::ffi::c_uint;
+    pub fn num_online_cpus() -> core::ffi::c_uint;
     #[link_name = "rust_helper_alloc_percpu_longlong"]
-    pub(crate) fn alloc_percpu_longlong() -> *mut core::ffi::c_longlong;
+    pub fn alloc_percpu_longlong() -> *mut core::ffi::c_longlong;
     #[link_name = "rust_helper_free_percpu_longlong"]
-    pub(crate) fn free_percpu_longlong(p: *mut core::ffi::c_longlong);
+    pub fn free_percpu_longlong(p: *mut core::ffi::c_longlong);
     #[link_name = "rust_helper_get_cpu"]
-    pub(crate) fn get_cpu() -> core::ffi::c_int;
+    pub fn get_cpu() -> core::ffi::c_int;
     #[link_name = "rust_helper_put_cpu"]
-    pub(crate) fn put_cpu();
+    pub fn put_cpu();
     #[link_name = "rust_helper_per_cpu_ptr"]
-    pub(crate) fn per_cpu_ptr(
+    pub fn per_cpu_ptr(
         p: *mut core::ffi::c_longlong,
         cpu: core::ffi::c_int,
     ) -> *mut core::ffi::c_longlong;
@@ -209,6 +198,6 @@ extern "C" {
 
 #[repr(C)]
 #[derive(Debug)]
-pub(crate) struct CRcuData {
+pub struct CRcuData {
     pub data_ptr: *mut core::ffi::c_void,
 }

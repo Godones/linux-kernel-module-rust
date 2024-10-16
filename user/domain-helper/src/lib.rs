@@ -8,12 +8,14 @@ use crate::helper::{register_domain, update_domain};
 pub enum DomainTypeRaw {
     EmptyDeviceDomain = 1,
     LogDomain = 2,
+    BlockDeviceDomain = 3,
 }
 impl From<u8> for DomainTypeRaw {
     fn from(value: u8) -> Self {
         match value {
             1 => DomainTypeRaw::EmptyDeviceDomain,
             2 => DomainTypeRaw::LogDomain,
+            3 => DomainTypeRaw::BlockDeviceDomain,
             _ => panic!("Invalid domain type"),
         }
     }

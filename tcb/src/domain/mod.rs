@@ -1,14 +1,20 @@
 use alloc::boxed::Box;
 
 use corelib::LinuxResult;
-use interface::{DomainType, DomainTypeRaw};
+use interface::{
+    null_block::{BlockArgs, BlockDeviceDomain},
+    DomainType, DomainTypeRaw,
+};
 use kernel::env;
 
 use crate::{
     create_domain, domain_helper,
     domain_helper::{alloc_domain_id, DOMAIN_DATA_ALLOCATOR, SHARED_HEAP_ALLOCATOR},
     domain_loader::creator::DomainCreateImpl,
-    domain_proxy::{empty_device::EmptyDeviceDomainProxy, logger::LogDomainProxy, ProxyBuilder},
+    domain_proxy::{
+        block_device::BlockDeviceDomainProxy, empty_device::EmptyDeviceDomainProxy,
+        logger::LogDomainProxy, ProxyBuilder,
+    },
     register_domain,
 };
 
@@ -41,8 +47,28 @@ pub fn init_domain_system() -> LinuxResult<()> {
         DomainType::EmptyDeviceDomain(null_device),
         true
     );
-
     println!("Register a empty device domain");
+
+    static BLOCK_DOMAIN: &[u8] = include_bytes!("../../../build/disk/grnull");
+    let (block_device, domain_file_info) = create_domain!(
+        BlockDeviceDomainProxy,
+        DomainTypeRaw::BlockDeviceDomain,
+        "block_device",
+        Some(BLOCK_DOMAIN.to_vec())
+    )?;
+    //
+    let args = BlockArgs::default();
+    block_device.init_by_box(Box::new(args))?;
+
+    block_device.exit()?;
+
+    register_domain!(
+        "block_device",
+        domain_file_info,
+        DomainType::BlockDeviceDomain(block_device),
+        true
+    );
+    println!("Register a block device domain");
 
     Ok(())
 }

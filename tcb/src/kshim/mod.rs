@@ -10,6 +10,7 @@ use crate::{
     kshim::{entropy::EntropySource, one::OneDevice},
 };
 
+mod block_device;
 mod entropy;
 mod one;
 

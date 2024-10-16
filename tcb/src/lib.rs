@@ -22,7 +22,7 @@ mod mem;
 
 use alloc::{borrow::ToOwned, string::String};
 
-use kernel::{sysctl::Sysctl, ThisModule};
+use kernel::{code, sysctl::Sysctl, ThisModule};
 
 use crate::{channel::CommandChannel, kshim::KObj};
 
@@ -40,10 +40,11 @@ impl kernel::Module for TcbModule {
         println_color!(33, "This is a yellow message");
         // kbind::logger::init_logger();
         let channel = channel::init_domain_channel()?;
-        domain::init_domain_system().unwrap();
-
+        domain::init_domain_system().map_err(|e| {
+            error!("Failed to init domain system: {:?}", e);
+            code::EINVAL
+        })?;
         let kobj = kshim::init_kernel_shim()?;
-
         Ok(TcbModule {
             _sysctl_domain_command: channel,
             kobj,

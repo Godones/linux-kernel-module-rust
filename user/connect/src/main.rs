@@ -19,6 +19,7 @@ enum Commands {
         /// The type of the domain
         /// [1: EmptyDeviceDomain]
         /// [2: LogDomain]
+        /// [3: BlockDeviceDomain]
         type_: u8,
         #[arg(short, long, value_name = "IDENT")]
         /// The identifier of the domain in the kernel
@@ -38,6 +39,7 @@ enum Commands {
         /// The type of the domain
         /// [1: EmptyDeviceDomain]
         /// [2: LogDomain]
+        /// [3: BlockDeviceDomain]
         type_: u8,
     },
 }

@@ -13,10 +13,9 @@ use core::{
     ptr::NonNull,
 };
 
-use crate::{
-    bindings,
-    init::{self, PinInit},
-};
+use pinned_init::*;
+
+use crate::bindings;
 
 pub struct Mode(bindings::umode_t);
 
@@ -341,7 +340,7 @@ impl<T> Opaque<T> {
         // SAFETY: We contain a `MaybeUninit`, so it is OK for the `init_func` to not fully
         // initialize the `T`.
         unsafe {
-            init::pin_init_from_closure::<_, ::core::convert::Infallible>(move |slot| {
+            pin_init_from_closure::<_, ::core::convert::Infallible>(move |slot| {
                 init_func(Self::raw_get(slot));
                 Ok(())
             })
@@ -357,7 +356,7 @@ impl<T> Opaque<T> {
     ) -> impl PinInit<Self, E> {
         // SAFETY: We contain a `MaybeUninit`, so it is OK for the `init_func` to not fully
         // initialize the `T`.
-        unsafe { init::pin_init_from_closure(|slot| init_func(Self::raw_get(slot))) }
+        unsafe { pin_init_from_closure(|slot| init_func(Self::raw_get(slot))) }
     }
 
     /// Returns a raw pointer to the opaque data.

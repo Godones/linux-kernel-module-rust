@@ -1,4 +1,4 @@
-use std::{env, fs::OpenOptions, io::Write, path::PathBuf, process::Command};
+use std::{env, fs::OpenOptions, io::Write, process::Command};
 
 #[allow(unused)]
 const OPAQUE_TYPES: &[&str] = &[
@@ -62,16 +62,16 @@ fn main() {
     println!("cargo:rerun-if-env-changed=CC");
     println!("cargo:rerun-if-env-changed=KDIR");
     println!("cargo:rerun-if-env-changed=c_flags");
+    println!("cargo:rerun-if-changed=src/helpers.c");
 
     let kernel_dir = env::var("KDIR");
     if kernel_dir.is_err() {
         return;
     }
-
+    let kernel_dir = kernel_dir.unwrap();
     kallsyms_lookup_name();
     handle_kernel_version_cfg();
 
-    let kernel_dir = kernel_dir.unwrap();
     let mut kernel_cflags = env::var("c_flags").expect("Add 'export c_flags' to Kbuild");
     kernel_cflags = kernel_cflags.replace("-mfunction-return=thunk-extern", "");
     kernel_cflags = kernel_cflags.replace("-fzero-call-used-regs=used-gpr", "");
@@ -83,41 +83,18 @@ fn main() {
 
     let kbuild_cflags_module =
         env::var("KBUILD_CFLAGS_MODULE").expect("Must be invoked from kernel makefile");
-
     let cflags = format!("{} {}", kernel_cflags, kbuild_cflags_module);
     let kernel_args = prepare_cflags(&cflags, &kernel_dir);
-
     let target = env::var("TARGET").unwrap();
+    build_helper(&kernel_args, &target);
+}
 
-    let mut builder = bindgen::Builder::default()
-        .use_core()
-        .ctypes_prefix("core::ffi")
-        .derive_default(true)
-        .size_t_is_usize(true)
-        .layout_tests(false)
-        .enable_function_attribute_detection();
-
-    builder = builder.clang_arg(format!("--target={}", target));
-    for arg in kernel_args.iter() {
-        builder = builder.clang_arg(arg.clone());
-    }
-    builder = builder.opaque_type("alt_instr");
-
-    println!("cargo:rerun-if-changed=src/bindings_helper.h");
-    builder = builder.header("src/bindings_helper.h");
-    let bindings = builder.generate().expect("Unable to generate bindings");
-
-    // let out_path = PathBuf::from(env::var("OUT_DIR").unwrap());
-    let out_path = PathBuf::from("src");
-    bindings
-        .write_to_file(out_path.join("bindings_c.rs"))
-        .expect("Couldn't write bindings!");
-
+fn build_helper(kernel_args: &Vec<String>, target: &str) {
     let mut builder = cc::Build::new();
     builder.compiler(env::var("CC").unwrap_or_else(|_| "clang".to_string()));
     builder.target(&target);
     builder.warnings(false);
-    println!("cargo:rerun-if-changed=src/helpers.c");
+
     builder.file("src/helpers.c");
     for arg in kernel_args.iter() {
         builder.flag(&arg);

@@ -20,7 +20,7 @@
 #include <linux/blk_types.h>
 #include <linux/blkdev.h>
 #include <linux/pagemap.h>
-
+#include <linux/srcu.h>
 // Bindgen gets confused at certain things
 //
 const gfp_t BINDINGS_GFP_KERNEL = GFP_KERNEL;

@@ -17,6 +17,7 @@ use kernel::{
         bio::Segment,
         mq::{self, GenDisk, Operations, TagSet},
     },
+    dbg,
     error::{Error, KernelResult as Result},
     mm::pages::Pages,
     module, new_mutex, new_spinlock, pr_info,
@@ -109,7 +110,6 @@ impl kernel::Module for NullBlkModule {
         let disk = Box::pin_init(new_mutex!(add_disk(tagset)?, "nullb:disk"))?;
 
         disk.lock().add()?;
-
         Ok(Self { _disk: disk })
     }
 }

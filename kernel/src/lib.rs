@@ -11,6 +11,7 @@ pub mod block;
 pub mod buf;
 mod build_assert;
 
+mod dbg;
 pub mod device;
 pub mod env;
 pub mod error;

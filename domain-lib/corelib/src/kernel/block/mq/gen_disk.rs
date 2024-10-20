@@ -6,7 +6,10 @@
 //! C header: [`include/linux/blk_mq.h`](../../include/linux/blk_mq.h)
 
 use alloc::sync::Arc;
-use core::fmt::{self, Write};
+use core::{
+    ffi::c_void,
+    fmt::{self, Write},
+};
 
 use crate::{
     bindings,
@@ -25,8 +28,9 @@ use crate::{
 ///
 ///  - `gendisk` must always point to an initialized and valid `struct gendisk`.
 pub struct GenDisk<T: Operations> {
-    _tagset: Arc<TagSet<T>>,
+    tagset: Arc<TagSet<T>>,
     gendisk: *mut bindings::gendisk,
+    queue_data: *const c_void,
 }
 
 // SAFETY: `GenDisk` is an owned pointer to a `struct gendisk` and an `Arc` to a
@@ -34,6 +38,26 @@ pub struct GenDisk<T: Operations> {
 unsafe impl<T: Operations + Send> Send for GenDisk<T> {}
 
 impl<T: Operations> GenDisk<T> {
+    pub fn new_no_alloc(tagset: Arc<TagSet<T>>, queue_data: T::QueueData) -> Self {
+        Self {
+            tagset,
+            gendisk: core::ptr::null_mut(),
+            queue_data: queue_data.into_foreign(),
+        }
+    }
+
+    pub fn set_gen_disk(&mut self, gendisk: *mut bindings::gendisk) {
+        self.gendisk = gendisk;
+    }
+
+    pub fn tagset_ptr(&self) -> *const bindings::blk_mq_tag_set {
+        self.tagset.raw_tag_set()
+    }
+
+    pub fn queue_data_ptr(&self) -> *const c_void {
+        self.queue_data
+    }
+
     /// Try to create a new `GenDisk`
     pub fn try_new(tagset: Arc<TagSet<T>>, queue_data: T::QueueData) -> Result<Self> {
         let data = queue_data.into_foreign();
@@ -77,8 +101,9 @@ impl<T: Operations> GenDisk<T> {
 
         recover_data.dismiss();
         Ok(Self {
-            _tagset: tagset,
+            tagset,
             gendisk,
+            queue_data: data,
         })
     }
 
@@ -134,7 +159,7 @@ impl<T: Operations> Drop for GenDisk<T> {
     fn drop(&mut self) {
         let queue_data = unsafe { (*(*self.gendisk).queue).queuedata };
 
-        crate::sys_del_gendisk(self.gendisk);
+        // crate::sys_del_gendisk(self.gendisk);
 
         // SAFETY: `queue.queuedata` was created by `GenDisk::try_new()` with a
         // call to `ForeignOwnable::into_pointer()` to create `queuedata`.

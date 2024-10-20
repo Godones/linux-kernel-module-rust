@@ -12,6 +12,7 @@ use crate::{
     bindings,
     block::mq::{raw_writer::RawWriter, Operations, TagSet},
     error::{from_err_ptr, KernelResult as Result},
+    pr_info,
     types::{ForeignOwnable, ScopeGuard},
 };
 
@@ -40,11 +41,13 @@ impl<T: Operations> GenDisk<T> {
 
         let lock_class_key = crate::sync::LockClassKey::new();
 
+        pr_info!("before __blk_mq_alloc_disk");
         // SAFETY: `tagset.raw_tag_set()` points to a valid and initialized tag set
         let gendisk = from_err_ptr(unsafe {
             bindings::__blk_mq_alloc_disk(tagset.raw_tag_set(), data as _, lock_class_key.as_ptr())
         })?;
 
+        pr_info!("after __blk_mq_alloc_disk");
         const TABLE: bindings::block_device_operations = bindings::block_device_operations {
             submit_bio: None,
             open: None,
@@ -88,9 +91,12 @@ impl<T: Operations> GenDisk<T> {
     /// device is accessible from VFS. The kernel may issue reads to the device
     /// during registration to discover partition infomation.
     pub fn add(&self) -> Result {
-        crate::error::to_result(unsafe {
+        pr_info!("before device_add_disk");
+        let res = crate::error::to_result(unsafe {
             bindings::device_add_disk(core::ptr::null_mut(), self.gendisk, core::ptr::null_mut())
-        })
+        });
+        pr_info!("after device_add_disk");
+        res
     }
 
     /// Call to tell the block layer the capcacity of the device
@@ -126,8 +132,9 @@ impl<T: Operations> Drop for GenDisk<T> {
     fn drop(&mut self) {
         let queue_data = unsafe { (*(*self.gendisk).queue).queuedata };
 
+        pr_info!("before del_gendisk");
         unsafe { bindings::del_gendisk(self.gendisk) };
-
+        pr_info!("after del_gendisk");
         // SAFETY: `queue.queuedata` was created by `GenDisk::try_new()` with a
         // call to `ForeignOwnable::into_pointer()` to create `queuedata`.
         // `ForeignOwnable::from_foreign()` is only called here.

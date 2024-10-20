@@ -7,7 +7,7 @@ use kernel::{
 
 use crate::{
     domain_helper::query_domain,
-    kshim::{entropy::EntropySource, one::OneDevice},
+    kshim::{block_device::BlockDeviceShim, entropy::EntropySource, one::OneDevice},
 };
 
 mod block_device;
@@ -53,6 +53,18 @@ pub fn init_kernel_shim() -> KernelResult<KObj> {
         Mode::from_int(0o666),
     )?;
     println!("One device registered");
+
+    let null_block_domain = query_domain("block_device").unwrap();
+    let null_block_domain = match null_block_domain {
+        DomainType::BlockDeviceDomain(null_block_domain) => null_block_domain,
+        _ => {
+            pr_err!("Failed to get block device domain");
+            return Err(linux_err::EINVAL);
+        }
+    };
+    let null_block = BlockDeviceShim::load(null_block_domain)?;
+
+    drop(null_block);
 
     Ok(KObj {
         entropy_source: entropy,

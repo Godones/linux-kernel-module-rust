@@ -59,9 +59,6 @@ pub fn init_domain_system() -> LinuxResult<()> {
     //
     let args = BlockArgs::default();
     block_device.init_by_box(Box::new(args))?;
-
-    block_device.exit()?;
-
     register_domain!(
         "block_device",
         domain_file_info,

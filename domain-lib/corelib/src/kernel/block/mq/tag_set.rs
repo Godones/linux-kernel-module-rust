@@ -23,8 +23,7 @@ pub struct TagSet<T: Operations> {
 }
 
 impl<T: Operations> TagSet<T> {
-    /// Try to create a new tag set
-    pub fn try_new(
+    pub fn try_new_no_alloc(
         nr_hw_queues: u32,
         tagset_data: T::TagSetData,
         num_tags: u32,
@@ -38,7 +37,7 @@ impl<T: Operations> TagSet<T> {
         // SAFETY: We just allocated `tagset`, we know this is the only reference to it.
         let inner = unsafe { &mut *tagset.inner.get() };
 
-        inner.ops = unsafe { OperationsVtable::<T>::build() };
+        // inner.ops = unsafe { OperationsVtable::<T>::build() };
         inner.nr_hw_queues = nr_hw_queues;
         inner.timeout = 0; // 0 means default which is 30 * HZ in C
         inner.numa_node = bindings::NUMA_NO_NODE;
@@ -47,7 +46,19 @@ impl<T: Operations> TagSet<T> {
         inner.flags = bindings::BLK_MQ_F_SHOULD_MERGE;
         inner.driver_data = tagset_data.into_foreign() as _;
         inner.nr_maps = num_maps;
+        Ok(tagset)
+    }
 
+    /// Try to create a new tag set
+    pub fn try_new(
+        nr_hw_queues: u32,
+        tagset_data: T::TagSetData,
+        num_tags: u32,
+        num_maps: u32,
+    ) -> Result<Arc<Self>> {
+        let tagset = Self::try_new_no_alloc(nr_hw_queues, tagset_data, num_tags, num_maps)?;
+        let inner = unsafe { &mut *tagset.inner.get() };
+        inner.ops = unsafe { OperationsVtable::<T>::build() };
         // SAFETY: `inner` points to valid and initialised memory.
         let ret = crate::sys_blk_mq_alloc_tag_set(inner);
         if ret < 0 {
@@ -55,7 +66,6 @@ impl<T: Operations> TagSet<T> {
             unsafe { T::TagSetData::from_foreign(inner.driver_data) };
             return Err(Error::from_errno(ret));
         }
-
         Ok(tagset)
     }
 
@@ -70,7 +80,7 @@ impl<T: Operations> Drop for TagSet<T> {
         let tagset_data = unsafe { (*self.inner.get()).driver_data };
 
         // SAFETY: `inner` is valid and has been properly initialised during construction.
-        crate::sys_blk_mq_free_tag_set(self.inner.get());
+        // crate::sys_blk_mq_free_tag_set(self.inner.get());
 
         // SAFETY: `tagset_data` was created by a call to
         // `ForeignOwnable::into_foreign` in `TagSet::try_new()`

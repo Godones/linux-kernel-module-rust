@@ -13,7 +13,7 @@ use crate::{
     bindings,
     kernel::{
         block::mq::{tag_set::TagSetRef, Request},
-        error::{from_result, KernelResult as Result},
+        error::{from_result, KernelResult as Result, KernelResult},
         types::ForeignOwnable,
     },
 };

@@ -41,6 +41,14 @@ impl DomainType {
             DomainType::BlockDeviceDomain(d) => d.domain_id(),
         }
     }
+
+    pub fn ref_count(&self) -> usize {
+        match self {
+            DomainType::EmptyDeviceDomain(d) => Arc::strong_count(d),
+            DomainType::LogDomain(d) => Arc::strong_count(d),
+            DomainType::BlockDeviceDomain(d) => Arc::strong_count(d),
+        }
+    }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Ord, PartialOrd)]

@@ -10,22 +10,40 @@ pub enum Command<'a> {
     Stop(StopCommand),
     Exit(ExitCommand),
     Update(UpdateCommand<'a>),
+    Load(LoadCommand<'a>),
+    Unload(UnloadCommand<'a>),
 }
 
+/// Command to update domain
 #[derive(Debug)]
 pub struct UpdateCommand<'a> {
-    pub old_domain_ident: &'a str,
-    pub new_domain_ident: &'a str,
+    pub domain_ident: &'a str,
+    pub register_domain_elf_ident: &'a str,
     pub domain_type: u8,
 }
 
+/// Command to start to send domain data
 #[derive(Debug)]
 pub struct StartCommand<'a> {
-    pub domain_ident: &'a str,
+    pub register_domain_elf_ident: &'a str,
     pub domain_type: u8,
     pub domain_size: usize,
 }
 
+/// Command to Load domain
+#[derive(Debug)]
+pub struct LoadCommand<'a> {
+    pub register_domain_elf_ident: &'a str,
+    pub domain_ident: &'a str,
+    pub domain_type: u8,
+}
+#[derive(Debug)]
+/// Command to Unload domain
+pub struct UnloadCommand<'a> {
+    pub domain_ident: &'a str,
+}
+
+/// Command to send domain data
 #[derive(Debug)]
 pub struct SendCommand<'a> {
     pub id: u64,
@@ -33,10 +51,12 @@ pub struct SendCommand<'a> {
     pub bytes: usize,
     pub data: &'a [u8],
 }
+/// Command to stop sending domain data
 #[derive(Debug)]
 pub struct StopCommand {
     pub id: u64,
 }
+
 #[derive(Debug)]
 pub struct ExitCommand {
     pub id: u64,
@@ -64,8 +84,40 @@ impl Command<'_> {
                 let update_command = Self::parse_update(iter.next()?)?;
                 Some(Command::Update(update_command))
             }
+            "load" => {
+                let load_command = Self::parse_load(iter.next()?)?;
+                Some(Command::Load(load_command))
+            }
+            "unload" => {
+                let unload_command = Self::parse_unload(iter.next()?)?;
+                Some(Command::Unload(unload_command))
+            }
             _ => None,
         }
+    }
+
+    fn parse_load(data: &[u8]) -> Option<LoadCommand> {
+        let mut iter = data.splitn(3, |&x| x == b':');
+        let register_domain_elf_ident = iter.next()?;
+        let register_domain_elf_ident = core::str::from_utf8(register_domain_elf_ident).ok()?;
+
+        let domain_ident = iter.next()?;
+        let domain_ident = core::str::from_utf8(domain_ident).ok()?;
+
+        let domain_type = iter.next()?;
+        let domain_type = core::str::from_utf8(domain_type).ok()?;
+        let domain_type_num = domain_type.parse::<u8>().ok()?;
+        let domain_type = domain_type_num;
+        Some(LoadCommand {
+            register_domain_elf_ident,
+            domain_ident,
+            domain_type,
+        })
+    }
+
+    fn parse_unload(data: &[u8]) -> Option<UnloadCommand> {
+        let domain_ident = core::str::from_utf8(data).ok()?;
+        Some(UnloadCommand { domain_ident })
     }
 
     fn parse_start(data: &[u8]) -> Option<StartCommand> {
@@ -80,7 +132,7 @@ impl Command<'_> {
         let domain_size = core::str::from_utf8(domain_size).ok()?;
         let domain_size = domain_size.parse::<usize>().ok()?;
         Some(StartCommand {
-            domain_ident,
+            register_domain_elf_ident: domain_ident,
             domain_type,
             domain_size,
         })
@@ -123,8 +175,8 @@ impl Command<'_> {
         let domain_type_num = domain_type.parse::<u8>().ok()?;
         let domain_type = domain_type_num;
         Some(UpdateCommand {
-            old_domain_ident,
-            new_domain_ident,
+            domain_ident: old_domain_ident,
+            register_domain_elf_ident: new_domain_ident,
             domain_type,
         })
     }
@@ -133,7 +185,9 @@ impl Command<'_> {
         match self {
             Command::Start(start_command) => format!(
                 "start:{}:{}:{}",
-                start_command.domain_ident, start_command.domain_type, start_command.domain_size
+                start_command.register_domain_elf_ident,
+                start_command.domain_type,
+                start_command.domain_size
             )
             .as_bytes()
             .to_vec(),
@@ -147,12 +201,23 @@ impl Command<'_> {
                 head.extend_from_slice(send_command.data);
                 head
             }
+            Command::Load(load_command) => format!(
+                "load:{}:{}:{}",
+                load_command.register_domain_elf_ident,
+                load_command.domain_ident,
+                load_command.domain_type
+            )
+            .as_bytes()
+            .to_vec(),
+            Command::Unload(unload_command) => format!("unload:{}", unload_command.domain_ident)
+                .as_bytes()
+                .to_vec(),
             Command::Stop(stop_command) => format!("stop:{}", stop_command.id).as_bytes().to_vec(),
             Command::Exit(exit_command) => format!("exit:{}", exit_command.id).as_bytes().to_vec(),
             Command::Update(update_command) => format!(
                 "update:{}:{}:{}",
-                update_command.old_domain_ident,
-                update_command.new_domain_ident,
+                update_command.domain_ident,
+                update_command.register_domain_elf_ident,
                 update_command.domain_type
             )
             .as_bytes()

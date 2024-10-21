@@ -1,4 +1,7 @@
-use interface::DomainType;
+use alloc::boxed::Box;
+use core::any::Any;
+
+use interface::{DomainType, DomainTypeRaw};
 use kernel::{
     error::{linux_err, KernelResult},
     sysctl::Sysctl,
@@ -7,12 +10,13 @@ use kernel::{
 
 use crate::{
     domain_helper::query_domain,
-    kshim::{block_device::BlockDeviceShim, entropy::EntropySource, one::OneDevice},
+    kshim::{entropy::EntropySource, one::OneDevice},
 };
 
 mod block_device;
 mod entropy;
 mod one;
+pub use block_device::BlockDeviceShim;
 
 pub struct KObj {
     entropy_source: Sysctl<EntropySource>,
@@ -53,21 +57,13 @@ pub fn init_kernel_shim() -> KernelResult<KObj> {
         Mode::from_int(0o666),
     )?;
     println!("One device registered");
-
-    let null_block_domain = query_domain("block_device").unwrap();
-    let null_block_domain = match null_block_domain {
-        DomainType::BlockDeviceDomain(null_block_domain) => null_block_domain,
-        _ => {
-            pr_err!("Failed to get block device domain");
-            return Err(linux_err::EINVAL);
-        }
-    };
-    let null_block = BlockDeviceShim::load(null_block_domain)?;
-
-    drop(null_block);
-
     Ok(KObj {
         entropy_source: entropy,
         one_device,
     })
+}
+
+pub trait KernelShim: Send + Sync {
+    fn any(self: Box<Self>) -> Box<dyn Any>;
+    fn domain_type(&self) -> DomainTypeRaw;
 }

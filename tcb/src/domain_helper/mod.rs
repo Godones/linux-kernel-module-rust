@@ -70,6 +70,10 @@ impl DomainContainer {
     fn get(&self, name: &str) -> Option<DomainType> {
         self.domains.get(name).cloned()
     }
+
+    fn ref_count(&self, name: &str) -> Option<usize> {
+        self.domains.get(name).map(|domain| domain.ref_count())
+    }
 }
 
 static DOMAIN_CONTAINER: Mutex<DomainContainer> = Mutex::new(DomainContainer::new());
@@ -115,6 +119,23 @@ pub fn register_domain(
         .domain_list
         .insert(domain_id, domain_data);
     res
+}
+
+/// Unregister the domain with the given identifier
+///
+/// User should make sure the domain is not used by any other
+pub fn unregister_domain(identifier: &str) {
+    let domain = DOMAIN_CONTAINER.lock().domains.remove(identifier);
+    if let Some(domain) = domain {
+        let domain_id = domain.domain_id();
+        DOMAIN_INFO.lock().domain_list.remove(&domain_id);
+    }
+}
+
+/// Get the reference count of the domain
+pub fn domain_ref_count(identifier: &str) -> Option<usize> {
+    let container = DOMAIN_CONTAINER.lock();
+    container.ref_count(identifier)
 }
 
 /// Register the domain elf data with the given identifier.

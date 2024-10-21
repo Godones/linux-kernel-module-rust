@@ -5,7 +5,10 @@ use std::{
     path::Path,
 };
 
-use command::{Command, Response, SendCommand, StartCommand, StopCommand, UpdateCommand};
+use command::{
+    Command, LoadCommand, Response, SendCommand, StartCommand, StopCommand, UnloadCommand,
+    UpdateCommand,
+};
 
 use super::Result;
 use crate::{DOMAIN_TYPE, PATH};
@@ -25,14 +28,14 @@ fn find_path(name: &str) -> Option<String> {
 ///
 /// It will communicate with the kernel module using a file in /proc/sys/rust/domain/command
 /// and send the domain file to the kernel module
-pub fn register_domain(name: &str, ty: u8, register_ident: &str) -> Result<()> {
+pub fn register_domain(name: &str, ty: u8, register_domain_elf_ident: &str) -> Result<()> {
     let path = find_path(name).ok_or_else(|| format!("Domain file {} not found", name))?;
     let mut file = fs::File::open(path)?;
     let file_size = file.metadata()?.len();
 
     // send start command
     let start_command = StartCommand {
-        domain_ident: register_ident,
+        register_domain_elf_ident,
         domain_type: ty,
         domain_size: file_size as usize,
     };
@@ -116,14 +119,40 @@ pub fn register_domain(name: &str, ty: u8, register_ident: &str) -> Result<()> {
     Ok(())
 }
 
-pub fn update_domain(old_ident: &str, new_ident: &str, ty: u8) -> Result<()> {
+pub fn update_domain(old_ident: &str, register_domain_elf_ident: &str, ty: u8) -> Result<()> {
     let update_command = Command::Update(UpdateCommand {
-        old_domain_ident: old_ident,
-        new_domain_ident: new_ident,
+        domain_ident: old_ident,
+        register_domain_elf_ident,
         domain_type: ty,
     });
     let update_command = update_command.to_bytes();
     write_to_channel(&update_command)?;
+
+    let res_buf = read_from_channel()?;
+    let response = Response::parse(&res_buf).ok_or("Parse response failed")?;
+    println!("Response: {:?}", response);
+    Ok(())
+}
+
+pub fn load_domain(register_domain_elf_ident: &str, domain_ident: &str, ty: u8) -> Result<()> {
+    let load_command = Command::Load(LoadCommand {
+        register_domain_elf_ident,
+        domain_ident,
+        domain_type: ty,
+    });
+    let load_command = load_command.to_bytes();
+    write_to_channel(&load_command)?;
+
+    let res_buf = read_from_channel()?;
+    let response = Response::parse(&res_buf).ok_or("Parse response failed")?;
+    println!("Response: {:?}", response);
+    Ok(())
+}
+
+pub fn unload_domain(domain_ident: &str) -> Result<()> {
+    let unload_command = Command::Unload(UnloadCommand { domain_ident });
+    let unload_command = unload_command.to_bytes();
+    write_to_channel(&unload_command)?;
 
     let res_buf = read_from_channel()?;
     let response = Response::parse(&res_buf).ok_or("Parse response failed")?;

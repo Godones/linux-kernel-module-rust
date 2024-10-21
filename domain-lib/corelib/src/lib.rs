@@ -21,6 +21,7 @@ pub type LinuxResult<T> = Result<T, LinuxErrno>;
 pub type LinuxError = LinuxErrno;
 
 use bindings::*;
+pub use kbind::safe_ptr::SafePtr;
 pub trait CoreFunction: Send + Sync {
     fn sys_alloc_pages(&self, domain_id: u64, n: usize) -> *mut u8;
     fn sys_free_pages(&self, domain_id: u64, p: *mut u8, n: usize);

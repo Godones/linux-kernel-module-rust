@@ -1,5 +1,6 @@
 use core::marker::PhantomData;
 
+use kbind::safe_ptr::SafePtr;
 use pinned_init::PinInit;
 
 use crate::{
@@ -99,29 +100,92 @@ impl<T: Operations> OperationsConverter<T> {
         unsafe { core::ptr::drop_in_place(pdu) };
     }
 
-    pub fn queue_rq(hctx_ptr: usize, bd_ptr: usize, hctx_driver_data_ptr: usize) -> KernelResult {
-        unsafe { Self::queue_rq_callback(hctx_ptr as _, bd_ptr as _, hctx_driver_data_ptr as _) }
+    unsafe fn commit_rqs_callback(
+        hctx: *mut bindings::blk_mq_hw_ctx,
+        driver_data: *mut core::ffi::c_void,
+    ) {
+        let hw_data = unsafe { T::HwData::borrow(driver_data) };
+
+        // SAFETY: `hctx` is valid as required by this function.
+        let queue_data = unsafe { (*(*hctx).queue).queuedata };
+
+        // SAFETY: `queue.queuedata` was created by `GenDisk::try_new()` with a
+        // call to `ForeignOwnable::into_pointer()` to create `queuedata`.
+        // `ForeignOwnable::from_foreign()` is only called when the tagset is
+        // dropped, which happens after we are dropped.
+        let queue_data = unsafe { T::QueueData::borrow(queue_data) };
+        T::commit_rqs(hw_data, queue_data)
     }
 
-    pub fn init_request(tag_set_ptr: usize, rq_ptr: usize, driver_data_ptr: usize) -> KernelResult {
+    unsafe fn complete_callback(rq: *mut bindings::request) {
+        T::complete(unsafe { Request::from_ptr(rq) });
+    }
+
+    pub fn queue_rq(
+        hctx_ptr: SafePtr,
+        bd_ptr: SafePtr,
+        hctx_driver_data_ptr: SafePtr,
+    ) -> KernelResult {
         unsafe {
-            Self::init_request_callback(tag_set_ptr as _, rq_ptr as _, 0, 0, driver_data_ptr as _)
+            Self::queue_rq_callback(
+                hctx_ptr.raw_ptr() as _,
+                bd_ptr.raw_ptr() as _,
+                hctx_driver_data_ptr.raw_ptr() as _,
+            )
         }
     }
-    pub fn exit_request(tag_set_ptr: usize, rq_ptr: usize) -> KernelResult {
-        unsafe { Self::exit_request_callback(tag_set_ptr as _, rq_ptr as _, 0) };
+
+    pub fn init_request(
+        tag_set_ptr: SafePtr,
+        rq_ptr: SafePtr,
+        driver_data_ptr: SafePtr,
+    ) -> KernelResult {
+        unsafe {
+            Self::init_request_callback(
+                tag_set_ptr.raw_ptr() as _,
+                rq_ptr.raw_ptr() as _,
+                0,
+                0,
+                driver_data_ptr.raw_ptr() as _,
+            )
+        }
+    }
+    pub fn exit_request(tag_set_ptr: SafePtr, rq_ptr: SafePtr) -> KernelResult {
+        unsafe {
+            Self::exit_request_callback(tag_set_ptr.raw_ptr() as _, rq_ptr.raw_ptr() as _, 0)
+        };
         Ok(())
     }
 
-    pub fn init_hctx(hctx_ptr: usize, tag_set_data_ptr: usize, hctx_idx: usize) -> KernelResult {
+    pub fn init_hctx(
+        hctx_ptr: SafePtr,
+        tag_set_data_ptr: SafePtr,
+        hctx_idx: usize,
+    ) -> KernelResult {
         unsafe {
-            Self::init_hctx_callback(hctx_ptr as _, tag_set_data_ptr as _, hctx_idx as _);
+            Self::init_hctx_callback(
+                hctx_ptr.raw_ptr() as _,
+                tag_set_data_ptr.raw_ptr() as _,
+                hctx_idx as _,
+            );
         }
         Ok(())
     }
 
-    pub fn exit_hctx(hctx_ptr: usize, hctx_idx: usize) -> KernelResult {
-        unsafe { Self::exit_hctx_callback(hctx_ptr as _, hctx_idx as _) };
+    pub fn exit_hctx(hctx_ptr: SafePtr, hctx_idx: usize) -> KernelResult {
+        unsafe { Self::exit_hctx_callback(hctx_ptr.raw_ptr() as _, hctx_idx as _) };
+        Ok(())
+    }
+
+    pub fn commit_rqs(hctx_ptr: SafePtr, hctx_driver_data_ptr: SafePtr) -> KernelResult {
+        unsafe {
+            Self::commit_rqs_callback(hctx_ptr.raw_ptr() as _, hctx_driver_data_ptr.raw_ptr() as _)
+        }
+        Ok(())
+    }
+
+    pub fn complete_request(rq_ptr: SafePtr) -> KernelResult {
+        unsafe { Self::complete_callback(rq_ptr.raw_ptr() as _) }
         Ok(())
     }
 }

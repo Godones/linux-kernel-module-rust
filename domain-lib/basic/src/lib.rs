@@ -12,7 +12,7 @@ use corelib::domain_info::DomainInfo;
 pub use corelib::{
     backtrace, blk_crash_trick, checkout_shared_data, create_domain, get_domain, impl_has_timer,
     kernel, new_mutex, new_spinlock, register_domain, reload_domain, update_domain, write_console,
-    CoreFunction, LinuxError, LinuxResult,
+    CoreFunction, LinuxError, LinuxResult, SafePtr,
 };
 use ksync::Mutex;
 

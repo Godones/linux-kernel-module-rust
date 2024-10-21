@@ -14,6 +14,7 @@ mod bindings {
     include!("bindings_c.rs");
 }
 pub use bindings::*;
+pub mod safe_ptr;
 
 pub const GFP_KERNEL: gfp_t = BINDINGS_GFP_KERNEL;
 pub const BINDINGS_GFP_ATOMIC: gfp_t = 2080;

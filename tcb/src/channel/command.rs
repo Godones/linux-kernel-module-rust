@@ -62,7 +62,7 @@ impl SysctlStorage for CommandChannel {
                 }
                 let ty = ty.unwrap();
                 inner.domain_type = Some(ty);
-                inner.domain_ident = Some(start_command.domain_ident.to_string());
+                inner.domain_ident = Some(start_command.register_domain_elf_ident.to_string());
                 inner.domain_size = Some(start_command.domain_size);
                 inner.domain_data = Some(Vec::with_capacity(start_command.domain_size));
                 // set res
@@ -111,8 +111,8 @@ impl SysctlStorage for CommandChannel {
             }
             Some(Command::Update(ref update_command)) => {
                 println!("Command: {:?}", command);
-                let old_domain_ident = update_command.old_domain_ident;
-                let new_domain_ident = update_command.new_domain_ident;
+                let old_domain_ident = update_command.domain_ident;
+                let new_domain_ident = update_command.register_domain_elf_ident;
                 let domain_type = DomainTypeRaw::try_from(update_command.domain_type);
                 if domain_type.is_err() {
                     pr_err!("Invalid domain type");
@@ -120,6 +120,34 @@ impl SysctlStorage for CommandChannel {
                 }
                 let domain_type = domain_type.unwrap();
                 update_domain(old_domain_ident, new_domain_ident, domain_type).unwrap();
+                inner.response = Some(Response::Ok(0));
+                (data.len(), Ok(()))
+            }
+            Some(Command::Load(ref load_command)) => {
+                println!("Command: {:?}", command);
+                let ty = DomainTypeRaw::try_from(load_command.domain_type);
+                if ty.is_err() {
+                    pr_err!("Invalid domain type");
+                    return (0, Err(linux_err::EINVAL));
+                }
+                let ty = ty.unwrap();
+                let res = super::load_domain(
+                    load_command.register_domain_elf_ident,
+                    load_command.domain_ident,
+                    ty,
+                );
+                if res.is_err() {
+                    return (0, Err(linux_err::EINVAL));
+                }
+                inner.response = Some(Response::Ok(0));
+                (data.len(), Ok(()))
+            }
+            Some(Command::Unload(ref unload_command)) => {
+                println!("Command: {:?}", command);
+                let res = super::unload_domain(unload_command.domain_ident);
+                if res.is_err() {
+                    return (0, Err(linux_err::EINVAL));
+                }
                 inner.response = Some(Response::Ok(0));
                 (data.len(), Ok(()))
             }

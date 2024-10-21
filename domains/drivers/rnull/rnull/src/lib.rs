@@ -7,7 +7,7 @@ extern crate alloc;
 use alloc::boxed::Box;
 use core::fmt::Debug;
 
-use basic::{kernel::block::mq::OperationsConverter, println, LinuxError, LinuxResult};
+use basic::{kernel::block::mq::OperationsConverter, println, LinuxError, LinuxResult, SafePtr};
 use interface::{
     null_block::{BlockArgs, BlockDeviceDomain},
     Basic,
@@ -46,7 +46,7 @@ impl BlockDeviceDomain for NullDeviceDomainImpl {
         *self.block.lock() = Some(block);
         Ok(())
     }
-    fn tag_set_with_queue_data(&self) -> LinuxResult<(usize, usize)> {
+    fn tag_set_with_queue_data(&self) -> LinuxResult<(SafePtr, SafePtr)> {
         let blk = self.block.lock();
         let blk = blk.as_ref().ok_or(LinuxError::EINVAL)?;
         let res = blk.tag_set_with_queue_data();
@@ -59,7 +59,7 @@ impl BlockDeviceDomain for NullDeviceDomainImpl {
         }
     }
 
-    fn set_gen_disk(&self, gen_disk: usize) -> LinuxResult<usize> {
+    fn set_gen_disk(&self, gen_disk: SafePtr) -> LinuxResult<()> {
         let blk = self.block.lock();
         let blk = blk.as_ref().ok_or(LinuxError::EINVAL)?;
         blk.set_gen_disk(gen_disk).map_err(|e| {
@@ -76,12 +76,7 @@ impl BlockDeviceDomain for NullDeviceDomainImpl {
         Ok(())
     }
 
-    fn init_request(
-        &self,
-        tag_set_ptr: usize,
-        rq_ptr: usize,
-        driver_data_ptr: usize,
-    ) -> LinuxResult<()> {
+    fn init_request(&self, tag_set_ptr: SafePtr, rq_ptr: SafePtr, driver_data_ptr: SafePtr) -> LinuxResult<()> {
         OperationsConverter::<NullBlkDevice>::init_request(tag_set_ptr, rq_ptr, driver_data_ptr)
             .map_err(|e| {
                 println!("NullBlkModule init_request error: {:?}", e);
@@ -89,19 +84,14 @@ impl BlockDeviceDomain for NullDeviceDomainImpl {
             })
     }
 
-    fn exit_request(&self, tag_set_ptr: usize, rq_ptr: usize) -> LinuxResult<()> {
+    fn exit_request(&self, tag_set_ptr: SafePtr, rq_ptr: SafePtr) -> LinuxResult<()> {
         OperationsConverter::<NullBlkDevice>::exit_request(tag_set_ptr, rq_ptr).map_err(|e| {
             println!("NullBlkModule exit_request error: {:?}", e);
             LinuxError::EINVAL
         })
     }
 
-    fn init_hctx(
-        &self,
-        hctx_ptr: usize,
-        tag_set_data_ptr: usize,
-        hctx_idx: usize,
-    ) -> LinuxResult<()> {
+    fn init_hctx(&self, hctx_ptr: SafePtr, tag_set_data_ptr: SafePtr, hctx_idx: usize) -> LinuxResult<()> {
         OperationsConverter::<NullBlkDevice>::init_hctx(hctx_ptr, tag_set_data_ptr, hctx_idx)
             .map_err(|e| {
                 println!("NullBlkModule init_hctx error: {:?}", e);
@@ -109,24 +99,33 @@ impl BlockDeviceDomain for NullDeviceDomainImpl {
             })
     }
 
-    fn exit_hctx(&self, hctx_ptr: usize, hctx_idx: usize) -> LinuxResult<()> {
+    fn exit_hctx(&self, hctx_ptr: SafePtr, hctx_idx: usize) -> LinuxResult<()> {
         OperationsConverter::<NullBlkDevice>::exit_hctx(hctx_ptr, hctx_idx).map_err(|e| {
             println!("NullBlkModule exit_hctx error: {:?}", e);
             LinuxError::EINVAL
         })
     }
 
-    fn queue_rq(
-        &self,
-        hctx_ptr: usize,
-        bd_ptr: usize,
-        hctx_driver_data_ptr: usize,
-    ) -> LinuxResult<()> {
+    fn queue_rq(&self, hctx_ptr: SafePtr, bd_ptr: SafePtr, hctx_driver_data_ptr: SafePtr) -> LinuxResult<()> {
         OperationsConverter::<NullBlkDevice>::queue_rq(hctx_ptr, bd_ptr, hctx_driver_data_ptr)
             .map_err(|e| {
                 println!("NullBlkModule queue_rq error: {:?}", e);
                 LinuxError::EINVAL
             })
+    }
+    fn commit_rqs(&self, hctx_ptr: SafePtr, hctx_driver_data_ptr: SafePtr) -> LinuxResult<()> {
+        OperationsConverter::<NullBlkDevice>::commit_rqs(hctx_ptr, hctx_driver_data_ptr).map_err(
+            |e| {
+                println!("NullBlkModule commit_rqs error: {:?}", e);
+                LinuxError::EINVAL
+            },
+        )
+    }
+    fn complete_request(&self, rq_ptr: SafePtr) -> LinuxResult<()> {
+        OperationsConverter::<NullBlkDevice>::complete_request(rq_ptr).map_err(|e| {
+            println!("NullBlkModule complete_request error: {:?}", e);
+            LinuxError::EINVAL
+        })
     }
 
     fn exit(&self) -> LinuxResult<()> {

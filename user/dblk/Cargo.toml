@@ -1,0 +1,8 @@
+[package]
+name = "dblk"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+domain-helper = { path = "../domain-helper" }
+spin = { version = "0.9.8", features = ["ticket_mutex"] }

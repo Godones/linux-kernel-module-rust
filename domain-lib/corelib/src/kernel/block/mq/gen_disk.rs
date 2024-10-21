@@ -11,6 +11,8 @@ use core::{
     fmt::{self, Write},
 };
 
+use kbind::safe_ptr::SafePtr;
+
 use crate::{
     bindings,
     kernel::{
@@ -46,16 +48,18 @@ impl<T: Operations> GenDisk<T> {
         }
     }
 
-    pub fn set_gen_disk(&mut self, gendisk: *mut bindings::gendisk) {
-        self.gendisk = gendisk;
+    pub fn set_gen_disk(&mut self, gendisk: SafePtr) {
+        unsafe {
+            self.gendisk = gendisk.raw_ptr() as *mut bindings::gendisk;
+        }
     }
 
-    pub fn tagset_ptr(&self) -> *const bindings::blk_mq_tag_set {
-        self.tagset.raw_tag_set()
+    pub fn tagset_ptr(&self) -> SafePtr {
+        unsafe { SafePtr::new(self.tagset.raw_tag_set() as _) }
     }
 
-    pub fn queue_data_ptr(&self) -> *const c_void {
-        self.queue_data
+    pub fn queue_data_ptr(&self) -> SafePtr {
+        unsafe { SafePtr::new(self.queue_data as _) }
     }
 
     /// Try to create a new `GenDisk`

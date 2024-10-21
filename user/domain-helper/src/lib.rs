@@ -1,7 +1,7 @@
 mod helper;
 use std::error::Error;
 
-use crate::helper::{register_domain, update_domain};
+use crate::helper::{load_domain, register_domain, unload_domain, update_domain};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Ord, PartialOrd)]
 #[repr(u8)]
@@ -91,6 +91,23 @@ impl DomainHelperBuilder {
             .as_ref()
             .ok_or("Domain file name is not set")?;
         update_domain(domain_name, domain_register_ident, ty as u8)?;
+        Ok(())
+    }
+
+    pub fn load_domain(self) -> Result<()> {
+        let domain_name = self.domain_name.as_ref().ok_or("Domain name is not set")?;
+        let ty = self.ty.ok_or("Domain type is not set")?;
+        let domain_register_ident = self
+            .domain_register_ident
+            .as_ref()
+            .ok_or("Domain file name is not set")?;
+        load_domain(domain_register_ident, domain_name, ty as u8)?;
+        Ok(())
+    }
+
+    pub fn unload_domain(self) -> Result<()> {
+        let domain_name = self.domain_name.as_ref().ok_or("Domain name is not set")?;
+        unload_domain(domain_name)?;
         Ok(())
     }
 }

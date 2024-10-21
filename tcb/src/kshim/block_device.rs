@@ -1,42 +1,70 @@
 use alloc::{boxed::Box, sync::Arc};
+use core::{any::Any, sync::atomic::AtomicUsize};
 
-use interface::null_block::BlockDeviceDomain;
+use corelib::SafePtr;
+use interface::{null_block::BlockDeviceDomain, DomainTypeRaw};
 use kernel::{
     bindings,
     error::{from_err_ptr, Error, KernelResult},
 };
 
+use crate::kshim::KernelShim;
+
 pub struct BlockDeviceShim {
-    domain: Arc<dyn BlockDeviceDomain>,
+    domain_ptr: *const Arc<dyn BlockDeviceDomain>,
     gendisk: *mut bindings::gendisk,
     tagset: *mut bindings::blk_mq_tag_set,
+    domain_type: DomainTypeRaw,
 }
+
+impl KernelShim for BlockDeviceShim {
+    fn any(self: Box<Self>) -> Box<dyn Any> {
+        self
+    }
+    fn domain_type(&self) -> DomainTypeRaw {
+        self.domain_type
+    }
+}
+
+unsafe impl Send for BlockDeviceShim {}
+unsafe impl Sync for BlockDeviceShim {}
 
 struct TagSetData {
     original_data: *mut core::ffi::c_void,
-    domain: Arc<dyn BlockDeviceDomain>,
+    domain: *const Arc<dyn BlockDeviceDomain>,
 }
 
 struct HctxData {
     original_data: *mut core::ffi::c_void,
-    domain: Arc<dyn BlockDeviceDomain>,
+    domain: *const Arc<dyn BlockDeviceDomain>,
 }
 
 impl HctxData {
-    pub unsafe fn from_raw(ptr: *mut core::ffi::c_void) -> &'static Self {
+    unsafe fn from_raw(ptr: *mut core::ffi::c_void) -> &'static Self {
         unsafe { &*(ptr as *const Self) }
     }
-    pub fn new(original_data: *mut core::ffi::c_void, domain: Arc<dyn BlockDeviceDomain>) -> Self {
+
+    fn new(
+        original_data: *mut core::ffi::c_void,
+        domain: *const Arc<dyn BlockDeviceDomain>,
+    ) -> Self {
         Self {
             original_data,
             domain,
         }
     }
+
+    fn domain(&self) -> &Arc<dyn BlockDeviceDomain> {
+        unsafe { &*self.domain }
+    }
 }
 
 impl TagSetData {
-    pub unsafe fn from_raw(ptr: *mut core::ffi::c_void) -> &'static Self {
+    unsafe fn from_raw(ptr: *mut core::ffi::c_void) -> &'static Self {
         unsafe { &*(ptr as *const Self) }
+    }
+    fn domain(&self) -> &Arc<dyn BlockDeviceDomain> {
+        unsafe { &*self.domain }
     }
 }
 
@@ -45,12 +73,14 @@ impl BlockDeviceShim {
         let (tag_set_ptr, queue_data_ptr) = domain
             .tag_set_with_queue_data()
             .map_err(|e| Error::from_errno(e as i32))?;
-        let tagset_ptr = tag_set_ptr as *mut bindings::blk_mq_tag_set;
+        let tagset_ptr = unsafe { tag_set_ptr.raw_ptr() as *mut bindings::blk_mq_tag_set };
         let tagset = unsafe { &mut *tagset_ptr };
+
+        let domain_ptr = Box::into_raw(Box::new(domain.clone()));
 
         let tagset_data = TagSetData {
             original_data: tagset.driver_data,
-            domain: domain.clone(),
+            domain: domain_ptr,
         };
         tagset.driver_data = Box::into_raw(Box::new(tagset_data)) as _;
         tagset.ops = &TAGSET_OPS_TABLE;
@@ -62,22 +92,23 @@ impl BlockDeviceShim {
             return Err(Error::from_errno(ret));
         }
 
-        let queue_data_ptr = queue_data_ptr as *mut core::ffi::c_void;
+        let queue_data_ptr = unsafe { queue_data_ptr.raw_ptr() };
 
         let gendisk = Self::alloc_gen_disk(tagset_ptr, queue_data_ptr)?;
 
-        let gen_disk = unsafe { &mut *gendisk };
+        let (gen_disk, gen_disk_sptr) = unsafe { (&mut *gendisk, SafePtr::new(gendisk as _)) };
 
-        gen_disk.private_data = Box::into_raw(Box::new(domain.clone())) as _;
+        gen_disk.private_data = domain_ptr as _;
         gen_disk.fops = &DISK_OPS_TABLE;
 
         domain
-            .set_gen_disk(gendisk as usize)
+            .set_gen_disk(gen_disk_sptr)
             .map_err(|e| Error::from_errno(e as i32))?;
 
         let block_device_shim = Self {
-            domain,
+            domain_ptr,
             gendisk,
+            domain_type: DomainTypeRaw::BlockDeviceDomain,
             tagset: tagset_ptr,
         };
 
@@ -115,10 +146,6 @@ impl Drop for BlockDeviceShim {
     fn drop(&mut self) {
         unsafe {
             // release the domain
-            let gen_disk = &mut *self.gendisk;
-            let domain = Box::from_raw(gen_disk.private_data as *mut Arc<dyn BlockDeviceDomain>);
-            drop(domain);
-
             pr_info!("BlockDeviceShim: before del_gendisk");
             bindings::del_gendisk(self.gendisk);
             pr_info!("BlockDeviceShim: after del_gendisk");
@@ -135,8 +162,9 @@ impl Drop for BlockDeviceShim {
             // restore original data, domain will drop it
             tagset.driver_data = original_data;
         }
+        let domain = unsafe { Box::from_raw(self.domain_ptr as *mut Arc<dyn BlockDeviceDomain>) };
 
-        self.domain
+        domain
             .exit()
             .map_err(|e| pr_err!("BlockDeviceShim: domain exit error: {}", e))
             .ok();
@@ -169,8 +197,8 @@ mod block_ops {
 
 mod block_mq_ops {
     use alloc::boxed::Box;
-    use core::sync::atomic::AtomicUsize;
 
+    use corelib::SafePtr;
     use kernel::{bindings, error::Error};
 
     use crate::kshim::block_device::{HctxData, TagSetData};
@@ -179,42 +207,64 @@ mod block_mq_ops {
         hctx: *mut bindings::blk_mq_hw_ctx,
         bd: *const bindings::blk_mq_queue_data,
     ) -> bindings::blk_status_t {
-        pr_info!("BlockDeviceShim: queue_rq_callback began");
+        // pr_info!("BlockDeviceShim: queue_rq_callback began");
         let driver_data = unsafe { HctxData::from_raw((*hctx).driver_data) };
-        let domain = &driver_data.domain;
+        let domain = driver_data.domain();
         let original_data = driver_data.original_data;
-        let result = domain.queue_rq(hctx as usize, bd as usize, original_data as usize);
-        pr_info!("BlockDeviceShim: queue_rq_callback ended");
+        let result = domain.queue_rq(
+            SafePtr::new(hctx as _),
+            SafePtr::new(bd as _),
+            SafePtr::new(original_data),
+        );
+        // pr_info!("BlockDeviceShim: queue_rq_callback ended");
         match result {
             Ok(()) => bindings::BLK_STS_OK as _,
             Err(e) => Error::from_errno(e as i32).to_blk_status(),
         }
     }
 
-    pub unsafe extern "C" fn commit_rqs_callback(hctx: *mut bindings::blk_mq_hw_ctx) {}
-    pub unsafe extern "C" fn complete_callback(rq: *mut bindings::request) {}
+    pub unsafe extern "C" fn commit_rqs_callback(hctx: *mut bindings::blk_mq_hw_ctx) {
+        // pr_info!("BlockDeviceShim: commit_rqs_callback began");
+        let driver_data = unsafe { HctxData::from_raw((*hctx).driver_data) };
+        let domain = driver_data.domain();
+        let original_data = driver_data.original_data;
+        let _res = domain.commit_rqs(SafePtr::new(hctx as _), SafePtr::new(original_data));
+        // pr_info!("BlockDeviceShim: commit_rqs_callback ended");
+    }
+    pub unsafe extern "C" fn complete_callback(rq: *mut bindings::request) {
+        // pr_info!("BlockDeviceShim: complete_callback began");
+        let hctx = (*rq).mq_hctx;
+        let driver_data = unsafe { HctxData::from_raw((*hctx).driver_data) };
+        let domain = driver_data.domain();
+        let _res = domain.complete_request(SafePtr::new(rq as _));
+        // pr_info!("BlockDeviceShim: complete_callback ended");
+    }
 
     pub unsafe extern "C" fn init_hctx_callback(
         hctx: *mut bindings::blk_mq_hw_ctx,
         tagset_data: *mut core::ffi::c_void,
         hctx_idx: core::ffi::c_uint,
     ) -> core::ffi::c_int {
-        pr_info!(
-            "BlockDeviceShim: init_hctx_callback began, hctx: {:?}",
-            hctx_idx
-        );
+        // pr_info!(
+        //     "BlockDeviceShim: init_hctx_callback began, hctx: {:?}",
+        //     hctx_idx
+        // );
         let driver_data = unsafe { TagSetData::from_raw(tagset_data) };
-        let domain = &driver_data.domain;
+        let domain = driver_data.domain();
         let original_data = driver_data.original_data;
-        let result = domain.init_hctx(hctx as usize, original_data as usize, hctx_idx as usize);
-        pr_info!("BlockDeviceShim: init_hctx_callback ended");
+        let result = domain.init_hctx(
+            SafePtr::new(hctx as _),
+            SafePtr::new(original_data),
+            hctx_idx as usize,
+        );
+        // pr_info!("BlockDeviceShim: init_hctx_callback ended");
         match result {
             Ok(()) => {
                 // update hctx driver data
                 unsafe {
                     let hctx = &mut *hctx;
                     let original_data = hctx.driver_data;
-                    let hctx_data = HctxData::new(original_data, domain.clone());
+                    let hctx_data = HctxData::new(original_data, driver_data.domain);
                     let hctx_data_ptr = Box::into_raw(Box::new(hctx_data));
                     hctx.driver_data = hctx_data_ptr as _;
                 }
@@ -228,10 +278,10 @@ mod block_mq_ops {
         hctx: *mut bindings::blk_mq_hw_ctx,
         hctx_idx: core::ffi::c_uint,
     ) {
-        pr_info!(
-            "BlockDeviceShim: exit_hctx_callback began, hctx: {:?}",
-            hctx_idx
-        );
+        // pr_info!(
+        //     "BlockDeviceShim: exit_hctx_callback began, hctx: {:?}",
+        //     hctx_idx
+        // );
         let (driver_data, hctx_mut) = unsafe {
             (
                 Box::from_raw((*hctx).driver_data as *mut HctxData),
@@ -239,11 +289,11 @@ mod block_mq_ops {
             )
         };
         let original_data = driver_data.original_data;
-        let domain = &driver_data.domain;
+        let domain = driver_data.domain();
         // restore original data
         hctx_mut.driver_data = original_data;
-        let _res = domain.exit_hctx(hctx as usize, hctx_idx as usize);
-        pr_info!("BlockDeviceShim: exit_hctx_callback ended");
+        let _res = domain.exit_hctx(SafePtr::new(hctx as _), hctx_idx as usize);
+        // pr_info!("BlockDeviceShim: exit_hctx_callback ended");
     }
 
     pub unsafe extern "C" fn init_request_callback(
@@ -252,20 +302,20 @@ mod block_mq_ops {
         _hctx_idx: core::ffi::c_uint,
         _numa_node: core::ffi::c_uint,
     ) -> core::ffi::c_int {
-        static CALL: AtomicUsize = AtomicUsize::new(0);
-        pr_info!(
-            "BlockDeviceShim: init_request_callback began, call count: {}, {:p}",
-            CALL.fetch_add(1, core::sync::atomic::Ordering::Relaxed),
-            rq
-        );
+        // static CALL: AtomicUsize = AtomicUsize::new(0);
+        // pr_info!(
+        //     "BlockDeviceShim: init_request_callback began, call count: {}, {:p}",
+        //     CALL.fetch_add(1, core::sync::atomic::Ordering::Relaxed),
+        //     rq
+        // );
         let driver_data = unsafe { TagSetData::from_raw((*set).driver_data) };
-        let domain = &driver_data.domain;
+        let domain = driver_data.domain();
         let result = domain.init_request(
-            set as usize,
-            rq as usize,
-            driver_data.original_data as usize,
+            SafePtr::new(set as _),
+            SafePtr::new(rq as _),
+            SafePtr::new(driver_data.original_data),
         );
-        pr_info!("BlockDeviceShim: init_request_callback ended");
+        // pr_info!("BlockDeviceShim: init_request_callback ended");
         match result {
             Ok(()) => 0,
             Err(e) => e as i32,
@@ -276,11 +326,11 @@ mod block_mq_ops {
         rq: *mut bindings::request,
         _hctx_idx: core::ffi::c_uint,
     ) {
-        pr_info!("BlockDeviceShim: exit_request_callback began, rq: {:p}", rq);
+        // pr_info!("BlockDeviceShim: exit_request_callback began, rq: {:p}", rq);
         let driver_data = unsafe { TagSetData::from_raw((*set).driver_data) };
-        let domain = &driver_data.domain;
-        let _res = domain.exit_request(set as usize, rq as usize);
-        pr_info!("BlockDeviceShim: exit_request_callback ended");
+        let domain = driver_data.domain();
+        let _res = domain.exit_request(SafePtr::new(set as _), SafePtr::new(rq as _));
+        // pr_info!("BlockDeviceShim: exit_request_callback ended");
     }
 
     pub unsafe extern "C" fn map_queues_callback(_tag_set_ptr: *mut bindings::blk_mq_tag_set) {}

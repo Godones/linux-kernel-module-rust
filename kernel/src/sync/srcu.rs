@@ -40,20 +40,18 @@ impl<T> SRcuData<T> {
         r
     }
 
-    pub fn read_raw(&mut self) {
-        let idx = unsafe { bindings::__srcu_read_lock(self.ssp) };
-        pr_warn!("srcu read lock idx: {}", idx);
-        unsafe {
-            bindings::__srcu_read_unlock(self.ssp, idx);
-        }
+    pub fn read_directly<R>(&self, f: impl FnOnce(&T) -> R) -> R {
+        let ptr = srcu_defererence::<T>(&self.crcu_data, self.ssp);
+        let v = unsafe { &*ptr };
+        f(v)
     }
 
-    pub fn update_raw(&mut self) {
-        pr_warn!("before synchronize_srcu");
-        unsafe {
-            bindings::synchronize_srcu(self.ssp);
-        }
-        pr_warn!("after synchronize_srcu");
+    pub fn update_directly(&self, data: T) -> Box<T> {
+        let old_ptr = self.crcu_data.data_ptr;
+        let new_ptr = Box::into_raw(Box::new(data));
+        srcu_assign_pointer(&self.crcu_data, new_ptr);
+        let old_data = unsafe { Box::from_raw(old_ptr as *mut T) };
+        old_data
     }
 
     pub fn update(&self, data: T) -> Box<T> {

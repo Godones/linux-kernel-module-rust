@@ -48,12 +48,8 @@ impl<T: Operations> TagSet<T> {
         inner.driver_data = tagset_data.into_foreign() as _;
         inner.nr_maps = num_maps;
 
-        pr_info!("before blk_mq_alloc_tag_set");
-
         // SAFETY: `inner` points to valid and initialised memory.
         let ret = unsafe { bindings::blk_mq_alloc_tag_set(inner) };
-
-        pr_info!("after blk_mq_alloc_tag_set");
         if ret < 0 {
             // SAFETY: We created `driver_data` above with `into_foreign`
             unsafe { T::TagSetData::from_foreign(inner.driver_data) };
@@ -72,12 +68,8 @@ impl<T: Operations> TagSet<T> {
 impl<T: Operations> Drop for TagSet<T> {
     fn drop(&mut self) {
         let tagset_data = unsafe { (*self.inner.get()).driver_data };
-
-        pr_info!("before blk_mq_free_tag_set");
         // SAFETY: `inner` is valid and has been properly initialised during construction.
         unsafe { bindings::blk_mq_free_tag_set(self.inner.get()) };
-
-        pr_info!("after blk_mq_free_tag_set");
         // SAFETY: `tagset_data` was created by a call to
         // `ForeignOwnable::into_foreign` in `TagSet::try_new()`
         unsafe { T::TagSetData::from_foreign(tagset_data) };

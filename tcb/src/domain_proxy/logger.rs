@@ -5,7 +5,7 @@ use corelib::{LinuxErrno, LinuxResult};
 use interface::{logger::LogDomain, Basic};
 use kernel::{
     init::InPlaceInit,
-    sync::{Mutex, RcuData},
+    sync::{Mutex, SRcuData},
 };
 use rref::RRefVec;
 
@@ -17,14 +17,14 @@ use crate::{
 
 #[derive(Debug)]
 pub struct LogDomainProxy {
-    domain: RcuData<Box<dyn LogDomain>>,
+    domain: SRcuData<Box<dyn LogDomain>>,
     domain_loader: Pin<Box<Mutex<DomainLoader>>>,
 }
 
 impl LogDomainProxy {
     pub fn new(domain: Box<dyn LogDomain>, domain_loader: DomainLoader) -> Self {
         LogDomainProxy {
-            domain: RcuData::new(domain),
+            domain: SRcuData::new(domain),
             domain_loader: Box::pin_init(new_mutex!(domain_loader)).unwrap(),
         }
     }

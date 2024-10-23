@@ -65,27 +65,39 @@ impl ProxyBuilder for BlockDeviceDomainProxy {
 
 impl Basic for BlockDeviceDomainProxy {
     fn domain_id(&self) -> u64 {
-        self.domain.read(|domain| domain.domain_id())
+        if self.flag.load(core::sync::atomic::Ordering::Relaxed) {
+            self._domain_id_with_lock()
+        } else {
+            self._domain_id_no_lock()
+        }
     }
 }
 
-impl BlockDeviceDomainProxy {}
-
 impl BlockDeviceDomain for BlockDeviceDomainProxy {
     fn init(&self, args: &BlockArgs) -> LinuxResult<()> {
-        self.domain.read(|domain| domain.init(args))
+        self.domain.read_directly(|domain| domain.init(args))
     }
     fn tag_set_with_queue_data(&self) -> LinuxResult<(SafePtr, SafePtr)> {
-        self.domain.read(|domain| domain.tag_set_with_queue_data())
+        if self.flag.load(core::sync::atomic::Ordering::Relaxed) {
+            self._tag_set_with_queue_data_with_lock()
+        } else {
+            self._tag_set_with_queue_data_no_lock()
+        }
     }
     fn set_gen_disk(&self, gen_disk: SafePtr) -> LinuxResult<()> {
-        self.domain.read(|domain| domain.set_gen_disk(gen_disk))
+        if self.flag.load(core::sync::atomic::Ordering::Relaxed) {
+            self._set_gen_disk_with_lock(gen_disk)
+        } else {
+            self._set_gen_disk_no_lock(gen_disk)
+        }
     }
     fn open(&self, mode: u32) -> LinuxResult<()> {
-        self.domain.read(|domain| domain.open(mode))
+        // todo!
+        self.domain.read_directly(|domain| domain.open(mode))
     }
     fn release(&self) -> LinuxResult<()> {
-        self.domain.read(|domain| domain.release())
+        // todo!
+        self.domain.read_directly(|domain| domain.release())
     }
     fn init_request(
         &self,
@@ -93,12 +105,18 @@ impl BlockDeviceDomain for BlockDeviceDomainProxy {
         rq_ptr: SafePtr,
         driver_data_ptr: SafePtr,
     ) -> LinuxResult<()> {
-        self.domain
-            .read(|domain| domain.init_request(tag_set_ptr, rq_ptr, driver_data_ptr))
+        if self.flag.load(core::sync::atomic::Ordering::Relaxed) {
+            self._init_request_with_lock(tag_set_ptr, rq_ptr, driver_data_ptr)
+        } else {
+            self._init_request_no_lock(tag_set_ptr, rq_ptr, driver_data_ptr)
+        }
     }
     fn exit_request(&self, tag_set_ptr: SafePtr, rq_ptr: SafePtr) -> LinuxResult<()> {
-        self.domain
-            .read(|domain| domain.exit_request(tag_set_ptr, rq_ptr))
+        if self.flag.load(core::sync::atomic::Ordering::Relaxed) {
+            self._exit_request_with_lock(tag_set_ptr, rq_ptr)
+        } else {
+            self._exit_request_no_lock(tag_set_ptr, rq_ptr)
+        }
     }
     fn init_hctx(
         &self,
@@ -106,13 +124,19 @@ impl BlockDeviceDomain for BlockDeviceDomainProxy {
         tag_set_data_ptr: SafePtr,
         hctx_idx: usize,
     ) -> LinuxResult<()> {
-        self.domain
-            .read(|domain| domain.init_hctx(hctx_ptr, tag_set_data_ptr, hctx_idx))
+        if self.flag.load(core::sync::atomic::Ordering::Relaxed) {
+            self._init_hctx_with_lock(hctx_ptr, tag_set_data_ptr, hctx_idx)
+        } else {
+            self._init_hctx_no_lock(hctx_ptr, tag_set_data_ptr, hctx_idx)
+        }
     }
 
     fn exit_hctx(&self, hctx_ptr: SafePtr, hctx_idx: usize) -> LinuxResult<()> {
-        self.domain
-            .read(|domain| domain.exit_hctx(hctx_ptr, hctx_idx))
+        if self.flag.load(core::sync::atomic::Ordering::Relaxed) {
+            self._exit_hctx_with_lock(hctx_ptr, hctx_idx)
+        } else {
+            self._exit_hctx_no_lock(hctx_ptr, hctx_idx)
+        }
     }
     fn queue_rq(
         &self,
@@ -120,18 +144,344 @@ impl BlockDeviceDomain for BlockDeviceDomainProxy {
         bd_ptr: SafePtr,
         hctx_driver_data_ptr: SafePtr,
     ) -> LinuxResult<()> {
-        self.domain
-            .read(|domain| domain.queue_rq(hctx_ptr, bd_ptr, hctx_driver_data_ptr))
+        if self.flag.load(core::sync::atomic::Ordering::Relaxed) {
+            self._queue_rq_with_lock(hctx_ptr, bd_ptr, hctx_driver_data_ptr)
+        } else {
+            self._queue_rq_no_lock(hctx_ptr, bd_ptr, hctx_driver_data_ptr)
+        }
     }
     fn commit_rqs(&self, hctx_ptr: SafePtr, hctx_driver_data_ptr: SafePtr) -> LinuxResult<()> {
-        self.domain
-            .read(|domain| domain.commit_rqs(hctx_ptr, hctx_driver_data_ptr))
+        if self.flag.load(core::sync::atomic::Ordering::Relaxed) {
+            self._commit_rqs_with_lock(hctx_ptr, hctx_driver_data_ptr)
+        } else {
+            self._commit_rqs_no_lock(hctx_ptr, hctx_driver_data_ptr)
+        }
     }
     fn complete_request(&self, rq_ptr: SafePtr) -> LinuxResult<()> {
-        self.domain.read(|domain| domain.complete_request(rq_ptr))
+        if self.flag.load(core::sync::atomic::Ordering::Relaxed) {
+            self._complete_request_with_lock(rq_ptr)
+        } else {
+            self._complete_request_no_lock(rq_ptr)
+        }
     }
     fn exit(&self) -> LinuxResult<()> {
-        self.domain.read(|domain| domain.exit())
+        if self.flag.load(core::sync::atomic::Ordering::Relaxed) {
+            self._exit_with_lock()
+        } else {
+            self._exit_no_lock()
+        }
+    }
+}
+
+impl BlockDeviceDomainProxy {
+    #[inline]
+    fn _domain_id(&self) -> u64 {
+        self.domain.read_directly(|domain| domain.domain_id())
+    }
+    #[inline]
+    fn _domain_id_no_lock(&self) -> u64 {
+        self.counter.get_with(|counter| {
+            *counter += 1;
+        });
+        let r = self._domain_id();
+        self.counter.get_with(|counter| {
+            *counter -= 1;
+        });
+        r
+    }
+    #[inline]
+    fn _domain_id_with_lock(&self) -> u64 {
+        let lock = self.lock.lock();
+        let r = self._domain_id();
+        drop(lock);
+        r
+    }
+    #[inline]
+    fn _tag_set_with_queue_data(&self) -> LinuxResult<(SafePtr, SafePtr)> {
+        self.domain
+            .read_directly(|domain| domain.tag_set_with_queue_data())
+    }
+    #[inline]
+    fn _tag_set_with_queue_data_no_lock(&self) -> LinuxResult<(SafePtr, SafePtr)> {
+        self.counter.get_with(|counter| {
+            *counter += 1;
+        });
+        let r = self._tag_set_with_queue_data();
+        self.counter.get_with(|counter| {
+            *counter -= 1;
+        });
+        r
+    }
+    #[inline]
+    fn _tag_set_with_queue_data_with_lock(&self) -> LinuxResult<(SafePtr, SafePtr)> {
+        let lock = self.lock.lock();
+        let r = self._tag_set_with_queue_data();
+        drop(lock);
+        r
+    }
+    #[inline]
+    fn _set_gen_disk(&self, gen_disk: SafePtr) -> LinuxResult<()> {
+        self.domain
+            .read_directly(|domain| domain.set_gen_disk(gen_disk))
+    }
+    #[inline]
+    fn _set_gen_disk_no_lock(&self, gen_disk: SafePtr) -> LinuxResult<()> {
+        self.counter.get_with(|counter| {
+            *counter += 1;
+        });
+        let r = self._set_gen_disk(gen_disk);
+        self.counter.get_with(|counter| {
+            *counter -= 1;
+        });
+        r
+    }
+    #[inline]
+    fn _set_gen_disk_with_lock(&self, gen_disk: SafePtr) -> LinuxResult<()> {
+        let lock = self.lock.lock();
+        let r = self._set_gen_disk(gen_disk);
+        drop(lock);
+        r
+    }
+
+    #[inline]
+    fn _init_request(
+        &self,
+        tag_set_ptr: SafePtr,
+        rq_ptr: SafePtr,
+        driver_data_ptr: SafePtr,
+    ) -> LinuxResult<()> {
+        self.domain
+            .read_directly(|domain| domain.init_request(tag_set_ptr, rq_ptr, driver_data_ptr))
+    }
+    #[inline]
+    fn _init_request_no_lock(
+        &self,
+        tag_set_ptr: SafePtr,
+        rq_ptr: SafePtr,
+        driver_data_ptr: SafePtr,
+    ) -> LinuxResult<()> {
+        self.counter.get_with(|counter| {
+            *counter += 1;
+        });
+        let r = self._init_request(tag_set_ptr, rq_ptr, driver_data_ptr);
+        self.counter.get_with(|counter| {
+            *counter -= 1;
+        });
+        r
+    }
+    #[inline]
+    fn _init_request_with_lock(
+        &self,
+        tag_set_ptr: SafePtr,
+        rq_ptr: SafePtr,
+        driver_data_ptr: SafePtr,
+    ) -> LinuxResult<()> {
+        let lock = self.lock.lock();
+        let r = self._init_request(tag_set_ptr, rq_ptr, driver_data_ptr);
+        drop(lock);
+        r
+    }
+
+    #[inline]
+    fn _exit_request(&self, tag_set_ptr: SafePtr, rq_ptr: SafePtr) -> LinuxResult<()> {
+        self.domain
+            .read_directly(|domain| domain.exit_request(tag_set_ptr, rq_ptr))
+    }
+    #[inline]
+    fn _exit_request_no_lock(&self, tag_set_ptr: SafePtr, rq_ptr: SafePtr) -> LinuxResult<()> {
+        self.counter.get_with(|counter| {
+            *counter += 1;
+        });
+        let r = self._exit_request(tag_set_ptr, rq_ptr);
+        self.counter.get_with(|counter| {
+            *counter -= 1;
+        });
+        r
+    }
+    #[inline]
+    fn _exit_request_with_lock(&self, tag_set_ptr: SafePtr, rq_ptr: SafePtr) -> LinuxResult<()> {
+        let lock = self.lock.lock();
+        let r = self._exit_request(tag_set_ptr, rq_ptr);
+        drop(lock);
+        r
+    }
+
+    #[inline]
+    fn _init_hctx(
+        &self,
+        hctx_ptr: SafePtr,
+        tag_set_data_ptr: SafePtr,
+        hctx_idx: usize,
+    ) -> LinuxResult<()> {
+        self.domain
+            .read_directly(|domain| domain.init_hctx(hctx_ptr, tag_set_data_ptr, hctx_idx))
+    }
+    #[inline]
+    fn _init_hctx_no_lock(
+        &self,
+        hctx_ptr: SafePtr,
+        tag_set_data_ptr: SafePtr,
+        hctx_idx: usize,
+    ) -> LinuxResult<()> {
+        self.counter.get_with(|counter| {
+            *counter += 1;
+        });
+        let r = self._init_hctx(hctx_ptr, tag_set_data_ptr, hctx_idx);
+        self.counter.get_with(|counter| {
+            *counter -= 1;
+        });
+        r
+    }
+    #[inline]
+    fn _init_hctx_with_lock(
+        &self,
+        hctx_ptr: SafePtr,
+        tag_set_data_ptr: SafePtr,
+        hctx_idx: usize,
+    ) -> LinuxResult<()> {
+        let lock = self.lock.lock();
+        let r = self._init_hctx(hctx_ptr, tag_set_data_ptr, hctx_idx);
+        drop(lock);
+        r
+    }
+    #[inline]
+    fn _exit_hctx(&self, hctx_ptr: SafePtr, hctx_idx: usize) -> LinuxResult<()> {
+        self.domain
+            .read_directly(|domain| domain.exit_hctx(hctx_ptr, hctx_idx))
+    }
+    #[inline]
+    fn _exit_hctx_no_lock(&self, hctx_ptr: SafePtr, hctx_idx: usize) -> LinuxResult<()> {
+        self.counter.get_with(|counter| {
+            *counter += 1;
+        });
+        let r = self._exit_hctx(hctx_ptr, hctx_idx);
+        self.counter.get_with(|counter| {
+            *counter -= 1;
+        });
+        r
+    }
+    #[inline]
+    fn _exit_hctx_with_lock(&self, hctx_ptr: SafePtr, hctx_idx: usize) -> LinuxResult<()> {
+        let lock = self.lock.lock();
+        let r = self._exit_hctx(hctx_ptr, hctx_idx);
+        drop(lock);
+        r
+    }
+    #[inline]
+    fn _queue_rq(
+        &self,
+        hctx_ptr: SafePtr,
+        bd_ptr: SafePtr,
+        hctx_driver_data_ptr: SafePtr,
+    ) -> LinuxResult<()> {
+        self.domain
+            .read_directly(|domain| domain.queue_rq(hctx_ptr, bd_ptr, hctx_driver_data_ptr))
+    }
+    #[inline]
+    fn _queue_rq_no_lock(
+        &self,
+        hctx_ptr: SafePtr,
+        bd_ptr: SafePtr,
+        hctx_driver_data_ptr: SafePtr,
+    ) -> LinuxResult<()> {
+        self.counter.get_with(|counter| {
+            *counter += 1;
+        });
+        let r = self._queue_rq(hctx_ptr, bd_ptr, hctx_driver_data_ptr);
+        self.counter.get_with(|counter| {
+            *counter -= 1;
+        });
+        r
+    }
+    #[inline]
+    fn _queue_rq_with_lock(
+        &self,
+        hctx_ptr: SafePtr,
+        bd_ptr: SafePtr,
+        hctx_driver_data_ptr: SafePtr,
+    ) -> LinuxResult<()> {
+        let lock = self.lock.lock();
+        let r = self._queue_rq(hctx_ptr, bd_ptr, hctx_driver_data_ptr);
+        drop(lock);
+        r
+    }
+
+    #[inline]
+    fn _commit_rqs(&self, hctx_ptr: SafePtr, hctx_driver_data_ptr: SafePtr) -> LinuxResult<()> {
+        self.domain
+            .read_directly(|domain| domain.commit_rqs(hctx_ptr, hctx_driver_data_ptr))
+    }
+    #[inline]
+    fn _commit_rqs_no_lock(
+        &self,
+        hctx_ptr: SafePtr,
+        hctx_driver_data_ptr: SafePtr,
+    ) -> LinuxResult<()> {
+        self.counter.get_with(|counter| {
+            *counter += 1;
+        });
+        let r = self._commit_rqs(hctx_ptr, hctx_driver_data_ptr);
+        self.counter.get_with(|counter| {
+            *counter -= 1;
+        });
+        r
+    }
+    #[inline]
+    fn _commit_rqs_with_lock(
+        &self,
+        hctx_ptr: SafePtr,
+        hctx_driver_data_ptr: SafePtr,
+    ) -> LinuxResult<()> {
+        let lock = self.lock.lock();
+        let r = self._commit_rqs(hctx_ptr, hctx_driver_data_ptr);
+        drop(lock);
+        r
+    }
+    #[inline]
+    fn _complete_request(&self, rq_ptr: SafePtr) -> LinuxResult<()> {
+        self.domain
+            .read_directly(|domain| domain.complete_request(rq_ptr))
+    }
+    #[inline]
+    fn _complete_request_no_lock(&self, rq_ptr: SafePtr) -> LinuxResult<()> {
+        self.counter.get_with(|counter| {
+            *counter += 1;
+        });
+        let r = self._complete_request(rq_ptr);
+        self.counter.get_with(|counter| {
+            *counter -= 1;
+        });
+        r
+    }
+    #[inline]
+    fn _complete_request_with_lock(&self, rq_ptr: SafePtr) -> LinuxResult<()> {
+        let lock = self.lock.lock();
+        let r = self._complete_request(rq_ptr);
+        drop(lock);
+        r
+    }
+    #[inline]
+    fn _exit(&self) -> LinuxResult<()> {
+        self.domain.read_directly(|domain| domain.exit())
+    }
+    #[inline]
+    fn _exit_no_lock(&self) -> LinuxResult<()> {
+        self.counter.get_with(|counter| {
+            *counter += 1;
+        });
+        let r = self._exit();
+        self.counter.get_with(|counter| {
+            *counter -= 1;
+        });
+        r
+    }
+
+    #[inline]
+    fn _exit_with_lock(&self) -> LinuxResult<()> {
+        let lock = self.lock.lock();
+        let r = self._exit();
+        drop(lock);
+        r
     }
 }
 
@@ -144,6 +494,7 @@ impl BlockDeviceDomainProxy {
         let mut loader_guard = self.domain_loader.lock();
         // The writer lock before enable the lock path
         let w_lock = self.lock.lock();
+        let old_id = self.domain_id();
         // enable lock path
         self.flag.store(true, core::sync::atomic::Ordering::Relaxed);
 
@@ -152,7 +503,6 @@ impl BlockDeviceDomainProxy {
             println!("Wait for all reader to finish");
             // yield_now();
         }
-        let old_id = self.domain_id();
         let resource = self.resource.get().unwrap();
         let args = resource.as_ref().downcast_ref::<BlockArgs>().unwrap();
 
@@ -160,7 +510,7 @@ impl BlockDeviceDomainProxy {
         new_domain.init(args).unwrap();
 
         // stage4: swap the domain and change to normal state
-        let old_domain = self.domain.update(new_domain);
+        let old_domain = self.domain.update_directly(new_domain);
 
         // disable lock path
         self.flag

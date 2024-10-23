@@ -40,14 +40,10 @@ impl<T: Operations> GenDisk<T> {
         });
 
         let lock_class_key = crate::sync::LockClassKey::new();
-
-        pr_info!("before __blk_mq_alloc_disk");
         // SAFETY: `tagset.raw_tag_set()` points to a valid and initialized tag set
         let gendisk = from_err_ptr(unsafe {
             bindings::__blk_mq_alloc_disk(tagset.raw_tag_set(), data as _, lock_class_key.as_ptr())
         })?;
-
-        pr_info!("after __blk_mq_alloc_disk");
         const TABLE: bindings::block_device_operations = bindings::block_device_operations {
             submit_bio: None,
             open: None,
@@ -131,10 +127,7 @@ impl<T: Operations> GenDisk<T> {
 impl<T: Operations> Drop for GenDisk<T> {
     fn drop(&mut self) {
         let queue_data = unsafe { (*(*self.gendisk).queue).queuedata };
-
-        pr_info!("before del_gendisk");
         unsafe { bindings::del_gendisk(self.gendisk) };
-        pr_info!("after del_gendisk");
         // SAFETY: `queue.queuedata` was created by `GenDisk::try_new()` with a
         // call to `ForeignOwnable::into_pointer()` to create `queuedata`.
         // `ForeignOwnable::from_foreign()` is only called here.

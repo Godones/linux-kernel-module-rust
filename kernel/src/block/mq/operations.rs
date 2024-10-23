@@ -4,7 +4,7 @@
 //!
 //! C header: [`include/linux/blk-mq.h`](../../include/linux/blk-mq.h)
 
-use core::{marker::PhantomData, sync::atomic::AtomicUsize};
+use core::marker::PhantomData;
 
 use kmacro::vtable;
 
@@ -98,7 +98,7 @@ impl<T: Operations> OperationsVtable<T> {
         hctx: *mut bindings::blk_mq_hw_ctx,
         bd: *const bindings::blk_mq_queue_data,
     ) -> bindings::blk_status_t {
-        pr_info!("queue_rq_callback began");
+        // pr_info!("queue_rq_callback began");
         // SAFETY: `bd` is valid as required by the safety requirement for this function.
         let rq = unsafe { Request::from_ptr((*bd).rq) };
 
@@ -129,7 +129,7 @@ impl<T: Operations> OperationsVtable<T> {
             // SAFETY: `bd` is valid as required by the safety requirement for this function.
             unsafe { (*bd).last },
         );
-        pr_info!("queue_rq_callback ended");
+        // pr_info!("queue_rq_callback ended");
         if let Err(e) = ret {
             e.to_blk_status()
         } else {
@@ -138,7 +138,7 @@ impl<T: Operations> OperationsVtable<T> {
     }
 
     unsafe extern "C" fn commit_rqs_callback(hctx: *mut bindings::blk_mq_hw_ctx) {
-        pr_info!("commit_rqs_callback began");
+        // pr_info!("commit_rqs_callback began");
         let hw_data = unsafe { T::HwData::borrow((*hctx).driver_data) };
 
         // SAFETY: `hctx` is valid as required by this function.
@@ -150,13 +150,13 @@ impl<T: Operations> OperationsVtable<T> {
         // dropped, which happens after we are dropped.
         let queue_data = unsafe { T::QueueData::borrow(queue_data) };
         T::commit_rqs(hw_data, queue_data);
-        pr_info!("commit_rqs_callback ended");
+        // pr_info!("commit_rqs_callback ended");
     }
 
     unsafe extern "C" fn complete_callback(rq: *mut bindings::request) {
-        pr_info!("complete_callback began");
+        // pr_info!("complete_callback began");
         T::complete(unsafe { Request::from_ptr(rq) });
-        pr_info!("complete_callback ended");
+        // pr_info!("complete_callback ended");
     }
 
     unsafe extern "C" fn poll_callback(
@@ -172,14 +172,14 @@ impl<T: Operations> OperationsVtable<T> {
         tagset_data: *mut core::ffi::c_void,
         hctx_idx: core::ffi::c_uint,
     ) -> core::ffi::c_int {
-        pr_info!("init_hctx_callback began, hctx: {:?}", hctx_idx);
+        // pr_info!("init_hctx_callback began, hctx: {:?}", hctx_idx);
         let res = from_result(|| {
             let tagset_data = unsafe { T::TagSetData::borrow(tagset_data) };
             let data = T::init_hctx(tagset_data, hctx_idx)?;
             unsafe { (*hctx).driver_data = data.into_foreign() as _ };
             Ok(0)
         });
-        pr_info!("init_hctx_callback ended");
+        // pr_info!("init_hctx_callback ended");
         res
     }
 
@@ -199,12 +199,12 @@ impl<T: Operations> OperationsVtable<T> {
         _hctx_idx: core::ffi::c_uint,
         _numa_node: core::ffi::c_uint,
     ) -> core::ffi::c_int {
-        static CALL: AtomicUsize = AtomicUsize::new(0);
-        pr_info!(
-            "init_request_callback began, call count: {}, {:p}",
-            CALL.fetch_add(1, core::sync::atomic::Ordering::Relaxed),
-            rq
-        );
+        // static CALL: AtomicUsize = AtomicUsize::new(0);
+        // pr_info!(
+        //     "init_request_callback began, call count: {}, {:p}",
+        //     CALL.fetch_add(1, core::sync::atomic::Ordering::Relaxed),
+        //     rq
+        // );
         let res = from_result(|| {
             // SAFETY: The tagset invariants guarantee that all requests are allocated with extra memory
             // for the request data.
@@ -216,7 +216,7 @@ impl<T: Operations> OperationsVtable<T> {
 
             Ok(0)
         });
-        pr_info!("init_request_callback ended");
+        // pr_info!("init_request_callback ended");
         res
     }
 
@@ -225,7 +225,7 @@ impl<T: Operations> OperationsVtable<T> {
         rq: *mut bindings::request,
         _hctx_idx: core::ffi::c_uint,
     ) {
-        pr_info!("exit_request_callback began, rq: {:p}", rq);
+        // pr_info!("exit_request_callback began, rq: {:p}", rq);
         // SAFETY: The tagset invariants guarantee that all requests are allocated with extra memory
         // for the request data.
         let pdu = unsafe { bindings::blk_mq_rq_to_pdu(rq) } as *mut T::RequestData;
@@ -233,7 +233,7 @@ impl<T: Operations> OperationsVtable<T> {
         // SAFETY: `pdu` is valid for read and write and is properly initialised.
         unsafe { core::ptr::drop_in_place(pdu) };
 
-        pr_info!("exit_request_callback ended");
+        // pr_info!("exit_request_callback ended");
     }
 
     unsafe extern "C" fn map_queues_callback(tag_set_ptr: *mut bindings::blk_mq_tag_set) {

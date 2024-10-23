@@ -85,9 +85,8 @@ impl BlockDeviceShim {
         tagset.driver_data = Box::into_raw(Box::new(tagset_data)) as _;
         tagset.ops = &TAGSET_OPS_TABLE;
 
-        pr_info!("BlockDeviceShim: before blk_mq_alloc_tag_set");
         let ret = unsafe { bindings::blk_mq_alloc_tag_set(tagset_ptr) };
-        pr_info!("BlockDeviceShim: after blk_mq_alloc_tag_set");
+
         if ret < 0 {
             return Err(Error::from_errno(ret));
         }
@@ -122,22 +121,19 @@ impl BlockDeviceShim {
         queue_data: *mut core::ffi::c_void,
     ) -> KernelResult<*mut bindings::gendisk> {
         let lock_class_key = kernel::sync::LockClassKey::new();
-        pr_info!("BlockDeviceShim: before __blk_mq_alloc_disk");
         // SAFETY: `tagset.raw_tag_set()` points to a valid and initialized tag set
         let gendisk = from_err_ptr(unsafe {
             bindings::__blk_mq_alloc_disk(tagset, queue_data as _, lock_class_key.as_ptr())
         })?;
-        pr_info!("BlockDeviceShim: after __blk_mq_alloc_disk");
         Ok(gendisk)
     }
 
     /// Register the block device with the kernel
     fn add_disk(&self) -> KernelResult<()> {
-        pr_info!("BlockDeviceShim: before device_add_disk");
         kernel::error::to_result(unsafe {
             bindings::device_add_disk(core::ptr::null_mut(), self.gendisk, core::ptr::null_mut())
         })?;
-        pr_info!("BlockDeviceShim: after device_add_disk");
+
         Ok(())
     }
 }
@@ -146,15 +142,9 @@ impl Drop for BlockDeviceShim {
     fn drop(&mut self) {
         unsafe {
             // release the domain
-            pr_info!("BlockDeviceShim: before del_gendisk");
             bindings::del_gendisk(self.gendisk);
-            pr_info!("BlockDeviceShim: after del_gendisk");
-
-            pr_info!("BlockDeviceShim: before blk_mq_free_tag_set");
             // SAFETY: `inner` is valid and has been properly initialised during construction.
             bindings::blk_mq_free_tag_set(self.tagset);
-            pr_info!("BlockDeviceShim: after blk_mq_free_tag_set");
-
             let tagset = &mut *self.tagset;
             let tagset_data = Box::from_raw(tagset.driver_data as *mut TagSetData);
             let original_data = tagset_data.original_data;
@@ -207,7 +197,6 @@ mod block_mq_ops {
         hctx: *mut bindings::blk_mq_hw_ctx,
         bd: *const bindings::blk_mq_queue_data,
     ) -> bindings::blk_status_t {
-        // pr_info!("BlockDeviceShim: queue_rq_callback began");
         let driver_data = unsafe { HctxData::from_raw((*hctx).driver_data) };
         let domain = driver_data.domain();
         let original_data = driver_data.original_data;
@@ -216,7 +205,6 @@ mod block_mq_ops {
             SafePtr::new(bd as _),
             SafePtr::new(original_data),
         );
-        // pr_info!("BlockDeviceShim: queue_rq_callback ended");
         match result {
             Ok(()) => bindings::BLK_STS_OK as _,
             Err(e) => Error::from_errno(e as i32).to_blk_status(),
@@ -224,20 +212,16 @@ mod block_mq_ops {
     }
 
     pub unsafe extern "C" fn commit_rqs_callback(hctx: *mut bindings::blk_mq_hw_ctx) {
-        // pr_info!("BlockDeviceShim: commit_rqs_callback began");
         let driver_data = unsafe { HctxData::from_raw((*hctx).driver_data) };
         let domain = driver_data.domain();
         let original_data = driver_data.original_data;
         let _res = domain.commit_rqs(SafePtr::new(hctx as _), SafePtr::new(original_data));
-        // pr_info!("BlockDeviceShim: commit_rqs_callback ended");
     }
     pub unsafe extern "C" fn complete_callback(rq: *mut bindings::request) {
-        // pr_info!("BlockDeviceShim: complete_callback began");
         let hctx = (*rq).mq_hctx;
         let driver_data = unsafe { HctxData::from_raw((*hctx).driver_data) };
         let domain = driver_data.domain();
         let _res = domain.complete_request(SafePtr::new(rq as _));
-        // pr_info!("BlockDeviceShim: complete_callback ended");
     }
 
     pub unsafe extern "C" fn init_hctx_callback(
@@ -245,10 +229,6 @@ mod block_mq_ops {
         tagset_data: *mut core::ffi::c_void,
         hctx_idx: core::ffi::c_uint,
     ) -> core::ffi::c_int {
-        // pr_info!(
-        //     "BlockDeviceShim: init_hctx_callback began, hctx: {:?}",
-        //     hctx_idx
-        // );
         let driver_data = unsafe { TagSetData::from_raw(tagset_data) };
         let domain = driver_data.domain();
         let original_data = driver_data.original_data;
@@ -257,7 +237,6 @@ mod block_mq_ops {
             SafePtr::new(original_data),
             hctx_idx as usize,
         );
-        // pr_info!("BlockDeviceShim: init_hctx_callback ended");
         match result {
             Ok(()) => {
                 // update hctx driver data
@@ -278,10 +257,6 @@ mod block_mq_ops {
         hctx: *mut bindings::blk_mq_hw_ctx,
         hctx_idx: core::ffi::c_uint,
     ) {
-        // pr_info!(
-        //     "BlockDeviceShim: exit_hctx_callback began, hctx: {:?}",
-        //     hctx_idx
-        // );
         let (driver_data, hctx_mut) = unsafe {
             (
                 Box::from_raw((*hctx).driver_data as *mut HctxData),
@@ -293,7 +268,6 @@ mod block_mq_ops {
         // restore original data
         hctx_mut.driver_data = original_data;
         let _res = domain.exit_hctx(SafePtr::new(hctx as _), hctx_idx as usize);
-        // pr_info!("BlockDeviceShim: exit_hctx_callback ended");
     }
 
     pub unsafe extern "C" fn init_request_callback(
@@ -302,12 +276,6 @@ mod block_mq_ops {
         _hctx_idx: core::ffi::c_uint,
         _numa_node: core::ffi::c_uint,
     ) -> core::ffi::c_int {
-        // static CALL: AtomicUsize = AtomicUsize::new(0);
-        // pr_info!(
-        //     "BlockDeviceShim: init_request_callback began, call count: {}, {:p}",
-        //     CALL.fetch_add(1, core::sync::atomic::Ordering::Relaxed),
-        //     rq
-        // );
         let driver_data = unsafe { TagSetData::from_raw((*set).driver_data) };
         let domain = driver_data.domain();
         let result = domain.init_request(
@@ -315,7 +283,6 @@ mod block_mq_ops {
             SafePtr::new(rq as _),
             SafePtr::new(driver_data.original_data),
         );
-        // pr_info!("BlockDeviceShim: init_request_callback ended");
         match result {
             Ok(()) => 0,
             Err(e) => e as i32,
@@ -326,11 +293,9 @@ mod block_mq_ops {
         rq: *mut bindings::request,
         _hctx_idx: core::ffi::c_uint,
     ) {
-        // pr_info!("BlockDeviceShim: exit_request_callback began, rq: {:p}", rq);
         let driver_data = unsafe { TagSetData::from_raw((*set).driver_data) };
         let domain = driver_data.domain();
         let _res = domain.exit_request(SafePtr::new(set as _), SafePtr::new(rq as _));
-        // pr_info!("BlockDeviceShim: exit_request_callback ended");
     }
 
     pub unsafe extern "C" fn map_queues_callback(_tag_set_ptr: *mut bindings::blk_mq_tag_set) {}

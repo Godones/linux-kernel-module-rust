@@ -5,7 +5,7 @@ use corelib::{LinuxError, LinuxResult};
 use interface::{empty_device::EmptyDeviceDomain, Basic};
 use kernel::{
     init::InPlaceInit,
-    sync::{LongLongPerCpu, Mutex, RcuData},
+    sync::{LongLongPerCpu, Mutex, SRcuData},
 };
 use rref::{RRefVec, SharedData};
 
@@ -17,7 +17,7 @@ use crate::{
 
 #[derive(Debug)]
 pub struct EmptyDeviceDomainProxy {
-    domain: RcuData<Box<dyn EmptyDeviceDomain>>,
+    domain: SRcuData<Box<dyn EmptyDeviceDomain>>,
     lock: Pin<Box<Mutex<()>>>,
     domain_loader: Pin<Box<Mutex<DomainLoader>>>,
     flag: AtomicBool,
@@ -27,7 +27,7 @@ pub struct EmptyDeviceDomainProxy {
 impl EmptyDeviceDomainProxy {
     pub fn new(domain: Box<dyn EmptyDeviceDomain>, domain_loader: DomainLoader) -> Self {
         EmptyDeviceDomainProxy {
-            domain: RcuData::new(domain),
+            domain: SRcuData::new(domain),
             lock: Box::pin_init(new_mutex!(())).unwrap(),
             domain_loader: Box::pin_init(new_mutex!(domain_loader)).unwrap(),
             flag: AtomicBool::new(false),
@@ -57,13 +57,17 @@ impl ProxyBuilder for EmptyDeviceDomainProxy {
 
 impl Basic for EmptyDeviceDomainProxy {
     fn domain_id(&self) -> u64 {
-        self.domain.read(|domain| domain.domain_id())
+        if self.flag.load(core::sync::atomic::Ordering::Relaxed) {
+            self._domain_id_with_lock()
+        } else {
+            self._domain_id_no_lock()
+        }
     }
 }
 
 impl EmptyDeviceDomain for EmptyDeviceDomainProxy {
     fn init(&self) -> LinuxResult<()> {
-        self.domain.read(|domain| domain.init())
+        self.domain.read_directly(|domain| domain.init())
     }
 
     fn read(&self, data: RRefVec<u8>) -> LinuxResult<RRefVec<u8>> {
@@ -84,8 +88,30 @@ impl EmptyDeviceDomain for EmptyDeviceDomainProxy {
 }
 
 impl EmptyDeviceDomainProxy {
+    fn _domain_id(&self) -> u64 {
+        self.domain.read_directly(|domain| domain.domain_id())
+    }
+
+    fn _domain_id_no_lock(&self) -> u64 {
+        self.counter.get_with(|counter| {
+            *counter += 1;
+        });
+        let r = self._domain_id();
+        self.counter.get_with(|counter| {
+            *counter -= 1;
+        });
+        r
+    }
+
+    fn _domain_id_with_lock(&self) -> u64 {
+        let lock = self.lock.lock();
+        let r = self._domain_id();
+        drop(lock);
+        r
+    }
+
     fn _read(&self, data: RRefVec<u8>) -> LinuxResult<RRefVec<u8>> {
-        let (res, old_id) = self.domain.read(|domain| {
+        let (res, old_id) = self.domain.read_directly(|domain| {
             let id = domain.domain_id();
             let old_id = data.move_to(id);
             let r = domain.read(data);
@@ -98,7 +124,7 @@ impl EmptyDeviceDomainProxy {
     }
 
     fn _write(&self, data: &RRefVec<u8>) -> LinuxResult<usize> {
-        self.domain.read(|domain| domain.write(data))
+        self.domain.read_directly(|domain| domain.write(data))
     }
 
     fn _read_no_lock(&self, data: RRefVec<u8>) -> LinuxResult<RRefVec<u8>> {
@@ -144,9 +170,11 @@ impl EmptyDeviceDomainProxy {
         new_domain: Box<dyn EmptyDeviceDomain>,
         domain_loader: DomainLoader,
     ) -> LinuxResult<()> {
+        println!("EmptyDeviceDomainProxy replace");
         let mut loader_guard = self.domain_loader.lock();
         // The writer lock before enable the lock path
         let w_lock = self.lock.lock();
+        let old_id = self.domain_id();
         // enable lock path
         self.flag.store(true, core::sync::atomic::Ordering::Relaxed);
 
@@ -155,13 +183,12 @@ impl EmptyDeviceDomainProxy {
             println!("Wait for all reader to finish");
             // yield_now();
         }
-        let old_id = self.domain_id();
 
         let new_domain_id = new_domain.domain_id();
         new_domain.init().unwrap();
 
         // stage4: swap the domain and change to normal state
-        let old_domain = self.domain.update(new_domain);
+        let old_domain = self.domain.update_directly(new_domain);
 
         // disable lock path
         self.flag

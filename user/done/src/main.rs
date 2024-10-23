@@ -49,35 +49,28 @@ fn run_log_domain_test() {
 
     let mut handlers = vec![];
 
-    // Retrieve the IDs of all active CPU cores.
-    let core_ids = core_affinity::get_core_ids().unwrap();
-    // Create a thread for each active CPU core.
-    for id in core_ids.into_iter() {
-        if id.id < THREAD_NUM {
-            let file = file.clone();
-            let thread = std::thread::spawn(move || {
-                let start = std::time::Instant::now();
-                // Pin this thread to a single CPU core.
-                let res = core_affinity::set_for_current(id);
-                if res {
-                    println!("Thread {} is running on core {}", id.id, id.id);
-                    loop {
-                        let mut file = file.lock();
-                        let r = file.write(format!("I'm Thread {}", id.id).as_bytes());
-                        println!("Thread {} write to file: {:?}", id.id, r);
-                        let now = std::time::Instant::now();
-                        // 75
-                        if now.duration_since(start) > Duration::from_millis(200) {
-                            println!("Thread {} is done", id.id);
-                            break;
-                        }
-                        // sleep(Duration::from_millis(5));
-                    }
+    for id in 0..THREAD_NUM {
+        let file = file.clone();
+        let thread = std::thread::spawn(move || {
+            let start = std::time::Instant::now();
+            println!("Thread {} is running", id);
+            loop {
+                let mut file = file.lock();
+                let r = file.write(format!("I'm Thread {}", id).as_bytes());
+                drop(file);
+                println!("Thread {} write to file: {:?}", id, r);
+                let now = std::time::Instant::now();
+                // 75
+                if now.duration_since(start) > Duration::from_millis(100) {
+                    println!("Thread {} is done", id);
+                    break;
                 }
-            });
-            handlers.push(thread);
-        }
+                // sleep(Duration::from_millis(5));
+            }
+        });
+        handlers.push(thread);
     }
+
     let updater = std::thread::spawn(move || {
         sleep(Duration::from_millis(10));
         update_to_new();

@@ -26,7 +26,7 @@ make LLVM=1 rustavailable		# 验证如上依赖安装无误，输出“Rust is a
 # for amd64
 make LLVM=1 menuconfig
 	# Kernel hacking -> Sample kernel code -> Rust samples 选择一些模块
-make LLVM=1 -j
+make LLVM=1 -j32
 
 # for aarch64
 make ARCH=arm64 CLANG_TRIPLE=aarch64_linux_gnu LLVM=1 menuconfig
@@ -606,6 +606,374 @@ void execmem_free(void *ptr);
 | 6.8(本机linux环境) | :heavy_multiplication_x: |    :heavy_check_mark:    | :heavy_multiplication_x: |
 | 6.10(主线RFL环境)  | :heavy_multiplication_x: | :heavy_multiplication_x: |    :heavy_check_mark:    |
 
+#### 6.1版本实现
+
+6.1版本上，阅读内核模块的加载过程，其主要流程如下：
+
+1. 通过`module_alloc` 为内核模块分配一段连续的虚拟地址空间
+2. 将各个段加载到内核地址空间
+3. 通过`set_memory_x` 将代码段的区间设置为可执行属性
+
+
+
+在实现过程中发现，对于`module_alloc` `module_memfree` `set_memory_x` 等函数，内核已经不再导出这些符号，这意味着无法直接在内核模块中使用，为了解决这个问题，需要一些hack。
+
+1. 在编译模块前在内核的符号表中动态查找这几个函数的地址，生成配置文件。由于内核启动后这些地址不会改变，只要在运行前查找到此符号即可
+2. 模块使用这些地址转为对应的函数(确保函数定义相同)，并调用
+
+域的私有堆使用两级分配器进行管理，因此tcb模块中需要进行页的分配，这可以使用`vzalloc` 进行分配。
+
+原有的Alien中的域加载过程和在Linux中的相同，为了简化后续的移植，将`loader` 作为一个domain-lib独立出去，同时通过接口完成对外依赖。
+
+由于在linux中目前还无法直接获取域的文件，因此通过直接包含到模块二进制的方式实现。通过简单的尝试，已经可以加载域并且调用域的功能了。
+
+```
+81.450101] [LKM] [ INFO] [tcb::domain_loader::creator] Load LogDomain domain, size: 45KB
+[17481.450104] [LKM] [ INFO] [loader] copy data to 0x0-0x4000
+[17481.450104] [LKM] [ INFO] [loader] copy data to 0x4000-0x5000
+[17481.450105] [LKM] [ INFO] [loader] copy data to 0x5000-0x6000
+[17481.450105] [LKM] [ INFO] [loader] copy data to 0x6000-0x6a68
+[17481.450106] [LKM] [ INFO] [loader] copy data to 0x7000-0x70c0
+[17481.450106] [LKM] [ INFO] [loader] copy data to 0x8000-0x9000
+[17481.450106] [LKM] [ INFO] [loader] copy data to 0x9000-0xa01c
+[17481.450224] [LKM] [ INFO] [loader] set_memory_x range: 0xffffffffc0756000-0xffffffffc075a000
+[17481.450224] [LKM] [ INFO] [loader] entry: 0xffffffffc0756150
+[17481.450225] [LKM] create domain database for domain_id: 1
+[17481.450233] [0][Domain:1] Logger init
+[17481.450234] [LKM] [ERROR] [tcb::domain_helper::sheap] <SharedHeap> alloc size: 18, ptr: 0xffff9c9e8178b7a0
+[17481.450610] [0][Domain:1] [ERROR] print using logger
+[17481.450611] [LKM] free_domain_resource for domain_id: 1
+[17481.450612] [LKM] domain_id: 0, count: 1
+[17481.450612] [LKM] <checkout_shared_data> shared heap size: 1
+[17481.450612] [LKM] <free_domain_shared_data> shared heap size: 1
+[17481.450613] [LKM] <free_domain_shared_data> for domain_id: 1
+[17481.450613] [LKM] domain has 0 data
+[17481.450613] [LKM] free_shared is Free, free 0 data
+[17481.450614] [LKM] [Domain: 1] free DomainDataMap resource
+[17481.450845] [LKM] [ WARN] [rref::rvec] <drop> for RRefVec
+[17481.450845] [LKM] [ WARN] [rref::rref] <drop> for RRef 0xffff9c9e8178b7a0
+[17481.450846] [LKM] [ WARN] [rref::rref] <custom_drop> for RRef 0xffff9c9e8178b7a0
+[17481.450846] [LKM] [ WARN] [rref] default for u8
+[17481.450847] [LKM] [ERROR] [tcb::domain_helper::sheap] <SharedHeap> dealloc: 0xffff9c9e8178b7a0
+[17481.451171] [LKM] [ INFO] [loader] drop domain loader [logger]
+[17481.451179] [LKM] Dropping VirtArea: ffffffffc0756000
+[17481.451179] [LKM] [ INFO] [loader] drop domain loader [gnull]
+[17481.451180] [LKM] Dropping VirtArea: ffffffffc0752000
+[17485.859590] [LKM] My message is on the heap!
+[17485.859593] [LKM] Goodbye kernel module!
+```
+
+## 实现
+
+这部分描述引入域的支持的实现。
+
+### 6.6版本支持
+
+在完成6.1版本的移植后，域的基本支持已经具备了。但后期我们需要将已有的Rust实现的驱动改造成域的形式，而这些驱动在RFL的仓库中，需要一些较高的linux版本。因为null block device的驱动比较时候改造和测试，这里也是选择了其支持的较早的版本。
+
+6.1版本到6.6版本的改动并不是很大，只需要调整一些内核接口变化即可。
+
+因为null block device 使用了大量RFL仓库的实现，因此这里也是把之前使用的项目和RFL仓库的代码进行了合并。
+
+### 内核同步原语
+
+#### per-cpu变量和RCU
+
+[Linux driver example for Per CPU Variable](https://embeddedguruji.blogspot.com/2019/05/linux-driver-example-for-per-cpu.html)
+
+[KernelPerCPUVariable](https://github.com/ANSANJAY/KernelPerCPUVariable)
+
+linux提供了分配和访问per-cpu变量的接口，我们只需要对这些接口进行封装并提供给Rust使用，但需要注意的是，C接口是一个宏，它需要传入变量的类型，这无法通过FFI完成，因此我们特化了longlong 的实现，对应到Rust的u64，因为per-cpu变量被我们后续用做计数器。
+
+```rust
+#[link_name = "rust_helper_num_online_cpus"]
+pub(crate) fn num_online_cpus() -> core::ffi::c_uint;
+#[link_name = "rust_helper_alloc_percpu_longlong"]
+pub(crate) fn alloc_percpu_longlong() -> *mut core::ffi::c_longlong;
+#[link_name = "rust_helper_free_percpu_longlong"]
+pub(crate) fn free_percpu_longlong(p: *mut core::ffi::c_longlong);
+#[link_name = "rust_helper_get_cpu"]
+pub(crate) fn get_cpu() -> core::ffi::c_int;
+#[link_name = "rust_helper_put_cpu"]
+pub(crate) fn put_cpu();
+```
+
+在无状态域的热升级中，我们使用RCU方法。我们也不需要重新实现RCU，与Per-cpu变量类似，RCU的接口也是一些宏，需要做额外的处理。
+
+```c
+struct rcudata {
+    void *a;
+};
+void * rust_helper_rcu_dereference(struct rcudata *p) { return rcu_dereference(p->a); }
+void rust_helper_rcu_assign_pointer(struct rcudata *p, void *v) { rcu_assign_pointer(p->a, v); }
+```
+
+在封装C接口时，我们需要用一个结构体包裹真正的数据，否则在RCU宏展开后，其赋值会作用在临时变量上。
+
+#### 互斥锁/自旋锁
+
+在有状态域的实现中，需要用锁来保证域更新期间只有更新者进入。我们利用自旋锁来完成这个工作，这两个锁的实现在RFL项目中已经包含，因此我们可以直接使用。但要注意，这里使用了自引用数据结构，需要Pin数据结构来做保证。
+
+### 域的热更新实现
+
+这部分的实现在第二层域代理中实现，与在Alien中的实现说类似的，只是把对应的数据结构换成了linux的。当前我们只实现了两个简单的域来做演示，一个是`LogDomain`, 另一个是`EmptyDeviceDomain`, 我们把`LogDomain`视为无状态域，`EmptyDeviceDomain`作为有状态域来检查域更新机制实现的正确性。
+
+### 测试域功能
+
+当前我们实现的两个域并不包含什么实际功能，想要应用程序使用到域的功能，一个做法是增加新的系统调用，通过系统调用访问域的功能，但是在内核模块中增加系统调用已经无法实施，这里我们选择另一个做法来测试域的功能。通过内核模块，我们创建两个虚拟的文件，并在文件的读写回调函数中调用域的功能。在用户态，通过读写这两个虚拟文件，就可以触发对域功能的访问，进而可以对域的热更新机制进行测试。
+
+**向内核添加系统调用**
+
+https://chenhaotian.top/linux/linux-kernel-add-syscall/index.html
+
+https://www.cnblogs.com/wangzahngjun/p/4992045.html
+
+[Linux 系统调用（二）——使用内核模块添加系统调用（无需编译内核）](https://blog.csdn.net/qq_34258344/article/details/103228607)
+
+[[Hooking syscall by modifying sys_call_table does not work](https://stackoverflow.com/questions/78599971/hooking-syscall-by-modifying-sys-call-table-does-not-work)](https://stackoverflow.com/questions/78599971/hooking-syscall-by-modifying-sys-call-table-does-not-work)
+
+
+
+## 驱动移植
+
+### 如何对接linux的接口和域的接口
+
+在Linux中，内核可加载模块的常用做法是通过向内核注入相关设备驱动程序或者文件系统的回调函数来实现扩展内核的功能。同时，这些模块可以使用内核导出的符号，向内核申请资源或者释放资源。内核模块的加载由相关的系统调用完成，加载程序通过调用LKM定义的`init`函数， 而LKM在`init`函数中向内核注册功能，在模块卸载时，通过调用LKM的`exit`把之前LKM注册的功能删除。
+
+为了将一个LKM改造成域的实现，需要对LKM与内核的交互方式进行分析。首先，一个域是只依赖domain-lib或者其它域的以及其它不包含unsafe代码的依赖。在Alien中，一个最小的mini-core作为TCB提供最核心的功能，而domain-lib通过对TCB提供的功能完成所有unsafe代码的封装和检查(Page,TaskContext)，因此系统中的unsafe代码只会来自TCB和domain-lib。
+
+当将域的设计应用到Linux kernel时，因为整个kernel是作为一个整体存在的，并不存在类似Alien中的mini-core。当前在kernel中使用Rust重写模块处在初步阶段，我们也无法做到脱离kernel的C代码。为此，我们需要把kernel整体作为一个TCB来看待。此时kernel导出的符号就等价于TCB提供的核心功能。
+
+> 此时我们把kernel当作可信基，意味着我们相信kernel提供的功能
+
+在domain-lib中，我们会把这些接口进行安全封装，将像当前RFL项目所做的那样。
+
+这里存在两个问题：
+
+1. 许多接口用于向kernel申请和释放资源(除了堆之外的资源)
+2. 扩展内核功能是通过注册回调函数来完成的
+
+在Alien中，TCB提供的资源是用于构建私有堆的物理页，这些资源可以在域被卸载时安全地释放掉。当Linux kernel成为TCB，其还提供了许多系统资源，这些系统资源需要手动地进行回收，这意味着如果域使用了这些资源，那当域卸载时，并不是简单地就能把域的资源全部回收掉。
+
+如果域也通过注册回调函数来扩展kernel的功能，那么当域被卸载时，这些回调函数也需要被正确地删除。在Alien中，整个系统被划分为多个域，这些域并不是向其它域注入回调函数来扩展域的功能的。同时如果域使用注册回调函数的话，那域的接口就被简化了，因为这个时候Linux kernel不是通过调用域的接口完成功能而是域内部的回调函数。这种方法会导致无法对域进行热更新操作，因为调用域提供的功能时并不是从域的接口进入，域代理无法感知域是否正在被使用，就不能正确同步。
+
+解决第一个问题的方法是在域接口上增加一个`exit` ，在域被替换回收资源时调用。因为domain-lib对kernel资源已经做了抽象，域内部只需要调用`Drop`就能释放这些资源。
+
+> 通过逐渐将更多kernel中的功能变成域实现，我们可以逐步过渡到更好的实现上
+
+为了解决第二个问题，我们需要禁止域去注册回调函数，而是**通过创建内核功能到域功能的中介来间接地使用域功能**，但是这种方式需要对内核的功能逐个做封装，并且需要仔细设计域的接口形式。在域的接口上，我们只能使用`RRef<T>` 相应的共享堆上的数据结构来进行通信，而内核中的大多数数据结构包含了裸指针，因此它们之间的对应关系也需要进行转换。
+
+到现在为止，可以看到这些域的实现和当前用Rust实现的内核模块是很相似的，但它们又存在一些区别:
+
+|          | LKM                                                 | Domain                                  |
+| -------- | --------------------------------------------------- | --------------------------------------- |
+| 编译运行 | 独立编译，kernel对其引用的符号进行重定位处理        | 独立编译，不需要对符号重定位处理(trait) |
+| 内核资源 | 手动分配，手动回收                                  | 自动分配回收和释放(资源抽象/Drop)       |
+| 热更新   | 不支持，kernel没有提供相关的状态管理和同步措施      | 支持                                    |
+| safe     | 不强制safe code实现， LKM之间没有界限(符号互相引用) | 强制safe code实现， 域之间通过接口      |
+
+原理上来说，Linux的内核模块在C语言也可以实现域的所有性质，但一些语言特性可能无法达到。
+
+**接口限定**
+
+把LKM使用的所有kernel导出的符号集中在一个结构体中 等价于 kernel作为TCB提供功能(trait)，这样可以限定LKM所能使用的kernel接口，使得LKM不会访问kernel的任意函数。
+
+> 在C语言需要额外的工具进行检查，因为C语言不限制对指针的任意转换。而当使用safe的Rust语言实现的时候，在编译时就可以阻止这种行为
+
+可以将LKM提供的接口集中在一个结构体中，等价于域的接口。这样不管是kernel使用LKM还是其它LKM依赖都可以明确LKM提供的功能。
+
+> 在当前的kernel形态下，这就需要在LKM提供的接口和内核回调函数之间实现中介层
+
+**私有堆/共享堆/自定义堆**
+
+LKM也可以应用私有堆和共享堆，这个是显然的。但应用共享堆的前提是LKM实现了功能限定。
+
+> LKM需要工具检查是否违反规定。Rust可以在语言层面定义规则
+
+**内存隔离**
+
+有了上述两个性质还不够使得使用C实现的LKM就具备了域的隔离性质，因为在实现域时还有一个重要的保证是域只能使用安全的Rust实现(内存安全)。在C中，需要使用工具检查这个性质
+
+**故障隔离**
+
+C代码中不提供unwind的支持，无法使用语言方法来进行故障隔离。
+
+**热升级**
+
+通过为LKM提供状态保存恢复和域更新同步机制，LKM也可以实现热升级。
+
+
+
+### null block device 改造
+
+通过将已有的null block device驱动改造为域实现，可以对比C实现/非域Rust实现/域实现之间的性能差距。同时测试故障恢复与热更新的影响。
+
+在块设备驱动中，核心的有两个数据结构:
+
+```rust
+/// A wrapper for the C `struct blk_mq_tag_set`
+pub struct TagSet<T: Operations> {
+    inner: UnsafeCell<bindings::blk_mq_tag_set>,
+    _p: PhantomData<T>,
+}
+```
+
+```rust
+/// A generic block device
+pub struct GenDisk<T: Operations> {
+    _tagset: Arc<TagSet<T>>,
+    gendisk: *mut bindings::gendisk,
+}
+```
+
+其中`TagSet` 是注册回调函数的结构体，在它的初始化过程中，会初始化一些参数，并向kernel分配数据结构:
+
+```rust
+inner.ops = unsafe { OperationsVtable::<T>::build() };
+inner.nr_hw_queues = nr_hw_queues;
+inner.timeout = 0; // 0 means default which is 30 * HZ in C
+inner.numa_node = bindings::NUMA_NO_NODE;
+inner.queue_depth = num_tags;
+inner.cmd_size = core::mem::size_of::<T::RequestData>().try_into()?;
+inner.flags = bindings::BLK_MQ_F_SHOULD_MERGE;
+inner.driver_data = tagset_data.into_foreign() as _;
+inner.nr_maps = num_maps;
+
+// SAFETY: `inner` points to valid and initialised memory.
+let ret = unsafe { bindings::blk_mq_alloc_tag_set(inner) };
+```
+
+这些过程应该由驱动内部实现，中间对象不需要再重复。
+
+`TagSet`会 构建`blk_mq_ops`, 这是回调函数的来源，中间对象需要处理这些对象。
+
+```rust
+ const VTABLE: bindings::blk_mq_ops = bindings::blk_mq_ops {
+    queue_rq: Some(Self::queue_rq_callback),
+    queue_rqs: None,
+    commit_rqs: Some(Self::commit_rqs_callback),
+    get_budget: None,
+    put_budget: None,
+    set_rq_budget_token: None,
+    get_rq_budget_token: None,
+    timeout: None,
+    poll: if T::HAS_POLL {
+        Some(Self::poll_callback)
+    } else {
+        None
+    },
+    complete: Some(Self::complete_callback),
+    init_hctx: Some(Self::init_hctx_callback),
+    exit_hctx: Some(Self::exit_hctx_callback),
+    init_request: Some(Self::init_request_callback),
+    exit_request: Some(Self::exit_request_callback),
+    cleanup_rq: None,
+    busy: None,
+    map_queues: if T::HAS_MAP_QUEUES {
+        Some(Self::map_queues_callback)
+    } else {
+        None
+    },
+    show_rq: None,
+};
+```
+
+这些回调函数的签名基本都是裸指针:
+
+```rust
+unsafe extern "C" fn queue_rq_callback(
+        hctx: *mut bindings::blk_mq_hw_ctx,
+        bd: *const bindings::blk_mq_queue_data,
+    ) -> bindings::blk_status_t;
+unsafe extern "C" fn commit_rqs_callback(hctx: *mut bindings::blk_mq_hw_ctx);
+unsafe extern "C" fn complete_callback(rq: *mut bindings::request);
+unsafe extern "C" fn poll_callback(
+    hctx: *mut bindings::blk_mq_hw_ctx,
+    _iob: *mut bindings::io_comp_batch,
+) -> core::ffi::c_int 
+```
+
+也就是说，在kernel调用这些回调函数时，应该从域的接口处进入，所有域的接口需要被设计为传递这些参数：
+
+- 依然保持驱动域分配和初始化`TagSet<T>` 和 `GenDisk<T>` 结构，除了两个结构里面的回调函数(以及可能的kernel资源)
+
+> 在域接口上不允许使用裸指针，所以改为返回指针的值，因为只有TCB理解这个值的含义，对于其它域来说，这个值是无意义的
+
+- 域需要实现回调函数规定的功能
+- kernel将指针转换为原始结构，并使用中介对象将域接口转为回调函数
+
+ <font color = red>**注意**</font>
+
+在`TagSet<T>` 这个初始化过程中，需要先填充`ops`才能调用`blk_mq_alloc_tag_set`去分配相应的硬件队列，以及软件队列，因为kernel在分配这些队列的时候，又会通过其中一些回调函数让驱动完成一些工作。所以在驱动侧不应该去分配硬件队列，应该由中间对象来进行分配。
+
+在`blk_mq_alloc_tag_set`期间，kernel会调用`init_request_callback` 回调函数初始化对应数量的`Request`
+
+```
+[39658.998522] rust_kernel: before __blk_mq_alloc_disk
+[39658.998537] rust_kernel: init_hctx_callback began, hctx: 0
+[39658.998538] rust_kernel: init_hctx_callback ended
+[39658.998539] rust_kernel: init_request_callback began, call count: 256, 0xffff8f4b71c10600
+[39658.998539] rust_kernel: init_request_callback ended
+[39658.998579] rust_kernel: after __blk_mq_alloc_disk
+```
+
+在`__blk_mq_alloc_disk`期间，kernel会调用`init_hctx_callback` 初始化硬件队列，并且初始一个特殊的`request`。
+
+在`device_add_disk` 期间,kernel会调用`init_request_callback` 初始化另外的对应数量的`Request`
+
+在`TagSet<T>` 和 `GenDisk<T>` 释放期间，会执行相反的过程回收这些资源。
+
+kernel对驱动域的调用过程:
+
+1. 创建和初始化域
+   1. 域创建`TagSet<T> ` ,`GenDisk<T>`数据结构，但只是填充初始的配置信息，不调用`blk_mq_alloc_tag_set` ，而是让kernel分配数据
+2. shim对象从域获取tagset的指针`domain.tag_set_with_queue_data()`, 创建tagset的ops，并重定向到域的实现
+3. shim对象调用`blk_mq_alloc_tag_set` 根据tagset分配`Request` ，如果失败，则让驱动域回收资源
+4. shim对象从驱动域拿到queue_data的指针，与tagset的指针一起分配gendisk结构。如果失败，则驱动域回收资源。如果成功，shim对象得到gendisk指针
+5. shim对象设置驱动域的gendisk指针，(`domain.set_gen_disk()`), 驱动域紧接着设置相应的配置信息
+6. shim对象调用 `device_add_disk(gen_disk)`  向内核注册该设备，kernel在此期间再一次调用回调函数(gen_disk->tagset->ops)分配`Request`
+7. 运行期间对gendisk和tagset的回调全部被重定向到域接口上
+8. 当域被卸载，shim对象调用`del_gendisk(gen_disk)` 释放gen_disk数据(Request)，调用`blk_mq_free_tag_set` 释放释放tagset数据(Request), kernel在此期间再一次调用回调函数(已经被重定向到域接口上)
+9. shim对象让域释放从kernel拿到的资源`domain.exit()`, 释放域占用的资源
+
+
+
+
+
+
+
+https://linux-kernel-labs-zh.xyz/labs/block_device_drivers.html
+
+
+
+
+
+### 文件系统
+
+tarfs/ext2
+
+```
+创建空的磁盘镜像文件
+dd if=/dev/zero of=ext_image bs=1M count=512
+使用 losetup将磁盘镜像文件虚拟成块设备
+sudo losetup /dev/loop1 ./ext_image
+卸载
+sudo umount
+sudo losetup -d /dev/loop1
+```
+
+
+
+https://www.cnblogs.com/wuchanming/p/4690474.html
+
+https://linux-kernel-labs.github.io/refs/heads/master/labs/filesystems_part1.html
+
+## 性能测试
+
+
+
+
+
 
 
 ## Reference
@@ -620,4 +988,31 @@ https://www.zhaixue.cc/kernel/kernel-module_sysmvers.html
 
 [学习使用 vmalloc 系列应用编程接口](https://github.com/apachecn/apachecn-linux-zh/blob/master/docs/linux-kernel-prog/09.md#%E5%AD%A6%E4%B9%A0%E4%BD%BF%E7%94%A8-vmalloc-%E7%B3%BB%E5%88%97%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B%E6%8E%A5%E5%8F%A3)
 
-[[内核模块加载流程图 ](https://www.cnblogs.com/pengdonglin137/p/17822352.html)](https://www.cnblogs.com/pengdonglin137/p/17822352.html)
+[内核模块加载流程图](https://www.cnblogs.com/pengdonglin137/p/17822352.html)
+
+[WSL升级内核版本](https://blog.csdn.net/fengshantao/article/details/139511245)
+
+[通过内核符号地址调用未导出的函数](https://heapdump.cn/article/1569179)
+
+[linux内存分配接口](https://juejin.cn/post/7369488229336170505#heading-61)
+
+
+
+[Linux Kernel Rust Modules](https://tomcat0x42.me/linux/rust/2023/04/07/linux-kernel-rust-modules.html)
+
+[Rust Kernel Programming](https://coderjoshdk.github.io/posts/Rust-Kernel-Programming.html#Everything_you_might_need) Rust for linux 案例
+
+[查找rust支持需要的配置 ](https://codentium.com/building-a-linux-kernel-with-rust-support-on-gentoo/) 自定义内核编译选项
+
+修改wsl2内核 https://enita.cn/2023/0731/bcd47a5aace1/ 
+
+wsl2 滚动发行版 **[WSL2-Linux-Kernel-Rolling](https://github.com/Nevuly/WSL2-Linux-Kernel-Rolling)**
+
+
+
+[scull_device_driver ](https://github.com/CriMilanese/scull_device_driver)杂项设备，模拟的是字符类设备
+
+**[linux-kernel-module-rust](https://github.com/lizhuohua/linux-kernel-module-rust)** 早期内核模块的尝试，包含一些简单的示例和论文
+
+FIO使用：https://help.aliyun.com/zh/ecs/user-guide/test-the-performance-of-block-storage-devices
+

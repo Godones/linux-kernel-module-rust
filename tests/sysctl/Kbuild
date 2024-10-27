@@ -1,3 +1,6 @@
+mkfile_path := $(abspath $(lastword $(MAKEFILE_LIST)))
+cur_makefile_path := $(dir $(mkfile_path))
+LKM_LDSCRIPT := $(cur_makefile_path)/../../lkm.lds
 module-name := sysctl
 obj-m := $(module-name).o
 
@@ -15,4 +18,4 @@ $(src)/../../target/$(TARGET)/$(BUILD)/lib$(module-name).a:
 .PHONY: clean
 
 %.o: ../../target/$(TARGET)/$(BUILD)/lib%.a
-	$(LD) -r -o $@ --whole-archive $<
+	$(LD) -T$(LKM_LDSCRIPT) -r -o $@ --whole-archive $<

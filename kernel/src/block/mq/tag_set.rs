@@ -10,9 +10,7 @@ use core::{cell::UnsafeCell, convert::TryInto, marker::PhantomData};
 use crate::{
     bindings,
     block::mq::{operations::OperationsVtable, Operations},
-    dbg,
     error::{Error, KernelResult as Result},
-    pr_info,
     types::ForeignOwnable,
 };
 

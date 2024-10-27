@@ -1,5 +1,6 @@
 use alloc::sync::Arc;
 
+use corelib::LinuxErrno;
 use interface::empty_device::EmptyDeviceDomain;
 use kernel::{
     buf::KernelSlicePtrWriter, code::EINVAL, error::KernelResult, sync::CpuId,
@@ -25,10 +26,14 @@ impl SysctlStorage for OneDevice {
         });
         let rvec = RRefVec::from_slice(data);
         let r = self.domain.write(&rvec);
-        if let Ok(r) = r {
-            (r, Ok(()))
-        } else {
-            (0, Err(EINVAL))
+        match r {
+            Ok(r) => (r, Ok(())),
+            Err(e) => {
+                if e == LinuxErrno::DOMAINCRASH {
+                    pr_err!("OneDevice::store_value: domain crash\n");
+                }
+                (0, Err(EINVAL))
+            }
         }
     }
     fn read_value(&self, data: &mut KernelSlicePtrWriter) -> (usize, KernelResult<()>) {

@@ -345,6 +345,7 @@ mod core_impl {
     pub(crate) fn sys_blk_queue_flag_clear(flag: core::ffi::c_uint, q: *mut request_queue) {
         CORE_FUNC.get_must().sys_blk_queue_flag_clear(flag, q)
     }
+    #[allow(unused)]
     pub(crate) fn sys_del_gendisk(disk: *mut gendisk) {
         CORE_FUNC.get_must().sys_del_gendisk(disk)
     }
@@ -366,6 +367,7 @@ mod core_impl {
     pub(crate) fn sys_blk_mq_alloc_tag_set(set: *mut blk_mq_tag_set) -> core::ffi::c_int {
         CORE_FUNC.get_must().sys_blk_mq_alloc_tag_set(set)
     }
+    #[allow(unused)]
     pub(crate) fn sys_blk_mq_free_tag_set(set: *mut blk_mq_tag_set) {
         CORE_FUNC.get_must().sys_blk_mq_free_tag_set(set)
     }

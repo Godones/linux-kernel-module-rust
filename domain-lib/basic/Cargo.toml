@@ -8,3 +8,16 @@ corelib = { path = "../corelib", features = ["core_impl"]}
 log = "0.4.22"
 rref = { path = "../rref" }
 ksync = { path = "../ksync" }
+domain_main = { path = "../domain_main" }
+
+unwinding = { version = "0.2.3", default-features = false, features = [
+    "unwinder",
+    "fde-gnu-eh-frame-hdr",
+    "panic",
+    "personality"
+], optional = true }
+spin = "0.9.8"
+
+[features]
+default = ["unwind"]
+unwind = ["dep:unwinding"]

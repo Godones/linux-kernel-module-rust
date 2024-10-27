@@ -128,8 +128,6 @@ pub fn kallsyms_lookup_name() {
         if INCLUDE_FUNCS.contains(&name) {
             let addr = usize::from_str_radix(addr, 16).unwrap();
             println!("{}: {:#x}", name.to_uppercase(), addr);
-            // env::set_var(format!("{}_ADDR", name.to_uppercase()), format!("{:#x}", addr));
-            // println!("cargo:rustc-env={}={:#x}", name.to_uppercase(), addr);
             env_file
                 .write(
                     format!(

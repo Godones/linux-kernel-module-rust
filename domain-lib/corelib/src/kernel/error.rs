@@ -47,6 +47,7 @@ impl Error {
     }
 
     /// Returns the error encoded as a pointer.
+    #[allow(unused)]
     pub(crate) fn to_ptr<T>(self) -> *mut T {
         // SAFETY: `self.0` is a valid error due to its invariant.
         crate::sys_err_ptr(self.0.into()) as *mut _

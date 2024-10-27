@@ -41,10 +41,8 @@ impl fmt::Write for LogLineWriter {
 #[macro_export]
 macro_rules! print {
     ($($arg:tt)*) => {
-        let domain_id = rref::domain_id();
-        let id = 0;
         let mut writer = $crate::console::LogLineWriter::new();
-        let _ = core::fmt::write(&mut writer, format_args!("[{}][Domain:{}] {}", id,domain_id, format_args!($($arg)*))).unwrap();
+        let _ = core::fmt::write(&mut writer, format_args!("[0][Domain:{}] {}",rref::domain_id(), format_args!($($arg)*))).unwrap();
         $crate::console::__print(format_args!("{}", writer.as_str()));
     };
 }
@@ -71,11 +69,17 @@ macro_rules! println {
 ///
 #[macro_export]
 macro_rules! println_color {
-    ($color:expr, $fmt:expr) => {
-        $crate::print!(concat!("\x1b[", $color, "m", $fmt, "\x1b[0m\n"));
-    };
-    ($color:expr, $fmt:expr, $($arg:tt)*) => {
-        $crate::print!(concat!("\x1b[", $color, "m", $fmt, "\x1b[0m\n"), $($arg)*);
+    ($color:expr,$($arg:tt)*) => {
+        let mut writer = $crate::console::LogLineWriter::new();
+        let prefix = match $color {
+            31 => "[ERROR] ",
+            32 => "[INFO] ",
+            33 => "[WARN] ",
+            34 => "[DEBUG] ",
+            _ => "[UNKNOWN] ",
+        };
+         let _ = core::fmt::write(&mut writer, format_args!("[0][Domain:{}]{} {}\n",rref::domain_id(), prefix, format_args!($($arg)*))).unwrap();
+        $crate::console::__print(format_args!("{}", writer.as_str()));
     };
 }
 

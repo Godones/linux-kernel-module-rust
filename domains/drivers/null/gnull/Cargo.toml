@@ -12,3 +12,8 @@ interface = { path = "../../../../domain-lib/interface",  features = ["domain"] 
 storage = { path = "../../../../domain-lib/storage", features = ["impl"] }
 
 null = { path = "../null" }
+
+
+[features]
+default = ["rust-unwind"]
+rust-unwind = []

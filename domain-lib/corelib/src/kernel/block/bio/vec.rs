@@ -140,7 +140,7 @@ pub struct BioSegmentIterator<'a> {
 
 impl<'a> BioSegmentIterator<'a> {
     #[inline(always)]
-    pub(crate) fn new(bio: &'a Bio<'a>) -> BioSegmentIterator<'_> {
+    pub(crate) fn new(bio: &'a Bio<'a>) -> BioSegmentIterator<'a> {
         Self {
             bio,
             iter: bio.iter(),

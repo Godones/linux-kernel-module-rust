@@ -4,9 +4,11 @@ extern crate alloc;
 use alloc::boxed::Box;
 
 use basic::{println, LinuxResult};
-use interface::{Basic};
+use interface::{
+    logger::{Level, LevelFilter, LogDomain},
+    Basic,
+};
 use log::{Log, Metadata, Record};
-use interface::logger::{Level, LevelFilter, LogDomain};
 use rref::RRefVec;
 
 #[derive(Debug)]
@@ -71,16 +73,35 @@ impl Log for SimpleLogger {
             log::Level::Debug => 32, // Green
             log::Level::Trace => 90, // BrightBlack
         };
-        println!(
-            "[{}] {}",
-            record.level(),
-            record.args(),
-        );
+        println!("[{}] {}", record.level(), record.args(),);
     }
     fn flush(&self) {}
 }
 
+#[derive(Debug)]
+pub struct UnwindWrap(Logger);
+impl UnwindWrap {
+    pub fn new(real: Logger) -> Self {
+        Self(real)
+    }
+}
+impl Basic for UnwindWrap {
+    fn domain_id(&self) -> u64 {
+        self.0.domain_id()
+    }
+}
+impl LogDomain for UnwindWrap {
+    fn init(&self) -> LinuxResult<()> {
+        self.0.init()
+    }
+    fn log(&self, level: Level, msg: &RRefVec<u8>) -> LinuxResult<()> {
+        basic::catch_unwind(|| self.0.log(level, msg))
+    }
+    fn set_max_level(&self, level: LevelFilter) -> LinuxResult<()> {
+        basic::catch_unwind(|| self.0.set_max_level(level))
+    }
+}
 
 pub fn main() -> Box<dyn LogDomain> {
-    Box::new(Logger)
+    Box::new(UnwindWrap::new(Logger))
 }

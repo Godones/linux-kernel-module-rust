@@ -17,7 +17,6 @@ use kernel::{
         bio::Segment,
         mq::{self, GenDisk, Operations, TagSet},
     },
-    dbg,
     error::{Error, KernelResult as Result},
     mm::pages::Pages,
     module, new_mutex, new_spinlock, pr_info,

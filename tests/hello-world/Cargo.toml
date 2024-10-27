@@ -9,7 +9,7 @@ crate-type = ["staticlib"]
 
 [dependencies]
 kernel = { path = "../../kernel" }
-
+log = "0.4.22"
 
 [lints.rust]
 unexpected_cfgs = { level = "warn", check-cfg = ['cfg(MODULE)'] }

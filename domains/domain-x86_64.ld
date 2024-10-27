@@ -8,9 +8,11 @@ SECTIONS
     . = BASE_ADDRESS;
     .text :{
         stext = .;
+        __executable_start = .;
         *(.text .text.*);
         . = ALIGN(4K);
         etext = .;
+        __etext = .;
     }
 
     .rodata : ALIGN(4096){
@@ -58,6 +60,7 @@ SECTIONS
 
     .eh_frame_hdr : ALIGN(4K){
         kernel_eh_frame_hdr = .;
+         __GNU_EH_FRAME_HDR = .;
         *(.eh_frame_hdr .eh_frame_hdr.*)
         kernel_eh_frame_hdr_end = .;
     }

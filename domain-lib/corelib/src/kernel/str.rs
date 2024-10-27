@@ -9,10 +9,9 @@ use core::{
     ops::{self, Deref, DerefMut, Index},
 };
 
-use crate::{
-    // bindings,
-    kernel::error::{linux_err::*, Error, KernelResult},
-    kernel::types::ForeignOwnable,
+use crate::kernel::{
+    error::{linux_err::*, Error, KernelResult},
+    types::ForeignOwnable,
 };
 
 /// Byte string without UTF-8 validity guarantee.
@@ -370,6 +369,7 @@ impl RawFormatter {
     ///
     /// If `pos` is less than `end`, then the region between `pos` (inclusive) and `end`
     /// (exclusive) must be valid for writes for the lifetime of the returned [`RawFormatter`].
+    #[allow(unused)]
     pub(crate) unsafe fn from_ptrs(pos: *mut u8, end: *mut u8) -> Self {
         // INVARIANT: The safety requirements guarantee the type invariants.
         Self {
@@ -399,6 +399,7 @@ impl RawFormatter {
     /// Returns the current insert position.
     ///
     /// N.B. It may point to invalid memory.
+    #[allow(unused)]
     pub(crate) fn pos(&self) -> *mut u8 {
         self.pos as _
     }

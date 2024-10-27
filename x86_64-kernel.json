@@ -17,7 +17,7 @@
     "std": false,
     "tier": 2
   },
-  "panic-strategy": "abort",
+  "panic-strategy": "unwind",
   "plt-by-default": false,
   "position-independent-executables": true,
   "relro-level": "off",

@@ -136,6 +136,72 @@ impl BlockDeviceDomain for NullDeviceDomainImpl {
     }
 }
 
+#[derive(Debug)]
+pub struct UnwindWrap(NullDeviceDomainImpl);
+
+impl Basic for UnwindWrap {
+    fn domain_id(&self) -> u64 {
+        self.0.domain_id()
+    }
+}
+
+impl BlockDeviceDomain for UnwindWrap{
+    fn init(&self, args: &BlockArgs) -> LinuxResult<()> {
+        self.0.init(args)
+    }
+
+    fn tag_set_with_queue_data(&self) -> LinuxResult<(SafePtr, SafePtr)> {
+        basic::catch_unwind(|| self.0.tag_set_with_queue_data())
+    }
+
+    fn set_gen_disk(&self, gen_disk: SafePtr) -> LinuxResult<()> {
+        basic::catch_unwind(|| self.0.set_gen_disk(gen_disk))
+    }
+
+    fn open(&self, mode: u32) -> LinuxResult<()> {
+        basic::catch_unwind(|| self.0.open(mode))
+    }
+
+    fn release(&self) -> LinuxResult<()> {
+        basic::catch_unwind(|| self.0.release())
+    }
+
+    fn init_request(&self, tag_set_ptr: SafePtr, rq_ptr: SafePtr, driver_data_ptr: SafePtr) -> LinuxResult<()> {
+        basic::catch_unwind(|| self.0.init_request(tag_set_ptr, rq_ptr, driver_data_ptr))
+    }
+
+    fn exit_request(&self, tag_set_ptr: SafePtr, rq_ptr: SafePtr) -> LinuxResult<()> {
+        basic::catch_unwind(|| self.0.exit_request(tag_set_ptr, rq_ptr))
+    }
+
+    fn init_hctx(&self, hctx_ptr: SafePtr, tag_set_data_ptr: SafePtr, hctx_idx: usize) -> LinuxResult<()> {
+        basic::catch_unwind(|| self.0.init_hctx(hctx_ptr, tag_set_data_ptr, hctx_idx))
+    }
+
+    fn exit_hctx(&self, hctx_ptr: SafePtr, hctx_idx: usize) -> LinuxResult<()> {
+        basic::catch_unwind(|| self.0.exit_hctx(hctx_ptr, hctx_idx))
+    }
+
+    fn queue_rq(&self, hctx_ptr: SafePtr, bd_ptr: SafePtr, hctx_driver_data_ptr: SafePtr) -> LinuxResult<()> {
+        basic::catch_unwind(|| self.0.queue_rq(hctx_ptr, bd_ptr, hctx_driver_data_ptr))
+    }
+
+    fn commit_rqs(&self, hctx_ptr: SafePtr, hctx_driver_data_ptr: SafePtr) -> LinuxResult<()> {
+        basic::catch_unwind(|| self.0.commit_rqs(hctx_ptr, hctx_driver_data_ptr))
+    }
+
+    fn complete_request(&self, rq_ptr: SafePtr) -> LinuxResult<()> {
+        basic::catch_unwind(|| self.0.complete_request(rq_ptr))
+    }
+
+    fn exit(&self) -> LinuxResult<()> {
+        basic::catch_unwind(|| self.0.exit())
+    }
+}
+
+
+
+
 pub fn main() -> Box<dyn BlockDeviceDomain> {
-    Box::new(NullDeviceDomainImpl::new())
+    Box::new(UnwindWrap(NullDeviceDomainImpl::new()))
 }

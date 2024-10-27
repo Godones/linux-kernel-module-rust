@@ -40,6 +40,7 @@ pub fn build_domain(name: &str, log: String, dir: &str, arch: Arch) {
         if path.exists() {
             let path = format!("./{}/{}/g{}/Cargo.toml", ty, name, name);
             let path = Path::new(&path);
+            println!("Cargo.toml found in {}, path is {}", ty, path.display());
             println!("The target arch is {:?}", arch);
             let _cmd = std::process::Command::new("cargo")
                 .arg("build")
@@ -66,14 +67,11 @@ pub fn build_domain(name: &str, log: String, dir: &str, arch: Arch) {
                 .expect("failed to execute cp");
             println!("Copy domain [{}] project success", name);
             return;
-        } else {
-            println!("Cargo.toml not found in {}, path is {}", ty, path.display());
         }
     }
 }
 
 pub fn build_all(log: String, arch: Option<String>) {
-    let mut pool = Vec::new();
     let domain_list = fs::read_to_string("./domains/domain-list.toml").unwrap();
     let config: Config = toml::from_str(&domain_list).unwrap();
     println!("Start building all domains");
@@ -91,9 +89,7 @@ pub fn build_all(log: String, arch: Option<String>) {
         // pool.spawn(move || build_domain(&domain_name, value, "init"));
         // build_domain(&domain_name, value, "init")
         let target_arch = arch.clone().into();
-        let thread =
-            std::thread::spawn(move || build_domain(&domain_name, value, "init", target_arch));
-        pool.push(thread);
+        build_domain(&domain_name, value, "init", target_arch);
     }
     let disk_members = config.domains.get("disk_members").unwrap().clone();
     if !disk_members.is_empty() {
@@ -109,12 +105,7 @@ pub fn build_all(log: String, arch: Option<String>) {
             // pool.spawn(move || build_domain(&domain_name, value, "disk"));
             // build_domain(&domain_name, value, "disk")
             let target_arch = arch.clone().into();
-            let thread =
-                std::thread::spawn(move || build_domain(&domain_name, value, "disk", target_arch));
-            pool.push(thread);
+            build_domain(&domain_name, value, "disk", target_arch)
         }
-    }
-    for thread in pool {
-        thread.join().unwrap();
     }
 }

@@ -17,4 +17,7 @@ logger = { path = "../logger" }
 
 
 [features]
+default = ["rust-unwind"]
+rust-unwind = []
+
 

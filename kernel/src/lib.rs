@@ -1,6 +1,5 @@
 #![feature(allocator_api)]
 #![feature(try_with_capacity)]
-#![feature(const_mut_refs)]
 #![feature(c_size_t)]
 #![no_std]
 #![allow(improper_ctypes)]
@@ -30,6 +29,8 @@ mod task;
 pub mod time;
 pub mod types;
 
+use alloc::boxed::Box;
+
 pub use error::linux_err as code;
 pub use init::PinInit;
 pub(crate) use mm::cache_padded::CachePadded;
@@ -47,10 +48,13 @@ pub mod init {
 }
 pub use kmacro::*;
 
+use crate::error::{linux_err, KernelResult};
+
 #[panic_handler]
 fn panic(info: &core::panic::PanicInfo) -> ! {
-    pr_err!("Kernel panic!");
-    pr_err!("{:?}", info);
+    pr_err!("Kernel panic!\n");
+    pr_err!("{:?}\n", info);
+    unwind_from_panic();
     unsafe {
         bug_helper();
     }
@@ -90,4 +94,18 @@ macro_rules! container_of {
         $crate::build_assert!(offset <= isize::MAX as usize);
         ptr.wrapping_sub(offset) as *const $type
     }}
+}
+
+pub fn catch_unwind<F: FnOnce() -> R, R>(f: F) -> KernelResult<R> {
+    let res = unwinding::panic::catch_unwind(f);
+    match res {
+        Ok(res) => Ok(res),
+        Err(_) => Err(linux_err::EAGAIN),
+    }
+}
+
+#[inline]
+pub fn unwind_from_panic() {
+    let res = unwinding::panic::begin_panic(Box::new(()));
+    pr_err!("unwinding from panic failed: {:?}\n", res.0);
 }

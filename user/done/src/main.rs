@@ -6,7 +6,7 @@ use spin::Mutex;
 fn main() {
     let argv: Vec<String> = std::env::args().collect();
     if argv.len() != 2 {
-        println!("Usage: done [new]/[test]");
+        println!("Usage: done [new]/[test]/[panic]");
         return;
     }
     let option = argv[1].as_str();
@@ -18,8 +18,11 @@ fn main() {
             println!("Run null device domain test");
             run_log_domain_test();
         }
+        "panic" => {
+            panic_test();
+        }
         _ => {
-            println!("Usage: done [new]/[test]");
+            println!("Usage: done [new]/[test]/[panic]");
             return;
         }
     }
@@ -37,8 +40,16 @@ fn update_to_new() {
     println!("Register and update null device domain to new version successfully");
 }
 
+fn panic_test() {
+    let mut file = OpenOptions::new()
+        .write(true)
+        .read(true)
+        .open(PATH)
+        .unwrap();
+    file.write(b"panic test").unwrap();
+}
+const PATH: &str = "/proc/sys/rust/domain/one";
 fn run_log_domain_test() {
-    const PATH: &str = "/proc/sys/rust/domain/one";
     const THREAD_NUM: usize = 4;
     let file = OpenOptions::new()
         .write(true)

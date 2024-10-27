@@ -22,4 +22,3 @@ build-std-features = ["compiler-builtins-mem"]
 lto = true
 strip = true
 opt-level = 3
-panic = "abort"

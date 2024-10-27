@@ -10,6 +10,13 @@ bitflags = "2.6.0"
 log = "0.4.22"
 kbind = { path = "../kbind" }
 
+unwinding = { version= "*", default-features = false, features = [
+    "unwinder",
+    "fde-static",
+    "panic",
+    "personality"
+] }
+
 [build-dependencies]
 bindgen = "0.70"
 cc = "1.0"

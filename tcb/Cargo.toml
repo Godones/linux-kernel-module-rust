@@ -10,7 +10,7 @@ crate-type = ["staticlib"]
 # domain lib
 interface = { path = "../domain-lib/interface" }
 corelib = { path = "../domain-lib/corelib" }
-basic = { path = "../domain-lib/basic" }
+basic = { path = "../domain-lib/basic", default-features = false }
 ksync = { path = "../domain-lib/ksync" }
 rref = { path = "../domain-lib/rref" }
 storage = { path = "../domain-lib/storage" }

@@ -1,5 +1,5 @@
 use alloc::{boxed::Box, sync::Arc};
-use core::{any::Any, sync::atomic::AtomicUsize};
+use core::any::Any;
 
 use corelib::SafePtr;
 use interface::{null_block::BlockDeviceDomain, DomainTypeRaw};

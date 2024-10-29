@@ -458,8 +458,16 @@ impl<T: FileSystem + ?Sized> New<T> {
         inode.i_blocks = params.blocks;
 
         inode.__i_ctime = params.ctime.into();
-        inode.i_mtime = params.mtime.into();
-        inode.i_atime = params.atime.into();
+        #[cfg(not(v6_8))]
+        {
+            inode.i_mtime = params.mtime.into();
+            inode.i_atime = params.atime.into();
+        }
+        #[cfg(v6_8)]
+        {
+            inode.__i_mtime = params.mtime.into();
+            inode.__i_atime = params.atime.into();
+        }
 
         // SAFETY: inode is a new inode, so it is valid for write.
         unsafe {

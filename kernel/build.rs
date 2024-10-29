@@ -48,12 +48,15 @@ fn handle_kernel_version_cfg() {
         panic!("The kernel version is less than 6.*");
     }
 
-    println!("cargo:rustc-check-cfg=cfg(KVER_6_6_OR_NEWER)");
-    println!("cargo:rustc-check-cfg=cfg(KVER_LESS_6_6)");
-    let cfg = if kernel_version.0 == 6 && kernel_version.1 < 6 {
-        "KVER_LESS_6_6"
+    // println!("cargo:rustc-check-cfg=cfg(KVER_6_6_OR_NEWER)");
+    println!("cargo:rustc-check-cfg=cfg(v6_6)");
+    println!("cargo:rustc-check-cfg=cfg(v6_8)");
+    let cfg = if kernel_version.1 == 6 {
+        "v6_6"
+    } else if kernel_version.1 == 8 {
+        "v6_8"
     } else {
-        "KVER_6_6_OR_NEWER"
+        panic!("The kernel version is not 6.6 or 6.8");
     };
     println!("cargo:rustc-cfg={}", cfg);
 }
@@ -80,6 +83,10 @@ fn main() {
     kernel_cflags = kernel_cflags.replace("-Wno-maybe-uninitialized", "-Wno-uninitialized");
     kernel_cflags = kernel_cflags.replace("-Wno-alloc-size-larger-than", "");
     kernel_cflags = kernel_cflags.replace("-Wimplicit-fallthrough=5", "-Wimplicit-fallthrough");
+    kernel_cflags = kernel_cflags.replace("-fsanitize=bounds-strict", "");
+    kernel_cflags = kernel_cflags.replace("-ftrivial-auto-var-init=zero", "");
+    kernel_cflags = kernel_cflags.replace("-mharden-sls=all", "");
+    kernel_cflags = kernel_cflags.replace("-Wmissing-prototypes", "");
 
     let kbuild_cflags_module =
         env::var("KBUILD_CFLAGS_MODULE").expect("Must be invoked from kernel makefile");

@@ -6,8 +6,8 @@ members = [
     "tcb",
     "user/*",
     "kmacro",
-    "kernel", "kbind",
-    
+    "kernel",
+    "kbind",
 ]
 
 

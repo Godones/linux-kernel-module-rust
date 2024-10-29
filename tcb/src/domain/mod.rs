@@ -1,7 +1,7 @@
 use alloc::boxed::Box;
 
 use corelib::LinuxResult;
-use interface::{null_block::BlockDeviceDomain, DomainType, DomainTypeRaw};
+use interface::{DomainType, DomainTypeRaw};
 use kernel::env;
 
 use crate::{

@@ -264,7 +264,10 @@ pub const fn ro_aops<T: Operations + ?Sized>() -> address_space::Ops<T::FileSyst
             swap_activate: None,
             swap_deactivate: None,
             swap_rw: None,
+            #[cfg(not(v6_8))]
             error_remove_page: None,
+            #[cfg(v6_8)]
+            error_remove_folio: None,
         };
 
         extern "C" fn read_folio_callback(

@@ -7,13 +7,13 @@ extern crate malloc;
 
 use alloc::boxed::Box;
 use core::panic::PanicInfo;
-
+use basic::domain_main;
 use corelib::CoreFunction;
 use interface::{null_block::BlockDeviceDomain, Basic};
 use rref::{domain_id, SharedHeapAlloc};
 use storage::StorageArg;
 
-#[no_mangle]
+#[domain_main]
 fn main(
     sys: &'static dyn CoreFunction,
     domain_id: u64,
@@ -33,21 +33,4 @@ fn main(
     // interface::activate_domain();
     // call the real blk driver
     rnull::main()
-}
-
-#[panic_handler]
-fn panic(info: &PanicInfo) -> ! {
-    if let Some(p) = info.location() {
-        basic::println_color!(
-            31,
-            "line {}, file {}: {}",
-            p.line(),
-            p.file(),
-            info.message()
-        );
-    } else {
-        basic::println_color!(31, "no location information available");
-    }
-    basic::backtrace(domain_id());
-    loop {}
 }

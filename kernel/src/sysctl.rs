@@ -141,12 +141,12 @@ impl<T: SysctlStorage> Sysctl<T> {
                 data: &*storage as *const T as *mut core::ffi::c_void,
                 proc_handler: Some(proc_handler::<T>),
                 maxlen: 0,
-                #[cfg(KVER_LESS_6_6)]
+                #[cfg(all(not(v6_8), not(v6_6)))]
                 child: ptr::null_mut(),
                 poll: ptr::null_mut(),
                 extra1: ptr::null_mut(),
                 extra2: ptr::null_mut(),
-                #[cfg(KVER_6_6_OR_NEWER)]
+                #[cfg(any(v6_6, v6_8))]
                 type_: bindings::ctl_table_SYSCTL_TABLE_TYPE_DEFAULT,
             },
             unsafe { mem::zeroed() },
@@ -154,7 +154,7 @@ impl<T: SysctlStorage> Sysctl<T> {
         .into_boxed_slice();
 
         let result = unsafe {
-            #[cfg(KVER_6_6_OR_NEWER)]
+            #[cfg(any(v6_6, v6_8))]
             {
                 bindings::register_sysctl_sz(
                     path.as_ptr() as *const i8,
@@ -162,7 +162,7 @@ impl<T: SysctlStorage> Sysctl<T> {
                     table.len(),
                 )
             }
-            #[cfg(KVER_LESS_6_6)]
+            #[cfg(all(not(v6_8), not(v6_6)))]
             bindings::register_sysctl(path.as_ptr() as *const i8, table.as_mut_ptr())
         };
         if result.is_null() {

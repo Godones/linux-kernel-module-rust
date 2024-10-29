@@ -59,7 +59,7 @@ impl Default for BlockArgs {
             param_memory_backed: true,
             param_irq_mode: 0,
             param_capacity_mib: 4096,
-            param_completion_time_nsec: 1_000_000,
+            param_completion_time_nsec: 0,
         }
     }
 }

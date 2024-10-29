@@ -19,6 +19,6 @@ build-std = ["core", "alloc"]
 build-std-features = ["compiler-builtins-mem"]
 
 [profile.release]
-lto = true
+#lto = true
 strip = true
-opt-level = 3
+#opt-level = 3

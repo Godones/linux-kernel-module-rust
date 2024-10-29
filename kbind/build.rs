@@ -52,6 +52,8 @@ fn main() {
     kernel_cflags = kernel_cflags.replace("-Wno-maybe-uninitialized", "-Wno-uninitialized");
     kernel_cflags = kernel_cflags.replace("-Wno-alloc-size-larger-than", "");
     kernel_cflags = kernel_cflags.replace("-Wimplicit-fallthrough=5", "-Wimplicit-fallthrough");
+    kernel_cflags = kernel_cflags.replace("-fsanitize=bounds-strict", "");
+    kernel_cflags = kernel_cflags.replace("-ftrivial-auto-var-init=zero", "");
 
     let kbuild_cflags_module =
         env::var("KBUILD_CFLAGS_MODULE").expect("Must be invoked from kernel makefile");

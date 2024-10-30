@@ -43,6 +43,10 @@ make LLVM=1 ARCH=riscv rust-analyzer
 bear -- make ARCH=riscv LLVM=1 -j12
 ```
 
+### 安装riscv gcc工具链
+
+https://blog.csdn.net/qq_43616898/article/details/127911311
+
 
 
 ### Linux on riscv
@@ -266,7 +270,7 @@ c内核模块https://linux-kernel-labs-zh.xyz/labs/kernel_modules.html
 
 1. 在rust/Makefile中， 我们删除以下的限制
 
-![image-20240908193658601](./assert/image-20240908193658601.png)
+![image-20240908193658601](./C:/Users/godones/Desktop/研究生培养/assert/image-20240908193658601.png)
 
 2. 在rust/prelude中，我们可以导出alloc中的数据结构，也可以直接使用`use alloc::`。在编译内核时，编译器会抱怨一些函数没有实现，这些函数是堆分配失败时触发的函数，我们需要手动定义，为了简单期间，这里只是简单的panic:
 
@@ -540,6 +544,17 @@ quiet_cmd_cc_o_c = CC [M]  $@
 ```
 use `addr_of_mut!` instead to create a raw pointer
 ```
+
+
+
+```
+x_flags := -mfunction-return=thunk-extern -fzero-call-used-regs=used-gpr -fconserve-stack -mrecord-mcount -Wno-alloc-size-larger-than -Wno-maybe-uninitialized -Wimplicit-fallthrough=5 -ftrivial-auto-var-init=zero -fsanitize=bounds-strict -mharden-sls=all
+
+
+cmd_cc_o_c = $(CC) $(filter-out $(CC_FLAGS_CFI) $(CFLAGS_GCOV), $(filter-out $(x_flags),$(c_flags))) -c -o $@ $<
+```
+
+
 
 
 
@@ -938,11 +953,43 @@ kernel对驱动域的调用过程:
 
 
 
-
-
-
-
 https://linux-kernel-labs-zh.xyz/labs/block_device_drivers.html
+
+### linux kernel的故障隔离
+
+为了在linux中启用故障隔离，引入了Rust的unwind机制，在测试过程中，发现内核会崩溃：
+
+```
+[  493.849106] BUG: TASK stack guard page was hit at 00000000635c0575 (stack is 000000000a190a4c..00000000dc307f6a)
+[  493.849112] stack guard page: 0000 [#1] PREEMPT SMP NOPTI
+[  493.849116] CPU: 8 PID: 4943 Comm: insmod Tainted: G           OE      6.6.0-microsoft-standard-WSL2+ #4
+[  493.849120] RIP: 0010:_ZN5gimli4read3cfi24UnwindTable$LT$R$C$S$GT$8next_row17h25548a9c73cd9ffaE+0x4d/0x2270 [hello_world]
+[  493.849144] Code: 00 00 48 8b 56 58 48 69 c9 38 04 00 00 48 89 94 08 00 fc ff ff c6 46 69 00 48 8b 56 30 48 85 d2 0f 84 94 1b 00 00 48 8d 46 28 <48> 89 84 24 98 00 00 00 44 0f b6 76 38 0f b6 6e 39 0f b6 5e 3a 4c
+[  493.849146] RSP: 0018:ffffa2d614093aa0 EFLAGS: 00010202
+[  493.849148] RAX: ffffa2d614094508 RBX: 0000000000000008 RCX: 0000000000000438
+[  493.849149] RDX: 0000000000000007 RSI: ffffa2d6140944e0 RDI: ffffa2d614094550
+[  493.849151] RBP: ffffa2d614094ea8 R08: fffffffffffffff8 R09: 0000000000000000
+[  493.849152] R10: 00ffff9681c78201 R11: ffffffffc05fde04 R12: ffffa2d6140944e0
+[  493.849153] R13: ffffa2d614095090 R14: ffffa2d614094550 R15: ffffa2d614095070
+[  493.849154] FS:  0000726e698ba080(0000) GS:ffff9681c7800000(0000) knlGS:0000000000000000
+[  493.849156] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[  493.849157] CR2: ffffa2d614093a98 CR3: 000000011e0ae000 CR4: 0000000000350ee0
+[  493.849160] Call Trace:
+[  493.849162] WARNING: kernel stack frame pointer at 00000000389b6155 in insmod:4943 has bad value 00000000b73c08b7
+[  493.849164] unwind stack type:0 next_sp:0000000000000000 mask:0x2 graph_idx:0
+```
+
+从捕捉到的信息来看，内核崩溃是因为task的内核栈溢出。通过查询内核源代码得知，kernel给task的内核栈大小为4*PAGE_SIZE, 由于故障期间需要对内核栈进行展开以及Rust通常分配较大的函数栈导致了栈溢出。
+
+
+
+
+
+**解决这个问题的方法是修改内核源码，增大内核栈大小到8*PAGE_SIZE**。
+
+https://stackoverflow.com/questions/65121145/how-to-test-validate-the-vmalloc-guard-page-is-working-in-linux
+
+https://stackoverflow.com/questions/27478788/debug-stack-overruns-in-kernel-modules
 
 
 
@@ -970,9 +1017,105 @@ https://linux-kernel-labs.github.io/refs/heads/master/labs/filesystems_part1.htm
 
 ## 性能测试
 
+### null block
+
+机器: 
+
+- WSL2 ubuntu24.04 linux6.6
+- AMD Ryzen 9 7945HX()
+- 16GB
+
+配置：
+
+driver:
+
+1. block_size: 4KB
+2. completion_nsec: 0
+3. irqmode: 0(IRQ_NONE)
+4. queue_mode:2 (MQ)
+5. hw_queue_depth: 256
+6. memory_backed:1
+7. queue scheduler:none
+
+fio:
+
+1. run  30 second
+2. IO engine: PSYNC
 
 
 
+
+
+Thread=1 cnull
+
+|            | randread              | randrw                | randwrite             | read                | readwrite            | write                       |
+| ---------- | --------------------- | --------------------- | --------------------- | ------------------- | -------------------- | --------------------------- |
+| 4k         | 234k+233k+229k = 232k | 91+98+85= 91          | 168k+188k+193k = 183k | 428k+454k+465k=449k | 180k+174k+175k = 176 | 213k+215k+215k = 214k       |
+| 32k        | 61+61.3+60.2 = 60.8   | 19.4+19.5+19.3 = 19.4 | 34.3+33.9+33.7= 33.97 | 72+73+71 = 72       | 32+31.3+30.7 = 31.33 | 34.9 + 33.9 + 34.5 =  34.43 |
+| 256k       |                       |                       |                       |                     |                      |                             |
+| 1024k=1M   |                       |                       |                       |                     |                      |                             |
+| 16384k=16M |                       |                       |                       |                     |                      |                             |
+
+Thread=1 rnull(LKM)
+
+|            | randread                        | randrw                                  | randwrite                    | read                           | readwrite                        | write                        |
+| ---------- | ------------------------------- | --------------------------------------- | ---------------------------- | ------------------------------ | -------------------------------- | ---------------------------- |
+| 4k         | 209k+210k+204k = 207k(-0.107)   | 83 +85+84 =84 (-0.07,-0.07)             | 191k+197k+186k = 192k(0.049) | 425k+455k+449k = 443k (-0.013) | 179+168+172= 173 (-0.017,-0.017) | 208k+220k+210k = 213(-0.004) |
+| 32k        | 61.0k+60.2+60.5 = 60.6(-0.0038) | 19.4+19.6+19.4 = (19.47,19.47) (0.0034) | 34.1+34.5+34.0=34.2 (0.0067) | 72+71+72.5 = 71.8(-0.003)      | 30.6+30.1+30.0 = 30.23(-0.035)   | 36.9 + 36.7+ 36 = 36.5(0.06) |
+| 256k       |                                 |                                         |                              |                                |                                  |                              |
+| 1024k=1M   |                                 |                                         |                              |                                |                                  |                              |
+| 16384k=16M |                                 |                                         |                              |                                |                                  |                              |
+
+Thread=1 rnull(Domain)
+
+|      | randread                             | randrw                               | randwrite                               | read                                | readwrite                               | write                                |
+| ---- | ------------------------------------ | ------------------------------------ | --------------------------------------- | ----------------------------------- | --------------------------------------- | ------------------------------------ |
+| 4k   | 206k+199k+201k=  202(-0.129)(-0.024) | 81.7+79.8+81.7= 81.1(-0.108)(-0.034) | 195k+191k+192k = 192.6 (0.05)(0.003125) | 452k+447k+448k = 449 (0) (0.013)    | 177k+174k+169k= 173(-0.017,-0.017)(0,0) | 208k+216k+207k = 210(-0.017)(-0.014) |
+| 32k  | 48.3 + 48.1+46.7 =                   | 17.8 + 17.5+17.9= 17.7(-0.08)(-0.08) | 32.2+31.9+32.6 =32.2(-0.05)(-0.058)     | 60.4+60.3+60.1 =60.3(-0.162)(-0.16) | 30.4+29.5+28.6 = 29.5(-0.058)(-0.024)   | 34.0+33.6+34.1 = 33.9(-0.015)(-0.07) |
+
+
+
+
+
+Thread=4 cnull
+
+|      | randread                 | randrw                | randwrite             | read                       | readwrite             | write                  |
+| ---- | ------------------------ | --------------------- | --------------------- | -------------------------- | --------------------- | ---------------------- |
+| 4k   | 1447k+1483k+1414k = 1448 | 427k+424k+416k = 422  | 535k+547k+565k=549    | 1812k + 1812k+1812k = 1812 | 895k+889k+869k =884   | 755k+762k+759k =  759k |
+| 32k  | 338k+343k+339k = 340     | 69.2+66.9+67.4 = 67.8 | 77.9+82.2+82.4 = 80.8 | 170k+172k+169k = 170       | 149k+150k+143k =  147 | 119k+120k+121k = 120   |
+
+Thread=4 rnull(LKM)
+
+|      | randread                        | randrw                        | randwrite                    | read                            | readwrite               | write                        |
+| ---- | ------------------------------- | ----------------------------- | ---------------------------- | ------------------------------- | ----------------------- | ---------------------------- |
+| 4k   | 1265k+1253k+1244k= 1254(-0.133) | 377k+393k+388k = 386(-0.085)  | 530k+532k+540k = 534(-0.027) | 1731k+1726k+1744k = 1733(-0.04) | 872k+900k+879k = 884(0) | 725k+755k+735k = 738(-0.027) |
+| 32k  | 322+317+328 = 322(-0.05)        | 66.9+66.5+66.8 = 66.7(-0.015) | 76.5+86.4+82.4 = 81.8(0.012) | 165k+168k+166k = 166(-0.02)     | 144+142+148=145(-0.016) | 115k+116k+118k=116(-0.03)    |
+
+Thread=4 rnull(Domain)
+
+|      | randread        | randrw | randwrite | read              | readwrite | write          |
+| ---- | --------------- | ------ | --------- | ----------------- | --------- | -------------- |
+| 4k   | 1266k1241k1163k |        |           | 1591k+1594k+1580k |           | 736k+736k+725k |
+| 32k  |                 |        |           |                   |           |                |
+
+
+
+
+
+Thread=4 
+
+|           | Domain                            | C                       |
+| --------- | --------------------------------- | ----------------------- |
+| write     | 883k+898k+911k = 897(0.012)       | 896k+880k+881k = 886k   |
+| read      | 1933k+1914k+1869k = 1,905(-0.012) | 1955k+1896k+1933k= 1928 |
+| write 32k | 138k+138k+138k = 138(0.007)       | 137k+138k+137k = 137    |
+| read 32k  | 200k+198k+193k = 197(-0.024)      | 201k+200k+204k = 202    |
+
+
+
+- 从实验的整体结果来看，C/LKM/Domain的性能差异并不是很大，LKM和C的差异平均在5%以内，最大的差距是10.5%(randread,4k), 而Domain和LKM的性能差距非常小。
+- 域的实现并没有导致原有的LKM性能下降，一方面是因为域实现并没有引入额外的硬件特征，只是多了几层函数调用，另一方面，用户程序发出的系统调用在Linux kernel中经过深层次的处理，而域在这个调用路径上只占据了非常小的位置。
+- 我们猜测当kernel中的大多数组件变成域后，性能会有一定的下降，但这个下降处于可接受的水平
 
 
 
@@ -1016,3 +1159,6 @@ wsl2 滚动发行版 **[WSL2-Linux-Kernel-Rolling](https://github.com/Nevuly/WSL
 
 FIO使用：https://help.aliyun.com/zh/ecs/user-guide/test-the-performance-of-block-storage-devices
 
+[在 Ubuntu 22.04.3 上构建自定义内核](https://cuefe.com/12/)
+
+[超级用户指南：轻松升级你的Ubuntu Linux内核版本](https://blog.csdn.net/Long_xu/article/details/126710992)

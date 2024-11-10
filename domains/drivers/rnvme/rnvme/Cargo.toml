@@ -1,0 +1,12 @@
+[package]
+name = "rnvme"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+basic = { path = "../../../../domain-lib/basic" }
+interface = { path = "../../../../domain-lib/interface" }
+rref = { path = "../../../../domain-lib/rref" }
+
+kmacro = { path = "../../../../kmacro" }
+pinned-init = { version = "0.0.8", default-features = false, features = ["alloc"]}

@@ -19,8 +19,14 @@
 #include <linux/blk-mq.h>
 #include <linux/blk_types.h>
 #include <linux/blkdev.h>
+#include <linux/blk-mq-pci.h>
+#include <linux/dmapool.h>
 #include <linux/pagemap.h>
 #include <linux/srcu.h>
+#include <linux/io.h>
+#include <linux/pci.h>
+#include <linux/device.h>
+#include <linux/dmapool.h>
 // Bindgen gets confused at certain things
 //
 const gfp_t BINDINGS_GFP_KERNEL = GFP_KERNEL;

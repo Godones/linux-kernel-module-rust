@@ -113,7 +113,7 @@ impl<'a> Map<'a> {
     }
 
     /// Sets the block device of the mapping.
-    pub fn set_bdev(&mut self, bdev: Option<&'a block::Device>) -> &mut Self {
+    pub fn set_bdev(&mut self, bdev: Option<&'a block::BlkDevice>) -> &mut Self {
         self.0.bdev = if let Some(b) = bdev {
             b.0.get()
         } else {

@@ -17,13 +17,14 @@ run_fio(){
   type=$1
   thread=$2
   bs=$3
-  echo Run command: sudo fio --name=mytest --ioengine=psync --rw=${type} --bs=${bs} --numjobs=${thread} --time_based --runtime=${RUN_TIME} -filename=/dev/${CLASS} --size=4G -group_reporting -direct=1
+  echo Run command: sudo fio --name=mytest --ioengine=psync --rw=${type} --bs=${bs} --numjobs=${thread} --time_based --runtime=${RUN_TIME} -filename=/dev/${CLASS} --size=4G -group_reporting 
   count=1
   while(( count<=3 ))
   do
     echo ----------TEST Impl:${CLASS} TYPE:$type THREAD:$thread BS:$bs $count start----------
-    sudo fio --name=mytest --ioengine=psync --rw=${type} --bs=${bs} --numjobs=${thread} --time_based --runtime=${RUN_TIME} -filename=/dev/${CLASS} --size=4G -group_reporting -direct=1
+    sudo fio --name=mytest --ioengine=psync --rw=${type} --bs=${bs} --numjobs=${thread} --time_based --runtime=${RUN_TIME} -filename=/dev/${CLASS} --size=4G -group_reporting 
     sync
+    echo 3 | sudo tee /proc/sys/vm/drop_caches
     sleep 2
     echo ----------TEST Impl:${CLASS} TYPE:$type THREAD:$thread BS:$bs $count over ----------
     ((count++))

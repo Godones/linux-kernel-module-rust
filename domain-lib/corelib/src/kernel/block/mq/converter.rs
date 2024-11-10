@@ -118,7 +118,7 @@ impl<T: Operations> OperationsConverter<T> {
     }
 
     unsafe fn complete_callback(rq: *mut bindings::request) {
-        T::complete(unsafe { Request::from_ptr(rq) });
+        T::complete(unsafe { &Request::from_ptr(rq) });
     }
 
     pub fn queue_rq(

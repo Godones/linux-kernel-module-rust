@@ -1,5 +1,6 @@
 #![feature(allocator_api)]
 #![feature(try_with_capacity)]
+#![feature(associated_type_defaults)]
 #![allow(non_snake_case)]
 #![no_std]
 extern crate alloc;
@@ -14,6 +15,7 @@ pub use pconst::LinuxErrno;
 use spin::Once;
 
 pub mod bindings;
+pub mod console;
 pub mod domain_info;
 pub mod kernel;
 
@@ -91,7 +93,29 @@ pub trait CoreFunction: Send + Sync {
     fn sys_blk_mq_rq_from_pdu(&self, pdu: *mut core::ffi::c_void) -> *mut request;
     fn sys_blk_mq_alloc_tag_set(&self, set: *mut blk_mq_tag_set) -> core::ffi::c_int;
     fn sys_blk_mq_free_tag_set(&self, set: *mut blk_mq_tag_set);
-
+    fn sys_blk_queue_virt_boundary(&self, arg1: *mut request_queue, arg2: core::ffi::c_ulong);
+    fn sys_blk_queue_max_hw_sectors(&self, arg1: *mut request_queue, arg2: core::ffi::c_uint);
+    fn sys_blk_queue_max_segments(&self, arg1: *mut request_queue, arg2: core::ffi::c_ushort);
+    fn sys_blk_rq_nr_phys_segments(&self, rq: *mut request) -> core::ffi::c_ushort;
+    fn sys__blk_rq_map_sg(
+        &self,
+        q: *mut request_queue,
+        rq: *mut request,
+        sglist: *mut scatterlist,
+        last_sg: *mut *mut scatterlist,
+    ) -> core::ffi::c_int;
+    fn sys_blk_rq_payload_bytes(&self, rq: *mut request) -> core::ffi::c_uint;
+    fn sys_blk_mq_init_queue(&self, arg1: *mut blk_mq_tag_set) -> *mut request_queue;
+    fn sys_blk_mq_alloc_request(
+        &self,
+        q: *mut request_queue,
+        opf: blk_opf_t,
+        flags: blk_mq_req_flags_t,
+    ) -> *mut request;
+    fn sys_blk_mq_free_request(&self, rq: *mut request);
+    fn sys_blk_execute_rq(&self, rq: *mut request, at_head: bool_) -> blk_status_t;
+    fn sys_blk_status_to_errno(&self, status: blk_status_t) -> core::ffi::c_int;
+    fn sys_blk_mq_tag_to_rq(&self, tags: *mut blk_mq_tags, tag: core::ffi::c_uint) -> *mut request;
     // mutex
     fn sys__mutex_init(
         &self,
@@ -159,6 +183,180 @@ pub trait CoreFunction: Send + Sync {
         range_ns: u64_,
         mode: hrtimer_mode,
     );
+
+    // rcu
+    fn sys_rcu_read_lock(&self);
+    fn sys_rcu_read_unlock(&self);
+    fn sys_synchronize_rcu(&self);
+
+    // device
+    fn sys_dev_name(&self, dev: *const device) -> *const core::ffi::c_char;
+    fn sys_dma_set_mask(&self, dev: *mut device, mask: u64_) -> core::ffi::c_int;
+    fn sys_dma_set_coherent_mask(&self, dev: *mut device, mask: u64_) -> core::ffi::c_int;
+    fn sys_dma_map_sg_attrs(
+        &self,
+        dev: *mut device,
+        sg: *mut scatterlist,
+        nents: core::ffi::c_int,
+        dir: dma_data_direction,
+        attrs: core::ffi::c_ulong,
+    ) -> core::ffi::c_uint;
+    fn sys_dma_unmap_sg_attrs(
+        &self,
+        dev: *mut device,
+        sg: *mut scatterlist,
+        nents: core::ffi::c_int,
+        dir: dma_data_direction,
+        attrs: core::ffi::c_ulong,
+    );
+    fn sys_get_device(&self, dev: *mut device);
+    fn sys_put_device(&self, dev: *mut device);
+    fn sys_request_threaded_irq(
+        &self,
+        irq: core::ffi::c_uint,
+        handler: irq_handler_t,
+        thread_fn: irq_handler_t,
+        flags: core::ffi::c_ulong,
+        name: *const core::ffi::c_char,
+        dev_id: *mut core::ffi::c_void,
+    ) -> core::ffi::c_int;
+    fn sys_free_irq(
+        &self,
+        arg1: core::ffi::c_uint,
+        arg2: *mut core::ffi::c_void,
+    ) -> *const core::ffi::c_void;
+
+    // DMA
+    fn sys_dma_alloc_attrs(
+        &self,
+        dev: *mut device,
+        size: usize,
+        dma_handle: *mut dma_addr_t,
+        flag: gfp_t,
+        attrs: core::ffi::c_ulong,
+    ) -> *mut core::ffi::c_void;
+    fn sys_dma_free_attrs(
+        &self,
+        dev: *mut device,
+        size: usize,
+        cpu_addr: *mut core::ffi::c_void,
+        dma_handle: u64,
+        attrs: core::ffi::c_ulong,
+    );
+    fn sys_dma_pool_create(
+        &self,
+        name: *const core::ffi::c_char,
+        dev: *mut device,
+        size: usize,
+        align: usize,
+        boundary: usize,
+    ) -> *mut dma_pool;
+    fn sys_dma_pool_alloc(
+        &self,
+        pool: *mut dma_pool,
+        flag: gfp_t,
+        dma_handle: *mut dma_addr_t,
+    ) -> *mut core::ffi::c_void;
+    fn sys_dma_pool_free(
+        &self,
+        pool: *mut dma_pool,
+        vaddr: *mut core::ffi::c_void,
+        dma_handle: dma_addr_t,
+    );
+    fn sys_dma_pool_destroy(&self, pool: *mut dma_pool);
+
+    // IO REMAP
+    fn sys_ioremap(
+        &self,
+        offset: resource_size_t,
+        size: core::ffi::c_ulong,
+    ) -> *mut core::ffi::c_void;
+    fn sys_memcpy_fromio(
+        &self,
+        arg1: *mut core::ffi::c_void,
+        arg2: *const core::ffi::c_void,
+        arg3: usize,
+    );
+    fn sys_iounmap(&self, addr: *mut core::ffi::c_void);
+    fn sys_readb(&self, addr: *const core::ffi::c_void) -> u8_;
+    fn sys_readw(&self, addr: *const core::ffi::c_void) -> u16_;
+    fn sys_readl(&self, addr: *const core::ffi::c_void) -> u32_;
+    fn sys_readq(&self, addr: *const core::ffi::c_void) -> u64_;
+
+    fn sys_writeb(&self, value: u8_, addr: *mut core::ffi::c_void);
+    fn sys_writew(&self, value: u16_, addr: *mut core::ffi::c_void);
+    fn sys_writel(&self, value: u32_, addr: *mut core::ffi::c_void);
+    fn sys_writeq(&self, value: u64_, addr: *mut core::ffi::c_void);
+
+    fn sys_readb_relaxed(&self, addr: *const core::ffi::c_void) -> u8_;
+    fn sys_readw_relaxed(&self, addr: *const core::ffi::c_void) -> u16_;
+    fn sys_readl_relaxed(&self, addr: *const core::ffi::c_void) -> u32_;
+    fn sys_readq_relaxed(&self, addr: *const core::ffi::c_void) -> u64_;
+
+    fn sys_writeb_relaxed(&self, value: u8_, addr: *mut core::ffi::c_void);
+    fn sys_writew_relaxed(&self, value: u16_, addr: *mut core::ffi::c_void);
+    fn sys_writel_relaxed(&self, value: u32_, addr: *mut core::ffi::c_void);
+    fn sys_writeq_relaxed(&self, value: u64_, addr: *mut core::ffi::c_void);
+
+    //PCI
+    #[must_use]
+    fn sys__pci_register_driver(
+        &self,
+        arg1: *mut pci_driver,
+        arg2: *mut module,
+        mod_name: *const core::ffi::c_char,
+    ) -> core::ffi::c_int;
+    fn sys_pci_unregister_driver(&self, arg1: *mut pci_driver);
+    fn sys_pci_set_drvdata(&self, pdev: *mut pci_dev, data: *mut core::ffi::c_void);
+    fn sys_pci_get_drvdata(&self, pdev: *mut pci_dev) -> *mut core::ffi::c_void;
+    fn sys_pci_enable_device_mem(&self, pdev: *mut pci_dev) -> core::ffi::c_int;
+    fn sys_pci_set_master(&self, pdev: *mut pci_dev);
+    fn sys_pci_select_bars(&self, dev: *mut pci_dev, flags: core::ffi::c_ulong)
+        -> core::ffi::c_int;
+    fn sys_pci_request_selected_regions(
+        &self,
+        arg1: *mut pci_dev,
+        arg2: core::ffi::c_int,
+        arg3: *const core::ffi::c_char,
+    ) -> core::ffi::c_int;
+    fn sys_pci_alloc_irq_vectors_affinity(
+        &self,
+        dev: *mut pci_dev,
+        min_vecs: core::ffi::c_uint,
+        max_vecs: core::ffi::c_uint,
+        flags: core::ffi::c_uint,
+        affd: *mut irq_affinity,
+    ) -> core::ffi::c_int;
+    fn sys_pci_free_irq_vectors(&self, pdev: *mut pci_dev);
+    fn sys_pci_irq_vector(&self, pdev: *mut pci_dev, nr: core::ffi::c_uint) -> core::ffi::c_int;
+    fn sys_blk_mq_pci_map_queues(
+        &self,
+        qmap: *mut blk_mq_queue_map,
+        pdev: *mut pci_dev,
+        offset: core::ffi::c_int,
+    );
+    fn sys_blk_mq_map_queues(&self, qmap: *mut blk_mq_queue_map);
+    fn sys_dma_map_page_attrs(
+        &self,
+        dev: *mut device,
+        page: *mut page,
+        offset: usize,
+        size: usize,
+        dir: dma_data_direction,
+        attrs: core::ffi::c_ulong,
+    ) -> dma_addr_t;
+    fn sys_dma_unmap_page_attrs(
+        &self,
+        dev: *mut device,
+        handle: dma_addr_t,
+        size: usize,
+        dir: dma_data_direction,
+        attrs: core::ffi::c_ulong,
+    );
+
+
+    fn sys_num_possible_cpus( &self,) -> core::ffi::c_uint;
+    fn sys_mdelay(&self, msecs: u64);
 }
 
 #[cfg(feature = "core_impl")]
@@ -300,6 +498,8 @@ mod core_impl {
     pub(crate) fn sys_kunmap(page: *mut page) {
         CORE_FUNC.get_must().sys_kunmap(page)
     }
+
+    // blk
     pub(crate) fn sys__blk_mq_alloc_disk(
         set: *mut blk_mq_tag_set,
         queuedata: *mut core::ffi::c_void,
@@ -364,12 +564,67 @@ mod core_impl {
     pub(crate) fn sys_blk_mq_rq_from_pdu(pdu: *mut core::ffi::c_void) -> *mut request {
         CORE_FUNC.get_must().sys_blk_mq_rq_from_pdu(pdu)
     }
+    #[allow(unused)]
     pub(crate) fn sys_blk_mq_alloc_tag_set(set: *mut blk_mq_tag_set) -> core::ffi::c_int {
         CORE_FUNC.get_must().sys_blk_mq_alloc_tag_set(set)
     }
     #[allow(unused)]
     pub(crate) fn sys_blk_mq_free_tag_set(set: *mut blk_mq_tag_set) {
         CORE_FUNC.get_must().sys_blk_mq_free_tag_set(set)
+    }
+    pub(crate) fn sys_blk_queue_virt_boundary(arg1: *mut request_queue, arg2: core::ffi::c_ulong) {
+        CORE_FUNC.get_must().sys_blk_queue_virt_boundary(arg1, arg2)
+    }
+    pub(crate) fn sys_blk_queue_max_hw_sectors(arg1: *mut request_queue, arg2: core::ffi::c_uint) {
+        CORE_FUNC
+            .get_must()
+            .sys_blk_queue_max_hw_sectors(arg1, arg2)
+    }
+    pub(crate) fn sys_blk_queue_max_segments(arg1: *mut request_queue, arg2: core::ffi::c_ushort) {
+        CORE_FUNC.get_must().sys_blk_queue_max_segments(arg1, arg2)
+    }
+
+    pub(crate) fn sys_blk_rq_nr_phys_segments(rq: *mut request) -> core::ffi::c_ushort {
+        CORE_FUNC.get_must().sys_blk_rq_nr_phys_segments(rq)
+    }
+
+    pub(crate) fn sys__blk_rq_map_sg(
+        q: *mut request_queue,
+        rq: *mut request,
+        sglist: *mut scatterlist,
+        last_sg: *mut *mut scatterlist,
+    ) -> core::ffi::c_int {
+        CORE_FUNC
+            .get_must()
+            .sys__blk_rq_map_sg(q, rq, sglist, last_sg)
+    }
+    pub(crate) fn sys_blk_rq_payload_bytes(rq: *mut request) -> core::ffi::c_uint {
+        CORE_FUNC.get_must().sys_blk_rq_payload_bytes(rq)
+    }
+    pub(crate) fn sys_blk_mq_init_queue(arg1: *mut blk_mq_tag_set) -> *mut request_queue {
+        CORE_FUNC.get_must().sys_blk_mq_init_queue(arg1)
+    }
+    pub(crate) fn sys_blk_mq_alloc_request(
+        q: *mut request_queue,
+        opf: blk_opf_t,
+        flags: blk_mq_req_flags_t,
+    ) -> *mut request {
+        CORE_FUNC.get_must().sys_blk_mq_alloc_request(q, opf, flags)
+    }
+    pub(crate) fn sys_blk_execute_rq(rq: *mut request, at_head: bool_) -> blk_status_t {
+        CORE_FUNC.get_must().sys_blk_execute_rq(rq, at_head)
+    }
+    pub(crate) fn sys_blk_status_to_errno(status: blk_status_t) -> core::ffi::c_int {
+        CORE_FUNC.get_must().sys_blk_status_to_errno(status)
+    }
+    pub(crate) fn sys_blk_mq_free_request(rq: *mut request) {
+        CORE_FUNC.get_must().sys_blk_mq_free_request(rq)
+    }
+    pub(crate) fn sys_blk_mq_tag_to_rq(
+        tags: *mut blk_mq_tags,
+        tag: core::ffi::c_uint,
+    ) -> *mut request {
+        CORE_FUNC.get_must().sys_blk_mq_tag_to_rq(tags, tag)
     }
 
     // mutex
@@ -483,6 +738,313 @@ mod core_impl {
         CORE_FUNC
             .get_must()
             .sys_hrtimer_start_range_ns(timer, tim, range_ns, mode);
+    }
+
+    // rcu
+
+    pub(crate) fn sys_rcu_read_lock() {
+        CORE_FUNC.get_must().sys_rcu_read_lock();
+    }
+    pub(crate) fn sys_rcu_read_unlock() {
+        CORE_FUNC.get_must().sys_rcu_read_unlock();
+    }
+    pub(crate) fn sys_synchronize_rcu() {
+        CORE_FUNC.get_must().sys_synchronize_rcu();
+    }
+
+    // device
+    pub(crate) fn sys_dev_name(dev: *const device) -> *const core::ffi::c_char {
+        CORE_FUNC.get_must().sys_dev_name(dev)
+    }
+    pub(crate) fn sys_dma_set_mask(dev: *mut device, mask: u64_) -> core::ffi::c_int {
+        CORE_FUNC.get_must().sys_dma_set_mask(dev, mask)
+    }
+    pub(crate) fn sys_dma_set_coherent_mask(dev: *mut device, mask: u64_) -> core::ffi::c_int {
+        CORE_FUNC.get_must().sys_dma_set_coherent_mask(dev, mask)
+    }
+    pub(crate) fn sys_dma_map_sg_attrs(
+        dev: *mut device,
+        sg: *mut scatterlist,
+        nents: core::ffi::c_int,
+        dir: dma_data_direction,
+        attrs: core::ffi::c_ulong,
+    ) -> core::ffi::c_uint {
+        CORE_FUNC
+            .get_must()
+            .sys_dma_map_sg_attrs(dev, sg, nents, dir, attrs)
+    }
+
+    pub(crate) fn sys_dma_unmap_sg_attrs(
+        dev: *mut device,
+        sg: *mut scatterlist,
+        nents: core::ffi::c_int,
+        dir: dma_data_direction,
+        attrs: core::ffi::c_ulong,
+    ) {
+        CORE_FUNC
+            .get_must()
+            .sys_dma_unmap_sg_attrs(dev, sg, nents, dir, attrs)
+    }
+    pub(crate) fn sys_get_device(dev: *mut device) {
+        CORE_FUNC.get_must().sys_get_device(dev)
+    }
+    pub(crate) fn sys_put_device(dev: *mut device) {
+        CORE_FUNC.get_must().sys_put_device(dev)
+    }
+
+    #[must_use]
+    pub(crate) fn sys_request_threaded_irq(
+        irq: core::ffi::c_uint,
+        handler: irq_handler_t,
+        thread_fn: irq_handler_t,
+        flags: core::ffi::c_ulong,
+        name: *const core::ffi::c_char,
+        dev: *mut core::ffi::c_void,
+    ) -> core::ffi::c_int {
+        CORE_FUNC
+            .get_must()
+            .sys_request_threaded_irq(irq, handler, thread_fn, flags, name, dev)
+    }
+    pub(crate) fn sys_free_irq(
+        arg1: core::ffi::c_uint,
+        arg2: *mut core::ffi::c_void,
+    ) -> *const core::ffi::c_void {
+        CORE_FUNC.get_must().sys_free_irq(arg1, arg2)
+    }
+
+    // dma
+    pub(crate) fn sys_dma_free_attrs(
+        dev: *mut device,
+        size: usize,
+        cpu_addr: *mut core::ffi::c_void,
+        dma_handle: dma_addr_t,
+        attrs: core::ffi::c_ulong,
+    ) {
+        CORE_FUNC
+            .get_must()
+            .sys_dma_free_attrs(dev, size, cpu_addr, dma_handle, attrs)
+    }
+    pub(crate) fn sys_dma_alloc_attrs(
+        dev: *mut device,
+        size: usize,
+        dma_handle: *mut dma_addr_t,
+        flag: gfp_t,
+        attrs: core::ffi::c_ulong,
+    ) -> *mut core::ffi::c_void {
+        CORE_FUNC
+            .get_must()
+            .sys_dma_alloc_attrs(dev, size, dma_handle, flag, attrs)
+    }
+    pub(crate) fn sys_dma_pool_create(
+        name: *const core::ffi::c_char,
+        dev: *mut device,
+        size: usize,
+        align: usize,
+        allocation: usize,
+    ) -> *mut dma_pool {
+        CORE_FUNC
+            .get_must()
+            .sys_dma_pool_create(name, dev, size, align, allocation)
+    }
+    pub(crate) fn sys_dma_pool_alloc(
+        pool: *mut dma_pool,
+        mem_flags: gfp_t,
+        handle: *mut dma_addr_t,
+    ) -> *mut core::ffi::c_void {
+        CORE_FUNC
+            .get_must()
+            .sys_dma_pool_alloc(pool, mem_flags, handle)
+    }
+    pub(crate) fn sys_dma_pool_free(
+        pool: *mut dma_pool,
+        vaddr: *mut core::ffi::c_void,
+        addr: dma_addr_t,
+    ) {
+        CORE_FUNC.get_must().sys_dma_pool_free(pool, vaddr, addr)
+    }
+    pub(crate) fn sys_dma_pool_destroy(pool: *mut dma_pool) {
+        CORE_FUNC.get_must().sys_dma_pool_destroy(pool)
+    }
+
+    // IO REMAP
+    pub(crate) fn sys_ioremap(
+        offset: resource_size_t,
+        size: core::ffi::c_ulong,
+    ) -> *mut core::ffi::c_void {
+        CORE_FUNC.get_must().sys_ioremap(offset, size)
+    }
+    pub(crate) fn sys_memcpy_fromio(
+        arg1: *mut core::ffi::c_void,
+        arg2: *const core::ffi::c_void,
+        arg3: usize,
+    ) {
+        CORE_FUNC.get_must().sys_memcpy_fromio(arg1, arg2, arg3)
+    }
+    pub(crate) fn sys_iounmap(addr: *mut core::ffi::c_void) {
+        CORE_FUNC.get_must().sys_iounmap(addr)
+    }
+
+    pub mod io {
+        use kbind::*;
+
+        use super::CORE_FUNC;
+        use crate::OnceGet;
+
+        pub(crate) fn readb(addr: *const core::ffi::c_void) -> u8_ {
+            CORE_FUNC.get_must().sys_readb(addr)
+        }
+        pub(crate) fn readw(addr: *const core::ffi::c_void) -> u16_ {
+            CORE_FUNC.get_must().sys_readw(addr)
+        }
+        pub(crate) fn readl(addr: *const core::ffi::c_void) -> u32_ {
+            CORE_FUNC.get_must().sys_readl(addr)
+        }
+        pub(crate) fn readq(addr: *const core::ffi::c_void) -> u64_ {
+            CORE_FUNC.get_must().sys_readq(addr)
+        }
+
+        pub(crate) fn writeb(value: u8_, addr: *mut core::ffi::c_void) {
+            CORE_FUNC.get_must().sys_writeb(value, addr)
+        }
+        pub(crate) fn writew(value: u16_, addr: *mut core::ffi::c_void) {
+            CORE_FUNC.get_must().sys_writew(value, addr)
+        }
+        pub(crate) fn writel(value: u32_, addr: *mut core::ffi::c_void) {
+            CORE_FUNC.get_must().sys_writel(value, addr)
+        }
+        pub(crate) fn writeq(value: u64_, addr: *mut core::ffi::c_void) {
+            CORE_FUNC.get_must().sys_writeq(value, addr)
+        }
+
+        pub(crate) fn readb_relaxed(addr: *const core::ffi::c_void) -> u8_ {
+            CORE_FUNC.get_must().sys_readb_relaxed(addr)
+        }
+        pub(crate) fn readw_relaxed(addr: *const core::ffi::c_void) -> u16_ {
+            CORE_FUNC.get_must().sys_readw_relaxed(addr)
+        }
+        pub(crate) fn readl_relaxed(addr: *const core::ffi::c_void) -> u32_ {
+            CORE_FUNC.get_must().sys_readl_relaxed(addr)
+        }
+        pub(crate) fn readq_relaxed(addr: *const core::ffi::c_void) -> u64_ {
+            CORE_FUNC.get_must().sys_readq_relaxed(addr)
+        }
+
+        pub(crate) fn writeb_relaxed(value: u8_, addr: *mut core::ffi::c_void) {
+            CORE_FUNC.get_must().sys_writeb_relaxed(value, addr)
+        }
+        pub(crate) fn writew_relaxed(value: u16_, addr: *mut core::ffi::c_void) {
+            CORE_FUNC.get_must().sys_writew_relaxed(value, addr)
+        }
+        pub(crate) fn writel_relaxed(value: u32_, addr: *mut core::ffi::c_void) {
+            CORE_FUNC.get_must().sys_writel_relaxed(value, addr)
+        }
+        pub(crate) fn writeq_relaxed(value: u64_, addr: *mut core::ffi::c_void) {
+            CORE_FUNC.get_must().sys_writeq_relaxed(value, addr)
+        }
+    }
+
+    // PCI
+    #[must_use]
+    pub(crate) fn sys__pci_register_driver(
+        arg1: *mut pci_driver,
+        arg2: *mut module,
+        mod_name: *const core::ffi::c_char,
+    ) -> core::ffi::c_int {
+        CORE_FUNC
+            .get_must()
+            .sys__pci_register_driver(arg1, arg2, mod_name)
+    }
+
+    pub(crate) fn sys_pci_unregister_driver(dev: *mut pci_driver) {
+        CORE_FUNC.get_must().sys_pci_unregister_driver(dev)
+    }
+    pub(crate) fn sys_pci_set_drvdata(pdev: *mut pci_dev, data: *mut core::ffi::c_void) {
+        CORE_FUNC.get_must().sys_pci_set_drvdata(pdev, data)
+    }
+    pub(crate) fn sys_pci_get_drvdata(pdev: *mut pci_dev) -> *mut core::ffi::c_void {
+        CORE_FUNC.get_must().sys_pci_get_drvdata(pdev)
+    }
+    #[must_use]
+    pub(crate) fn sys_pci_enable_device_mem(dev: *mut pci_dev) -> core::ffi::c_int {
+        CORE_FUNC.get_must().sys_pci_enable_device_mem(dev)
+    }
+    pub(crate) fn sys_pci_set_master(dev: *mut pci_dev) {
+        CORE_FUNC.get_must().sys_pci_set_master(dev)
+    }
+    pub(crate) fn sys_pci_select_bars(
+        dev: *mut pci_dev,
+        flags: core::ffi::c_ulong,
+    ) -> core::ffi::c_int {
+        CORE_FUNC.get_must().sys_pci_select_bars(dev, flags)
+    }
+    pub(crate) fn sys_pci_request_selected_regions(
+        arg1: *mut pci_dev,
+        arg2: core::ffi::c_int,
+        arg3: *const core::ffi::c_char,
+    ) -> core::ffi::c_int {
+        CORE_FUNC
+            .get_must()
+            .sys_pci_request_selected_regions(arg1, arg2, arg3)
+    }
+
+    pub(crate) fn sys_pci_alloc_irq_vectors_affinity(
+        dev: *mut pci_dev,
+        min_vecs: core::ffi::c_uint,
+        max_vecs: core::ffi::c_uint,
+        flags: core::ffi::c_uint,
+        affd: *mut irq_affinity,
+    ) -> core::ffi::c_int {
+        CORE_FUNC
+            .get_must()
+            .sys_pci_alloc_irq_vectors_affinity(dev, min_vecs, max_vecs, flags, affd)
+    }
+    pub(crate) fn sys_pci_free_irq_vectors(dev: *mut pci_dev) {
+        CORE_FUNC.get_must().sys_pci_free_irq_vectors(dev)
+    }
+    pub(crate) fn sys_pci_irq_vector(dev: *mut pci_dev, nr: core::ffi::c_uint) -> core::ffi::c_int {
+        CORE_FUNC.get_must().sys_pci_irq_vector(dev, nr)
+    }
+    pub fn sys_blk_mq_pci_map_queues(
+        qmap: *mut blk_mq_queue_map,
+        pdev: *mut pci_dev,
+        offset: core::ffi::c_int,
+    ) {
+        CORE_FUNC
+            .get_must()
+            .sys_blk_mq_pci_map_queues(qmap, pdev, offset)
+    }
+    pub fn sys_blk_mq_map_queues(qmap: *mut blk_mq_queue_map) {
+        CORE_FUNC.get_must().sys_blk_mq_map_queues(qmap)
+    }
+    pub fn sys_dma_map_page_attrs(
+        dev: *mut device,
+        page: *mut page,
+        offset: usize,
+        size: usize,
+        dir: dma_data_direction,
+        attrs: core::ffi::c_ulong,
+    ) -> dma_addr_t {
+        CORE_FUNC
+            .get_must()
+            .sys_dma_map_page_attrs(dev, page, offset, size, dir, attrs)
+    }
+    pub fn sys_dma_unmap_page_attrs(
+        dev: *mut device,
+        addr: dma_addr_t,
+        size: usize,
+        dir: dma_data_direction,
+        attrs: core::ffi::c_ulong,
+    ) {
+        CORE_FUNC
+            .get_must()
+            .sys_dma_unmap_page_attrs(dev, addr, size, dir, attrs)
+    }
+
+    pub fn sys_num_possible_cpus() -> core::ffi::c_uint {
+        CORE_FUNC.get_must().sys_num_possible_cpus()
+    }
+    pub fn sys_mdelay(ms: u64){
+        CORE_FUNC.get_must().sys_mdelay(ms)
     }
 }
 

@@ -10,7 +10,7 @@ use kmacro::vtable;
 
 use crate::{
     bindings,
-    block::mq::{tag_set::TagSetRef, Request},
+    block::mq::{Request, TagSet},
     error::{from_result, KernelResult as Result},
     init::PinInit,
     pr_info,
@@ -60,7 +60,7 @@ pub trait Operations: Sized {
     );
 
     /// Called by the kernel when the request is completed
-    fn complete(_rq: Request<Self>);
+    fn complete(_rq: &Request<Self>);
 
     /// Called by the kernel to allocate and initialize a driver specific hardware context data
     fn init_hctx(
@@ -69,13 +69,15 @@ pub trait Operations: Sized {
     ) -> Result<Self::HwData>;
 
     /// Called by the kernel to poll the device for completed requests. Only used for poll queues.
-    fn poll(_hw_data: <Self::HwData as ForeignOwnable>::Borrowed<'_>) -> i32 {
-        unreachable!()
+    /// Called by the kernel to poll the device for completed requests. Only
+    /// used for poll queues.
+    fn poll(_hw_data: <Self::HwData as ForeignOwnable>::Borrowed<'_>) -> bool {
+        unreachable!("poll: {}", crate::error::VTABLE_DEFAULT_ERROR)
     }
 
     /// Called by the kernel to map submission queues to CPU cores.
-    fn map_queues(_tag_set: &TagSetRef) {
-        unreachable!()
+    fn map_queues(_tag_set: &TagSet<Self>) {
+        unreachable!("map_queues: {}", crate::error::VTABLE_DEFAULT_ERROR)
     }
 
     // There is no need for exit_request() because `drop` will be called.
@@ -155,16 +157,24 @@ impl<T: Operations> OperationsVtable<T> {
 
     unsafe extern "C" fn complete_callback(rq: *mut bindings::request) {
         // pr_info!("complete_callback began");
-        T::complete(unsafe { Request::from_ptr(rq) });
+        T::complete(unsafe { &Request::from_ptr(rq) });
         // pr_info!("complete_callback ended");
     }
 
+    /// # Safety
+    ///
+    /// This function may only be called by blk-mq C infrastructure. `hctx` must
+    /// be a pointer to a valid and aligned `struct blk_mq_hw_ctx` that was
+    /// previously initialized by a call to `init_hctx_callback`.
     unsafe extern "C" fn poll_callback(
         hctx: *mut bindings::blk_mq_hw_ctx,
         _iob: *mut bindings::io_comp_batch,
     ) -> core::ffi::c_int {
+        // SAFETY: By function safety requirement, `hctx` was initialized by
+        // `init_hctx_callback` and thus `driver_data` came from a call to
+        // `into_foreign`.
         let hw_data = unsafe { T::HwData::borrow((*hctx).driver_data) };
-        T::poll(hw_data)
+        T::poll(hw_data).into()
     }
 
     unsafe extern "C" fn init_hctx_callback(
@@ -236,11 +246,17 @@ impl<T: Operations> OperationsVtable<T> {
         // pr_info!("exit_request_callback ended");
     }
 
-    unsafe extern "C" fn map_queues_callback(tag_set_ptr: *mut bindings::blk_mq_tag_set) {
-        let tag_set = unsafe { TagSetRef::from_ptr(tag_set_ptr) };
-        T::map_queues(&tag_set);
+    /// # Safety
+    ///
+    /// This function may only be called by blk-mq C infrastructure. `tag_set`
+    /// must be a pointer to a valid and initialized `TagSet<T>`. The pointee
+    /// must be valid for use as a reference at least the duration of this call.
+    unsafe extern "C" fn map_queues_callback(tag_set: *mut bindings::blk_mq_tag_set) {
+        // SAFETY: The safety requirements of this function satiesfies the
+        // requirements of `TagSet::from_ptr`.
+        let tag_set = unsafe { TagSet::from_ptr(tag_set) };
+        T::map_queues(tag_set);
     }
-
     const VTABLE: bindings::blk_mq_ops = bindings::blk_mq_ops {
         queue_rq: Some(Self::queue_rq_callback),
         queue_rqs: None,

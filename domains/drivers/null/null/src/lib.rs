@@ -2,11 +2,10 @@
 #![forbid(unsafe_code)]
 extern crate alloc;
 
-use alloc::boxed::Box;
-use alloc::string::String;
-use core::fmt::Debug;
-use core::sync::atomic::AtomicBool;
-use basic::{println, LinuxResult};
+use alloc::{boxed::Box, string::String};
+use core::{fmt::Debug, sync::atomic::AtomicBool};
+use basic::{LinuxResult};
+use basic::console::*;
 use interface::{empty_device::EmptyDeviceDomain, Basic};
 use rref::RRefVec;
 
@@ -66,7 +65,6 @@ impl EmptyDeviceDomain for UnwindWrap {
 pub fn main() -> Box<dyn EmptyDeviceDomain> {
     Box::new(UnwindWrap::new(NullDeviceDomainImpl))
 }
-
 
 #[derive(Debug)]
 struct PrintOnDrop(String);

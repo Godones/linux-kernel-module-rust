@@ -94,14 +94,14 @@ impl<T: FileSystem + ?Sized, S> SuperBlock<T, S> {
     }
 
     /// Returns the block device associated with the superblock.
-    pub fn bdev(&self) -> &block::Device {
+    pub fn bdev(&self) -> &block::BlkDevice {
         if !matches!(T::SUPER_TYPE, Type::BlockDev) {
             build_error!("bdev is only available in blockdev superblocks");
         }
 
         // SAFETY: The superblock is valid and given that it's a blockdev superblock it must have a
         // valid `s_bdev` that remains valid while the superblock (`self`) is valid.
-        unsafe { block::Device::from_raw((*self.0.get()).s_bdev) }
+        unsafe { block::BlkDevice::from_raw((*self.0.get()).s_bdev) }
     }
 
     /// Returns the number of sectors in the underlying block device.

@@ -1,22 +1,27 @@
 use alloc::{boxed::Box, sync::Arc};
 use core::{fmt::Debug, pin::Pin};
 
-use basic::{impl_has_timer, kernel::{
-    block,
-    block::{
-        bio::Segment,
-        mq,
-        mq::{GenDisk, Operations, TagSet},
+use basic::{
+    impl_has_timer,
+    kernel::{
+        block,
+        block::{
+            bio::Segment,
+            mq,
+            mq::{GenDisk, Operations, TagSet},
+        },
+        error,
+        error::{Error, KernelResult},
+        mm::pages::Pages,
+        radix_tree::RadixTree,
+        sync::{Mutex, SpinLock, UniqueArc},
+        time,
+        time::hrtimer::{RawTimer, TimerCallback},
+        types::ForeignOwnable,
     },
-    error,
-    error::{Error, KernelResult},
-    mm::pages::Pages,
-    radix_tree::RadixTree,
-    sync::{Mutex, SpinLock},
-    time,
-    time::hrtimer::{RawTimer, TimerCallback},
-    types::ForeignOwnable,
-}, new_mutex, new_spinlock, println, SafePtr};
+    new_mutex, new_spinlock, SafePtr,
+};
+use basic::console::*;
 use interface::null_block::BlockArgs;
 use kmacro::vtable;
 use pinned_init::{pin_data, pin_init, InPlaceInit, PinInit};
@@ -56,7 +61,8 @@ impl NullBlkDomain {
     pub fn init(args: &BlockArgs) -> KernelResult<Self> {
         println!("Rust null_blk loaded");
         // TODO: Major device number?
-        let tagset = TagSet::try_new_no_alloc(1, (), 256, 1)?;
+        let tagset = UniqueArc::try_pin_init(TagSet::try_new_no_alloc(1, (), 256, 1))?.into();
+
         let disk = Box::pin_init(new_mutex!(add_disk(tagset, args)?, "nullb:disk"))?;
         Ok(Self {
             disk,
@@ -227,7 +233,7 @@ impl Operations for NullBlkDevice {
     ) {
     }
 
-    fn complete(rq: mq::Request<Self>) {
+    fn complete(rq: &mq::Request<Self>) {
         rq.end_ok();
     }
 

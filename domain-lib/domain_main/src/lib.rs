@@ -21,7 +21,7 @@ fn panic_impl() -> TokenStream {
         #[panic_handler]
         fn panic(info: &PanicInfo) -> ! {
             if let Some(p) = info.location() {
-                basic::println_color!(
+                basic::console::println_color!(
                     31,
                     "line {}, file {}: {}",
                     p.line(),
@@ -29,7 +29,7 @@ fn panic_impl() -> TokenStream {
                     info.message()
                 );
             } else {
-                basic::println_color!(31, "no location information available");
+                basic::console::println_color!(31, "no location information available");
             }
             basic::backtrace(domain_id());
             static FAKE_LOCK: basic::sync::Mutex<()> = basic::sync::Mutex::new(());

@@ -194,6 +194,65 @@ extern "C" {
     pub fn memalloc_nofs_save() -> core::ffi::c_uint;
     #[link_name = "rust_helper_memalloc_nofs_restore"]
     pub fn memalloc_nofs_restore(flags: core::ffi::c_uint);
+
+    //io mem
+    #[link_name = "rust_helper_readb"]
+    pub fn readb(addr: *const core::ffi::c_void) -> u8_;
+    #[link_name = "rust_helper_readw"]
+    pub fn readw(addr: *const core::ffi::c_void) -> u16_;
+    #[link_name = "rust_helper_readl"]
+    pub fn readl(addr: *const core::ffi::c_void) -> u32_;
+    #[link_name = "rust_helper_readq"]
+    pub fn readq(addr: *const core::ffi::c_void) -> u64_;
+    #[link_name = "rust_helper_writeb"]
+    pub fn writeb(value: u8_, addr: *mut core::ffi::c_void);
+    #[link_name = "rust_helper_writew"]
+    pub fn writew(value: u16_, addr: *mut core::ffi::c_void);
+    #[link_name = "rust_helper_writel"]
+    pub fn writel(value: u32_, addr: *mut core::ffi::c_void);
+    #[link_name = "rust_helper_writeq"]
+    pub fn writeq(value: u64_, addr: *mut core::ffi::c_void);
+
+    #[link_name = "rust_helper_readb_relaxed"]
+    pub fn readb_relaxed(addr: *const core::ffi::c_void) -> u8_;
+    #[link_name = "rust_helper_readw_relaxed"]
+    pub fn readw_relaxed(addr: *const core::ffi::c_void) -> u16_;
+    #[link_name = "rust_helper_readl_relaxed"]
+    pub fn readl_relaxed(addr: *const core::ffi::c_void) -> u32_;
+    #[link_name = "rust_helper_readq_relaxed"]
+    pub fn readq_relaxed(addr: *const core::ffi::c_void) -> u64_;
+
+    #[link_name = "rust_helper_writeb_relaxed"]
+    pub fn writeb_relaxed(value: u8_, addr: *mut core::ffi::c_void);
+    #[link_name = "rust_helper_writew_relaxed"]
+    pub fn writew_relaxed(value: u16_, addr: *mut core::ffi::c_void);
+    #[link_name = "rust_helper_writel_relaxed"]
+    pub fn writel_relaxed(value: u32_, addr: *mut core::ffi::c_void);
+    #[link_name = "rust_helper_writeq_relaxed"]
+    pub fn writeq_relaxed(value: u64_, addr: *mut core::ffi::c_void);
+
+    // blk
+    #[link_name = "rust_helper_blk_mq_tag_to_rq"]
+    pub fn blk_mq_tag_to_rq(tags: *mut blk_mq_tags, tag: core::ffi::c_uint) -> *mut request;
+    #[link_name = "rust_helper_blk_rq_payload_bytes"]
+    pub fn blk_rq_payload_bytes(rq: *mut request) -> core::ffi::c_uint;
+    #[link_name = "rust_helper_blk_rq_nr_phys_segments"]
+    pub fn blk_rq_nr_phys_segments(rq: *mut request) -> core::ffi::c_ushort;
+
+    #[link_name = "rust_helper_dev_name"]
+    pub fn dev_name(dev: *const device) -> *const core::ffi::c_char;
+
+    // PCI
+    #[link_name = "rust_helper_pci_set_drvdata"]
+    pub fn pci_set_drvdata(pdev: *mut pci_dev, data: *mut core::ffi::c_void);
+    #[link_name = "rust_helper_pci_get_drvdata"]
+    pub fn pci_get_drvdata(pdev: *mut pci_dev) -> *mut core::ffi::c_void;
+
+    #[link_name = "rust_helper_mdelay"]
+    pub fn mdelay(ms: u64);
+    #[link_name = "rust_helper_num_possible_cpus"]
+    pub fn num_possible_cpus() -> core::ffi::c_uint;
+
 }
 
 #[repr(C)]

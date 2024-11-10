@@ -2,15 +2,17 @@
 
 //! Kernel types.
 
-use alloc::boxed::Box;
+use alloc::{boxed::Box, sync::Arc};
 use core::{
     cell::UnsafeCell,
+    ffi::c_void,
     fmt::Debug,
     marker::{PhantomData, PhantomPinned},
-    mem::MaybeUninit,
+    mem::{ManuallyDrop, MaybeUninit},
     ops::{Deref, DerefMut},
     pin::Pin,
     ptr::NonNull,
+    sync::atomic::{AtomicPtr, Ordering},
 };
 
 use pinned_init::*;
@@ -132,6 +134,86 @@ impl<T: 'static> ForeignOwnable for Box<T> {
     }
 }
 
+impl<T: 'static> ForeignOwnable for Arc<T> {
+    type Borrowed<'a> = ArcBorrow<'a, T>;
+    type BorrowedMut<'a> = ();
+
+    fn into_foreign(self) -> *const core::ffi::c_void {
+        // SAFETY: We are transferring ownership of the reference count increment to the foreign
+        // code.
+        let ptr = Arc::into_raw(self);
+        ptr as _
+    }
+
+    unsafe fn from_foreign(ptr: *const core::ffi::c_void) -> Self {
+        // SAFETY: By the safety requirement of this function, we know that `ptr` came from
+        // a previous call to `Arc::into_foreign`, which guarantees that `ptr` is valid and
+        // holds a reference count increment that is transferrable to us.
+        unsafe { Self::from_raw(ptr as _) }
+    }
+
+    unsafe fn borrow<'a>(ptr: *const core::ffi::c_void) -> ArcBorrow<'a, T> {
+        // SAFETY: By the safety requirement of this function, we know that `ptr` came from
+        // a previous call to `Arc::into_foreign`.
+        let inner = unsafe { &*(ptr as *const T) };
+
+        // SAFETY: The safety requirements of `from_foreign` ensure that the object remains alive
+        // for the lifetime of the returned value.
+        ArcBorrow::new(inner)
+    }
+
+    unsafe fn borrow_mut<'a>(_ptr: *const c_void) -> Self::BorrowedMut<'a> {
+        todo!()
+    }
+}
+
+pub trait ArcExt {
+    type T: ?Sized;
+    fn as_arc_borrow(&self) -> ArcBorrow<Self::T>;
+}
+
+impl<T: ?Sized> ArcExt for Arc<T> {
+    type T = T;
+    fn as_arc_borrow(&self) -> ArcBorrow<Self::T> {
+        let v = self.as_ref();
+        ArcBorrow::new(v)
+    }
+}
+
+impl<T: ?Sized> From<ArcBorrow<'_, T>> for Arc<T> {
+    fn from(b: ArcBorrow<'_, T>) -> Self {
+        let ptr = b.inner as *const T;
+        unsafe {
+            let t = ManuallyDrop::new(Arc::from_raw(ptr));
+            t.deref().clone()
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy)]
+pub struct ArcBorrow<'a, T: ?Sized + 'a> {
+    inner: &'a T,
+    _p: PhantomData<&'a ()>,
+}
+
+impl<'a, T: ?Sized> ArcBorrow<'a, T> {
+    fn new(inner: &'a T) -> Self {
+        // INVARIANT: The safety requirements guarantee the invariants.
+        Self {
+            inner,
+            _p: PhantomData,
+        }
+    }
+}
+impl<T: ?Sized> Deref for ArcBorrow<'_, T> {
+    type Target = T;
+
+    fn deref(&self) -> &Self::Target {
+        // SAFETY: By the type invariant, the underlying object is still alive with no mutable
+        // references to it, so it is safe to create a shared reference.
+        self.inner
+    }
+}
 impl ForeignOwnable for () {
     type Borrowed<'a> = ();
     type BorrowedMut<'a> = ();
@@ -648,4 +730,54 @@ macro_rules! derive_readable_from_bytes {
             };
         )*
     };
+}
+
+/// An optional atomic boxed value.
+pub struct AtomicOptionalBoxedPtr<T> {
+    ptr: AtomicPtr<T>,
+}
+
+impl<T> AtomicOptionalBoxedPtr<T> {
+    /// Creates a new instance with the given value.
+    pub fn new(value: Option<Box<T>>) -> Self {
+        Self {
+            ptr: AtomicPtr::new(Self::to_ptr(value)),
+        }
+    }
+
+    fn to_ptr(value: Option<Box<T>>) -> *mut T {
+        if let Some(v) = value {
+            Box::into_raw(v)
+        } else {
+            core::ptr::null_mut()
+        }
+    }
+
+    /// Swaps the existing boxed value with the given one.
+    pub fn swap(&self, value: Option<Box<T>>, order: Ordering) -> Option<Box<T>> {
+        let ptr = self.ptr.swap(Self::to_ptr(value), order);
+        if ptr.is_null() {
+            return None;
+        }
+        // SAFETY: All non-null values that are stored come from `Box::into_raw`. Additionally,
+        // they are always swapped by something else when read.
+        Some(unsafe { Box::from_raw(ptr) })
+    }
+
+    /// Stores a new value. The previous value is dropped.
+    pub fn store(&self, value: Option<Box<T>>, order: Ordering) {
+        self.swap(value, order);
+    }
+
+    /// Stores a new value and returns the old one.
+    pub fn take(&self, order: Ordering) -> Option<Box<T>> {
+        self.swap(None, order)
+    }
+}
+
+impl<T> Drop for AtomicOptionalBoxedPtr<T> {
+    fn drop(&mut self) {
+        // Noone else has a reference to this object.
+        self.take(Ordering::Relaxed);
+    }
 }

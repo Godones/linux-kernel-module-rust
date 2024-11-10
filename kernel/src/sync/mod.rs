@@ -9,13 +9,15 @@ use crate::types::Opaque;
 pub mod lock;
 mod locked_by;
 mod per_cpu;
-mod rcu;
+pub mod rcu;
+mod revocable;
 mod srcu;
 
 pub use lock::{mutex::Mutex, spinlock::SpinLock};
 pub use locked_by::LockedBy;
 pub use per_cpu::*;
 pub use rcu::RcuData;
+pub use revocable::RevocableMutex;
 pub use srcu::SRcuData;
 
 use crate::bindings;

@@ -2,7 +2,8 @@
 members = [
     "null",
     "logger",
-    "rnull"
+    "rnull",
+    "rnvme"
 ]
 
 init_members = [
@@ -12,5 +13,6 @@ init_members = [
 disk_members = [
     "null",
     "logger",
-    "rnull"
+    "rnull",
+    "rnvme"
 ]

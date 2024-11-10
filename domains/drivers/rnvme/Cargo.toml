@@ -1,0 +1,7 @@
+[workspace]
+members = [
+    "grnvme",
+    "rnvme"
+]
+
+resolver = "2"

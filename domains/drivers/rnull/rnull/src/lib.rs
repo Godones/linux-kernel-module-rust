@@ -1,13 +1,14 @@
 #![no_std]
 #![feature(impl_trait_in_assoc_type)]
 #![feature(allocator_api)]
+#![forbid(unsafe_code)]
 mod block_domain;
 
 extern crate alloc;
 use alloc::boxed::Box;
 use core::fmt::Debug;
-
-use basic::{kernel::block::mq::OperationsConverter, println, LinuxError, LinuxResult, SafePtr};
+use basic::console::*;
+use basic::{ kernel::block::mq::OperationsConverter, LinuxError, LinuxResult, SafePtr };
 use interface::{
     null_block::{BlockArgs, BlockDeviceDomain},
     Basic,
@@ -76,7 +77,12 @@ impl BlockDeviceDomain for NullDeviceDomainImpl {
         Ok(())
     }
 
-    fn init_request(&self, tag_set_ptr: SafePtr, rq_ptr: SafePtr, driver_data_ptr: SafePtr) -> LinuxResult<()> {
+    fn init_request(
+        &self,
+        tag_set_ptr: SafePtr,
+        rq_ptr: SafePtr,
+        driver_data_ptr: SafePtr,
+    ) -> LinuxResult<()> {
         OperationsConverter::<NullBlkDevice>::init_request(tag_set_ptr, rq_ptr, driver_data_ptr)
             .map_err(|e| {
                 println!("NullBlkModule init_request error: {:?}", e);
@@ -91,7 +97,12 @@ impl BlockDeviceDomain for NullDeviceDomainImpl {
         })
     }
 
-    fn init_hctx(&self, hctx_ptr: SafePtr, tag_set_data_ptr: SafePtr, hctx_idx: usize) -> LinuxResult<()> {
+    fn init_hctx(
+        &self,
+        hctx_ptr: SafePtr,
+        tag_set_data_ptr: SafePtr,
+        hctx_idx: usize,
+    ) -> LinuxResult<()> {
         OperationsConverter::<NullBlkDevice>::init_hctx(hctx_ptr, tag_set_data_ptr, hctx_idx)
             .map_err(|e| {
                 println!("NullBlkModule init_hctx error: {:?}", e);
@@ -106,7 +117,12 @@ impl BlockDeviceDomain for NullDeviceDomainImpl {
         })
     }
 
-    fn queue_rq(&self, hctx_ptr: SafePtr, bd_ptr: SafePtr, hctx_driver_data_ptr: SafePtr) -> LinuxResult<()> {
+    fn queue_rq(
+        &self,
+        hctx_ptr: SafePtr,
+        bd_ptr: SafePtr,
+        hctx_driver_data_ptr: SafePtr,
+    ) -> LinuxResult<()> {
         OperationsConverter::<NullBlkDevice>::queue_rq(hctx_ptr, bd_ptr, hctx_driver_data_ptr)
             .map_err(|e| {
                 println!("NullBlkModule queue_rq error: {:?}", e);
@@ -145,7 +161,7 @@ impl Basic for UnwindWrap {
     }
 }
 
-impl BlockDeviceDomain for UnwindWrap{
+impl BlockDeviceDomain for UnwindWrap {
     fn init(&self, args: &BlockArgs) -> LinuxResult<()> {
         self.0.init(args)
     }
@@ -166,7 +182,12 @@ impl BlockDeviceDomain for UnwindWrap{
         basic::catch_unwind(|| self.0.release())
     }
 
-    fn init_request(&self, tag_set_ptr: SafePtr, rq_ptr: SafePtr, driver_data_ptr: SafePtr) -> LinuxResult<()> {
+    fn init_request(
+        &self,
+        tag_set_ptr: SafePtr,
+        rq_ptr: SafePtr,
+        driver_data_ptr: SafePtr,
+    ) -> LinuxResult<()> {
         basic::catch_unwind(|| self.0.init_request(tag_set_ptr, rq_ptr, driver_data_ptr))
     }
 
@@ -174,7 +195,12 @@ impl BlockDeviceDomain for UnwindWrap{
         basic::catch_unwind(|| self.0.exit_request(tag_set_ptr, rq_ptr))
     }
 
-    fn init_hctx(&self, hctx_ptr: SafePtr, tag_set_data_ptr: SafePtr, hctx_idx: usize) -> LinuxResult<()> {
+    fn init_hctx(
+        &self,
+        hctx_ptr: SafePtr,
+        tag_set_data_ptr: SafePtr,
+        hctx_idx: usize,
+    ) -> LinuxResult<()> {
         basic::catch_unwind(|| self.0.init_hctx(hctx_ptr, tag_set_data_ptr, hctx_idx))
     }
 
@@ -182,7 +208,12 @@ impl BlockDeviceDomain for UnwindWrap{
         basic::catch_unwind(|| self.0.exit_hctx(hctx_ptr, hctx_idx))
     }
 
-    fn queue_rq(&self, hctx_ptr: SafePtr, bd_ptr: SafePtr, hctx_driver_data_ptr: SafePtr) -> LinuxResult<()> {
+    fn queue_rq(
+        &self,
+        hctx_ptr: SafePtr,
+        bd_ptr: SafePtr,
+        hctx_driver_data_ptr: SafePtr,
+    ) -> LinuxResult<()> {
         basic::catch_unwind(|| self.0.queue_rq(hctx_ptr, bd_ptr, hctx_driver_data_ptr))
     }
 
@@ -198,9 +229,6 @@ impl BlockDeviceDomain for UnwindWrap{
         basic::catch_unwind(|| self.0.exit())
     }
 }
-
-
-
 
 pub fn main() -> Box<dyn BlockDeviceDomain> {
     Box::new(UnwindWrap(NullDeviceDomainImpl::new()))

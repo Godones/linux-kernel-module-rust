@@ -87,7 +87,7 @@ pub struct Stdout;
 
 impl Write for Stdout {
     fn write_str(&mut self, s: &str) -> core::fmt::Result {
-        corelib::write_console(s);
+        crate::write_console(s);
         Ok(())
     }
 }

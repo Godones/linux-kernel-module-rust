@@ -93,6 +93,8 @@ fn main() {
     let cflags = format!("{} {}", kernel_cflags, kbuild_cflags_module);
     let kernel_args = prepare_cflags(&cflags, &kernel_dir);
     let target = env::var("TARGET").unwrap();
+    println!("target: {}", target);
+    // panic!("");
     build_helper(&kernel_args, &target);
 }
 

@@ -117,6 +117,10 @@ impl Segment<'_> {
 
         unsafe { page.read_atomic(ptr, self.offset(), self.len()) }
     }
+
+    pub fn page(&self) -> *mut bindings::page {
+        self.bio_vec.bv_page
+    }
 }
 
 impl core::fmt::Display for Segment<'_> {
@@ -140,7 +144,7 @@ impl<'a> BioSegmentIterator<'a> {
     pub(crate) fn new(bio: &'a Bio<'a>) -> BioSegmentIterator<'a> {
         Self {
             bio,
-            iter: bio.iter(),
+            iter: bio.raw_iter(),
         }
     }
 }

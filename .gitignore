@@ -1,6 +1,5 @@
 **/target
 **/*.rs.bk
-Cargo.lock
 .cache.mk
 .*o.cmd
 .tmp_versions/

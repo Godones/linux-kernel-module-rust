@@ -20,9 +20,9 @@ pub type Count = u64;
 ///
 /// Wraps the kernel's `struct block_device`.
 #[repr(transparent)]
-pub struct Device(pub(crate) Opaque<bindings::block_device>);
+pub struct BlkDevice(pub(crate) Opaque<bindings::block_device>);
 
-impl Device {
+impl BlkDevice {
     /// Creates a new block device reference from the given raw pointer.
     ///
     /// # Safety

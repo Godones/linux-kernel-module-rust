@@ -39,7 +39,7 @@ impl<'a> Bio<'a> {
 
     /// Return a copy of the `bvec_iter` for this `Bio`
     #[inline(always)]
-    fn iter(&self) -> bindings::bvec_iter {
+    pub fn raw_iter(&self) -> bindings::bvec_iter {
         // SAFETY: self.0 is always a valid pointer
         unsafe { (*self.get_raw()).bi_iter }
     }

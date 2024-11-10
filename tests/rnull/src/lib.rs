@@ -24,7 +24,7 @@ use kernel::{
     sync::{Mutex, SpinLock},
     time::hrtimer::{RawTimer, TimerCallback},
     types::ForeignOwnable,
-    vtable, ThisModule,
+    vtable, ThisModule, UniqueArc,
 };
 use pinned_init::*;
 module! {
@@ -54,6 +54,11 @@ module! {
             permissions: 0,
             description: "Completion time in nano seconds for timer mode",
         },
+        param_block_size: u16 {
+            default: 4096,
+            permissions: 0,
+            description: "Block size in bytes",
+        },
     },
 }
 
@@ -72,7 +77,7 @@ impl TryFrom<u8> for IRQMode {
             0 => Ok(Self::None),
             1 => Ok(Self::Soft),
             2 => Ok(Self::Timer),
-            _ => Err(kernel::error::linux_err::EINVAL),
+            _ => Err(kernel::code::EINVAL),
         }
     }
 }
@@ -82,6 +87,10 @@ struct NullBlkModule {
 }
 
 fn add_disk(tagset: Arc<TagSet<NullBlkDevice>>) -> Result<GenDisk<NullBlkDevice>> {
+    let block_size = *param_block_size.read();
+    if block_size % 512 != 0 || !(512..=4096).contains(&block_size) {
+        return Err(kernel::code::EINVAL);
+    }
     let tree = RadixTree::new()?;
     let mode = (*param_irq_mode.read()).try_into()?;
     let queue_data = Box::pin_init(pin_init!(
@@ -95,8 +104,8 @@ fn add_disk(tagset: Arc<TagSet<NullBlkDevice>>) -> Result<GenDisk<NullBlkDevice>
     let disk = GenDisk::try_new(tagset, queue_data)?;
     disk.set_name(format_args!("rnullb{}", 0))?;
     disk.set_capacity(*param_capacity_mib.read() << 11);
-    disk.set_queue_logical_block_size(4096);
-    disk.set_queue_physical_block_size(4096);
+    disk.set_queue_logical_block_size(block_size.into());
+    disk.set_queue_physical_block_size(block_size.into());
     disk.set_rotational(false);
     Ok(disk)
 }
@@ -105,7 +114,7 @@ impl kernel::Module for NullBlkModule {
     fn init(_module: &'static ThisModule) -> Result<Self> {
         pr_info!("Rust null_blk loaded\n");
         // TODO: Major device number?
-        let tagset = TagSet::try_new(1, (), 256, 1)?;
+        let tagset = UniqueArc::try_pin_init(TagSet::try_new(1, (), 256, 1))?.into();
         let disk = Box::pin_init(new_mutex!(add_disk(tagset)?, "nullb:disk"))?;
 
         disk.lock().add()?;
@@ -242,7 +251,7 @@ impl Operations for NullBlkDevice {
     ) {
     }
 
-    fn complete(rq: mq::Request<Self>) {
+    fn complete(rq: &mq::Request<Self>) {
         rq.end_ok();
     }
 

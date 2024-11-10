@@ -13,7 +13,6 @@ use interface::{empty_device::EmptyDeviceDomain, Basic};
 use rref::{domain_id, SharedHeapAlloc};
 use storage::StorageArg;
 
-
 #[domain_main]
 fn main(
     sys: &'static dyn CoreFunction,

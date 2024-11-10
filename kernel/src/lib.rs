@@ -1,6 +1,7 @@
 #![feature(allocator_api)]
 #![feature(try_with_capacity)]
 #![feature(c_size_t)]
+#![feature(associated_type_defaults)]
 #![no_std]
 #![allow(improper_ctypes)]
 extern crate alloc;
@@ -16,12 +17,17 @@ pub mod env;
 pub mod error;
 pub mod fs;
 mod kalloc;
+pub use kalloc::{BoxExt, UniqueArc};
+pub mod driver;
+pub mod irq;
 pub mod logger;
 pub mod mm;
 pub mod module;
+pub mod pci;
 pub mod print;
 pub mod radix_tree;
 pub mod random;
+pub mod revocable;
 pub mod str;
 pub mod sync;
 pub mod sysctl;
@@ -108,4 +114,10 @@ pub fn catch_unwind<F: FnOnce() -> R, R>(f: F) -> KernelResult<R> {
 pub fn unwind_from_panic() {
     let res = unwinding::panic::begin_panic(Box::new(()));
     pr_err!("unwinding from panic failed: {:?}\n", res.0);
+}
+
+/// Returns maximum number of CPUs that may be online on the system.
+pub fn num_possible_cpus() -> u32 {
+    // SAFETY: FFI call with no additional requirements.
+    unsafe { bindings::num_possible_cpus() }
 }

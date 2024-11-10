@@ -3,7 +3,7 @@
 extern crate alloc;
 use alloc::boxed::Box;
 
-use basic::{println, LinuxResult};
+use basic::{console::println, LinuxResult};
 use interface::{
     logger::{Level, LevelFilter, LogDomain},
     Basic,

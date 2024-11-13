@@ -159,7 +159,7 @@ https://gitee.com/YJMSTR/riscv-linux/blob/master/articles/20220816-introduction-
 sudo apt install debootstrap qemu qemu-user-static binfmt-support
 ```
 
-生成最小 bootstrap rootfs 
+生成最小 bootstrap rootfs
 
 ```
 sudo debootstrap --arch=riscv64 --foreign jammy ./temp-rootfs http://mirrors.tuna.tsinghua.edu.cn/ubuntu-ports
@@ -171,7 +171,7 @@ sudo debootstrap --arch=riscv64 --foreign jammy ./temp-rootfs http://mirrors.tun
 cp /usr/bin/qemu-riscv64-static ./temp-rootfs/usr/bin/
 ```
 
- chroot 和 debootstrap
+chroot 和 debootstrap
 
 ```
 wget https://raw.githubusercontent.com/ywhs/linux-software/master/ch-mount.sh
@@ -252,7 +252,31 @@ https://cloud.tencent.com/developer/article/1914743
 
 https://blog.csdn.net/xuesong10210/article/details/129167731
 
-### 编写内核模块
+## qemu启动ubuntu
+
+安装ubuntu: https://www.xxfe.com/posts/20230403-qemu-ubuntu/
+
+https://sjp38.github.io/post/qemu_setup_on_ubuntu/
+
+
+
+命令行配置clash：https://hiif.ong/ubuntu/   https://www.hengy1.top/article/3dadfa74.html
+
+升级内核：
+
+下载预编译：https://www.cnblogs.com/Esurts/articles/17925424.html
+
+源码编译方式：https://blog.csdn.net/zengNLP/article/details/137007053
+
+使用apt方式升级 http://sinoll.com/blog/view?id=146
+
+使用ubuntu-mainline-kernel 安装： https://xie.infoq.cn/article/9f205cbfff243fe50a14aaf12
+
+
+
+
+
+## 编写内核模块
 
 c内核模块https://linux-kernel-labs-zh.xyz/labs/kernel_modules.html
 
@@ -270,7 +294,7 @@ c内核模块https://linux-kernel-labs-zh.xyz/labs/kernel_modules.html
 
 1. 在rust/Makefile中， 我们删除以下的限制
 
-![image-20240908193658601](./C:/Users/godones/Desktop/研究生培养/assert/image-20240908193658601.png)
+![image-20240908193658601](./assert/image-20240908193658601.png)
 
 2. 在rust/prelude中，我们可以导出alloc中的数据结构，也可以直接使用`use alloc::`。在编译内核时，编译器会抱怨一些函数没有实现，这些函数是堆分配失败时触发的函数，我们需要手动定义，为了简单期间，这里只是简单的panic:
 
@@ -385,7 +409,7 @@ $(src)/target/$(TARGET)/$(BUILD)/libhello_world.a: cargo_will_determine_dependen
 
 https://github.com/fishinabarrel/linux-kernel-module-rust/pull/67
 
-https://github.com/rust-lang/rust/issues/57390 
+https://github.com/rust-lang/rust/issues/57390
 
 但他们给出的办法在当前的Rust版本上都不可用，添加这个设置的办法也是碰巧从https://users.rust-lang.org/t/how-can-i-enable-plt-in-a-custom-target/57332 这个回答中看到并且**尝试成功**。
 
@@ -607,7 +631,7 @@ void *execmem_alloc(enum execmem_type type, size_t size);
 void execmem_free(void *ptr);
 ```
 
-对应的接口位于[execmem.h](https://elixir.bootlin.com/linux/v6.10/source/include/linux/execmem.h#L118)中。 
+对应的接口位于[execmem.h](https://elixir.bootlin.com/linux/v6.10/source/include/linux/execmem.h#L118)中。
 
 可以在当前的[内核模块加载函数](https://elixir.bootlin.com/linux/v6.10/source/kernel/module/main.c#L1205)中看到，目前为内核模块分配内存正是使用这个接口。因此我们应该尝试使用这个接口去完成域模块的加载。
 
@@ -917,7 +941,7 @@ unsafe extern "C" fn poll_callback(
 - 域需要实现回调函数规定的功能
 - kernel将指针转换为原始结构，并使用中介对象将域接口转为回调函数
 
- <font color = red>**注意**</font>
+<font color = red>**注意**</font>
 
 在`TagSet<T>` 这个初始化过程中，需要先填充`ops`才能调用`blk_mq_alloc_tag_set`去分配相应的硬件队列，以及软件队列，因为kernel在分配这些队列的时候，又会通过其中一些回调函数让驱动完成一些工作。所以在驱动侧不应该去分配硬件队列，应该由中间对象来进行分配。
 
@@ -993,7 +1017,126 @@ https://stackoverflow.com/questions/27478788/debug-stack-overruns-in-kernel-modu
 
 
 
+### NVME驱动
 
+与Null blk驱动类似，NVME驱动也是一个块设备驱动，但可以用于真实的硬件设备。我们选择将其进行域改造，因为它和Null blk共用了一部分基础代码，可以简化我们的工作。
+
+使用文件来模拟nvme设备：https://blog.csdn.net/q547569552/article/details/124595432
+
+#### nvme模块加载过程
+
+按照内核的驱动模型，向内核注册一个PCI驱动
+
+```rust
+struct NvmeModule {
+    _registration: Pin<Box<driver::DriverRegistration<pci::PciAdapter<NvmeDevice>>>>,
+}
+
+{
+    let registration = driver::DriverRegistration::new_pinned(c_str!("nvme"), module)?;
+    Ok(Self {
+        _registration: registration,
+    })
+}
+```
+
+`DriverRegistration` 是`DriverOps`的包装器，它只会向下调用实现这个Trait的具体实现，不同的总线有不同的注册方式:
+
+```rust
+pub trait DriverOps {
+    type RegType: Default;
+    unsafe fn register(
+        reg: *mut Self::RegType,
+        name: &'static CStr,
+        module: &'static ThisModule,
+    ) -> Result;
+    unsafe fn unregister(reg: *mut Self::RegType);
+}
+```
+
+`PciAdapter` 实现了 `DriverOps`, 其通过调用
+
+```rus
+bindings::__pci_register_driver
+bindings::pci_unregister_driver
+```
+
+两个内核函数注册和卸载PCI总线设备驱动，在这个过程中，还会设置`probe` 和 `remove` 两个回调函数，
+
+而`PciAdapter` 又是PCI总线驱动的封装
+
+```rust
+pub struct PciAdapter<T: PciDriver>(T);
+/// A PCI driver
+pub trait PciDriver {
+    type Data: ForeignOwnable + driver::DeviceRemoval = ();
+    type IdInfo: 'static = ();
+    const ID_TABLE: driver::IdTable<'static, DeviceId, Self::IdInfo>;
+    fn probe(dev: &mut PciDevice, id: Option<&Self::IdInfo>) -> Result<Self::Data>;
+    fn remove(_data: &Self::Data);
+}
+```
+
+`PciAdapter` 需要具体的PCI设备实现`probe` 和 `remove` 两个重要的函数。
+
+> [!CAUTION]
+>
+> 到这里为止，如果我们要将其改造为域，就需要把这几个操作重新定向到域的接口上
+
+- 对于`DriverRegistration`,  我们将其移到TCB中，作为内核驱动和域接口shim层的一部分
+
+- 到`PciAdapter` 部分，由于其是由`DriverRegistration`来调用的，并且还会设置回调函数，因此我们需要为此创建一个`PciAdapterShim`,  **shim来将回调函数重定向到域接口**
+   - PciAdapter原有的`register` 和 `unregister` 部分功能保留
+   - 为了将回调函数重定向到域接口，我们在`pci_driver::driver::p`字段保存**域对象**
+   - 域需要提供`probe`和`remove` 接口，使用`SafePtr` 传递裸指针
+
+当向内核注册完PCI设备驱动后，没有被识别的NVME设备开始调用`probe`接口进行识别和注册。这个步骤发生在`__pci_register_driver`后。
+
+
+
+在NVME设备的`probe` 实现中，主要步骤如下:
+
+1. 设置device相关的一些参数
+2. 读取模块参数`nvme_irq_queue_count` 和 `nvme_poll_queue_count`
+3. 申请dma pool，用于分配DMA内存
+4. 配置 admin queue(命令队列)
+   1. 重置设备
+   2. **分配admin_tagset**(需要重定向回调函数)
+   3. 分配admin_queue
+   4. **分配admin_mq** (内部似乎也会调用回调函数)
+   5. 注册admin_queue的中断处理函数-> nvme为命令队列和IO队列都实现中断处理函数
+      1. 由PCI device申请中断号，并向内核注册中断处理函数（中断处理函数也需要重定向）
+5. 配置IO queue(IO)队列
+   1. 与设备协商nr_io_queues
+      1. 申请一个同步request，写入command
+      2. 发送同步命令等待执行完成
+   2. admin_queue 取消中断处理函数，pci device回收中断号
+   3. pci device申请中断号，admin_queue 再次注册中断处理函数
+   4. **分配io_tagset**(重定向回调函数) 这里面还会调用`map_queues_callback`
+   5. 为所有的IO queue创建完成队列和提交队列
+      1. 分配io_queue
+      2. 创建完成队列（发送命令）
+      3. 创建提交队列（发送命令）
+      4. 如果是中断queue，注册中断
+6. 确认设备
+7. 分配gen_disk数据结构（重定向回调函数)
+8. 注册disk
+
+
+
+
+
+
+
+[How to load and unload linux drivers that are built into kernel](https://stackoverflow.com/questions/66795580/how-to-load-and-unload-linux-drivers-that-are-built-into-kernel)
+
+[Disabling Unused Drivers and Peripherals in Linux](https://www.variscite.com/blog/disabling-unused-drivers-and-peripherals-in-linux/)
+
+[nvme驱动中nvme-core和nvme的区别](https://stackoverflow.com/questions/49337859/difference-between-core-c-and-pci-c-in-linux-nvme-driver)
+
+[wsl2挂载磁盘](https://superuser.com/questions/1757063/curious-error-when-mounting-m-2-nvme-ssd-ext4-partition-on-wsl-2-wsl-service-at)
+
+[qemu使用virt-manager管理虚拟机](https://www.cnblogs.com/beaclnd/p/18047633)
 
 ### 文件系统
 
@@ -1019,7 +1162,7 @@ https://linux-kernel-labs.github.io/refs/heads/master/labs/filesystems_part1.htm
 
 ### null block
 
-机器: 
+机器:
 
 - WSL2 ubuntu24.04 linux6.6
 - AMD Ryzen 9 7945HX()
@@ -1100,13 +1243,11 @@ Thread=4 rnull(Domain)
 
 
 
-
-
-Thread=4 
+Thread=4
 
 |           | Domain                            | C                       |
 | --------- | --------------------------------- | ----------------------- |
-| write     | 883k+898k+911k = 897(0.012)       | 896k+880k+881k = 886k   |
+| write 4k  | 883k+898k+911k = 897(0.012)       | 896k+880k+881k = 886k   |
 | read      | 1933k+1914k+1869k = 1,905(-0.012) | 1955k+1896k+1933k= 1928 |
 | write 32k | 138k+138k+138k = 138(0.007)       | 137k+138k+137k = 137    |
 | read 32k  | 200k+198k+193k = 197(-0.024)      | 201k+200k+204k = 202    |
@@ -1116,6 +1257,30 @@ Thread=4
 - 从实验的整体结果来看，C/LKM/Domain的性能差异并不是很大，LKM和C的差异平均在5%以内，最大的差距是10.5%(randread,4k), 而Domain和LKM的性能差距非常小。
 - 域的实现并没有导致原有的LKM性能下降，一方面是因为域实现并没有引入额外的硬件特征，只是多了几层函数调用，另一方面，用户程序发出的系统调用在Linux kernel中经过深层次的处理，而域在这个调用路径上只占据了非常小的位置。
 - 我们猜测当kernel中的大多数组件变成域后，性能会有一定的下降，但这个下降处于可接受的水平
+
+
+
+### NVME
+
+```
+# 禁用数据统计
+echo 0 | sudo tee /sys/block/nvme0n1/queue/iostats
+sudo fio --name=mytest --ioengine=psync --rw=write --bs=4k --numjobs=1 --time_based --runtime=10s -filename=/dev/nvme0n1 --size=4G
+```
+
+```
+write: IOPS= 118k +154k
+read:  IOPS= 90.0k + 109k + 106k
+```
+
+Rust
+
+```
+read: 208k + 206k +207k
+write: 208k + 201k + 209k
+```
+
+
 
 
 
@@ -1147,7 +1312,7 @@ https://www.zhaixue.cc/kernel/kernel-module_sysmvers.html
 
 [查找rust支持需要的配置 ](https://codentium.com/building-a-linux-kernel-with-rust-support-on-gentoo/) 自定义内核编译选项
 
-修改wsl2内核 https://enita.cn/2023/0731/bcd47a5aace1/ 
+修改wsl2内核 https://enita.cn/2023/0731/bcd47a5aace1/
 
 wsl2 滚动发行版 **[WSL2-Linux-Kernel-Rolling](https://github.com/Nevuly/WSL2-Linux-Kernel-Rolling)**
 

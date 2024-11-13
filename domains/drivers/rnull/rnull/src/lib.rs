@@ -7,8 +7,8 @@ mod block_domain;
 extern crate alloc;
 use alloc::boxed::Box;
 use core::fmt::Debug;
-use basic::console::*;
-use basic::{ kernel::block::mq::OperationsConverter, LinuxError, LinuxResult, SafePtr };
+
+use basic::{console::*, kernel::block::mq::OperationsConverter, LinuxError, LinuxResult, SafePtr};
 use interface::{
     null_block::{BlockArgs, BlockDeviceDomain},
     Basic,

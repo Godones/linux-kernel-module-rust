@@ -3,7 +3,7 @@
 //! Generic support for drivers of different buses (e.g., PCI, Platform, Amba, etc.).
 //!
 //! Each bus/subsystem is expected to implement [`DriverOps`], which allows drivers to register
-//! using the [`Registration`] class.
+//! using the [`DriverRegistration`] class.
 
 use alloc::{boxed::Box, sync::Arc};
 use core::{cell::UnsafeCell, marker::PhantomData, ops::Deref, pin::Pin};
@@ -45,16 +45,16 @@ pub trait DriverOps {
 }
 
 /// The registration of a driver.
-pub struct Registration<T: DriverOps> {
+pub struct DriverRegistration<T: DriverOps> {
     is_registered: bool,
     concrete_reg: UnsafeCell<T::RegType>,
 }
 
 // SAFETY: `Registration` has no fields or methods accessible via `&Registration`, so it is safe to
 // share references to it with multiple threads as nothing can be done.
-unsafe impl<T: DriverOps> Sync for Registration<T> {}
+unsafe impl<T: DriverOps> Sync for DriverRegistration<T> {}
 
-impl<T: DriverOps> Registration<T> {
+impl<T: DriverOps> DriverRegistration<T> {
     /// Creates a new instance of the registration object.
     pub fn new() -> Self {
         Self {
@@ -97,13 +97,7 @@ impl<T: DriverOps> Registration<T> {
     }
 }
 
-impl<T: DriverOps> Default for Registration<T> {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-impl<T: DriverOps> Drop for Registration<T> {
+impl<T: DriverOps> Drop for DriverRegistration<T> {
     fn drop(&mut self) {
         if self.is_registered {
             // SAFETY: This path only runs if a previous call to `T::register` completed

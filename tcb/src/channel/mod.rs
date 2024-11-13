@@ -5,20 +5,23 @@ use alloc::{
     vec::Vec,
 };
 
+use basic::SafePtr;
 use kernel::sysctl::Sysctl;
 use spin::RwLock;
 
 mod command;
 pub use command::CommandChannel;
 use corelib::{LinuxError, LinuxResult};
-use interface::{null_block::BlockArgs, DomainType, DomainTypeRaw};
+use interface::{null_block::BlockArgs, nvme::NvmeBlockArgs, DomainType, DomainTypeRaw};
 use kernel::{error::KernelResult, types::Mode};
 
 use crate::{
     create_domain,
     domain_helper::{domain_ref_count, unregister_domain, DOMAIN_SYS},
-    domain_proxy::{block_device::BlockDeviceDomainProxy, ProxyBuilder},
-    kshim::{BlockDeviceShim, KernelShim},
+    domain_proxy::{
+        block_device::BlockDeviceDomainProxy, nvme_device::NvmeDeviceDomainProxy, ProxyBuilder,
+    },
+    kshim::{BlockDeviceShim, KernelShim, NvmeDomainShim},
     register_domain,
 };
 
@@ -72,6 +75,33 @@ pub fn load_domain(
                 true
             );
             let null_block = BlockDeviceShim::load(block_device).expect("Load block device failed");
+            KSHIM_OBJ
+                .write()
+                .insert(domain_ident.to_string(), Box::new(null_block));
+        }
+        DomainTypeRaw::NvmeBlockDeviceDomain => {
+            let (nvme_device, domain_file_info) = create_domain!(
+                NvmeDeviceDomainProxy,
+                DomainTypeRaw::NvmeBlockDeviceDomain,
+                register_domain_elf_ident
+            )?;
+            let module = *crate::MODULE.get().unwrap();
+            let args = unsafe {
+                NvmeBlockArgs::new(
+                    None,
+                    None,
+                    nvme_device.clone(),
+                    SafePtr::new(module.as_ptr()),
+                )
+            };
+            nvme_device.init_by_box(Box::new(args))?;
+            register_domain!(
+                domain_ident,
+                domain_file_info,
+                DomainType::NvmeBlockDeviceDomain(nvme_device.clone()),
+                true
+            );
+            let null_block = NvmeDomainShim::new(nvme_device);
             KSHIM_OBJ
                 .write()
                 .insert(domain_ident.to_string(), Box::new(null_block));

@@ -12,6 +12,6 @@ mod tag_set;
 
 pub use converter::OperationsConverter;
 pub use gen_disk::GenDisk;
-pub use operations::Operations;
+pub use operations::MqOperations;
 pub use request::{Request, RequestQueue};
 pub use tag_set::TagSet;

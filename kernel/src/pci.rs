@@ -19,9 +19,9 @@ use crate::{
 };
 
 /// An adapter for the registration of PCI drivers.
-pub struct Adapter<T: Driver>(T);
+pub struct PciAdapter<T: PciDriver>(T);
 
-impl<T: Driver> driver::DriverOps for Adapter<T> {
+impl<T: PciDriver> driver::DriverOps for PciAdapter<T> {
     type RegType = bindings::pci_driver;
 
     unsafe fn register(
@@ -29,7 +29,7 @@ impl<T: Driver> driver::DriverOps for Adapter<T> {
         name: &'static CStr,
         module: &'static ThisModule,
     ) -> Result {
-        let pdrv: &mut bindings::pci_driver = unsafe { &mut *reg };
+        let pdrv = unsafe { &mut *reg };
 
         pdrv.name = name.as_char_ptr();
         pdrv.probe = Some(Self::probe_callback);
@@ -43,13 +43,13 @@ impl<T: Driver> driver::DriverOps for Adapter<T> {
     }
 }
 
-impl<T: Driver> Adapter<T> {
+impl<T: PciDriver> PciAdapter<T> {
     extern "C" fn probe_callback(
         pdev: *mut bindings::pci_dev,
         id: *const bindings::pci_device_id,
     ) -> core::ffi::c_int {
         from_result(|| {
-            let mut dev = unsafe { Device::from_ptr(pdev) };
+            let mut dev = unsafe { PciDevice::from_ptr(pdev) };
 
             // SAFETY: `id` is a pointer within the static table, so it's always valid.
             let offset = unsafe { (*id).driver_data };
@@ -120,19 +120,6 @@ impl DeviceId {
             class_mask,
         }
     }
-
-    pub const fn to_rawid(&self, offset: isize) -> bindings::pci_device_id {
-        bindings::pci_device_id {
-            vendor: self.vendor,
-            device: self.device,
-            subvendor: self.subvendor,
-            subdevice: self.subdevice,
-            class: self.class,
-            class_mask: self.class_mask,
-            driver_data: offset as _,
-            override_only: 0,
-        }
-    }
 }
 
 // SAFETY: `ZERO` is all zeroed-out and `to_rawid` stores `offset` in `pci_device_id::driver_data`.
@@ -183,7 +170,7 @@ macro_rules! define_pci_id_table {
 pub use define_pci_id_table;
 
 /// A PCI driver
-pub trait Driver {
+pub trait PciDriver {
     /// Data stored on device by driver.
     ///
     /// Corresponds to the data set or retrieved via the kernel's
@@ -205,7 +192,7 @@ pub trait Driver {
     ///
     /// Called when a new platform device is added or discovered.
     /// Implementers should attempt to initialize the device here.
-    fn probe(dev: &mut Device, id: Option<&Self::IdInfo>) -> Result<Self::Data>;
+    fn probe(dev: &mut PciDevice, id: Option<&Self::IdInfo>) -> Result<Self::Data>;
 
     /// PCI driver remove.
     ///
@@ -219,12 +206,12 @@ pub trait Driver {
 /// # Invariants
 ///
 /// The field `ptr` is non-null and valid for the lifetime of the object.
-pub struct Device {
+pub struct PciDevice {
     ptr: *mut bindings::pci_dev,
     res_taken: u64,
 }
 
-impl Device {
+impl PciDevice {
     pub unsafe fn from_ptr(ptr: *mut bindings::pci_dev) -> Self {
         Self { ptr, res_taken: 0 }
     }
@@ -333,7 +320,7 @@ impl Device {
         unsafe { bindings::pci_free_irq_vectors(self.ptr) };
     }
 
-    pub fn request_irq<T: irq::Handler>(
+    pub fn request_irq<T: irq::IRQHandler>(
         &self,
         index: u32,
         data: T::Data,
@@ -349,7 +336,7 @@ impl Device {
     }
 }
 
-unsafe impl device::RawDevice for Device {
+unsafe impl device::RawDevice for PciDevice {
     fn raw_device(&self) -> *mut bindings::device {
         // SAFETY: By the type invariants, we know that `self.ptr` is non-null and valid.
         unsafe { &mut (*self.ptr).dev }

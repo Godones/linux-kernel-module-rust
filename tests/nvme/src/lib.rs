@@ -53,7 +53,7 @@ use crate::nvme_mq::IoQueueOperations;
 struct NvmeData {
     db_stride: usize,
     dev: Device,
-    pci_dev: pci::Device,
+    pci_dev: pci::PciDevice,
     instance: u32,
     shadow: Option<NvmeShadow>,
     #[pin]
@@ -169,7 +169,7 @@ impl NvmeDevice {
 
     fn setup_io_queues(
         dev: &Arc<DeviceData>,
-        pci_dev: &mut pci::Device,
+        pci_dev: &mut pci::PciDevice,
         admin_queue: &Arc<nvme_queue::NvmeQueue<nvme_mq::AdminQueueOperations>>,
         mq: &mq::RequestQueue<nvme_mq::AdminQueueOperations>,
     ) -> Result<Arc<mq::TagSet<nvme_mq::IoQueueOperations>>> {
@@ -177,7 +177,7 @@ impl NvmeDevice {
         let nr_io_queues = dev.poll_queue_count + dev.irq_queue_count;
         let result = Self::set_queue_count(nr_io_queues, mq)?;
         if result < nr_io_queues {
-            todo!();
+            unimplemented!("Failed to set queue count");
             nr_io_queues = result;
         }
 
@@ -252,7 +252,7 @@ impl NvmeDevice {
     fn dev_add(
         cap: u64,
         dev: &Arc<DeviceData>,
-        pci_dev: &mut pci::Device,
+        pci_dev: &mut pci::PciDevice,
         admin_queue: &Arc<nvme_queue::NvmeQueue<nvme_mq::AdminQueueOperations>>,
         mq: &mq::RequestQueue<nvme_mq::AdminQueueOperations>,
     ) -> Result {
@@ -338,7 +338,7 @@ impl NvmeDevice {
 
     fn configure_admin_queue(
         dev: &Arc<DeviceData>,
-        pci_dev: &pci::Device,
+        pci_dev: &pci::PciDevice,
     ) -> Result<(
         Arc<nvme_queue::NvmeQueue<nvme_mq::AdminQueueOperations>>,
         mq::RequestQueue<nvme_mq::AdminQueueOperations>,
@@ -359,8 +359,8 @@ impl NvmeDevice {
 
         //TODO: Depth?
         let queue_depth = 64;
-        let admin_tagset: Arc<mq::TagSet<nvme_mq::AdminQueueOperations>> =
-            UniqueArc::try_pin_init(mq::TagSet::try_new(1, dev.clone(), queue_depth, 1))?.into();
+        let admin_tagset: Arc<TagSet<nvme_mq::AdminQueueOperations>> =
+            UniqueArc::try_pin_init(TagSet::try_new(1, dev.clone(), queue_depth, 1))?.into();
         let admin_queue: Arc<nvme_queue::NvmeQueue<nvme_mq::AdminQueueOperations>> =
             nvme_queue::NvmeQueue::try_new(
                 dev.clone(),
@@ -378,7 +378,7 @@ impl NvmeDevice {
         })?;
         let admin_mq = mq::RequestQueue::try_new(admin_tagset, ns)?;
 
-        let mut aqa = (queue_depth - 1) as u32;
+        let mut aqa = queue_depth - 1;
         aqa |= aqa << 16;
 
         let mut ctrl_config = NVME_CC_ENABLE | NVME_CC_CSS_NVM;
@@ -565,7 +565,7 @@ impl NvmeDevice {
     }
 }
 
-impl pci::Driver for NvmeDevice {
+impl pci::PciDriver for NvmeDevice {
     type Data = Arc<DeviceData>;
 
     define_pci_id_table! {
@@ -573,7 +573,7 @@ impl pci::Driver for NvmeDevice {
         [ (pci::DeviceId::with_class(bindings::PCI_CLASS_STORAGE_EXPRESS, 0xffffff), None) ]
     }
 
-    fn probe(dev: &mut pci::Device, _id: Option<&Self::IdInfo>) -> Result<Arc<DeviceData>> {
+    fn probe(dev: &mut pci::PciDevice, _id: Option<&Self::IdInfo>) -> Result<Arc<DeviceData>> {
         pr_info!("probe called!\n");
 
         // TODO: We need to disable the device on error.
@@ -622,7 +622,7 @@ impl pci::Driver for NvmeDevice {
 
         let cap = u64::from_le(bar.readq(OFFSET_CAP));
         let device = Device::from_dev(dev);
-        let pci_device = unsafe { pci::Device::from_ptr(dev.as_ptr()) };
+        let pci_device = unsafe { pci::PciDevice::from_ptr(dev.as_ptr()) };
         let dma_pool = dma::Pool::try_new(
             c_str!("prp list page"),
             dev,
@@ -632,7 +632,7 @@ impl pci::Driver for NvmeDevice {
         )
         .unwrap();
 
-        let data: Self::Data = kernel::new_device_data!(
+        let data = kernel::new_device_data!(
             (),
             NvmeResources { bar },
             pin_init!(NvmeData {
@@ -695,14 +695,14 @@ impl pci::Driver for NvmeDevice {
 static NEXT_ID: AtomicU32 = AtomicU32::new(0);
 
 struct NvmeModule {
-    _registration: Pin<Box<driver::Registration<pci::Adapter<NvmeDevice>>>>,
+    _registration: Pin<Box<driver::DriverRegistration<pci::PciAdapter<NvmeDevice>>>>,
 }
 
 impl kernel::Module for NvmeModule {
     fn init(module: &'static ThisModule) -> Result<Self> {
         pr_info!("Nvme module loaded!\n");
         static_assert!(core::mem::size_of::<MappingData>() <= kernel::bindings::PAGE_SIZE as usize);
-        let registration = driver::Registration::new_pinned(c_str!("nvme"), module)?;
+        let registration = driver::DriverRegistration::new_pinned(c_str!("nvme"), module)?;
         pr_info!("pci driver registered\n");
         Ok(Self {
             _registration: registration,

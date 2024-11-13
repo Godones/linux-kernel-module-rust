@@ -6,15 +6,15 @@ use pinned_init::PinInit;
 use crate::{
     bindings,
     kernel::{
-        block::mq::{Operations, Request},
+        block::mq::{MqOperations, Request, TagSet},
         error::{from_result, KernelResult},
         types::ForeignOwnable,
     },
 };
 
-pub struct OperationsConverter<T: Operations>(PhantomData<T>);
+pub struct OperationsConverter<T: MqOperations>(PhantomData<T>);
 
-impl<T: Operations> OperationsConverter<T> {
+impl<T: MqOperations> OperationsConverter<T> {
     unsafe fn queue_rq_callback(
         hctx: *mut bindings::blk_mq_hw_ctx,
         bd: *const bindings::blk_mq_queue_data,
@@ -121,6 +121,24 @@ impl<T: Operations> OperationsConverter<T> {
         T::complete(unsafe { &Request::from_ptr(rq) });
     }
 
+    unsafe fn map_queues_callback(tag_set: *mut bindings::blk_mq_tag_set) {
+        // SAFETY: The safety requirements of this function satiesfies the
+        // requirements of `TagSet::from_ptr`.
+        let tag_set = unsafe { TagSet::from_ptr(tag_set) };
+        T::map_queues(tag_set);
+    }
+
+    unsafe fn poll_callback(
+        hctx: *mut bindings::blk_mq_hw_ctx,
+        _iob: *mut bindings::io_comp_batch,
+    ) -> core::ffi::c_int {
+        // SAFETY: By function safety requirement, `hctx` was initialized by
+        // `init_hctx_callback` and thus `driver_data` came from a call to
+        // `into_foreign`.
+        let hw_data = unsafe { T::HwData::borrow((*hctx).driver_data) };
+        T::poll(hw_data).into()
+    }
+
     pub fn queue_rq(
         hctx_ptr: SafePtr,
         bd_ptr: SafePtr,
@@ -187,5 +205,17 @@ impl<T: Operations> OperationsConverter<T> {
     pub fn complete_request(rq_ptr: SafePtr) -> KernelResult {
         unsafe { Self::complete_callback(rq_ptr.raw_ptr() as _) }
         Ok(())
+    }
+
+    pub fn map_queues(tag_set_ptr: SafePtr) -> KernelResult {
+        unsafe {
+            Self::map_queues_callback(tag_set_ptr.raw_ptr() as _);
+        }
+        Ok(())
+    }
+
+    pub fn poll_queues(hctx_ptr: SafePtr, iob_ptr: SafePtr) -> KernelResult<i32> {
+        let res = unsafe { Self::poll_callback(hctx_ptr.raw_ptr() as _, iob_ptr.raw_ptr() as _) };
+        Ok(res)
     }
 }

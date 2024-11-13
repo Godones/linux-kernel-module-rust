@@ -12,8 +12,12 @@ use core::{any::Any, fmt::Debug};
 
 pub use pconst::LinuxErrno;
 
-use crate::{empty_device::EmptyDeviceDomain, logger::LogDomain, null_block::BlockDeviceDomain};
-use crate::nvme::NvmeBlockDeviceDomain;
+use crate::{
+    empty_device::EmptyDeviceDomain,
+    logger::LogDomain,
+    null_block::BlockDeviceDomain,
+    nvme::{NvmeBlockDeviceDomain, PCIDeviceOp},
+};
 
 type LinuxResult<T> = Result<T, LinuxErrno>;
 
@@ -63,6 +67,7 @@ pub enum DomainTypeRaw {
     EmptyDeviceDomain = 1,
     LogDomain = 2,
     BlockDeviceDomain = 3,
+    NvmeBlockDeviceDomain = 4,
 }
 
 impl TryFrom<u8> for DomainTypeRaw {
@@ -73,6 +78,7 @@ impl TryFrom<u8> for DomainTypeRaw {
             1 => Ok(DomainTypeRaw::EmptyDeviceDomain),
             2 => Ok(DomainTypeRaw::LogDomain),
             3 => Ok(DomainTypeRaw::BlockDeviceDomain),
+            4 => Ok(DomainTypeRaw::NvmeBlockDeviceDomain),
             _ => Err(()),
         }
     }

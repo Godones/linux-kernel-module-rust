@@ -11,11 +11,11 @@ use alloc::sync::Arc;
 
 use corelib::domain_info::DomainInfo;
 pub use corelib::{
-    backtrace, blk_crash_trick, c_str, checkout_shared_data, create_domain, get_domain,
-    impl_has_timer, kernel, new_mutex, new_spinlock, register_domain, reload_domain, static_assert,
-    sys_blk_mq_map_queues, sys_blk_mq_pci_map_queues, sys_dma_map_page_attrs,
-    sys_dma_unmap_page_attrs, update_domain, write_console, CoreFunction, LinuxError, LinuxResult,
-    SafePtr,sys_num_possible_cpus,new_device_data,sys_mdelay,bindings
+    backtrace, bindings, blk_crash_trick, c_str, checkout_shared_data, create_domain, get_domain,
+    impl_has_timer, kernel, new_device_data, new_mutex, new_spinlock, register_domain,
+    reload_domain, static_assert, sys_blk_mq_map_queues, sys_blk_mq_pci_map_queues,
+    sys_dma_map_page_attrs, sys_dma_unmap_page_attrs, sys_mdelay, sys_num_possible_cpus,
+    update_domain, write_console, CoreFunction, LinuxError, LinuxResult, SafePtr,
 };
 pub use domain_main::domain_main;
 use ksync::Mutex;

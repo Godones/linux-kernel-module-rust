@@ -202,7 +202,7 @@ mod block_mq_ops {
         let original_data = driver_data.original_data;
         let result = domain.queue_rq(
             SafePtr::new(hctx as _),
-            SafePtr::new(bd as _),
+            SafePtr::new(bd as *mut bindings::blk_mq_queue_data),
             SafePtr::new(original_data),
         );
         match result {
@@ -298,11 +298,22 @@ mod block_mq_ops {
         let _res = domain.exit_request(SafePtr::new(set as _), SafePtr::new(rq as _));
     }
 
-    pub unsafe extern "C" fn map_queues_callback(_tag_set_ptr: *mut bindings::blk_mq_tag_set) {}
-    pub unsafe extern "C" fn poll_callback(
+    unsafe extern "C" fn map_queues_callback(_tag_set: *mut bindings::blk_mq_tag_set) {
+        // let driver_data = unsafe { TagSetData::from_raw((*tag_set).driver_data) };
+        // let domain = driver_data.domain();
+        // let _res = domain.map_queues(SafePtr::new(tag_set as _));
+    }
+    unsafe extern "C" fn poll_callback(
         _hctx: *mut bindings::blk_mq_hw_ctx,
         _iob: *mut bindings::io_comp_batch,
     ) -> core::ffi::c_int {
+        // let driver_data = unsafe { HctxData::from_raw((*hctx).driver_data) };
+        // let domain = driver_data.domain();
+        // let res = domain.poll_queues(SafePtr::new(hctx as _), SafePtr::new(iob as _));
+        // match res {
+        //     Ok(()) => 0,
+        //     Err(e) => e as i32,
+        // }
         0
     }
 }

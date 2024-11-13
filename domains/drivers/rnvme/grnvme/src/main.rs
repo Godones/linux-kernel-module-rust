@@ -7,9 +7,10 @@ extern crate malloc;
 
 use alloc::boxed::Box;
 use core::panic::PanicInfo;
+
 use basic::domain_main;
 use corelib::CoreFunction;
-use interface::{null_block::BlockDeviceDomain, Basic};
+use interface::{nvme::NvmeBlockDeviceDomain, Basic};
 use rref::{domain_id, SharedHeapAlloc};
 use storage::StorageArg;
 
@@ -19,7 +20,7 @@ fn main(
     domain_id: u64,
     shared_heap: &'static dyn SharedHeapAlloc,
     storage_arg: StorageArg,
-) -> Box<dyn BlockDeviceDomain> {
+) -> Box<dyn NvmeBlockDeviceDomain> {
     // init basic
     corelib::init(sys);
     // init rref's shared heap

@@ -4,7 +4,11 @@
 
 #![allow(dead_code)]
 
+use alloc::{boxed::Box, sync::Arc};
 use core::{fmt, marker::PhantomData};
+
+use interface::nvme::IrqHandlerOp;
+use kbind::safe_ptr::SafePtr;
 
 use crate::{
     bindings,
@@ -15,14 +19,15 @@ use crate::{
     },
 };
 
-struct InternalRegistration<T: ForeignOwnable> {
+struct InternalRegistration<T: ForeignOwnable, H: IrqHandler> {
     irq: u32,
-    data: *mut core::ffi::c_void,
+    data_shim: *mut core::ffi::c_void,
     name: CString,
     _p: PhantomData<T>,
+    _h: PhantomData<H>,
 }
 
-impl<T: ForeignOwnable> InternalRegistration<T> {
+impl<T: ForeignOwnable, H: IrqHandler> InternalRegistration<T, H> {
     /// Registers a new irq handler.
     ///
     /// # Safety
@@ -38,13 +43,17 @@ impl<T: ForeignOwnable> InternalRegistration<T> {
         flags: usize,
         data: T,
         name: fmt::Arguments<'_>,
+        domain: Arc<dyn IrqHandlerOp>,
     ) -> Result<Self> {
-        let ptr = data.into_foreign() as *mut _;
+        let data_ptr = data.into_foreign() as *mut _;
         let name = CString::try_from_fmt(name)?;
         let guard = ScopeGuard::new(|| {
             // SAFETY: `ptr` came from a previous call to `into_foreign`.
-            unsafe { T::from_foreign(ptr) };
+            unsafe { T::from_foreign(data_ptr) };
         });
+
+        let data_shim = IrqHandlerDataShim::new(data_ptr, domain);
+        let data_shim = Box::into_raw(Box::new(data_shim));
         // SAFETY: `name` and `ptr` remain valid as long as the registration is alive.
         to_result(crate::sys_request_threaded_irq(
             irq,
@@ -52,45 +61,46 @@ impl<T: ForeignOwnable> InternalRegistration<T> {
             thread_fn,
             flags as _,
             name.as_char_ptr(),
-            ptr,
+            data_shim as _,
         ))?;
         guard.dismiss();
         Ok(Self {
             irq,
             name,
-            data: ptr,
+            data_shim: data_shim as _,
             _p: PhantomData,
+            _h: PhantomData,
         })
     }
 }
 
-impl<T: ForeignOwnable> Drop for InternalRegistration<T> {
+impl<T: ForeignOwnable, H: IrqHandler> Drop for InternalRegistration<T, H> {
     fn drop(&mut self) {
         // Unregister irq handler.
         //
         // SAFETY: When `try_new` succeeds, the irq was successfully requested, so it is ok to free
         // it here.
-        crate::sys_free_irq(self.irq, self.data);
+        crate::sys_free_irq(self.irq, self.data_shim);
 
         // Free context data.
         //
         // SAFETY: This matches the call to `into_foreign` from `try_new` in the success case.
-        unsafe { T::from_foreign(self.data) };
+        let data_shim = unsafe { Box::from_raw(self.data_shim as *mut IrqHandlerDataShim) };
+        unsafe { T::from_foreign(data_shim.data) };
     }
 }
 
 /// An irq handler.
-pub trait Handler {
-    /// The context data associated with and made available to the handler.
+pub trait IrqHandler {
+    // The context data associated with and made available to the handler.
     type Data: ForeignOwnable;
-
     /// Called from interrupt context when the irq happens.
-    fn handle_irq(data: <Self::Data as ForeignOwnable>::Borrowed<'_>) -> Return;
+    fn handle_irq(data: SafePtr) -> Return;
 }
 
-pub struct Registration<H: Handler>(InternalRegistration<H::Data>);
+pub struct IrqRegistration<H: IrqHandler>(InternalRegistration<H::Data, H>);
 
-impl<H: Handler> Registration<H> {
+impl<H: IrqHandler> IrqRegistration<H> {
     /// Registers a new irq handler.
     ///
     /// The valid values of `flags` come from the [`flags`] module.
@@ -99,21 +109,84 @@ impl<H: Handler> Registration<H> {
         data: H::Data,
         flags: usize,
         name: fmt::Arguments<'_>,
+        domain: Arc<dyn IrqHandlerOp>,
     ) -> Result<Self> {
         // SAFETY: `handler` only calls `H::Data::borrow` on `raw_data`.
         Ok(Self(unsafe {
-            InternalRegistration::try_new(irq, Some(Self::handler), None, flags, data, name)?
+            InternalRegistration::try_new(
+                irq,
+                Some(shim::handler),
+                None,
+                flags,
+                data,
+                name,
+                domain,
+            )?
         }))
     }
 
-    unsafe extern "C" fn handler(
+    // unsafe extern "C" fn handler(
+    //     _irq: core::ffi::c_int,
+    //     raw_data: *mut core::ffi::c_void,
+    // ) -> bindings::irqreturn_t {
+    //     // SAFETY: On registration, `into_foreign` was called, so it is safe to borrow from it here
+    //     // because `from_foreign` is called only after the irq is unregistered.
+    //     let data = unsafe { H::Data::borrow(raw_data) };
+    //     H::handle_irq(data) as _
+    // }
+}
+
+pub struct IrqHandlerDataShim {
+    pub data: *mut core::ffi::c_void,
+    pub domain: Arc<dyn IrqHandlerOp>,
+}
+
+impl IrqHandlerDataShim {
+    pub fn new(data: *mut core::ffi::c_void, domain: Arc<dyn IrqHandlerOp>) -> Self {
+        Self { data, domain }
+    }
+    pub fn from_foreign(data: *mut core::ffi::c_void) -> &'static IrqHandlerDataShim {
+        // SAFETY: `data` is a valid pointer to `IrqHandlerDataShim`.
+        unsafe { &*(data as *const IrqHandlerDataShim) }
+    }
+    pub fn domain(&self) -> &Arc<dyn IrqHandlerOp> {
+        &self.domain
+    }
+}
+
+pub use shim::IrqHandlerShim;
+
+mod shim {
+    use kbind::safe_ptr::SafePtr;
+
+    use super::{IrqHandler, IrqHandlerDataShim};
+    use crate::{
+        bindings,
+        kernel::{error::KernelResult as Result, types::ForeignOwnable},
+    };
+
+    pub unsafe extern "C" fn handler(
         _irq: core::ffi::c_int,
         raw_data: *mut core::ffi::c_void,
     ) -> bindings::irqreturn_t {
-        // SAFETY: On registration, `into_foreign` was called, so it is safe to borrow from it here
-        // because `from_foreign` is called only after the irq is unregistered.
-        let data = unsafe { H::Data::borrow(raw_data) };
-        H::handle_irq(data) as _
+        let data_shim = IrqHandlerDataShim::from_foreign(raw_data);
+        let domain = data_shim.domain();
+        let res = domain
+            .handle_irq(SafePtr::new(data_shim.data))
+            .expect("irq handler failed");
+        res
+    }
+
+    pub struct IrqHandlerShim<T: IrqHandler>(core::marker::PhantomData<T>);
+
+    impl<T: IrqHandler> IrqHandlerShim<T> {
+        pub fn handle_irq(raw_data: SafePtr) -> Result<u32> {
+            let res =
+                // let raw_data = raw_data.raw_ptr();
+                // let data = T::Data::borrow(raw_data) ;
+                T::handle_irq(raw_data);
+            Ok(res as u32)
+        }
     }
 }
 

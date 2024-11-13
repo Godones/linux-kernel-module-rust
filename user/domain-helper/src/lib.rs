@@ -9,6 +9,7 @@ pub enum DomainTypeRaw {
     EmptyDeviceDomain = 1,
     LogDomain = 2,
     BlockDeviceDomain = 3,
+    NvmeBlockDeviceDomain = 4,
 }
 impl From<u8> for DomainTypeRaw {
     fn from(value: u8) -> Self {
@@ -16,6 +17,7 @@ impl From<u8> for DomainTypeRaw {
             1 => DomainTypeRaw::EmptyDeviceDomain,
             2 => DomainTypeRaw::LogDomain,
             3 => DomainTypeRaw::BlockDeviceDomain,
+            4 => DomainTypeRaw::NvmeBlockDeviceDomain,
             _ => panic!("Invalid domain type"),
         }
     }

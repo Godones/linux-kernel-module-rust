@@ -12,7 +12,7 @@ use crate::{
     kernel::{
         block::{
             bio::{Bio, BioIterator},
-            mq::{Operations, TagSet},
+            mq::{MqOperations, TagSet},
         },
         error::{from_err_ptr, Error, KernelResult as Result},
         types::ForeignOwnable,
@@ -28,12 +28,12 @@ use crate::{
 ///    instance alive at least until a matching call to `req_ref_put_and_test`
 ///
 #[repr(transparent)]
-pub struct Request<T: Operations> {
+pub struct Request<T: MqOperations> {
     ptr: *mut bindings::request,
     _p: PhantomData<T>,
 }
 
-impl<T: Operations> Request<T> {
+impl<T: MqOperations> Request<T> {
     pub(crate) unsafe fn from_ptr(ptr: *mut bindings::request) -> Self {
         Self {
             ptr,
@@ -163,20 +163,20 @@ impl<T: Operations> Request<T> {
 
 // SAFETY: It is impossible to obtain an owned or mutable `Request`, so we can
 // mark it `Send`.
-unsafe impl<T: Operations> Send for Request<T> {}
+unsafe impl<T: MqOperations> Send for Request<T> {}
 
 // SAFETY: `Request` references can be shared across threads.
-unsafe impl<T: Operations> Sync for Request<T> {}
+unsafe impl<T: MqOperations> Sync for Request<T> {}
 
-pub struct RequestQueue<T: Operations> {
+pub struct RequestQueue<T: MqOperations> {
     ptr: *mut bindings::request_queue,
     #[allow(unused)]
     tagset: Arc<TagSet<T>>,
 }
 
-impl<T: Operations> RequestQueue<T> {
+impl<T: MqOperations> RequestQueue<T> {
     pub fn try_new(tagset: Arc<TagSet<T>>, queue_data: T::QueueData) -> Result<Self> {
-        let mq = from_err_ptr( crate::sys_blk_mq_init_queue(tagset.raw_tag_set()) )?;
+        let mq = from_err_ptr(crate::sys_blk_mq_init_queue(tagset.raw_tag_set()))?;
         unsafe { (*mq).queuedata = queue_data.into_foreign() as _ };
         Ok(Self { ptr: mq, tagset })
     }
@@ -188,18 +188,18 @@ impl<T: Operations> RequestQueue<T> {
     }
 }
 
-impl<T: Operations> Drop for RequestQueue<T> {
+impl<T: MqOperations> Drop for RequestQueue<T> {
     fn drop(&mut self) {
         // TODO: Free queue, unless it has been adopted by a disk, for example.
     }
 }
 
-pub struct RequestRef<'a, T: Operations> {
+pub struct RequestRef<'a, T: MqOperations> {
     rq: Request<T>,
     _p: PhantomData<&'a ()>,
 }
 
-impl<'a, T: Operations> RequestRef<'a, T> {
+impl<'a, T: MqOperations> RequestRef<'a, T> {
     pub(crate) unsafe fn new(ptr: *mut bindings::request) -> Self {
         Self {
             rq: unsafe { Request::from_ptr(ptr) },
@@ -218,7 +218,7 @@ impl<'a, T: Operations> RequestRef<'a, T> {
     }
 }
 
-impl<T: Operations> core::ops::Deref for RequestRef<'_, T> {
+impl<T: MqOperations> core::ops::Deref for RequestRef<'_, T> {
     type Target = Request<T>;
 
     fn deref(&self) -> &Request<T> {
@@ -226,12 +226,12 @@ impl<T: Operations> core::ops::Deref for RequestRef<'_, T> {
     }
 }
 /// A synchronous request to be submitted to a queue.
-pub struct SyncRequest<T: Operations> {
+pub struct SyncRequest<T: MqOperations> {
     ptr: *mut bindings::request,
     _p: PhantomData<T>,
 }
 
-impl<T: Operations> SyncRequest<T> {
+impl<T: MqOperations> SyncRequest<T> {
     /// Creates a new synchronous request.
     ///
     /// # Safety
@@ -266,7 +266,7 @@ impl<T: Operations> SyncRequest<T> {
     }
 }
 
-impl<T: Operations> Drop for SyncRequest<T> {
+impl<T: MqOperations> Drop for SyncRequest<T> {
     fn drop(&mut self) {
         crate::sys_blk_mq_free_request(self.ptr);
     }

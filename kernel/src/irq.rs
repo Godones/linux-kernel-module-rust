@@ -80,7 +80,7 @@ impl<T: ForeignOwnable> Drop for InternalRegistration<T> {
 }
 
 /// An irq handler.
-pub trait Handler {
+pub trait IRQHandler {
     /// The context data associated with and made available to the handler.
     type Data: ForeignOwnable;
 
@@ -100,7 +100,7 @@ pub trait Handler {
 ///
 /// struct Example;
 ///
-/// impl irq::Handler for Example {
+/// impl irq::IRQHandler for Example {
 ///     type Data = Box<u32>;
 ///
 ///     fn handle_irq(_data: &u32) -> irq::Return {
@@ -112,9 +112,9 @@ pub trait Handler {
 ///     irq::Registration::try_new(irq, data, irq::flags::SHARED, fmt!("example_{irq}"))
 /// }
 /// ```
-pub struct Registration<H: Handler>(InternalRegistration<H::Data>);
+pub struct Registration<H: IRQHandler>(InternalRegistration<H::Data>);
 
-impl<H: Handler> Registration<H> {
+impl<H: IRQHandler> Registration<H> {
     /// Registers a new irq handler.
     ///
     /// The valid values of `flags` come from the [`flags`] module.

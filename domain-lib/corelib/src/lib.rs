@@ -354,8 +354,7 @@ pub trait CoreFunction: Send + Sync {
         attrs: core::ffi::c_ulong,
     );
 
-
-    fn sys_num_possible_cpus( &self,) -> core::ffi::c_uint;
+    fn sys_num_possible_cpus(&self) -> core::ffi::c_uint;
     fn sys_mdelay(&self, msecs: u64);
 }
 
@@ -564,11 +563,9 @@ mod core_impl {
     pub(crate) fn sys_blk_mq_rq_from_pdu(pdu: *mut core::ffi::c_void) -> *mut request {
         CORE_FUNC.get_must().sys_blk_mq_rq_from_pdu(pdu)
     }
-    #[allow(unused)]
     pub(crate) fn sys_blk_mq_alloc_tag_set(set: *mut blk_mq_tag_set) -> core::ffi::c_int {
         CORE_FUNC.get_must().sys_blk_mq_alloc_tag_set(set)
     }
-    #[allow(unused)]
     pub(crate) fn sys_blk_mq_free_tag_set(set: *mut blk_mq_tag_set) {
         CORE_FUNC.get_must().sys_blk_mq_free_tag_set(set)
     }
@@ -1043,7 +1040,7 @@ mod core_impl {
     pub fn sys_num_possible_cpus() -> core::ffi::c_uint {
         CORE_FUNC.get_must().sys_num_possible_cpus()
     }
-    pub fn sys_mdelay(ms: u64){
+    pub fn sys_mdelay(ms: u64) {
         CORE_FUNC.get_must().sys_mdelay(ms)
     }
 }

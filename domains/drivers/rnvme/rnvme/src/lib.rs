@@ -7,6 +7,7 @@
 #![feature(impl_trait_in_assoc_type)]
 #![feature(allocator_api)]
 #![no_std]
+#![feature(trait_upcasting)]
 // SPDX-License-Identifier: GPL-2.0
 extern crate alloc;
 
@@ -20,7 +21,7 @@ use core::{
 };
 
 use basic::{
-    c_str,
+    bindings, c_str,
     console::print as pr_info,
     kernel::{
         block::{mq, mq::TagSet},
@@ -34,13 +35,14 @@ use basic::{
         types::AtomicOptionalBoxedPtr,
         ThisModule,
     },
-    bindings,
     new_spinlock, static_assert,
 };
+use interface::nvme::NvmeBlockDeviceDomain;
 use kmacro::module;
 use pinned_init::*;
-use interface::nvme::NvmeBlockDeviceDomain;
+use spin::{Mutex, Once};
 
+mod domain;
 #[allow(dead_code)]
 mod nvme_defs;
 mod nvme_driver_defs;
@@ -49,15 +51,17 @@ mod nvme_prp;
 mod nvme_queue;
 
 use nvme_defs::*;
-use nvme_driver_defs::*;
 
-use crate::nvme_mq::IoQueueOperations;
+use crate::{
+    domain::{NvmeDomain, UnwindWrap},
+    nvme_mq::IoQueueOperations,
+};
 
 #[pin_data]
 struct NvmeData {
     db_stride: usize,
     dev: Device,
-    pci_dev: pci::Device,
+    pci_dev: pci::PciDevice,
     instance: u32,
     shadow: Option<NvmeShadow>,
     #[pin]
@@ -173,15 +177,16 @@ impl NvmeDevice {
 
     fn setup_io_queues(
         dev: &Arc<DeviceData>,
-        pci_dev: &mut pci::Device,
+        pci_dev: &mut pci::PciDevice,
         admin_queue: &Arc<nvme_queue::NvmeQueue<nvme_mq::AdminQueueOperations>>,
         mq: &mq::RequestQueue<nvme_mq::AdminQueueOperations>,
-    ) -> Result<Arc<mq::TagSet<nvme_mq::IoQueueOperations>>> {
+        domain: Arc<dyn NvmeBlockDeviceDomain>,
+    ) -> Result<Arc<TagSet<IoQueueOperations>>> {
         pr_info!("Setting up io queues\n");
         let nr_io_queues = dev.poll_queue_count + dev.irq_queue_count;
         let result = Self::set_queue_count(nr_io_queues, mq)?;
         if result < nr_io_queues {
-            todo!();
+            unimplemented!("Failed to set queue count");
             nr_io_queues = result;
         }
 
@@ -198,7 +203,7 @@ impl NvmeDevice {
             0,
             bindings::PCI_IRQ_ALL_TYPES,
         )?;
-        admin_queue.register_irq(pci_dev)?;
+        admin_queue.register_irq(pci_dev, domain.clone())?;
 
         // TODO: Check what else needs to happen from C side.
 
@@ -210,7 +215,14 @@ impl NvmeDevice {
         pr_info!("HW queue count: {}\n", nr_io_queues);
         //TODO: 1 or 3 on demand, depending on polling enabled
         let tagset: Arc<TagSet<IoQueueOperations>> =
-            UniqueArc::try_pin_init(TagSet::try_new(nr_io_queues, dev.clone(), q_depth, 3))?.into();
+            UniqueArc::try_pin_init(TagSet::try_new::<true>(
+                nr_io_queues,
+                dev.clone(),
+                q_depth,
+                3,
+                domain.clone() as _,
+            ))?
+            .into();
 
         dev.queues.lock().io.try_reserve(nr_io_queues as _)?;
         for i in 1..=nr_io_queues {
@@ -235,6 +247,7 @@ impl NvmeDevice {
                 vector,
                 tagset.clone(),
                 polled,
+                true,
             )?;
 
             // Create completion queue.
@@ -244,7 +257,7 @@ impl NvmeDevice {
             Self::alloc_submission_queue(mq, &io_queue)?;
 
             if !polled {
-                io_queue.register_irq(pci_dev)?;
+                io_queue.register_irq(pci_dev, domain.clone())?;
             }
 
             dev.queues.lock().io.push(io_queue.clone());
@@ -256,11 +269,12 @@ impl NvmeDevice {
     fn dev_add(
         cap: u64,
         dev: &Arc<DeviceData>,
-        pci_dev: &mut pci::Device,
+        pci_dev: &mut pci::PciDevice,
         admin_queue: &Arc<nvme_queue::NvmeQueue<nvme_mq::AdminQueueOperations>>,
         mq: &mq::RequestQueue<nvme_mq::AdminQueueOperations>,
+        domain: Arc<dyn NvmeBlockDeviceDomain>,
     ) -> Result {
-        let tagset = Self::setup_io_queues(dev, pci_dev, admin_queue, mq)?;
+        let tagset = Self::setup_io_queues(dev, pci_dev, admin_queue, mq, domain)?;
         pr_info!("setup_io_queues done\n");
 
         let id = dma::try_alloc_coherent::<u8>(pci_dev, 4096, false)?;
@@ -319,7 +333,7 @@ impl NvmeDevice {
         {
             let bar = &dev.resources().unwrap().bar;
             while u32::from_le(bar.readl(OFFSET_CSTS)) & NVME_CSTS_RDY == 0 {
-                basic::sys_mdelay(100) ;
+                basic::sys_mdelay(100);
                 // TODO: Add check for fatal signal pending.
                 // TODO: Set timeout.
             }
@@ -332,7 +346,7 @@ impl NvmeDevice {
         {
             let bar = &dev.resources().unwrap().bar;
             while u32::from_le(bar.readl(OFFSET_CSTS)) & NVME_CSTS_RDY != 0 {
-                basic::sys_mdelay(100) ;
+                basic::sys_mdelay(100);
                 // TODO: Add check for fatal signal pending.
                 // TODO: Set timeout.
             }
@@ -342,7 +356,8 @@ impl NvmeDevice {
 
     fn configure_admin_queue(
         dev: &Arc<DeviceData>,
-        pci_dev: &pci::Device,
+        pci_dev: &pci::PciDevice,
+        domain: Arc<dyn NvmeBlockDeviceDomain>,
     ) -> Result<(
         Arc<nvme_queue::NvmeQueue<nvme_mq::AdminQueueOperations>>,
         mq::RequestQueue<nvme_mq::AdminQueueOperations>,
@@ -363,8 +378,10 @@ impl NvmeDevice {
 
         //TODO: Depth?
         let queue_depth = 64;
-        let admin_tagset: Arc<mq::TagSet<nvme_mq::AdminQueueOperations>> =
-            UniqueArc::try_pin_init(mq::TagSet::try_new(1, dev.clone(), queue_depth, 1))?.into();
+        let admin_tagset: Arc<TagSet<nvme_mq::AdminQueueOperations>> = UniqueArc::try_pin_init(
+            TagSet::try_new::<false>(1, dev.clone(), queue_depth, 1, domain.clone() as _),
+        )?
+        .into();
         let admin_queue: Arc<nvme_queue::NvmeQueue<nvme_mq::AdminQueueOperations>> =
             nvme_queue::NvmeQueue::try_new(
                 dev.clone(),
@@ -374,6 +391,7 @@ impl NvmeDevice {
                 0,
                 admin_tagset.clone(),
                 false,
+                false,
             )?;
         dev.queues.lock().admin = Some(admin_queue.clone());
         let ns = Box::try_new(NvmeNamespace {
@@ -382,7 +400,7 @@ impl NvmeDevice {
         })?;
         let admin_mq = mq::RequestQueue::try_new(admin_tagset, ns)?;
 
-        let mut aqa = (queue_depth - 1) as u32;
+        let mut aqa = queue_depth - 1;
         aqa |= aqa << 16;
 
         let mut ctrl_config = NVME_CC_ENABLE | NVME_CC_CSS_NVM;
@@ -404,7 +422,7 @@ impl NvmeDevice {
         Self::wait_ready(dev);
 
         pr_info!("Registering admin queue irq\n");
-        admin_queue.register_irq(pci_dev)?;
+        admin_queue.register_irq(pci_dev, domain)?;
         pr_info!("Done registering admin queue irq\n");
 
         Ok((admin_queue, admin_mq))
@@ -442,7 +460,7 @@ impl NvmeDevice {
         Ok(core::cmp::min(res & 0xffff, res >> 16) + 1)
     }
 
-    fn alloc_completion_queue<T: mq::Operations<RequestData = NvmeRequest>>(
+    fn alloc_completion_queue<T: mq::MqOperations<RequestData = NvmeRequest>>(
         mq: &mq::RequestQueue<nvme_mq::AdminQueueOperations>,
         queue: &nvme_queue::NvmeQueue<T>,
     ) -> Result<u32> {
@@ -467,7 +485,7 @@ impl NvmeDevice {
         )
     }
 
-    fn alloc_submission_queue<T: mq::Operations<RequestData = NvmeRequest>>(
+    fn alloc_submission_queue<T: mq::MqOperations<RequestData = NvmeRequest>>(
         mq: &mq::RequestQueue<nvme_mq::AdminQueueOperations>,
         queue: &nvme_queue::NvmeQueue<T>,
     ) -> Result<u32> {
@@ -569,7 +587,7 @@ impl NvmeDevice {
     }
 }
 
-impl pci::Driver for NvmeDevice {
+impl pci::PciDriver for NvmeDevice {
     type Data = Arc<DeviceData>;
 
     define_pci_id_table! {
@@ -577,7 +595,7 @@ impl pci::Driver for NvmeDevice {
         [ (pci::DeviceId::with_class(bindings::PCI_CLASS_STORAGE_EXPRESS, 0xffffff), None) ]
     }
 
-    fn probe(dev: &mut pci::Device, _id: Option<&Self::IdInfo>) -> Result<Arc<DeviceData>> {
+    fn probe(dev: &mut pci::PciDevice, _id: Option<&Self::IdInfo>) -> Result<Arc<DeviceData>> {
         pr_info!("probe called!\n");
 
         // TODO: We need to disable the device on error.
@@ -599,8 +617,8 @@ impl pci::Driver for NvmeDevice {
         // We start off with just one vector. We increase it later.
         dev.alloc_irq_vectors(1, 1, bindings::PCI_IRQ_ALL_TYPES)?;
 
-        let param_irq_queue_count = *nvme_irq_queue_count.read();
-        let param_poll_queue_count = *nvme_poll_queue_count.read();
+        let param_irq_queue_count = *NVME_IRQ_QUEUE_COUNT.get().unwrap();
+        let param_poll_queue_count = *NVME_POLL_QUEUE_COUNT.get().unwrap();
         let irq_queue_count: u32 = if param_irq_queue_count == -1 {
             basic::sys_num_possible_cpus()
         } else {
@@ -626,12 +644,12 @@ impl pci::Driver for NvmeDevice {
 
         let cap = u64::from_le(bar.readq(OFFSET_CAP));
         let device = Device::from_dev(dev);
-        let pci_device = unsafe { pci::Device::from_ptr(dev.as_ptr()) };
+        let pci_device = unsafe { pci::PciDevice::from_ptr(dev.as_ptr()) };
         let dma_pool = dma::Pool::try_new(
             c_str!("prp list page"),
             dev,
-            NVME_CTRL_PAGE_SIZE / 8,
-            NVME_CTRL_PAGE_SIZE,
+            nvme_driver_defs::NVME_CTRL_PAGE_SIZE / 8,
+            nvme_driver_defs::NVME_CTRL_PAGE_SIZE,
             0,
         )
         .unwrap();
@@ -659,9 +677,10 @@ impl pci::Driver for NvmeDevice {
         )?
         .into();
 
+        let domain = DOMAIN_SELF.lock().as_ref().unwrap().clone();
         // TODO: Handle initialization on a workqueue
         pr_info!("Setting up admin queue");
-        let (admin_nvme_queue, admin_mq) = Self::configure_admin_queue(&data, dev)?;
+        let (admin_nvme_queue, admin_mq) = Self::configure_admin_queue(&data, dev, domain.clone())?;
         pr_info!("Created admin queue\n");
         // TODO: Move this to a function. We should not fail `probe` if this fails.
         // if false {
@@ -682,7 +701,14 @@ impl pci::Driver for NvmeDevice {
         //     }
         // }
 
-        if let Err(e) = Self::dev_add(cap, &data, dev, &admin_nvme_queue, &admin_mq) {
+        if let Err(e) = Self::dev_add(
+            cap,
+            &data,
+            dev,
+            &admin_nvme_queue,
+            &admin_mq,
+            domain.clone(),
+        ) {
             pr_info!("Probe failed: {:?}\n", e);
             return Err(e);
         }
@@ -695,49 +721,13 @@ impl pci::Driver for NvmeDevice {
         todo!()
     }
 }
+static NVME_IRQ_QUEUE_COUNT: Once<i64> = Once::new();
+static NVME_POLL_QUEUE_COUNT: Once<i64> = Once::new();
+
+static DOMAIN_SELF: Mutex<Option<Arc<dyn NvmeBlockDeviceDomain>>> = Mutex::new(None);
 
 static NEXT_ID: AtomicU32 = AtomicU32::new(0);
 
-struct NvmeModule {
-    _registration: Pin<Box<driver::Registration<pci::Adapter<NvmeDevice>>>>,
-}
-
-impl NvmeModule {
-    fn init(module: &'static ThisModule) -> Result<Self> {
-        pr_info!("Nvme module loaded!\n");
-        static_assert!(
-            core::mem::size_of::<MappingData>() <= basic::bindings::PAGE_SIZE as usize
-        );
-        let registration = driver::Registration::new_pinned(c_str!("nvme"), module)?;
-        pr_info!("pci driver registered\n");
-        Ok(Self {
-            _registration: registration,
-        })
-    }
-}
-
-// TODO: Define PCI module.
-// module! {
-//     type: NvmeModule,
-//     name: "rnvme",
-//     author: "Wedson Almeida Filho",
-//     description: "NVMe PCI driver",
-//     license: "GPL v2",
-//     params: {
-//         nvme_irq_queue_count: i64 {
-//             default: 1,
-//             permissions: 0,
-//             description: "Number of irq queues (-1 means num_cpu)",
-//         },
-//         nvme_poll_queue_count: i64 {
-//             default: 1,
-//             permissions: 0,
-//             description: "Number of polled queues (-1 means num_cpu)",
-//         },
-//     },
-// }
-
-
-pub fn main()->Box<dyn NvmeBlockDeviceDomain >{
-    todo!()
+pub fn main() -> Box<dyn NvmeBlockDeviceDomain> {
+    Box::new(UnwindWrap::new(NvmeDomain::new()))
 }

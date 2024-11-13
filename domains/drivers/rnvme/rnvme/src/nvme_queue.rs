@@ -10,24 +10,30 @@ use basic::{
         block::mq,
         error::KernelResult as Result,
         irq,
+        irq::Return,
         mm::dma,
         pci,
         sync::{SpinLock, UniqueArc},
-        types::ArcBorrow,
+        types::{ArcBorrow, ForeignOwnable},
     },
-    new_spinlock,
+    new_spinlock, SafePtr,
 };
+use interface::nvme::{BlkMqOp, IrqHandlerOp, NvmeBlockDeviceDomain};
 use pinned_init::*;
 
-use crate::{DeviceData, NvmeCommand, NvmeCompletion, NvmeRequest};
-struct NvmeQueueInner<T: mq::Operations<RequestData = NvmeRequest> + 'static> {
+use crate::{
+    nvme_mq::{AdminQueueOperations, IoQueueOperations},
+    DeviceData, NvmeCommand, NvmeCompletion, NvmeRequest,
+};
+
+struct NvmeQueueInner<T: mq::MqOperations<RequestData = NvmeRequest> + 'static> {
     sq_tail: u16,
     last_sq_tail: u16,
-    irq: Option<irq::Registration<NvmeQueue<T>>>,
+    irq: Option<irq::IrqRegistration<NvmeQueue<T>>>,
 }
 
 #[pin_data]
-pub(crate) struct NvmeQueue<T: mq::Operations<RequestData = NvmeRequest> + 'static> {
+pub(crate) struct NvmeQueue<T: mq::MqOperations<RequestData = NvmeRequest> + 'static> {
     pub(crate) data: Arc<DeviceData>,
     pub(crate) db_offset: usize,
     pub(crate) sdb_index: usize,
@@ -46,20 +52,22 @@ pub(crate) struct NvmeQueue<T: mq::Operations<RequestData = NvmeRequest> + 'stat
     #[pin]
     inner: SpinLock<NvmeQueueInner<T>>,
     tagset: Arc<mq::TagSet<T>>,
+    is_io_queue: bool,
 }
 
 impl<T> NvmeQueue<T>
 where
-    T: mq::Operations<RequestData = NvmeRequest>,
+    T: mq::MqOperations<RequestData = NvmeRequest>,
 {
     pub(crate) fn try_new(
         data: Arc<DeviceData>,
-        dev: &pci::Device,
+        dev: &pci::PciDevice,
         qid: u16,
         depth: u16,
         vector: u16,
         tagset: Arc<mq::TagSet<T>>,
         polled: bool,
+        is_io_queue: bool,
     ) -> Result<Arc<Self>> {
         let cq = dma::try_alloc_coherent::<NvmeCompletion>(dev, depth.into(), false)?;
         let sq = dma::try_alloc_coherent(dev, depth.into(), false)?;
@@ -90,6 +98,7 @@ where
                 irq: None,
             }),
             polled,
+            is_io_queue
         }))?;
 
         Ok(queue.into())
@@ -229,7 +238,11 @@ where
         drop(registration);
     }
 
-    pub(crate) fn register_irq(self: &Arc<Self>, pci_dev: &pci::Device) -> Result {
+    pub(crate) fn register_irq(
+        self: &Arc<Self>,
+        pci_dev: &pci::PciDevice,
+        domain: Arc<dyn IrqHandlerOp>,
+    ) -> Result {
         pr_info!(
             "Registering irq for queue qid: {}, vector {}\n",
             self.qid,
@@ -239,6 +252,7 @@ where
             self.cq_vector.into(),
             self.clone(),
             format_args!("nvme{}q{}", self.data.instance, self.qid),
+            domain,
         )?;
 
         // TODO: irqdisable
@@ -247,17 +261,42 @@ where
     }
 }
 
-impl<T> irq::Handler for NvmeQueue<T>
+impl<T> irq::IrqHandler for NvmeQueue<T>
 where
-    T: mq::Operations<RequestData = NvmeRequest> + 'static,
+    T: mq::MqOperations<RequestData = NvmeRequest> + 'static,
 {
     type Data = Arc<NvmeQueue<T>>;
+    fn handle_irq(_data: SafePtr) -> irq::Return {
+        unimplemented!("NvmeQueue::handle_irq")
+    }
+}
 
-    fn handle_irq(queue: ArcBorrow<'_, NvmeQueue<T>>) -> irq::Return {
+pub struct NvmeQueueIrqHandler;
+
+impl NvmeQueueIrqHandler {
+    fn handle_irq_inner<T: mq::MqOperations<RequestData = NvmeRequest> + 'static>(
+        queue: ArcBorrow<'_, NvmeQueue<T>>,
+    ) -> irq::Return {
         if queue.process_completions() {
             irq::Return::Handled
         } else {
             irq::Return::None
+        }
+    }
+}
+type IO = Arc<NvmeQueue<IoQueueOperations>>;
+type Admin = Arc<NvmeQueue<AdminQueueOperations>>;
+
+impl irq::IrqHandler for NvmeQueueIrqHandler {
+    type Data = ();
+
+    fn handle_irq(data: SafePtr) -> Return {
+        let queue = unsafe { Admin::borrow(data.raw_ptr()) };
+        if queue.is_io_queue {
+            let queue = unsafe { IO::borrow(data.raw_ptr()) };
+            NvmeQueueIrqHandler::handle_irq_inner(queue)
+        } else {
+            NvmeQueueIrqHandler::handle_irq_inner(queue)
         }
     }
 }

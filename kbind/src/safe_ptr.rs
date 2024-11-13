@@ -1,5 +1,5 @@
 /// A safe wrapper around a raw pointer.
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Debug)]
 #[repr(transparent)]
 pub struct SafePtr(*mut core::ffi::c_void);
 
@@ -7,15 +7,15 @@ impl SafePtr {
     /// # Safety
     ///
     /// The caller must ensure that the pointer is valid.
-    pub unsafe fn new(ptr: *mut core::ffi::c_void) -> Self {
-        Self(ptr)
+    pub unsafe fn new<T>(ptr: *mut T) -> Self {
+        Self(ptr as _)
     }
 
     /// # Safety
     ///
     /// The caller must ensure that the pointer is valid.
-    pub unsafe fn raw_ptr(&self) -> *mut core::ffi::c_void {
-        self.0
+    pub unsafe fn raw_ptr<T>(&self) -> *mut T {
+        self.0 as _
     }
 
     /// # Safety
@@ -32,3 +32,6 @@ impl SafePtr {
         &mut *(self.0 as *mut T)
     }
 }
+
+unsafe impl Send for SafePtr {}
+unsafe impl Sync for SafePtr {}

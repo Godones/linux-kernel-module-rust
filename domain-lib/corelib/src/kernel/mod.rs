@@ -1,3 +1,5 @@
+use kbind::safe_ptr::SafePtr;
+
 use crate::bindings;
 
 pub mod block;
@@ -17,7 +19,8 @@ pub mod types;
 /// Equivalent to `THIS_MODULE` in the C API.
 ///
 /// C header: `include/linux/export.h`
-pub struct ThisModule(pub(crate) *mut bindings::module);
+#[repr(transparent)]
+pub struct ThisModule(*mut bindings::module);
 
 // SAFETY: `THIS_MODULE` may be used from all threads within a module.
 unsafe impl Sync for ThisModule {}
@@ -34,6 +37,10 @@ impl ThisModule {
 
     pub fn as_ptr(&self) -> *mut bindings::module {
         self.0
+    }
+
+    pub fn from_safe_ptr(ptr: SafePtr) -> ThisModule {
+        unsafe { ThisModule::from_ptr(ptr.raw_ptr() as *mut bindings::module) }
     }
 }
 

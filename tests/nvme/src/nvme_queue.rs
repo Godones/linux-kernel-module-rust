@@ -45,7 +45,7 @@ where
 {
     pub(crate) fn try_new(
         data: Arc<DeviceData>,
-        dev: &pci::Device,
+        dev: &pci::PciDevice,
         qid: u16,
         depth: u16,
         vector: u16,
@@ -220,7 +220,7 @@ where
         drop(registration);
     }
 
-    pub(crate) fn register_irq(self: &Arc<Self>, pci_dev: &pci::Device) -> Result {
+    pub(crate) fn register_irq(self: &Arc<Self>, pci_dev: &pci::PciDevice) -> Result {
         pr_info!(
             "Registering irq for queue qid: {}, vector {}\n",
             self.qid,
@@ -238,7 +238,7 @@ where
     }
 }
 
-impl<T> irq::Handler for NvmeQueue<T>
+impl<T> irq::IRQHandler for NvmeQueue<T>
 where
     T: mq::Operations<RequestData = NvmeRequest> + 'static,
 {

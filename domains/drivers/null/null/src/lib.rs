@@ -4,8 +4,8 @@ extern crate alloc;
 
 use alloc::{boxed::Box, string::String};
 use core::{fmt::Debug, sync::atomic::AtomicBool};
-use basic::{LinuxResult};
-use basic::console::*;
+
+use basic::{console::*, LinuxResult};
 use interface::{empty_device::EmptyDeviceDomain, Basic};
 use rref::RRefVec;
 

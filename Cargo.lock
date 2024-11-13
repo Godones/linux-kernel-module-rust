@@ -261,7 +261,6 @@ name = "dblk"
 version = "0.1.0"
 dependencies = [
  "domain-helper",
- "spin",
 ]
 
 [[package]]
@@ -271,6 +270,13 @@ dependencies = [
  "core_affinity",
  "domain-helper",
  "spin",
+]
+
+[[package]]
+name = "dnvme"
+version = "0.1.0"
+dependencies = [
+ "domain-helper",
 ]
 
 [[package]]

@@ -6,13 +6,14 @@
 
 #![allow(dead_code)]
 
+use alloc::{boxed::Box, sync::Arc};
 use core::fmt;
 
 use crate::{
     bindings,
     kernel::{
         device, driver,
-        error::{from_result, to_result, Error, KernelResult as Result},
+        error::{to_result, Error, KernelResult as Result},
         irq,
         mm::io_mem::Resource,
         str::CStr,
@@ -22,58 +23,129 @@ use crate::{
 };
 
 /// An adapter for the registration of PCI drivers.
-pub struct Adapter<T: Driver>(T);
+pub struct PciAdapter<T: PciDriver>(T);
 
-impl<T: Driver> driver::DriverOps for Adapter<T> {
+impl<T: PciDriver> driver::DriverOps for PciAdapter<T> {
     type RegType = bindings::pci_driver;
-
+    type DomainType = Arc<dyn PCIDeviceOp>;
     unsafe fn register(
         reg: *mut bindings::pci_driver,
         name: &'static CStr,
-        module: &'static ThisModule,
+        module: ThisModule,
+        domain: Self::DomainType,
     ) -> Result {
         let pdrv: &mut bindings::pci_driver = unsafe { &mut *reg };
 
+        let domain = Box::new(domain);
+        let domain_raw = Box::into_raw(domain);
+        // we need to keep the domain alive until the driver is unregistered
+        // store the domain in the private data field of the driver
+        pdrv.driver.p = domain_raw as *mut core::ffi::c_void as _;
         pdrv.name = name.as_char_ptr();
-        pdrv.probe = Some(Self::probe_callback);
-        pdrv.remove = Some(Self::remove_callback);
+        pdrv.probe = Some(shim::probe_callback);
+        pdrv.remove = Some(shim::remove_callback);
         pdrv.id_table = T::ID_TABLE.as_ref();
         to_result(crate::sys__pci_register_driver(
             reg,
-            module.0,
+            module.as_ptr(),
             name.as_char_ptr(),
         ))
     }
 
     unsafe fn unregister(reg: *mut bindings::pci_driver) {
-        crate::sys_pci_unregister_driver(reg)
+        crate::sys_pci_unregister_driver(reg);
+        let pdrv = unsafe { &mut *reg };
+        let domain_raw = pdrv.driver.p as *mut Arc<dyn PCIDeviceOp>;
+        let _ = Box::from_raw(domain_raw);
     }
 }
 
-impl<T: Driver> Adapter<T> {
-    extern "C" fn probe_callback(
+pub use shim::PciAdapterShim;
+mod shim {
+    use alloc::sync::Arc;
+
+    use interface::nvme::PCIDeviceOp;
+    use kbind::safe_ptr::SafePtr;
+
+    use crate::{
+        bindings,
+        kernel::{
+            error::KernelResult as Result,
+            pci::{PciAdapter, PciDriver},
+        },
+    };
+    pub unsafe extern "C" fn probe_callback(
         pdev: *mut bindings::pci_dev,
         id: *const bindings::pci_device_id,
     ) -> core::ffi::c_int {
-        from_result(|| {
-            let mut dev = unsafe { Device::from_ptr(pdev) };
+        let pdev = unsafe { &mut *pdev };
+        // get pci driver
+        let pci_driver = unsafe { &*(pdev.driver as *const bindings::pci_driver) };
+        // find domain
+        let domain = pci_driver.driver.p as *mut Arc<dyn PCIDeviceOp>;
+        let domain = unsafe { &*domain };
+        let res = domain.probe(
+            SafePtr::new(pdev),
+            SafePtr::new(id as *mut bindings::pci_device_id),
+        );
+        match res {
+            Ok(_) => 0,
+            Err(e) => e as isize as i32,
+        }
+    }
+    pub unsafe extern "C" fn remove_callback(pdev: *mut bindings::pci_dev) {
+        let pdev = unsafe { &mut *pdev };
+        // get pci driver
+        let pci_driver = unsafe { &*(pdev.driver as *const bindings::pci_driver) };
+        // find domain
+        let domain = pci_driver.driver.p as *mut Arc<dyn PCIDeviceOp>;
+        let domain = unsafe { &*domain };
+        let _ = domain.remove(SafePtr::new(pdev));
+    }
 
-            // SAFETY: `id` is a pointer within the static table, so it's always valid.
-            let offset = unsafe { (*id).driver_data };
-            // SAFETY: The offset comes from a previous call to `offset_from` in `IdArray::new`, which
-            // guarantees that the resulting pointer is within the table.
-            let info = {
-                let ptr = unsafe {
-                    id.cast::<u8>()
-                        .offset(offset as _)
-                        .cast::<Option<T::IdInfo>>()
-                };
-                unsafe { (&*ptr).as_ref() }
+    pub struct PciAdapterShim<T: PciDriver>(core::marker::PhantomData<T>);
+
+    impl<T: PciDriver> PciAdapterShim<T> {
+        pub fn probe(pdev: SafePtr, pci_device_id: SafePtr) -> Result<i32> {
+            unsafe {
+                let pdev = pdev.raw_ptr();
+                let pci_device_id = pci_device_id.raw_ptr();
+                let res = PciAdapter::<T>::probe_callback(pdev, pci_device_id);
+                res
+            }
+        }
+        pub fn remove(pdev: SafePtr) -> Result<()> {
+            unsafe {
+                let pdev = pdev.raw_ptr();
+                PciAdapter::<T>::remove_callback(pdev);
+                Ok(())
+            }
+        }
+    }
+}
+
+impl<T: PciDriver> PciAdapter<T> {
+    fn probe_callback(
+        pdev: *mut bindings::pci_dev,
+        id: *const bindings::pci_device_id,
+    ) -> Result<core::ffi::c_int> {
+        let mut dev = unsafe { PciDevice::from_ptr(pdev) };
+
+        // SAFETY: `id` is a pointer within the static table, so it's always valid.
+        let offset = unsafe { (*id).driver_data };
+        // SAFETY: The offset comes from a previous call to `offset_from` in `IdArray::new`, which
+        // guarantees that the resulting pointer is within the table.
+        let info = {
+            let ptr = unsafe {
+                id.cast::<u8>()
+                    .offset(offset as _)
+                    .cast::<Option<T::IdInfo>>()
             };
-            let data = T::probe(&mut dev, info)?;
-            crate::sys_pci_set_drvdata(pdev, data.into_foreign() as _);
-            Ok(0)
-        })
+            unsafe { (&*ptr).as_ref() }
+        };
+        let data = T::probe(&mut dev, info)?;
+        crate::sys_pci_set_drvdata(pdev, data.into_foreign() as _);
+        Ok(0)
     }
 
     extern "C" fn remove_callback(pdev: *mut bindings::pci_dev) {
@@ -188,11 +260,12 @@ macro_rules! define_pci_id_table {
     };
 }
 pub use define_pci_id_table;
+use interface::nvme::{IrqHandlerOp, PCIDeviceOp};
 
 use crate::println;
 
 /// A PCI driver
-pub trait Driver {
+pub trait PciDriver {
     /// Data stored on device by driver.
     ///
     /// Corresponds to the data set or retrieved via the kernel's
@@ -214,7 +287,7 @@ pub trait Driver {
     ///
     /// Called when a new platform device is added or discovered.
     /// Implementers should attempt to initialize the device here.
-    fn probe(dev: &mut Device, id: Option<&Self::IdInfo>) -> Result<Self::Data>;
+    fn probe(dev: &mut PciDevice, id: Option<&Self::IdInfo>) -> Result<Self::Data>;
 
     /// PCI driver remove.
     ///
@@ -228,12 +301,12 @@ pub trait Driver {
 /// # Invariants
 ///
 /// The field `ptr` is non-null and valid for the lifetime of the object.
-pub struct Device {
+pub struct PciDevice {
     ptr: *mut bindings::pci_dev,
     res_taken: u64,
 }
 
-impl Device {
+impl PciDevice {
     pub unsafe fn from_ptr(ptr: *mut bindings::pci_dev) -> Self {
         Self { ptr, res_taken: 0 }
     }
@@ -337,23 +410,24 @@ impl Device {
         crate::sys_pci_free_irq_vectors(self.ptr);
     }
 
-    pub fn request_irq<T: irq::Handler>(
+    pub fn request_irq<T: irq::IrqHandler>(
         &self,
         index: u32,
         data: T::Data,
         name_args: fmt::Arguments<'_>,
-    ) -> Result<irq::Registration<T>> {
+        domain: Arc<dyn IrqHandlerOp>,
+    ) -> Result<irq::IrqRegistration<T>> {
         let ret = crate::sys_pci_irq_vector(self.ptr, index);
         if ret < 0 {
             return Err(Error::from_errno(ret));
         }
         println!("Setting up IRQ: {}", ret);
 
-        irq::Registration::try_new(ret as _, data, irq::flags::SHARED, name_args)
+        irq::IrqRegistration::try_new(ret as _, data, irq::flags::SHARED, name_args, domain)
     }
 }
 
-unsafe impl device::RawDevice for Device {
+unsafe impl device::RawDevice for PciDevice {
     fn raw_device(&self) -> *mut bindings::device {
         // SAFETY: By the type invariants, we know that `self.ptr` is non-null and valid.
         unsafe { &mut (*self.ptr).dev }

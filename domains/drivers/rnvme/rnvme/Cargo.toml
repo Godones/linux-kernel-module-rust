@@ -10,3 +10,6 @@ rref = { path = "../../../../domain-lib/rref" }
 
 kmacro = { path = "../../../../kmacro" }
 pinned-init = { version = "0.0.8", default-features = false, features = ["alloc"]}
+
+
+spin = "0.9.8"

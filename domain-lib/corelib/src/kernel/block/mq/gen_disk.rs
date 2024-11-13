@@ -16,7 +16,7 @@ use kbind::safe_ptr::SafePtr;
 use crate::{
     bindings,
     kernel::{
-        block::mq::{raw_writer::RawWriter, Operations, TagSet},
+        block::mq::{raw_writer::RawWriter, MqOperations, TagSet},
         error,
         error::{from_err_ptr, KernelResult as Result},
         sync::LockClassKey,
@@ -29,7 +29,7 @@ use crate::{
 /// # Invariants
 ///
 ///  - `gendisk` must always point to an initialized and valid `struct gendisk`.
-pub struct GenDisk<T: Operations> {
+pub struct GenDisk<T: MqOperations> {
     tagset: Arc<TagSet<T>>,
     gendisk: *mut bindings::gendisk,
     queue_data: *const c_void,
@@ -37,9 +37,9 @@ pub struct GenDisk<T: Operations> {
 
 // SAFETY: `GenDisk` is an owned pointer to a `struct gendisk` and an `Arc` to a
 // `TagSet` It is safe to send this to other threads as long as T is Send.
-unsafe impl<T: Operations + Send> Send for GenDisk<T> {}
+unsafe impl<T: MqOperations + Send> Send for GenDisk<T> {}
 
-impl<T: Operations> GenDisk<T> {
+impl<T: MqOperations> GenDisk<T> {
     pub fn new_no_alloc(tagset: Arc<TagSet<T>>, queue_data: T::QueueData) -> Self {
         Self {
             tagset,
@@ -59,7 +59,7 @@ impl<T: Operations> GenDisk<T> {
     }
 
     pub fn queue_data_ptr(&self) -> SafePtr {
-        unsafe { SafePtr::new(self.queue_data as _) }
+        unsafe { SafePtr::new(self.queue_data as *mut c_void) }
     }
 
     /// Try to create a new `GenDisk`
@@ -170,7 +170,7 @@ impl<T: Operations> GenDisk<T> {
     }
 }
 
-impl<T: Operations> Drop for GenDisk<T> {
+impl<T: MqOperations> Drop for GenDisk<T> {
     fn drop(&mut self) {
         let queue_data = unsafe { (*(*self.gendisk).queue).queuedata };
 

@@ -2,13 +2,14 @@ use alloc::{boxed::Box, sync::Arc};
 use core::{fmt::Debug, pin::Pin};
 
 use basic::{
+    console::*,
     impl_has_timer,
     kernel::{
         block,
         block::{
             bio::Segment,
             mq,
-            mq::{GenDisk, Operations, TagSet},
+            mq::{GenDisk, MqOperations, TagSet},
         },
         error,
         error::{Error, KernelResult},
@@ -21,7 +22,6 @@ use basic::{
     },
     new_mutex, new_spinlock, SafePtr,
 };
-use basic::console::*;
 use interface::null_block::BlockArgs;
 use kmacro::vtable;
 use pinned_init::{pin_data, pin_init, InPlaceInit, PinInit};
@@ -183,12 +183,13 @@ impl_has_timer! {
 }
 
 #[vtable]
-impl Operations for NullBlkDevice {
+impl MqOperations for NullBlkDevice {
     type RequestData = Pdu;
     type RequestDataInit = impl PinInit<Pdu>;
     type QueueData = Pin<Box<QueueData>>;
     type HwData = ();
     type TagSetData = ();
+    type DomainType = ();
 
     fn new_request_data(
         _tagset_data: <Self::TagSetData as ForeignOwnable>::Borrowed<'_>,

@@ -15,8 +15,11 @@ use crate::{
 
 mod block_device;
 mod entropy;
+mod nvme;
 mod one;
+
 pub use block_device::BlockDeviceShim;
+pub use nvme::NvmeDomainShim;
 
 pub struct KObj {
     entropy_source: Sysctl<EntropySource>,

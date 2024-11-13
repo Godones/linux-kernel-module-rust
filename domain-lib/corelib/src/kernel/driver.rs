@@ -3,7 +3,7 @@
 //! Generic support for drivers of different buses (e.g., PCI, Platform, Amba, etc.).
 //!
 //! Each bus/subsystem is expected to implement [`DriverOps`], which allows drivers to register
-//! using the [`Registration`] class.
+//! using the [`DriverRegistration`] class.
 
 use alloc::{boxed::Box, sync::Arc};
 use core::{cell::UnsafeCell, marker::PhantomData, ops::Deref, pin::Pin};
@@ -19,7 +19,7 @@ pub trait DriverOps {
     /// The type that holds information about the registration. This is typically a struct defined
     /// by the C portion of the kernel.
     type RegType: Default;
-
+    type DomainType;
     /// Registers a driver.
     ///
     /// # Safety
@@ -32,7 +32,8 @@ pub trait DriverOps {
     unsafe fn register(
         reg: *mut Self::RegType,
         name: &'static CStr,
-        module: &'static ThisModule,
+        module: ThisModule,
+        domain: Self::DomainType,
     ) -> Result;
 
     /// Unregisters a driver previously registered with [`DriverOps::register`].
@@ -45,16 +46,16 @@ pub trait DriverOps {
 }
 
 /// The registration of a driver.
-pub struct Registration<T: DriverOps> {
+pub struct DriverRegistration<T: DriverOps> {
     is_registered: bool,
     concrete_reg: UnsafeCell<T::RegType>,
 }
 
 // SAFETY: `Registration` has no fields or methods accessible via `&Registration`, so it is safe to
 // share references to it with multiple threads as nothing can be done.
-unsafe impl<T: DriverOps> Sync for Registration<T> {}
+unsafe impl<T: DriverOps> Sync for DriverRegistration<T> {}
 
-impl<T: DriverOps> Registration<T> {
+impl<T: DriverOps> DriverRegistration<T> {
     /// Creates a new instance of the registration object.
     pub fn new() -> Self {
         Self {
@@ -66,9 +67,13 @@ impl<T: DriverOps> Registration<T> {
     /// Allocates a pinned registration object and registers it.
     ///
     /// Returns a pinned heap-allocated representation of the registration.
-    pub fn new_pinned(name: &'static CStr, module: &'static ThisModule) -> Result<Pin<Box<Self>>> {
+    pub fn new_pinned(
+        name: &'static CStr,
+        module: ThisModule,
+        domain: T::DomainType,
+    ) -> Result<Pin<Box<Self>>> {
         let mut reg = Pin::from(Box::try_new(Self::new())?);
-        reg.as_mut().register(name, module)?;
+        reg.as_mut().register(name, module, domain)?;
         Ok(reg)
     }
 
@@ -79,7 +84,8 @@ impl<T: DriverOps> Registration<T> {
     pub fn register(
         self: Pin<&mut Self>,
         name: &'static CStr,
-        module: &'static ThisModule,
+        module: ThisModule,
+        domain: T::DomainType,
     ) -> Result {
         // SAFETY: We never move out of `this`.
         let this = unsafe { self.get_unchecked_mut() };
@@ -90,20 +96,20 @@ impl<T: DriverOps> Registration<T> {
 
         // SAFETY: `concrete_reg` was initialised via its default constructor. It is only freed
         // after `Self::drop` is called, which first calls `T::unregister`.
-        unsafe { T::register(this.concrete_reg.get(), name, module) }?;
+        unsafe { T::register(this.concrete_reg.get(), name, module, domain) }?;
 
         this.is_registered = true;
         Ok(())
     }
 }
 
-impl<T: DriverOps> Default for Registration<T> {
+impl<T: DriverOps> Default for DriverRegistration<T> {
     fn default() -> Self {
         Self::new()
     }
 }
 
-impl<T: DriverOps> Drop for Registration<T> {
+impl<T: DriverOps> Drop for DriverRegistration<T> {
     fn drop(&mut self) {
         if self.is_registered {
             // SAFETY: This path only runs if a previous call to `T::register` completed

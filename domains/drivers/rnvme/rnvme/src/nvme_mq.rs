@@ -5,12 +5,17 @@ use core::{
     sync::atomic::{AtomicU16, AtomicU32, AtomicU64, Ordering},
 };
 
-use basic::{bindings, console::print as pr_info, kernel::{
-    block::mq,
-    device::RawDevice,
-    error::{linux_err::*, KernelResult as Result},
-    types::{ArcBorrow, AtomicOptionalBoxedPtr, ForeignOwnable},
-}};
+use basic::{
+    bindings,
+    console::print as pr_info,
+    kernel::{
+        block::mq,
+        device::RawDevice,
+        error::{linux_err::*, KernelResult as Result},
+        types::{ArcBorrow, AtomicOptionalBoxedPtr, ForeignOwnable},
+    },
+};
+use interface::nvme::BlkMqOp;
 use kmacro::vtable;
 use pinned_init::*;
 
@@ -22,13 +27,13 @@ use super::{
 pub(crate) struct AdminQueueOperations;
 
 #[vtable]
-impl mq::Operations for AdminQueueOperations {
+impl mq::MqOperations for AdminQueueOperations {
     type RequestData = NvmeRequest;
     type RequestDataInit = impl PinInit<Self::RequestData>;
     type QueueData = Box<NvmeNamespace>;
     type HwData = Arc<NvmeQueue<Self>>;
     type TagSetData = Arc<DeviceData>;
-
+    type DomainType = Arc<dyn BlkMqOp>;
     fn new_request_data(
         tagset_data: <Self::TagSetData as ForeignOwnable>::Borrowed<'_>,
     ) -> Self::RequestDataInit {
@@ -84,13 +89,13 @@ impl mq::Operations for AdminQueueOperations {
 pub(crate) struct IoQueueOperations;
 
 #[vtable]
-impl mq::Operations for IoQueueOperations {
+impl mq::MqOperations for IoQueueOperations {
     type RequestData = NvmeRequest;
     type RequestDataInit = impl PinInit<Self::RequestData>;
     type QueueData = Box<NvmeNamespace>;
     type HwData = Arc<NvmeQueue<Self>>;
     type TagSetData = Arc<DeviceData>;
-
+    type DomainType = Arc<dyn BlkMqOp>;
     fn new_request_data(data: ArcBorrow<'_, DeviceData>) -> Self::RequestDataInit {
         let device = data.dev.clone();
         let dma_pool = data.dma_pool.clone();
@@ -183,7 +188,7 @@ fn queue_rq<T>(
     is_last: bool,
 ) -> Result
 where
-    T: mq::Operations<RequestData = NvmeRequest>,
+    T: mq::MqOperations<RequestData = NvmeRequest>,
 {
     match rq.command() {
         bindings::req_op_REQ_OP_DRV_IN | bindings::req_op_REQ_OP_DRV_OUT => {
@@ -283,7 +288,7 @@ where
 
 fn complete<T>(rq: &mq::Request<T>)
 where
-    T: mq::Operations<RequestData = NvmeRequest>,
+    T: mq::MqOperations<RequestData = NvmeRequest>,
 {
     match rq.command() {
         bindings::req_op_REQ_OP_DRV_IN

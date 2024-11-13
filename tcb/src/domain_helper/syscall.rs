@@ -518,27 +518,63 @@ impl CoreFunction for DomainSyscall {
         unsafe { kernel::bindings::put_device(dev) }
     }
 
-    fn sys_request_threaded_irq(&self, irq: c_uint, handler: irq_handler_t, thread_fn: irq_handler_t, flags: c_ulong, name: *const c_char, dev_id: *mut c_void) -> c_int {
-        unsafe { kernel::bindings::request_threaded_irq(irq, handler, thread_fn, flags, name, dev_id) }
+    fn sys_request_threaded_irq(
+        &self,
+        irq: c_uint,
+        handler: irq_handler_t,
+        thread_fn: irq_handler_t,
+        flags: c_ulong,
+        name: *const c_char,
+        dev_id: *mut c_void,
+    ) -> c_int {
+        unsafe {
+            kernel::bindings::request_threaded_irq(irq, handler, thread_fn, flags, name, dev_id)
+        }
     }
 
     fn sys_free_irq(&self, arg1: c_uint, arg2: *mut c_void) -> *const c_void {
         unsafe { kernel::bindings::free_irq(arg1, arg2) }
     }
 
-    fn sys_dma_alloc_attrs(&self, dev: *mut device, size: usize, dma_handle: *mut dma_addr_t, flag: gfp_t, attrs: c_ulong) -> *mut c_void {
+    fn sys_dma_alloc_attrs(
+        &self,
+        dev: *mut device,
+        size: usize,
+        dma_handle: *mut dma_addr_t,
+        flag: gfp_t,
+        attrs: c_ulong,
+    ) -> *mut c_void {
         unsafe { kernel::bindings::dma_alloc_attrs(dev, size, dma_handle, flag, attrs) }
     }
 
-    fn sys_dma_free_attrs(&self, dev: *mut device, size: usize, cpu_addr: *mut c_void, dma_handle: u64, attrs: c_ulong) {
+    fn sys_dma_free_attrs(
+        &self,
+        dev: *mut device,
+        size: usize,
+        cpu_addr: *mut c_void,
+        dma_handle: u64,
+        attrs: c_ulong,
+    ) {
         unsafe { kernel::bindings::dma_free_attrs(dev, size, cpu_addr, dma_handle, attrs) }
     }
 
-    fn sys_dma_pool_create(&self, name: *const c_char, dev: *mut device, size: usize, align: usize, boundary: usize) -> *mut dma_pool {
+    fn sys_dma_pool_create(
+        &self,
+        name: *const c_char,
+        dev: *mut device,
+        size: usize,
+        align: usize,
+        boundary: usize,
+    ) -> *mut dma_pool {
         unsafe { kernel::bindings::dma_pool_create(name, dev, size, align, boundary) }
     }
 
-    fn sys_dma_pool_alloc(&self, pool: *mut dma_pool, flag: gfp_t, dma_handle: *mut dma_addr_t) -> *mut c_void {
+    fn sys_dma_pool_alloc(
+        &self,
+        pool: *mut dma_pool,
+        flag: gfp_t,
+        dma_handle: *mut dma_addr_t,
+    ) -> *mut c_void {
         unsafe { kernel::bindings::dma_pool_alloc(pool, flag, dma_handle) }
     }
 
@@ -626,7 +662,12 @@ impl CoreFunction for DomainSyscall {
         unsafe { kernel::bindings::writeq_relaxed(value, addr) }
     }
 
-    fn sys__pci_register_driver(&self, arg1: *mut pci_driver, arg2: *mut module, mod_name: *const c_char) -> c_int {
+    fn sys__pci_register_driver(
+        &self,
+        arg1: *mut pci_driver,
+        arg2: *mut module,
+        mod_name: *const c_char,
+    ) -> c_int {
         unsafe { kernel::bindings::__pci_register_driver(arg1, arg2, mod_name) }
     }
 
@@ -654,12 +695,26 @@ impl CoreFunction for DomainSyscall {
         unsafe { kernel::bindings::pci_select_bars(dev, flags) }
     }
 
-    fn sys_pci_request_selected_regions(&self, arg1: *mut pci_dev, arg2: c_int, arg3: *const c_char) -> c_int {
+    fn sys_pci_request_selected_regions(
+        &self,
+        arg1: *mut pci_dev,
+        arg2: c_int,
+        arg3: *const c_char,
+    ) -> c_int {
         unsafe { kernel::bindings::pci_request_selected_regions(arg1, arg2, arg3) }
     }
 
-    fn sys_pci_alloc_irq_vectors_affinity(&self, dev: *mut pci_dev, min_vecs: c_uint, max_vecs: c_uint, flags: c_uint, affd: *mut irq_affinity) -> c_int {
-        unsafe { kernel::bindings::pci_alloc_irq_vectors_affinity(dev, min_vecs, max_vecs, flags, affd) }
+    fn sys_pci_alloc_irq_vectors_affinity(
+        &self,
+        dev: *mut pci_dev,
+        min_vecs: c_uint,
+        max_vecs: c_uint,
+        flags: c_uint,
+        affd: *mut irq_affinity,
+    ) -> c_int {
+        unsafe {
+            kernel::bindings::pci_alloc_irq_vectors_affinity(dev, min_vecs, max_vecs, flags, affd)
+        }
     }
 
     fn sys_pci_free_irq_vectors(&self, pdev: *mut pci_dev) {
@@ -670,7 +725,12 @@ impl CoreFunction for DomainSyscall {
         unsafe { kernel::bindings::pci_irq_vector(pdev, nr) }
     }
 
-    fn sys_blk_mq_pci_map_queues(&self, qmap: *mut blk_mq_queue_map, pdev: *mut pci_dev, offset: c_int) {
+    fn sys_blk_mq_pci_map_queues(
+        &self,
+        qmap: *mut blk_mq_queue_map,
+        pdev: *mut pci_dev,
+        offset: c_int,
+    ) {
         unsafe { kernel::bindings::blk_mq_pci_map_queues(qmap, pdev, offset) }
     }
 
@@ -678,11 +738,26 @@ impl CoreFunction for DomainSyscall {
         unsafe { kernel::bindings::blk_mq_map_queues(qmap) }
     }
 
-    fn sys_dma_map_page_attrs(&self, dev: *mut device, page: *mut page, offset: usize, size: usize, dir: dma_data_direction, attrs: c_ulong) -> dma_addr_t {
+    fn sys_dma_map_page_attrs(
+        &self,
+        dev: *mut device,
+        page: *mut page,
+        offset: usize,
+        size: usize,
+        dir: dma_data_direction,
+        attrs: c_ulong,
+    ) -> dma_addr_t {
         unsafe { kernel::bindings::dma_map_page_attrs(dev, page, offset, size, dir, attrs) }
     }
 
-    fn sys_dma_unmap_page_attrs(&self, dev: *mut device, handle: dma_addr_t, size: usize, dir: dma_data_direction, attrs: c_ulong) {
+    fn sys_dma_unmap_page_attrs(
+        &self,
+        dev: *mut device,
+        handle: dma_addr_t,
+        size: usize,
+        dir: dma_data_direction,
+        attrs: c_ulong,
+    ) {
         unsafe { kernel::bindings::dma_unmap_page_attrs(dev, handle, size, dir, attrs) }
     }
 

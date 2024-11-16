@@ -6,8 +6,16 @@
 
 #![allow(dead_code)]
 
-use alloc::{boxed::Box, sync::Arc};
-use core::fmt;
+use alloc::{
+    boxed::Box,
+    collections::BTreeMap,
+    string::{String, ToString},
+    sync::Arc,
+};
+use core::{fmt, pin::Pin};
+
+use pinned_init::{pin_data, pin_init, InPlaceInit};
+use spin::Lazy;
 
 use crate::{
     bindings,
@@ -20,6 +28,7 @@ use crate::{
         types::ForeignOwnable,
         ThisModule,
     },
+    new_spinlock,
 };
 
 /// An adapter for the registration of PCI drivers.
@@ -35,35 +44,55 @@ impl<T: PciDriver> driver::DriverOps for PciAdapter<T> {
         domain: Self::DomainType,
     ) -> Result {
         let pdrv: &mut bindings::pci_driver = unsafe { &mut *reg };
-
-        let domain = Box::new(domain);
-        let domain_raw = Box::into_raw(domain);
         // we need to keep the domain alive until the driver is unregistered
         // store the domain in the private data field of the driver
-        pdrv.driver.p = domain_raw as *mut core::ffi::c_void as _;
+
+        // pdrv.driver.p = domain_raw as *mut core::ffi::c_void as _;
+        let domain_name = name.to_string();
+        DOMAIN_LIST.domain.lock().insert(domain_name, domain);
+
         pdrv.name = name.as_char_ptr();
         pdrv.probe = Some(shim::probe_callback);
         pdrv.remove = Some(shim::remove_callback);
         pdrv.id_table = T::ID_TABLE.as_ref();
-        to_result(crate::sys__pci_register_driver(
+        let res = to_result(crate::sys__pci_register_driver(
             reg,
             module.as_ptr(),
             name.as_char_ptr(),
-        ))
+        ));
+        if res.is_err() {
+            let domain_name = name.to_string();
+            DOMAIN_LIST.domain.lock().remove(&domain_name);
+        }
+        res
     }
 
     unsafe fn unregister(reg: *mut bindings::pci_driver) {
         crate::sys_pci_unregister_driver(reg);
-        let pdrv = unsafe { &mut *reg };
-        let domain_raw = pdrv.driver.p as *mut Arc<dyn PCIDeviceOp>;
-        let _ = Box::from_raw(domain_raw);
+        // let pdrv = unsafe { &mut *reg };
+        // let domain_raw = pdrv.driver.p as *mut Arc<dyn PCIDeviceOp>;
+        // let _ = Box::from_raw(domain_raw);
+        let name = CStr::from_char_ptr((*reg).name);
+        DOMAIN_LIST.domain.lock().remove(name.as_str_unchecked());
     }
 }
 
+#[pin_data]
+struct DomainList {
+    #[pin]
+    domain: SpinLock<BTreeMap<String, Arc<dyn PCIDeviceOp>>>,
+}
+
+static DOMAIN_LIST: Lazy<Pin<Box<DomainList>>> = Lazy::new(|| {
+    let domain = pin_init!(DomainList{
+        domain <- new_spinlock!(BTreeMap::new()),
+    });
+    let d = Box::pin_init(domain).expect("Failed to initialize domain list");
+    d
+});
+
 pub use shim::PciAdapterShim;
 mod shim {
-    use alloc::sync::Arc;
-
     use interface::nvme::PCIDeviceOp;
     use kbind::safe_ptr::SafePtr;
 
@@ -71,9 +100,11 @@ mod shim {
         bindings,
         kernel::{
             error::KernelResult as Result,
-            pci::{PciAdapter, PciDriver},
+            pci::{PciAdapter, PciDriver, DOMAIN_LIST},
+            str::CStr,
         },
     };
+
     pub unsafe extern "C" fn probe_callback(
         pdev: *mut bindings::pci_dev,
         id: *const bindings::pci_device_id,
@@ -82,8 +113,9 @@ mod shim {
         // get pci driver
         let pci_driver = unsafe { &*(pdev.driver as *const bindings::pci_driver) };
         // find domain
-        let domain = pci_driver.driver.p as *mut Arc<dyn PCIDeviceOp>;
-        let domain = unsafe { &*domain };
+        let domain_name = CStr::from_char_ptr(pci_driver.name);
+        let binding = DOMAIN_LIST.domain.lock();
+        let domain = binding.get(domain_name.as_str_unchecked()).unwrap();
         let res = domain.probe(
             SafePtr::new(pdev),
             SafePtr::new(id as *mut bindings::pci_device_id),
@@ -98,8 +130,12 @@ mod shim {
         // get pci driver
         let pci_driver = unsafe { &*(pdev.driver as *const bindings::pci_driver) };
         // find domain
-        let domain = pci_driver.driver.p as *mut Arc<dyn PCIDeviceOp>;
-        let domain = unsafe { &*domain };
+        // let domain = pci_driver.driver.p as *mut Arc<dyn PCIDeviceOp>;
+        // let domain = unsafe { &*domain };
+        let domain_name = CStr::from_char_ptr(pci_driver.name);
+        let binding = DOMAIN_LIST.domain.lock();
+        let domain = binding.get(domain_name.as_str_unchecked()).unwrap();
+
         let _ = domain.remove(SafePtr::new(pdev));
     }
 
@@ -262,7 +298,7 @@ macro_rules! define_pci_id_table {
 pub use define_pci_id_table;
 use interface::nvme::{IrqHandlerOp, PCIDeviceOp};
 
-use crate::println;
+use crate::{kernel::sync::SpinLock, println};
 
 /// A PCI driver
 pub trait PciDriver {

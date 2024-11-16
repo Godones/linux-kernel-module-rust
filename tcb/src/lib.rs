@@ -41,7 +41,7 @@ impl kernel::Module for TcbModule {
         println_color!(31, "This is a red message");
         println_color!(32, "This is a green message");
         println_color!(33, "This is a yellow message");
-        // kbind::logger::init_logger();
+        kernel::logger::init_logger();
         MODULE.call_once(|| module);
         let channel = channel::init_domain_channel()?;
         domain::init_domain_system().map_err(|e| {

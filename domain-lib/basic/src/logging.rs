@@ -10,7 +10,7 @@ impl Log for SimpleLogger {
         if !self.enabled(record.metadata()) {
             return;
         }
-        let color = match record.level() {
+        let _color = match record.level() {
             Level::Error => 31, // Red
             Level::Warn => 93,  // BrightYellow
             Level::Info => 35,  // Blue
@@ -20,8 +20,7 @@ impl Log for SimpleLogger {
         let path = record.file();
         let line = record.line();
         println!(
-            "\u{1B}[1;{}m[{:>5}] [{:?}:{}] {}\u{1B}[0m",
-            color,
+            "[{:>5}] [{:?}:{}] {}",
             record.level(),
             path.unwrap_or(""),
             line.unwrap_or(0),
@@ -40,6 +39,6 @@ pub fn init_logger() {
         Some("INFO") => LevelFilter::Info,
         Some("DEBUG") => LevelFilter::Debug,
         Some("TRACE") => LevelFilter::Trace,
-        _ => LevelFilter::Off,
+        _ => LevelFilter::Error,
     });
 }

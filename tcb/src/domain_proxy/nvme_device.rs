@@ -435,18 +435,18 @@ impl NvmeDeviceDomainProxy {
         });
         r
     }
-
+    #[inline]
     fn _handle_irq(&self, data: SafePtr) -> LinuxResult<u32> {
         self.domain.read_directly(|domain| domain.handle_irq(data))
     }
-
+    #[inline]
     fn _handle_irq_with_lock(&self, data: SafePtr) -> LinuxResult<u32> {
         let lock = self.lock.lock();
         let r = self._handle_irq(data);
         drop(lock);
         r
     }
-
+    #[inline]
     fn _handle_irq_no_lock(&self, data: SafePtr) -> LinuxResult<u32> {
         self.counter.get_with(|counter| {
             *counter += 1;
@@ -457,12 +457,12 @@ impl NvmeDeviceDomainProxy {
         });
         r
     }
-
+    #[inline]
     fn _probe(&self, pdev: SafePtr, pci_device_id: SafePtr) -> LinuxResult<i32> {
         self.domain
             .read_directly(|domain| domain.probe(pdev, pci_device_id))
     }
-
+    #[inline]
     fn _probe_no_lock(&self, pdev: SafePtr, pci_device_id: SafePtr) -> LinuxResult<i32> {
         self.counter.get_with(|counter| {
             *counter += 1;
@@ -473,18 +473,18 @@ impl NvmeDeviceDomainProxy {
         });
         r
     }
-
+    #[inline]
     fn _probe_with_lock(&self, pdev: SafePtr, pci_device_id: SafePtr) -> LinuxResult<i32> {
         let lock = self.lock.lock();
         let r = self._probe(pdev, pci_device_id);
         drop(lock);
         r
     }
-
+    #[inline]
     fn _remove(&self, pdev: SafePtr) -> LinuxResult<()> {
         self.domain.read_directly(|domain| domain.remove(pdev))
     }
-
+    #[inline]
     fn _remove_no_lock(&self, pdev: SafePtr) -> LinuxResult<()> {
         self.counter.get_with(|counter| {
             *counter += 1;
@@ -495,7 +495,7 @@ impl NvmeDeviceDomainProxy {
         });
         r
     }
-
+    #[inline]
     fn _remove_with_lock(&self, pdev: SafePtr) -> LinuxResult<()> {
         let lock = self.lock.lock();
         let r = self._remove(pdev);

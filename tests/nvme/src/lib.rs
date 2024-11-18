@@ -172,7 +172,7 @@ impl NvmeDevice {
         pci_dev: &mut pci::PciDevice,
         admin_queue: &Arc<nvme_queue::NvmeQueue<nvme_mq::AdminQueueOperations>>,
         mq: &mq::RequestQueue<nvme_mq::AdminQueueOperations>,
-    ) -> Result<Arc<mq::TagSet<nvme_mq::IoQueueOperations>>> {
+    ) -> Result<Arc<TagSet<IoQueueOperations>>> {
         pr_info!("Setting up io queues\n");
         let nr_io_queues = dev.poll_queue_count + dev.irq_queue_count;
         let result = Self::set_queue_count(nr_io_queues, mq)?;

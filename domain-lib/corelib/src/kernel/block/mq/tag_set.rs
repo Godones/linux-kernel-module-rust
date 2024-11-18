@@ -13,7 +13,7 @@ use crate::{
     bindings,
     kernel::{
         block::mq::{
-            operations::{OperationsVtable, OperationsVtableShim, TagSetDataShim},
+            operations::{OperationsVtableShim, TagSetDataShim},
             request::RequestRef,
             MqOperations,
         },
@@ -93,7 +93,7 @@ impl<T: MqOperations> TagSet<T> {
         num_maps: u32,
         domain: T::DomainType,
     ) -> impl PinInit<Self, Error> {
-        let domain_ptr = Box::into_raw(Box::new(domain.clone()));
+        let domain_ptr = Box::into_raw(Box::new(domain));
 
         let tagset_data_shim = TagSetDataShim {
             original_tag_data: tagset_data.into_foreign() as _,

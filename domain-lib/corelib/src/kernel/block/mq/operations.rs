@@ -79,197 +79,10 @@ pub trait MqOperations: Sized {
     }
 
     /// Called by the kernel to map submission queues to CPU cores.
-    fn map_queues(_tag_set: &TagSet<Self>) {
+    fn map_queues(_tag_set: &TagSet<Self>, _tagset_data: Self::TagSetData) {
         unreachable!("map_queues: {}", crate::kernel::error::VTABLE_DEFAULT_ERROR)
     }
     // There is no need for exit_request() because `drop` will be called.
-}
-
-pub(crate) struct OperationsVtable<T: MqOperations>(PhantomData<T>);
-#[allow(unused)]
-impl<T: MqOperations> OperationsVtable<T> {
-    // # Safety
-    //
-    // - The caller of this function must ensure that `hctx` and `bd` are valid
-    //   and initialized. The pointees must outlive this function.
-    // - `hctx->driver_data` must be a pointer created by a call to
-    //   `Self::init_hctx_callback()` and the pointee must outlive this
-    //   function.
-    // - This function must not be called with a `hctx` for which
-    //   `Self::exit_hctx_callback()` has been called.
-    // - (*bd).rq must point to a valid `bindings:request` with a positive refcount in the `ref` field.
-    unsafe extern "C" fn queue_rq_callback(
-        hctx: *mut bindings::blk_mq_hw_ctx,
-        bd: *const bindings::blk_mq_queue_data,
-    ) -> bindings::blk_status_t {
-        // SAFETY: `bd` is valid as required by the safety requirement for this function.
-        let rq = unsafe { Request::from_ptr((*bd).rq) };
-
-        // SAFETY: The safety requirement for this function ensure that
-        // `(*hctx).driver_data` was returned by a call to
-        // `Self::init_hctx_callback()`. That function uses
-        // `PointerWrapper::into_pointer()` to create `driver_data`. Further,
-        // the returned value does not outlive this function and
-        // `from_foreign()` is not called until `Self::exit_hctx_callback()` is
-        // called. By the safety requirement of this function and contract with
-        // the `blk-mq` API, `queue_rq_callback()` will not be called after that
-        // point.
-        let hw_data = unsafe { T::HwData::borrow((*hctx).driver_data) };
-
-        // SAFETY: `hctx` is valid as required by this function.
-        let queue_data = unsafe { (*(*hctx).queue).queuedata };
-
-        // SAFETY: `queue.queuedata` was created by `GenDisk::try_new()` with a
-        // call to `ForeignOwnable::into_pointer()` to create `queuedata`.
-        // `ForeignOwnable::from_foreign()` is only called when the tagset is
-        // dropped, which happens after we are dropped.
-        let queue_data = unsafe { T::QueueData::borrow(queue_data) };
-
-        let ret = T::queue_rq(
-            hw_data,
-            queue_data,
-            rq,
-            // SAFETY: `bd` is valid as required by the safety requirement for this function.
-            unsafe { (*bd).last },
-        );
-        if let Err(e) = ret {
-            e.to_blk_status()
-        } else {
-            bindings::BLK_STS_OK as _
-        }
-    }
-
-    unsafe extern "C" fn commit_rqs_callback(hctx: *mut bindings::blk_mq_hw_ctx) {
-        let hw_data = unsafe { T::HwData::borrow((*hctx).driver_data) };
-
-        // SAFETY: `hctx` is valid as required by this function.
-        let queue_data = unsafe { (*(*hctx).queue).queuedata };
-
-        // SAFETY: `queue.queuedata` was created by `GenDisk::try_new()` with a
-        // call to `ForeignOwnable::into_pointer()` to create `queuedata`.
-        // `ForeignOwnable::from_foreign()` is only called when the tagset is
-        // dropped, which happens after we are dropped.
-        let queue_data = unsafe { T::QueueData::borrow(queue_data) };
-        T::commit_rqs(hw_data, queue_data)
-    }
-
-    unsafe extern "C" fn complete_callback(rq: *mut bindings::request) {
-        T::complete(unsafe { &Request::from_ptr(rq) });
-    }
-
-    /// # Safety
-    ///
-    /// This function may only be called by blk-mq C infrastructure. `hctx` must
-    /// be a pointer to a valid and aligned `struct blk_mq_hw_ctx` that was
-    /// previously initialized by a call to `init_hctx_callback`.
-    unsafe extern "C" fn poll_callback(
-        hctx: *mut bindings::blk_mq_hw_ctx,
-        _iob: *mut bindings::io_comp_batch,
-    ) -> core::ffi::c_int {
-        // SAFETY: By function safety requirement, `hctx` was initialized by
-        // `init_hctx_callback` and thus `driver_data` came from a call to
-        // `into_foreign`.
-        let hw_data = unsafe { T::HwData::borrow((*hctx).driver_data) };
-        T::poll(hw_data).into()
-    }
-
-    unsafe extern "C" fn init_hctx_callback(
-        hctx: *mut bindings::blk_mq_hw_ctx,
-        tagset_data: *mut core::ffi::c_void,
-        hctx_idx: core::ffi::c_uint,
-    ) -> core::ffi::c_int {
-        from_result(|| {
-            let tagset_data = unsafe { T::TagSetData::borrow(tagset_data) };
-            let data = T::init_hctx(tagset_data, hctx_idx)?;
-            unsafe { (*hctx).driver_data = data.into_foreign() as _ };
-            Ok(0)
-        })
-    }
-
-    unsafe extern "C" fn exit_hctx_callback(
-        hctx: *mut bindings::blk_mq_hw_ctx,
-        _hctx_idx: core::ffi::c_uint,
-    ) {
-        let ptr = unsafe { (*hctx).driver_data };
-        unsafe { T::HwData::from_foreign(ptr) };
-    }
-
-    unsafe extern "C" fn init_request_callback(
-        set: *mut bindings::blk_mq_tag_set,
-        rq: *mut bindings::request,
-        _hctx_idx: core::ffi::c_uint,
-        _numa_node: core::ffi::c_uint,
-    ) -> core::ffi::c_int {
-        from_result(|| {
-            // SAFETY: The tagset invariants guarantee that all requests are allocated with extra memory
-            // for the request data.
-            let pdu = crate::sys_blk_mq_rq_to_pdu(rq) as *mut T::RequestData;
-            let tagset_data = unsafe { T::TagSetData::borrow((*set).driver_data) };
-
-            let initializer = T::new_request_data(tagset_data);
-            unsafe { initializer.__pinned_init(pdu)? };
-
-            Ok(0)
-        })
-    }
-
-    unsafe extern "C" fn exit_request_callback(
-        _set: *mut bindings::blk_mq_tag_set,
-        rq: *mut bindings::request,
-        _hctx_idx: core::ffi::c_uint,
-    ) {
-        // SAFETY: The tagset invariants guarantee that all requests are allocated with extra memory
-        // for the request data.
-        let pdu = crate::sys_blk_mq_rq_to_pdu(rq) as *mut T::RequestData;
-
-        // SAFETY: `pdu` is valid for read and write and is properly initialised.
-        unsafe { core::ptr::drop_in_place(pdu) };
-    }
-
-    /// # Safety
-    ///
-    /// This function may only be called by blk-mq C infrastructure. `tag_set`
-    /// must be a pointer to a valid and initialized `TagSet<T>`. The pointee
-    /// must be valid for use as a reference at least the duration of this call.
-    unsafe extern "C" fn map_queues_callback(tag_set: *mut bindings::blk_mq_tag_set) {
-        // SAFETY: The safety requirements of this function satiesfies the
-        // requirements of `TagSet::from_ptr`.
-        let tag_set = unsafe { TagSet::from_ptr(tag_set) };
-        T::map_queues(tag_set);
-    }
-
-    const VTABLE: bindings::blk_mq_ops = bindings::blk_mq_ops {
-        queue_rq: Some(Self::queue_rq_callback),
-        queue_rqs: None,
-        commit_rqs: Some(Self::commit_rqs_callback),
-        get_budget: None,
-        put_budget: None,
-        set_rq_budget_token: None,
-        get_rq_budget_token: None,
-        timeout: None,
-        poll: if T::HAS_POLL {
-            Some(Self::poll_callback)
-        } else {
-            None
-        },
-        complete: Some(Self::complete_callback),
-        init_hctx: Some(Self::init_hctx_callback),
-        exit_hctx: Some(Self::exit_hctx_callback),
-        init_request: Some(Self::init_request_callback),
-        exit_request: Some(Self::exit_request_callback),
-        cleanup_rq: None,
-        busy: None,
-        map_queues: if T::HAS_MAP_QUEUES {
-            Some(Self::map_queues_callback)
-        } else {
-            None
-        },
-        show_rq: None,
-    };
-
-    pub(crate) const unsafe fn build() -> &'static bindings::blk_mq_ops {
-        &Self::VTABLE
-    }
 }
 
 pub struct TagSetDataShim {
@@ -311,7 +124,7 @@ pub use shim::OperationsVtableShim;
 
 mod shim {
     use alloc::boxed::Box;
-    use core::marker::PhantomData;
+    use core::{marker::PhantomData, sync::atomic::AtomicBool};
 
     use kbind::safe_ptr::SafePtr;
 
@@ -400,6 +213,7 @@ mod shim {
             hctx_mut.driver_data = original_data;
             let _res = domain.exit_hctx(SafePtr::new(hctx as _), hctx_idx as usize, IO);
         }
+
         unsafe extern "C" fn init_request_callback(
             set: *mut bindings::blk_mq_tag_set,
             rq: *mut bindings::request,
@@ -432,7 +246,11 @@ mod shim {
         unsafe extern "C" fn map_queues_callback(tag_set: *mut bindings::blk_mq_tag_set) {
             let driver_data = unsafe { TagSetDataShim::from_raw((*tag_set).driver_data) };
             let domain = driver_data.domain();
-            let _res = domain.map_queues(SafePtr::new(tag_set as _), IO);
+            let _res = domain.map_queues(
+                SafePtr::new(tag_set as _),
+                SafePtr::new(driver_data.original_tag_data),
+                IO,
+            );
         }
 
         unsafe extern "C" fn poll_callback(

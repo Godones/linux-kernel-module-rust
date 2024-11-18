@@ -738,7 +738,6 @@ mod core_impl {
     }
 
     // rcu
-
     pub(crate) fn sys_rcu_read_lock() {
         CORE_FUNC.get_must().sys_rcu_read_lock();
     }

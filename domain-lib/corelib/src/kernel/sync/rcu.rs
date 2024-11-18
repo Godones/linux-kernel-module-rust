@@ -26,12 +26,6 @@ impl Guard {
     pub fn unlock(self) {}
 }
 
-impl Default for Guard {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 impl Drop for Guard {
     fn drop(&mut self) {
         // SAFETY: By the type invariants, the rcu read side is locked, so it is ok to unlock it.

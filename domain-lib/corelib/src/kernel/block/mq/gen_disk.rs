@@ -33,6 +33,7 @@ pub struct GenDisk<T: MqOperations> {
     tagset: Arc<TagSet<T>>,
     gendisk: *mut bindings::gendisk,
     queue_data: *const c_void,
+    over_write: bool,
 }
 
 // SAFETY: `GenDisk` is an owned pointer to a `struct gendisk` and an `Arc` to a
@@ -45,6 +46,7 @@ impl<T: MqOperations> GenDisk<T> {
             tagset,
             gendisk: core::ptr::null_mut(),
             queue_data: queue_data.into_foreign(),
+            over_write: false,
         }
     }
 
@@ -108,6 +110,7 @@ impl<T: MqOperations> GenDisk<T> {
             tagset,
             gendisk,
             queue_data: data,
+            over_write: true,
         })
     }
 
@@ -174,7 +177,9 @@ impl<T: MqOperations> Drop for GenDisk<T> {
     fn drop(&mut self) {
         let queue_data = unsafe { (*(*self.gendisk).queue).queuedata };
 
-        // crate::sys_del_gendisk(self.gendisk);
+        if self.over_write {
+            crate::sys_del_gendisk(self.gendisk);
+        }
 
         // SAFETY: `queue.queuedata` was created by `GenDisk::try_new()` with a
         // call to `ForeignOwnable::into_pointer()` to create `queuedata`.

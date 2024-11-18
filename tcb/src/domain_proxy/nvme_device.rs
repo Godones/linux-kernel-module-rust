@@ -374,24 +374,39 @@ impl NvmeDeviceDomainProxy {
         r
     }
     #[inline]
-    fn _map_queues(&self, tag_set_ptr: SafePtr, io_queue: bool) -> LinuxResult<()> {
+    fn _map_queues(
+        &self,
+        tag_set_ptr: SafePtr,
+        driver_data_ptr: SafePtr,
+        io_queue: bool,
+    ) -> LinuxResult<()> {
         self.domain
-            .read_directly(|domain| domain.map_queues(tag_set_ptr, io_queue))
+            .read_directly(|domain| domain.map_queues(tag_set_ptr, driver_data_ptr, io_queue))
     }
 
     #[inline]
-    fn _map_queues_with_lock(&self, tag_set_ptr: SafePtr, io_queue: bool) -> LinuxResult<()> {
+    fn _map_queues_with_lock(
+        &self,
+        tag_set_ptr: SafePtr,
+        driver_data_ptr: SafePtr,
+        io_queue: bool,
+    ) -> LinuxResult<()> {
         let lock = self.lock.lock();
-        let r = self._map_queues(tag_set_ptr, io_queue);
+        let r = self._map_queues(tag_set_ptr, driver_data_ptr, io_queue);
         drop(lock);
         r
     }
     #[inline]
-    fn _map_queues_no_lock(&self, tag_set_ptr: SafePtr, io_queue: bool) -> LinuxResult<()> {
+    fn _map_queues_no_lock(
+        &self,
+        tag_set_ptr: SafePtr,
+        driver_data_ptr: SafePtr,
+        io_queue: bool,
+    ) -> LinuxResult<()> {
         self.counter.get_with(|counter| {
             *counter += 1;
         });
-        let r = self._map_queues(tag_set_ptr, io_queue);
+        let r = self._map_queues(tag_set_ptr, driver_data_ptr, io_queue);
         self.counter.get_with(|counter| {
             *counter -= 1;
         });
@@ -612,11 +627,16 @@ impl BlkMqOp for NvmeDeviceDomainProxy {
         }
     }
 
-    fn map_queues(&self, tag_set_ptr: SafePtr, io_queue: bool) -> LinuxResult<()> {
+    fn map_queues(
+        &self,
+        tag_set_ptr: SafePtr,
+        driver_data_ptr: SafePtr,
+        io_queue: bool,
+    ) -> LinuxResult<()> {
         if self.flag.load(core::sync::atomic::Ordering::Relaxed) {
-            self._map_queues_with_lock(tag_set_ptr, io_queue)
+            self._map_queues_with_lock(tag_set_ptr, driver_data_ptr, io_queue)
         } else {
-            self._map_queues_no_lock(tag_set_ptr, io_queue)
+            self._map_queues_no_lock(tag_set_ptr, driver_data_ptr, io_queue)
         }
     }
 
@@ -785,7 +805,12 @@ impl BlkMqOp for NvmeDeviceDomainEmptyImpl {
         Err(LinuxError::ENOSYS)
     }
 
-    fn map_queues(&self, _tag_set_ptr: SafePtr, _io_queue: bool) -> LinuxResult<()> {
+    fn map_queues(
+        &self,
+        _tag_set_ptr: SafePtr,
+        _driver_data_ptr: SafePtr,
+        _io_queue: bool,
+    ) -> LinuxResult<()> {
         Err(LinuxError::ENOSYS)
     }
 

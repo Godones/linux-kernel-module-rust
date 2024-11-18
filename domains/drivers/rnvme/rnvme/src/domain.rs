@@ -204,11 +204,16 @@ impl BlkMqOp for NvmeDomain {
         })
     }
 
-    fn map_queues(&self, tag_set_ptr: SafePtr, io_queue: bool) -> LinuxResult<()> {
+    fn map_queues(
+        &self,
+        tag_set_ptr: SafePtr,
+        driver_data_ptr: SafePtr,
+        io_queue: bool,
+    ) -> LinuxResult<()> {
         let res = if io_queue {
-            OperationsConverter::<IoQueueOperations>::map_queues(tag_set_ptr)
+            OperationsConverter::<IoQueueOperations>::map_queues(tag_set_ptr, driver_data_ptr)
         } else {
-            OperationsConverter::<AdminQueueOperations>::map_queues(tag_set_ptr)
+            OperationsConverter::<AdminQueueOperations>::map_queues(tag_set_ptr, driver_data_ptr)
         };
         res.map_err(|e| {
             println!("NullBlkModule map_queues error: {:?}", e);
@@ -359,8 +364,13 @@ impl BlkMqOp for UnwindWrap {
         basic::catch_unwind(|| self.0.complete_request(rq_ptr, io_queue))
     }
 
-    fn map_queues(&self, tag_set_ptr: SafePtr, io_queue: bool) -> LinuxResult<()> {
-        basic::catch_unwind(|| self.0.map_queues(tag_set_ptr, io_queue))
+    fn map_queues(
+        &self,
+        tag_set_ptr: SafePtr,
+        driver_data_ptr: SafePtr,
+        io_queue: bool,
+    ) -> LinuxResult<()> {
+        basic::catch_unwind(|| self.0.map_queues(tag_set_ptr, driver_data_ptr, io_queue))
     }
 
     fn poll_queues(&self, hctx_ptr: SafePtr, iob_ptr: SafePtr, io_queue: bool) -> LinuxResult<i32> {

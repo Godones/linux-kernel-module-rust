@@ -144,10 +144,10 @@ impl mq::MqOperations for IoQueueOperations {
         queue.process_completions()
     }
 
-    fn map_queues(tag_set: &mq::TagSet<Self>) {
+    fn map_queues(tag_set: &mq::TagSet<Self>, device_data: Self::TagSetData) {
         // TODO: Build abstractions for these unsafe calls
         unsafe {
-            let device_data = Self::TagSetData::from_foreign((*tag_set.raw_tag_set()).driver_data);
+            // let device_data = Self::TagSetData::from_foreign((*tag_set.raw_tag_set()).driver_data);
             let num_maps = (*tag_set.raw_tag_set()).nr_maps;
             pr_info!("num_maps: {}\n", num_maps);
             let mut queue_offset: u32 = 0;

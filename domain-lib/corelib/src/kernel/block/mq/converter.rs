@@ -121,11 +121,15 @@ impl<T: MqOperations> OperationsConverter<T> {
         T::complete(unsafe { &Request::from_ptr(rq) });
     }
 
-    unsafe fn map_queues_callback(tag_set: *mut bindings::blk_mq_tag_set) {
+    unsafe fn map_queues_callback(
+        tag_set: *mut bindings::blk_mq_tag_set,
+        driver_data: *mut core::ffi::c_void,
+    ) {
         // SAFETY: The safety requirements of this function satiesfies the
         // requirements of `TagSet::from_ptr`.
         let tag_set = unsafe { TagSet::from_ptr(tag_set) };
-        T::map_queues(tag_set);
+        let driver_data = unsafe { T::TagSetData::from_foreign(driver_data) };
+        T::map_queues(tag_set, driver_data);
     }
 
     unsafe fn poll_callback(
@@ -207,9 +211,9 @@ impl<T: MqOperations> OperationsConverter<T> {
         Ok(())
     }
 
-    pub fn map_queues(tag_set_ptr: SafePtr) -> KernelResult {
+    pub fn map_queues(tag_set_ptr: SafePtr, driver_data_ptr: SafePtr) -> KernelResult {
         unsafe {
-            Self::map_queues_callback(tag_set_ptr.raw_ptr() as _);
+            Self::map_queues_callback(tag_set_ptr.raw_ptr() as _, driver_data_ptr.raw_ptr() as _);
         }
         Ok(())
     }

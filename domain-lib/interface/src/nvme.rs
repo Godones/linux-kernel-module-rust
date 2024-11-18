@@ -50,7 +50,12 @@ pub trait BlkMqOp: DowncastSync {
         io_queue: bool,
     ) -> LinuxResult<()>;
     fn complete_request(&self, rq_ptr: SafePtr, io_queue: bool) -> LinuxResult<()>;
-    fn map_queues(&self, tag_set_ptr: SafePtr, io_queue: bool) -> LinuxResult<()>;
+    fn map_queues(
+        &self,
+        tag_set_ptr: SafePtr,
+        driver_data_ptr: SafePtr,
+        io_queue: bool,
+    ) -> LinuxResult<()>;
     fn poll_queues(&self, hctx_ptr: SafePtr, iob_ptr: SafePtr, io_queue: bool) -> LinuxResult<i32>;
 }
 

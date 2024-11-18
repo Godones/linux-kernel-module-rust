@@ -463,7 +463,7 @@ impl CoreFunction for DomainSyscall {
     }
 
     fn sys_rcu_read_lock(&self) {
-        unsafe { kernel::bindings::rust_helper_rcu_read_unlock() }
+        unsafe { kernel::bindings::rust_helper_rcu_read_lock() }
     }
 
     fn sys_rcu_read_unlock(&self) {

@@ -14,6 +14,7 @@ use alloc::{
 };
 use core::{fmt, pin::Pin};
 
+use interface::nvme::{IrqHandlerOp, PCIDeviceOp};
 use pinned_init::{pin_data, pin_init, InPlaceInit};
 use spin::Lazy;
 
@@ -25,12 +26,12 @@ use crate::{
         irq,
         mm::io_mem::Resource,
         str::CStr,
+        sync::Mutex,
         types::ForeignOwnable,
         ThisModule,
     },
-    new_spinlock,
+    new_mutex, println,
 };
-
 /// An adapter for the registration of PCI drivers.
 pub struct PciAdapter<T: PciDriver>(T);
 
@@ -80,12 +81,12 @@ impl<T: PciDriver> driver::DriverOps for PciAdapter<T> {
 #[pin_data]
 struct DomainList {
     #[pin]
-    domain: SpinLock<BTreeMap<String, Arc<dyn PCIDeviceOp>>>,
+    domain: Mutex<BTreeMap<String, Arc<dyn PCIDeviceOp>>>,
 }
 
 static DOMAIN_LIST: Lazy<Pin<Box<DomainList>>> = Lazy::new(|| {
     let domain = pin_init!(DomainList{
-        domain <- new_spinlock!(BTreeMap::new()),
+        domain <- new_mutex!(BTreeMap::new()),
     });
     let d = Box::pin_init(domain).expect("Failed to initialize domain list");
     d
@@ -296,9 +297,6 @@ macro_rules! define_pci_id_table {
     };
 }
 pub use define_pci_id_table;
-use interface::nvme::{IrqHandlerOp, PCIDeviceOp};
-
-use crate::{kernel::sync::SpinLock, println};
 
 /// A PCI driver
 pub trait PciDriver {

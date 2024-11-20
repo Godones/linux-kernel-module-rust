@@ -260,7 +260,7 @@ https://sjp38.github.io/post/qemu_setup_on_ubuntu/
 
 
 
-命令行配置clash：https://hiif.ong/ubuntu/   https://www.hengy1.top/article/3dadfa74.html
+命令行配置clash：https://hiif.ong/ubuntu/   https://www.hengy1.top/article/3dadfa74.html https://docs.gtk.pw/contents/linux/clash-cli.html#%E5%AE%89%E8%A3%85-installation
 
 升级内核：
 
@@ -272,7 +272,15 @@ https://sjp38.github.io/post/qemu_setup_on_ubuntu/
 
 使用ubuntu-mainline-kernel 安装： https://xie.infoq.cn/article/9f205cbfff243fe50a14aaf12
 
+更新grub启用新版本：https://blog.csdn.net/bby1987/article/details/104264285
 
+增大qemu-img大小：https://community.spiceworks.com/t/how-can-i-make-ubuntu-vg-ubuntu-lv-consume-the-entire-disk-space-available/806107/9
+
+
+
+使用clang编译内核可能出现的错误：
+
+CONFIG_FRAME_WARN  过小https://lkml.iu.edu/hypermail/linux/kernel/2109.0/05748.html
 
 
 
@@ -1124,7 +1132,7 @@ pub trait PciDriver {
 
 
 
-
+![image-20241116222359389](./assert/image-20241116222359389.png)
 
 
 
@@ -1137,6 +1145,10 @@ pub trait PciDriver {
 [wsl2挂载磁盘](https://superuser.com/questions/1757063/curious-error-when-mounting-m-2-nvme-ssd-ext4-partition-on-wsl-2-wsl-service-at)
 
 [qemu使用virt-manager管理虚拟机](https://www.cnblogs.com/beaclnd/p/18047633)
+
+[nvme驱动分析](https://github.com/andyBrake/andyBrake.github.io/blob/master/doc/nvme.md)
+
+
 
 ### 文件系统
 
@@ -1262,25 +1274,70 @@ Thread=4
 
 ### NVME
 
+#### 测试环境
+
+- linux：Linux ubuntu 6.8.0+ #1 SMP PREEMPT_DYNAMIC
+
+- qemu-kvm
+- CPU:AMD Ryzen 9 7945HX with Radeon Graphics (16) @ 2.495GHz
+- Memory: 16GB
+
+测试命令
+
 ```
 # 禁用数据统计
 echo 0 | sudo tee /sys/block/nvme0n1/queue/iostats
-sudo fio --name=mytest --ioengine=psync --rw=write --bs=4k --numjobs=1 --time_based --runtime=10s -filename=/dev/nvme0n1 --size=4G
+sudo fio --name=mytest --ioengine=libaio --rw=randread --bs=4k --numjobs=1 --time_based --runtime=120s -filename=/dev/nvme0n1 --size=10G --direct=1 --iodepth=1/8/32/128
 ```
 
-```
-write: IOPS= 118k +154k
-read:  IOPS= 90.0k + 109k + 106k
-```
+BS: 512B
 
-Rust
-
-```
-read: 208k + 206k +207k
-write: 208k + 201k + 209k
-```
+| QD: IOPS/Lat | C                               | LKM                                                     | DM                                                         |
+| ------------ | ------------------------------- | ------------------------------------------------------- | ---------------------------------------------------------- |
+| 1            | 11.4k  avg=87.10, stdev=75.85   | 10.2k  avg=97.40, stdev=95.95 usr=2.39%, sys=37.20%,    | 10.1k avg=97.56, stdev=156.30  usr=3.15%, sys=39.08%,      |
+| 8            | 39.1k  avg=204.24, stdev=133.29 | 25.0k avg=319.29, stdev=195.01 usr=4.08%, sys=95.28%,   | 24.8k avg=321.02, stdev=596.05  usr=4.81%, sys=94.56%      |
+| 32           | 62.2k avg=514.15, stdev=208.07  | 25.2k avg=1268.09, stdev=394.27  usr=4.12%, sys=95.86%  | 25.0k  avg=1278.49, stdev=1429.94   usr=4.94%, sys=95.03%, |
+| 128          | 72.2k avg=1773.11, stdev=566.44 | 25.3k  avg=5051.08, stdev=874.05  usr=4.35%, sys=95.63% | 25.2k  avg=5081.91, stdev=3873.23   usr=4.96%, sys=95.03%  |
 
 
+
+BS:4KB
+
+| QD: IOPS/Lat | C                                 | LKM                              | DM                               |
+| ------------ | --------------------------------- | -------------------------------- | -------------------------------- |
+| 1            | 10.2k avg=97.41, stdev=89.92      | 10.2k   avg=96.89, stdev=96.26   | 9431 avg=105.33, stdev=109.33    |
+| 8            | 37.2k  avg=214.67us, stdev=119.28 | 23.4k   avg=341.24, stdev=204.59 | 23.2k  avg=343.94, stdev=229.73  |
+| 32           | 57.1k  avg=560.32, stdev=205.69   | 23.3k  avg=1370.16, stdev=460.59 | 25.7k  avg=1246.84, stdev=486.39 |
+| 128          | 67.5k  avg=1896.05, stdev=551.06  | 23.8k avg=5380.01, stdev=912.95  | 24.9k avg=5149.58, stdev=1174.09 |
+
+#### 结果分析
+
+- 在QD=1时，C/LKM的性能差距在10%左右
+- 当QD=8时，LKM和DM的性能提升了，但相比C实现差距拉大
+- 当QD>8后，LKM和DM的性能不再有显著提升，但是C的仍然在提升
+- LKM和DM的性能差距在两个测试中差距最大10%
+
+#### WHY
+
+- 首先当QD>=8后，LKM和C的实现差距逐渐增大，这可能是由于参数没有设置正确或者是其它原因, 在LKM的作者的测试中，C/LKM的性能差距不会这么显著。(配置参数/虚拟硬盘？)
+- LKM和DM的性能差距非常小，我们观察到，当驱动域初始化完成后，kernel就很少再次调用域的接口了，因为当前我们是把kernel作为一个TCB来对待，驱动初始化完成后，内核的调用路径就很少进入域接口中。
+- 至于为什么DM有时候又会比LKM性能高一点，有可能是因为编译器的原因？。
+
+
+
+
+
+[FIO测试存储性能iodepth队列深度对iops的影响](https://blog.csdn.net/qq_40442753/article/details/109848776)
+
+[文件系统性能基准测试](https://gitlab.cn/docs/jh/administration/operations/filesystem_benchmarking.html)
+
+[FIO 性能测试](https://juicefs.com/docs/zh/cloud/benchmark/fio/)
+
+
+
+[扩展磁盘分区大小](https://blog.csdn.net/weixin_37480442/article/details/129258534)
+
+[查看nvme设备参数](https://blog.csdn.net/u013253075/article/details/132105249)
 
 
 
@@ -1327,3 +1384,9 @@ FIO使用：https://help.aliyun.com/zh/ecs/user-guide/test-the-performance-of-bl
 [在 Ubuntu 22.04.3 上构建自定义内核](https://cuefe.com/12/)
 
 [超级用户指南：轻松升级你的Ubuntu Linux内核版本](https://blog.csdn.net/Long_xu/article/details/126710992)
+
+
+
+blk-mp框架说明：https://www.cnblogs.com/zyly/p/16690841.html#_label2_3
+
+gdb解决内核崩溃问题：https://www.cnblogs.com/sunsuns/p/18493011

@@ -29,8 +29,6 @@ pub const MAX_LFS_FILESIZE: loff_t = 9223372036854775807;
 pub const PAGE_SIZE: usize = 4096;
 pub const SB_RDONLY: core::ffi::c_ulong = 1;
 
-
-
 pub const XA_FLAGS_LOCK_IRQ: gfp_t = 1;
 pub const XA_FLAGS_LOCK_BH: gfp_t = 2;
 pub const XA_FLAGS_TRACK_FREE: gfp_t = 4;

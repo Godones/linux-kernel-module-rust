@@ -4,19 +4,21 @@
 //!
 //! C header: [`include/linux/blk-mq.h`](../../include/linux/blk-mq.h)
 
-use core::marker::PhantomData;
-use core::sync::atomic::{AtomicBool, AtomicU64, Ordering};
+use core::{
+    marker::PhantomData,
+    sync::atomic::{AtomicBool, AtomicU64, Ordering},
+};
+
 use kmacro::vtable;
 
 use crate::{
     bindings,
-    block::mq::{Request, TagSet},
+    block::mq::{request::RequestDataWrapper, Request, TagSet},
     error::{from_result, KernelResult as Result},
     init::PinInit,
     pr_info,
     types::{ARef, ForeignOwnable},
 };
-use crate::block::mq::request::RequestDataWrapper;
 
 /// Implement this trait to interface blk-mq as block devices
 #[vtable]
@@ -107,7 +109,10 @@ impl<T: Operations> OperationsVtable<T> {
         request.wrapper_ref().refcount().store(2, Ordering::Relaxed);
 
         // The request is not completed yet.
-        request.wrapper_ref().completed().store(false, Ordering::Relaxed);
+        request
+            .wrapper_ref()
+            .completed()
+            .store(false, Ordering::Relaxed);
 
         // SAFETY:
         //  - We own a refcount that we took above. We pass that to `ARef`.
@@ -236,7 +241,9 @@ impl<T: Operations> OperationsVtable<T> {
 
             // SAFETY: The `completed` field is allocated but not initialized,
             // so it is valid for writes.
-            unsafe { RequestDataWrapper::completed_ptr(pdu.as_ptr()).write(AtomicBool::new(false)) };
+            unsafe {
+                RequestDataWrapper::completed_ptr(pdu.as_ptr()).write(AtomicBool::new(false))
+            };
 
             // SAFETY: Because `set` is a `TagSet<T>`, `driver_data` comes from
             // a call to `into_foregn` by the initializer returned by

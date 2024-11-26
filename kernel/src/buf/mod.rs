@@ -2,15 +2,17 @@ mod kernel_ptr;
 mod user_ptr;
 
 use alloc::vec::Vec;
-use core::ffi::{c_ulong, c_void};
-use core::mem::MaybeUninit;
+use core::{
+    ffi::{c_ulong, c_void},
+    mem::MaybeUninit,
+};
+
 pub use kernel_ptr::*;
 pub use user_ptr::*;
-use crate::bindings;
-use crate::code::EFAULT;
-use crate::error::KernelResult as Result;
-use crate::kalloc::AllocFlags;
-use crate::types::FromBytes;
+
+use crate::{
+    bindings, code::EFAULT, error::KernelResult as Result, kalloc::AllocFlags, types::FromBytes,
+};
 
 /// The type used for userspace addresses.
 pub type UserPtr = usize;
@@ -21,7 +23,6 @@ pub struct UserSliceReader {
     ptr: UserPtr,
     length: usize,
 }
-
 
 impl UserSliceReader {
     /// Skip the provided number of bytes.

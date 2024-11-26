@@ -91,7 +91,7 @@ pub struct Devres<T>(Arc<DevresInner<T>>);
 
 impl<T> DevresInner<T> {
     fn new(dev: &Device, data: T, _flags: AllocFlags) -> Result<Arc<DevresInner<T>>> {
-        let inner:Arc<DevresInner<T>> = UniqueArc::pin_init(pin_init!( DevresInner {
+        let inner: Arc<DevresInner<T>> = UniqueArc::pin_init(pin_init!( DevresInner {
             data <- Revocable::new(data),
         }))?
         .into();

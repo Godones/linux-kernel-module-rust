@@ -26,7 +26,7 @@ use kernel::{
         mq::{GenDisk, GenDiskBuilder, TagSet},
     },
     c_str, define_pci_id_table,
-    device::{Device},
+    device::Device,
     devres::Devres,
     driver,
     error::{linux_err::*, KernelResult as Result},

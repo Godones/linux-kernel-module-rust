@@ -9,8 +9,7 @@
 extern crate alloc;
 
 use alloc::{boxed::Box, sync::Arc};
-use core::ops::Deref;
-use core::pin::Pin;
+use core::{ops::Deref, pin::Pin};
 
 use kernel::{
     bindings,
@@ -19,18 +18,16 @@ use kernel::{
         mq::{self, GenDisk, Operations, TagSet},
     },
     error::{Error, KernelResult as Result},
+    kalloc::alloc_flags,
+    mm::{cache_padded::CacheAligned, pages::Page},
     module, new_mutex, new_spinlock, pr_info,
+    radix_tree::XArray,
     sync::{Mutex, SpinLock},
     time::hrtimer::{RawTimer, TimerCallback},
-    types::ForeignOwnable,
+    types::{ARef, ForeignOwnable},
     vtable, ThisModule, UniqueArc,
 };
 use pinned_init::*;
-use kernel::kalloc::{alloc_flags};
-use kernel::mm::cache_padded::CacheAligned;
-use kernel::mm::pages::Page;
-use kernel::radix_tree::XArray;
-use kernel::types::ARef;
 
 module! {
     type: NullBlkModule,
@@ -90,7 +87,6 @@ impl TryFrom<u8> for IRQMode {
 struct NullBlkModule {
     _disk: Pin<Box<Mutex<GenDisk<NullBlkDevice>>>>,
 }
-
 
 fn add_disk(tagset: Arc<TagSet<NullBlkDevice>>) -> Result<GenDisk<NullBlkDevice>> {
     let block_size = *param_block_size.read();
@@ -190,7 +186,10 @@ impl NullBlkDevice {
         let mut page = if let Some(page) = tree.get_locked(idx) {
             page
         } else {
-            tree.set(idx, Box::try_new(Page::alloc_page(alloc_flags::GFP_KERNEL)?)?)?;
+            tree.set(
+                idx,
+                Box::try_new(Page::alloc_page(alloc_flags::GFP_KERNEL)?)?,
+            )?;
             tree.get_locked(idx).unwrap()
         };
 
@@ -231,7 +230,6 @@ struct Pdu {
     #[pin]
     timer: kernel::time::hrtimer::Timer<Self>,
 }
-
 
 impl TimerCallback for Pdu {
     type Receiver = ARef<mq::Request<NullBlkDevice>>;

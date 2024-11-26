@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: GPL-2.0
 
 use core::fmt::{self, Write};
-use crate::code::EINVAL;
-use crate::error::KernelResult as Result;
+
+use crate::{code::EINVAL, error::KernelResult as Result};
 
 /// A mutable reference to a byte buffer where a string can be written into.
 ///

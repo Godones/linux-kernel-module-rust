@@ -8,7 +8,6 @@
 
 use core::{fmt, ops::Deref};
 
-
 use crate::{
     bindings,
     code::{EBUSY, EINVAL, ENOMEM},
@@ -42,7 +41,6 @@ impl<T: PciDriver> driver::DriverOps for PciAdapter<T> {
         pdrv.id_table = T::ID_TABLE.as_ref();
         to_result(unsafe { bindings::__pci_register_driver(reg, module.0, name.as_char_ptr()) })
     }
-
 
     fn unregister(pdrv: &mut Self::RegType) {
         // SAFETY: `pdrv` is guaranteed to be a valid `RegType`.

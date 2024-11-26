@@ -1,7 +1,9 @@
 // SPDX-License-Identifier: GPL-2.0
 
 use core::fmt::Debug;
+
 use pinned_init::{pin_data, pin_init, try_pin_init, PinInit};
+
 use crate::error::Error;
 
 #[repr(align(64))]
@@ -44,7 +46,6 @@ impl<T: Debug> Debug for CachePadded<T> {
     }
 }
 
-
 /// Wrapper type that alings content to a cache line.
 #[repr(align(64))]
 #[pin_data]
@@ -60,9 +61,7 @@ impl<T> CacheAligned<T> {
     }
 
     /// Creates an initializer for `CacheAligned<T>` form an initalizer for `T`
-    pub fn new_initializer(
-        t: impl PinInit<T>,
-    ) -> impl PinInit<CacheAligned<T>> {
+    pub fn new_initializer(t: impl PinInit<T>) -> impl PinInit<CacheAligned<T>> {
         pin_init!( CacheAligned {
             value <- t
         })
@@ -72,7 +71,7 @@ impl<T> CacheAligned<T> {
     /// initalizer for `T`
     pub fn try_new_initializer(
         t: impl PinInit<T, crate::error::Error>,
-    ) -> impl PinInit<CacheAligned<T>,Error> {
+    ) -> impl PinInit<CacheAligned<T>, Error> {
         try_pin_init!( CacheAligned {
             value <- t
         }?Error)

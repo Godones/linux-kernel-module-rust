@@ -94,7 +94,7 @@ extern "C" {
     #[link_name = "rust_helper_kunmap_atomic"]
     pub fn kunmap_atomic(address: *mut core::ffi::c_void);
 
-    #[link_name="rust_helper_kmap_local_page"]
+    #[link_name = "rust_helper_kmap_local_page"]
     pub fn kmap_local_page(page: *mut page) -> *mut core::ffi::c_void;
 
     // Page end
@@ -266,13 +266,12 @@ extern "C" {
     #[link_name = "rust_helper_num_possible_cpus"]
     pub fn num_possible_cpus() -> core::ffi::c_uint;
 
-
     // xarray
-    #[link_name="rust_helper_xa_init_flags"]
+    #[link_name = "rust_helper_xa_init_flags"]
     pub fn xa_init_flags(xa: *mut xarray, flags: gfp_t);
-    #[link_name="rust_helper_xa_empty"]
+    #[link_name = "rust_helper_xa_empty"]
     pub fn xa_empty(xa: *mut xarray) -> bool_;
-    #[link_name="rust_helper_xa_alloc"]
+    #[link_name = "rust_helper_xa_alloc"]
     pub fn xa_alloc(
         xa: *mut xarray,
         id: *mut u32_,
@@ -280,11 +279,11 @@ extern "C" {
         limit: xa_limit,
         gfp: gfp_t,
     ) -> core::ffi::c_int;
-    #[link_name="rust_helper_xa_lock"]
+    #[link_name = "rust_helper_xa_lock"]
     pub fn xa_lock(xa: *mut xarray);
-    #[link_name="rust_helper_xa_unlock"]
+    #[link_name = "rust_helper_xa_unlock"]
     pub fn xa_unlock(xa: *mut xarray);
-    #[link_name="rust_helper_xa_err"]
+    #[link_name = "rust_helper_xa_err"]
     pub fn xa_err(entry: *mut core::ffi::c_void) -> core::ffi::c_int;
 
 }

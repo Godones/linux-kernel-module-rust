@@ -7,14 +7,15 @@
 
 use alloc::{boxed::Box, sync::Arc};
 use core::{marker::PhantomData, ops::Deref, pin::Pin};
+
 use pinned_init::{pin_data, pinned_drop, try_pin_init, PinInit};
+
 use crate::{
-    error::{ KernelResult as Result},
+    error::{Error, KernelResult as Result},
     str::CStr,
+    types::Opaque,
     ThisModule,
 };
-use crate::error::Error;
-use crate::types::Opaque;
 
 /// A subsystem (e.g., PCI, Platform, Amba, etc.) that allows drivers to be written for it.
 pub trait DriverOps {
@@ -81,7 +82,6 @@ impl<T: DriverOps> DriverRegistration<T> {
     }
 }
 
-
 #[pinned_drop]
 impl<T: DriverOps> PinnedDrop for DriverRegistration<T> {
     fn drop(self: Pin<&mut Self>) {
@@ -90,7 +90,6 @@ impl<T: DriverOps> PinnedDrop for DriverRegistration<T> {
         T::unregister(drv);
     }
 }
-
 
 /// Conversion from a device id to a raw device id.
 ///

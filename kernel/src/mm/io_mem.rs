@@ -4,12 +4,10 @@
 //!
 //! C header: [`include/asm-generic/io.h`](../../../../include/asm-generic/io.h)
 
-
 use crate::{
     bindings, build_assert,
     error::{linux_err::*, KernelResult as Result},
 };
-
 
 /// IO-mapped memory, starting at the base address @addr and spanning @maxlen bytes.
 ///

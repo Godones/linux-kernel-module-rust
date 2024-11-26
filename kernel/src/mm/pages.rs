@@ -5,12 +5,12 @@
 //! This module currently provides limited support. It supports pages of order 0
 //! for most operations. Page allocation flags are fixed.
 
-use core::{ ptr};
-use core::alloc::AllocError;
-use core::ptr::NonNull;
-use crate::{bindings, code::*, error::KernelResult as Result, PAGE_SIZE};
-use crate::buf::UserSliceReader;
-use crate::kalloc::AllocFlags;
+use core::{alloc::AllocError, ptr, ptr::NonNull};
+
+use crate::{
+    bindings, buf::UserSliceReader, code::*, error::KernelResult as Result, kalloc::AllocFlags,
+    PAGE_SIZE,
+};
 
 /// A pointer to a page that owns the page allocation.
 ///
@@ -119,7 +119,9 @@ impl Page {
         len: usize,
         f: impl FnOnce(*mut u8) -> Result<T>,
     ) -> Result<T> {
-        let bounds_ok = off <= PAGE_SIZE as usize && len <= PAGE_SIZE as usize && (off + len) <= PAGE_SIZE as usize;
+        let bounds_ok = off <= PAGE_SIZE as usize
+            && len <= PAGE_SIZE as usize
+            && (off + len) <= PAGE_SIZE as usize;
 
         if bounds_ok {
             self.with_page_mapped(move |page_addr| {

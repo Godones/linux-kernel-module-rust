@@ -7,9 +7,7 @@
 use core::{fmt, mem::ManuallyDrop};
 
 use super::Bio;
-use crate::{bindings, error::KernelResult as Result};
-use crate::mm::pages::Page;
-
+use crate::{bindings, error::KernelResult as Result, mm::pages::Page};
 
 /// A wrapper around a `strutct bio_vec` - a contiguous range of physical memory addresses
 ///
@@ -57,7 +55,6 @@ impl Segment<'_> {
             })
         })
     }
-
 
     /// Copy data to the page of this segment from `src_page`.
     ///
@@ -174,7 +171,10 @@ impl<'a> BioSegmentIterator<'a> {
     unsafe fn len(&self) -> u32 {
         // SAFETY: By safety requirement of this function `self.iter.bi_size` is
         // greater than 0.
-        unsafe { self.mp_len().min((bindings::PAGE_SIZE as u32) - self.offset()) }
+        unsafe {
+            self.mp_len()
+                .min((bindings::PAGE_SIZE as u32) - self.offset())
+        }
     }
 
     /// Get the offset from the last page boundary in the currently indexed

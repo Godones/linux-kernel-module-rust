@@ -3,15 +3,23 @@
 //! RadixTree abstraction.
 //!
 //! C header: [`include/linux/radix_tree.h`](../../include/linux/radix_tree.h)
-//! 
-use core::{marker::PhantomData, mem, pin::Pin};
-use core::ffi::c_ulong;
-use core::ops::{Deref, DerefMut};
-use core::ptr::NonNull;
+//!
+use core::{
+    ffi::c_ulong,
+    marker::PhantomData,
+    mem,
+    ops::{Deref, DerefMut},
+    pin::Pin,
+    ptr::NonNull,
+};
+
 use pinned_init::{pin_data, pin_init, pinned_drop, PinInit};
-use crate::{bindings, build_assert, error::{to_result, KernelResult as Result}, types::{ForeignOwnable, Opaque}};
-use crate::error::Error;
-use crate::types::ScopeGuard;
+
+use crate::{
+    bindings, build_assert,
+    error::{to_result, Error, KernelResult as Result},
+    types::{ForeignOwnable, Opaque, ScopeGuard},
+};
 
 /// Flags passed to `XArray::new` to configure the `XArray`.
 type Flags = bindings::gfp_t;
@@ -107,7 +115,6 @@ where
     }
 }
 
-
 // Convenience impl for `ForeignOwnable` types whose `Borrowed` form implements
 // `DerefMut`
 impl<'a, T: ForeignOwnable> DerefMut for Guard<'a, T>
@@ -130,7 +137,6 @@ impl<'a, T: ForeignOwnable> Drop for Guard<'a, T> {
     }
 }
 
-
 /// Represents a reserved slot in an `XArray`, which does not yet have a value but has an assigned
 /// index and may not be allocated by any other user. If the Reservation is dropped without
 /// being filled, the entry is marked as available again.
@@ -138,7 +144,6 @@ impl<'a, T: ForeignOwnable> Drop for Guard<'a, T> {
 /// Users must ensure that reserved slots are not filled by other mechanisms, or otherwise their
 /// contents may be dropped and replaced (which will print a warning).
 pub struct Reservation<'a, T: ForeignOwnable>(&'a XArray<T>, usize, PhantomData<T>);
-
 
 impl<'a, T: ForeignOwnable> Reservation<'a, T> {
     /// Stores a value into the reserved slot.
@@ -166,8 +171,6 @@ impl<'a, T: ForeignOwnable> Drop for Reservation<'a, T> {
         }
     }
 }
-
-
 
 impl<T: ForeignOwnable> XArray<T> {
     /// Creates a new `XArray` with the given flags.

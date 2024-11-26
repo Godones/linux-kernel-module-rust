@@ -3,14 +3,16 @@
 //! This module provides the `TagSet` struct to wrap the C `struct blk_mq_tag_set`.
 //!
 //! C header: [`include/linux/blk-mq.h`](../../include/linux/blk-mq.h)
-use core::{convert::TryInto, marker::PhantomData, pin::Pin};
-use core::sync::atomic::Ordering;
+use core::{convert::TryInto, marker::PhantomData, pin::Pin, sync::atomic::Ordering};
+
 use pinned_init::*;
 
-use crate::{bindings, block::mq::{operations::OperationsVtable, Operations}, error::{Error, KernelResult as Result}, types::{ForeignOwnable, Opaque}};
-use crate::block::mq::Request;
-use crate::block::mq::request::RequestDataWrapper;
-use crate::types::ARef;
+use crate::{
+    bindings,
+    block::mq::{operations::OperationsVtable, request::RequestDataWrapper, Operations, Request},
+    error::{Error, KernelResult as Result},
+    types::{ARef, ForeignOwnable, Opaque},
+};
 
 /// A wrapper for the C `struct blk_mq_tag_set`.
 ///
@@ -100,15 +102,22 @@ impl<T: Operations> TagSet<T> {
         if rq_ptr.is_null() {
             None
         } else {
-            let refcount_ptr = unsafe { RequestDataWrapper::refcount_ptr(Request::wrapper_ptr(rq_ptr.cast::<Request<T>>()).as_ptr()) };
-            let refcount_ref = unsafe {&*refcount_ptr};
-            refcount_ref.fetch_update(Ordering::Relaxed, Ordering::Relaxed, |x| {
-                if x >= 1 {
-                    Some(x+1)
-                } else {
-                    None
-                }
-            }).ok().map(|_| unsafe { Request::aref_from_raw(rq_ptr) })
+            let refcount_ptr = unsafe {
+                RequestDataWrapper::refcount_ptr(
+                    Request::wrapper_ptr(rq_ptr.cast::<Request<T>>()).as_ptr(),
+                )
+            };
+            let refcount_ref = unsafe { &*refcount_ptr };
+            refcount_ref
+                .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |x| {
+                    if x >= 1 {
+                        Some(x + 1)
+                    } else {
+                        None
+                    }
+                })
+                .ok()
+                .map(|_| unsafe { Request::aref_from_raw(rq_ptr) })
         }
     }
 }

@@ -19,6 +19,7 @@ use crate::{
         mq::{Operations, TagSet},
     },
     error::{from_err_ptr, Error, KernelResult as Result},
+    pr_err,
     time::{
         hrtimer,
         hrtimer::{HasTimer, RawTimer, TimerCallback},
@@ -107,14 +108,15 @@ impl<T: Operations> Request<T> {
     /// `Err` variant.
     fn try_set_end(this: ARef<Self>) -> Result<*mut bindings::request, ARef<Self>> {
         // We can race with `TagSet::tag_to_rq`
-        if let Err(_old) = this.wrapper_ref().refcount().compare_exchange(
-            2,
-            0,
-            Ordering::Relaxed,
-            Ordering::Relaxed,
-        ) {
-            return Err(this);
-        }
+        // if let Err(old) = this.wrapper_ref().refcount().compare_exchange(
+        //     2,
+        //     0,
+        //     Ordering::Relaxed,
+        //     Ordering::Relaxed,
+        // ) {
+        //     pr_err!("Request refcount is not 2, but {}", old);
+        //     return Err(this);
+        // }
 
         let request_ptr = this.0.get();
         core::mem::forget(this);

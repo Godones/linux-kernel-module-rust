@@ -21,17 +21,21 @@ use core::{
 
 use kernel::{
     bindings,
-    block::{mq, mq::TagSet},
-    c_str,
-    device::{self, Device, RawDevice},
+    block::{
+        mq,
+        mq::{GenDisk, GenDiskBuilder, TagSet},
+    },
+    c_str, define_pci_id_table,
+    device::{Device},
+    devres::Devres,
     driver,
     error::{linux_err::*, KernelResult as Result},
-    mm::{dma, io_mem::IoMem},
+    mm::dma,
     new_spinlock, pci,
-    pci::define_pci_id_table,
+    pci::Bar,
     pr_info, static_assert,
     sync::SpinLock,
-    types::AtomicOptionalBoxedPtr,
+    types::{ARef, AtomicOptionalBoxedPtr},
     ThisModule, UniqueArc,
 };
 use kmacro::module;
@@ -52,7 +56,6 @@ use crate::nvme_mq::IoQueueOperations;
 #[pin_data]
 struct NvmeData {
     db_stride: usize,
-    dev: Device,
     pci_dev: pci::PciDevice,
     instance: u32,
     shadow: Option<NvmeShadow>,
@@ -61,10 +64,7 @@ struct NvmeData {
     dma_pool: Arc<dma::Pool<le<u64>>>,
     poll_queue_count: u32,
     irq_queue_count: u32,
-}
-
-struct NvmeResources {
-    bar: IoMem<8192>,
+    bar: Devres<Bar<8192>>,
 }
 
 struct NvmeQueues {
@@ -77,8 +77,6 @@ struct NvmeShadow {
     eis: dma::CoherentAllocation<u32, dma::CoherentAllocator>,
 }
 
-type DeviceData = device::Data<(), NvmeResources, NvmeData>;
-
 #[pin_data]
 struct NvmeRequest {
     dma_pool: Arc<dma::Pool<le<u64>>>,
@@ -87,7 +85,7 @@ struct NvmeRequest {
     status: AtomicU16,
     direction: AtomicU32,
     len: AtomicU32,
-    dev: Device,
+    dev: ARef<Device>,
     cmd: SyncUnsafeCell<NvmeCommand>,
     sg_count: AtomicU32,
     page_count: AtomicU32,
@@ -146,38 +144,39 @@ impl NvmeDevice {
         id: &NvmeIdNs,
         tagset: Arc<mq::TagSet<nvme_mq::IoQueueOperations>>,
         rt: &NvmeLbaRangeType,
-    ) -> Result<mq::GenDisk<nvme_mq::IoQueueOperations>> {
+    ) -> Result<GenDisk<nvme_mq::IoQueueOperations>> {
         if rt.attributes & NVME_LBART_ATTRIB_HIDE != 0 {
             return Err(ENODEV);
         }
 
         let lbaf = (id.flbas & 0xf) as usize;
         let lba_shift = id.lbaf[lbaf].ds as u32;
-        let ns = Box::new(NvmeNamespace {
+        let ns = Box::try_new(NvmeNamespace {
             id: nsid,
             lba_shift,
-        });
-        let disk = mq::GenDisk::try_new(tagset, ns)?;
-        disk.set_name(format_args!("nvme{}n{}", instance, nsid))?;
-        disk.set_capacity(id.nsze.into() << (lba_shift - bindings::SECTOR_SHIFT));
-        disk.set_queue_logical_block_size(1 << lba_shift);
-        disk.set_queue_max_hw_sectors(max_sectors);
-        disk.set_queue_max_segments(nvme_driver_defs::NVME_MAX_SEGS as _);
-        disk.set_queue_virt_boundary(nvme_driver_defs::NVME_CTRL_PAGE_SIZE - 1);
+        })?;
+        let disk = GenDiskBuilder::new()
+            .logical_block_size(1 << lba_shift)?
+            .capacity_sectors(id.nsze.into() << (lba_shift - bindings::SECTOR_SHIFT))
+            .virt_boundary_mask((nvme_driver_defs::NVME_CTRL_PAGE_SIZE - 1) as u64)
+            .max_hw_sectors(max_sectors)
+            .max_segments(nvme_driver_defs::NVME_MAX_SEGS as _)
+            .build(format_args!("nvme{}n{}", instance, nsid), tagset, ns)?;
+
         Ok(disk)
     }
 
     fn setup_io_queues(
-        dev: &Arc<DeviceData>,
-        pci_dev: &mut pci::PciDevice,
+        dev: &Arc<NvmeData>,
+        pci_dev: pci::PciDevice,
         admin_queue: &Arc<nvme_queue::NvmeQueue<nvme_mq::AdminQueueOperations>>,
         mq: &mq::RequestQueue<nvme_mq::AdminQueueOperations>,
-    ) -> Result<Arc<TagSet<IoQueueOperations>>> {
+    ) -> Result<Arc<mq::TagSet<nvme_mq::IoQueueOperations>>> {
         pr_info!("Setting up io queues\n");
         let nr_io_queues = dev.poll_queue_count + dev.irq_queue_count;
         let result = Self::set_queue_count(nr_io_queues, mq)?;
         if result < nr_io_queues {
-            unimplemented!("Failed to set queue count");
+            todo!();
             nr_io_queues = result;
         }
 
@@ -194,12 +193,13 @@ impl NvmeDevice {
             0,
             bindings::PCI_IRQ_ALL_TYPES,
         )?;
-        admin_queue.register_irq(pci_dev)?;
+        admin_queue.register_irq(&pci_dev)?;
 
         // TODO: Check what else needs to happen from C side.
 
         // Initialise the queue depth.
-        let max_depth = (u64::from_le(dev.resources().unwrap().bar.readq(OFFSET_CAP)) & 0xffff) + 1;
+        let max_depth =
+            (u64::from_le(dev.bar.try_access().unwrap().readq(OFFSET_CAP)) & 0xffff) + 1;
         let q_depth = core::cmp::min(max_depth, 1024).try_into()?;
 
         pr_info!("HW queue depth: {}\n", q_depth);
@@ -225,7 +225,7 @@ impl NvmeDevice {
 
             let io_queue = nvme_queue::NvmeQueue::try_new(
                 dev.clone(),
-                pci_dev,
+                &pci_dev,
                 qid,
                 q_depth.try_into()?,
                 vector,
@@ -240,7 +240,7 @@ impl NvmeDevice {
             Self::alloc_submission_queue(mq, &io_queue)?;
 
             if !polled {
-                io_queue.register_irq(pci_dev)?;
+                io_queue.register_irq(&pci_dev)?;
             }
 
             dev.queues.lock().io.push(io_queue.clone());
@@ -251,16 +251,16 @@ impl NvmeDevice {
 
     fn dev_add(
         cap: u64,
-        dev: &Arc<DeviceData>,
-        pci_dev: &mut pci::PciDevice,
+        dev: &Arc<NvmeData>,
+        pci_dev: pci::PciDevice,
         admin_queue: &Arc<nvme_queue::NvmeQueue<nvme_mq::AdminQueueOperations>>,
         mq: &mq::RequestQueue<nvme_mq::AdminQueueOperations>,
     ) -> Result {
-        let tagset = Self::setup_io_queues(dev, pci_dev, admin_queue, mq)?;
+        let tagset = Self::setup_io_queues(dev, pci_dev.clone(), admin_queue, mq)?;
         pr_info!("setup_io_queues done\n");
 
-        let id = dma::try_alloc_coherent::<u8>(pci_dev, 4096, false)?;
-        let rt = dma::try_alloc_coherent::<u8>(pci_dev, 4096, false)?;
+        let id = dma::try_alloc_coherent::<u8>(pci_dev.as_dev(), 4096, false)?;
+        let rt = dma::try_alloc_coherent::<u8>(pci_dev.as_dev(), 4096, false)?;
 
         // Identify the device.
         Self::identify(mq, 0, 1, id.dma_handle)?;
@@ -295,25 +295,22 @@ impl NvmeDevice {
                 unsafe { &*(rt.first_ptr() as *const NvmeLbaRangeType) }
             };
 
-            if let Ok(disk) =
-                Self::alloc_ns(max_sectors, dev.instance, i, id_ns, tagset.clone(), rt)
-            {
-                // TODO: Add disk to list.
-                pr_info!("about to add disk\n");
-                let _res = disk.add();
-                pr_info!("disk added\n");
+            pr_info!("about to add disk\n");
+            let disk = Self::alloc_ns(max_sectors, dev.instance, i, id_ns, tagset.clone(), rt)?;
+            // TODO: Add disk to list.
+            pr_info!("disk added\n");
 
-                core::mem::forget(disk);
-            }
+            // TODO: DONT LEAK
+            core::mem::forget(disk);
         }
 
         Ok(())
     }
 
-    fn wait_ready(dev: &Arc<DeviceData>) {
+    fn wait_ready(dev: &Arc<NvmeData>) {
         pr_info!("Waiting for controller ready\n");
         {
-            let bar = &dev.resources().unwrap().bar;
+            let bar = dev.bar.try_access().unwrap();
             while u32::from_le(bar.readl(OFFSET_CSTS)) & NVME_CSTS_RDY == 0 {
                 unsafe { bindings::mdelay(100) };
                 // TODO: Add check for fatal signal pending.
@@ -323,10 +320,10 @@ impl NvmeDevice {
         pr_info!("Controller ready\n");
     }
 
-    fn wait_idle(dev: &Arc<DeviceData>) {
+    fn wait_idle(dev: &Arc<NvmeData>) {
         pr_info!("Waiting for controller idle\n");
         {
-            let bar = &dev.resources().unwrap().bar;
+            let bar = dev.bar.try_access().unwrap();
             while u32::from_le(bar.readl(OFFSET_CSTS)) & NVME_CSTS_RDY != 0 {
                 unsafe { bindings::mdelay(100) };
                 // TODO: Add check for fatal signal pending.
@@ -337,8 +334,8 @@ impl NvmeDevice {
     }
 
     fn configure_admin_queue(
-        dev: &Arc<DeviceData>,
-        pci_dev: &pci::PciDevice,
+        dev: &Arc<NvmeData>,
+        pci_dev: pci::PciDevice,
     ) -> Result<(
         Arc<nvme_queue::NvmeQueue<nvme_mq::AdminQueueOperations>>,
         mq::RequestQueue<nvme_mq::AdminQueueOperations>,
@@ -353,7 +350,7 @@ impl NvmeDevice {
 
         pr_info!("Disable (reset) controller\n");
         {
-            dev.resources().unwrap().bar.writel(0, OFFSET_CC);
+            dev.bar.try_access().unwrap().writel(0, OFFSET_CC);
         }
         Self::wait_idle(dev);
 
@@ -364,7 +361,7 @@ impl NvmeDevice {
         let admin_queue: Arc<nvme_queue::NvmeQueue<nvme_mq::AdminQueueOperations>> =
             nvme_queue::NvmeQueue::try_new(
                 dev.clone(),
-                pci_dev,
+                &pci_dev,
                 0,
                 queue_depth.try_into()?,
                 0,
@@ -388,8 +385,7 @@ impl NvmeDevice {
 
         pr_info!("About to wait for nvme readiness\n");
         {
-            let res = dev.resources().unwrap();
-            let bar = &res.bar;
+            let bar = dev.bar.try_access().unwrap();
 
             // TODO: All writes should support endian conversion
             bar.writel(aqa, OFFSET_AQA);
@@ -400,7 +396,7 @@ impl NvmeDevice {
         Self::wait_ready(dev);
 
         pr_info!("Registering admin queue irq\n");
-        admin_queue.register_irq(pci_dev)?;
+        admin_queue.register_irq(&pci_dev)?;
         pr_info!("Done registering admin queue irq\n");
 
         Ok((admin_queue, admin_mq))
@@ -566,34 +562,29 @@ impl NvmeDevice {
 }
 
 impl pci::PciDriver for NvmeDevice {
-    type Data = Arc<DeviceData>;
+    type Data = Arc<NvmeData>;
 
     define_pci_id_table! {
         (),
         [ (pci::DeviceId::with_class(bindings::PCI_CLASS_STORAGE_EXPRESS, 0xffffff), None) ]
     }
 
-    fn probe(dev: &mut pci::PciDevice, _id: Option<&Self::IdInfo>) -> Result<Arc<DeviceData>> {
+    fn probe(pci_dev: &mut pci::PciDevice, _id: Option<&Self::IdInfo>) -> Result<Arc<NvmeData>> {
         pr_info!("probe called!\n");
 
         // TODO: We need to disable the device on error.
-        dev.enable_device_mem()?;
-        dev.set_master();
-
-        let bars = dev.select_bars(bindings::IORESOURCE_MEM.into());
-
-        // TODO: We need to release resources on failure.
-        dev.request_selected_regions(bars, c_str!("nvme"))?;
+        pci_dev.enable_device_mem()?;
+        pci_dev.set_master();
 
         // TODO: Set the right mask.
-        dev.dma_set_mask(!0)?;
-        dev.dma_set_coherent_mask(!0)?;
+        pci_dev.as_dev().dma_set_mask(!0)?;
+        pci_dev.as_dev().dma_set_coherent_mask(!0)?;
 
-        let res = dev.take_resource(0).ok_or(ENXIO)?;
-        let bar = unsafe { IoMem::<8192>::try_new(res) }?;
+        // TODO: We need to release resources on failure.
+        let bar = pci_dev.iomap_region_sized::<8192>(0, c_str!("rnvme:controller"))?;
 
         // We start off with just one vector. We increase it later.
-        dev.alloc_irq_vectors(1, 1, bindings::PCI_IRQ_ALL_TYPES)?;
+        pci_dev.alloc_irq_vectors(1, 1, bindings::PCI_IRQ_ALL_TYPES)?;
 
         let param_irq_queue_count = *nvme_irq_queue_count.read();
         let param_poll_queue_count = *nvme_poll_queue_count.read();
@@ -620,44 +611,39 @@ impl pci::PciDriver for NvmeDevice {
             return Err(EBUSY);
         }
 
-        let cap = u64::from_le(bar.readq(OFFSET_CAP));
-        let device = Device::from_dev(dev);
-        let pci_device = unsafe { pci::PciDevice::from_ptr(dev.as_ptr()) };
+        let cap = u64::from_le(bar.try_access().unwrap().readq(OFFSET_CAP));
         let dma_pool = dma::Pool::try_new(
             c_str!("prp list page"),
-            dev,
+            pci_dev.as_dev(),
             NVME_CTRL_PAGE_SIZE / 8,
             NVME_CTRL_PAGE_SIZE,
             0,
         )
         .unwrap();
 
-        let data = kernel::new_device_data!(
-            (),
-            NvmeResources { bar },
-            pin_init!(NvmeData {
-                // TODO: Use typed register access
-                db_stride: 1 << (((cap >> 32) & 0xf) + 2),
-                dev: device,
-                pci_dev: pci_device,
-                instance: id,
-                shadow: None,
-                dma_pool: dma_pool,
-                queues <- new_spinlock!(
-                    NvmeQueues {
-                        admin: None,
-                        io: Vec::new(),
-                    }),
-                poll_queue_count: poll_queue_count,
-                irq_queue_count: irq_queue_count,
-            }),
-            "Nvme::Data"
-        )?
+        let pci_dev_clone = pci_dev.clone();
+
+        let data = UniqueArc::pin_init(pin_init!(NvmeData {
+            // TODO: Use typed register access
+            db_stride: 1 << (((cap >> 32) & 0xf) + 2),
+            pci_dev: pci_dev_clone,
+            instance: id,
+            shadow: None,
+            dma_pool: dma_pool,
+            queues <- new_spinlock!(
+                NvmeQueues {
+                    admin: None,
+                    io: Vec::new(),
+                }),
+            poll_queue_count: poll_queue_count,
+            irq_queue_count: irq_queue_count,
+            bar,
+        }))?
         .into();
 
         // TODO: Handle initialization on a workqueue
         pr_info!("Setting up admin queue");
-        let (admin_nvme_queue, admin_mq) = Self::configure_admin_queue(&data, dev)?;
+        let (admin_nvme_queue, admin_mq) = Self::configure_admin_queue(&data, pci_dev.clone())?;
         pr_info!("Created admin queue\n");
         // TODO: Move this to a function. We should not fail `probe` if this fails.
         // if false {
@@ -678,7 +664,7 @@ impl pci::PciDriver for NvmeDevice {
         //     }
         // }
 
-        if let Err(e) = Self::dev_add(cap, &data, dev, &admin_nvme_queue, &admin_mq) {
+        if let Err(e) = Self::dev_add(cap, &data, pci_dev.clone(), &admin_nvme_queue, &admin_mq) {
             pr_info!("Probe failed: {:?}\n", e);
             return Err(e);
         }
@@ -701,8 +687,9 @@ struct NvmeModule {
 impl kernel::Module for NvmeModule {
     fn init(module: &'static ThisModule) -> Result<Self> {
         pr_info!("Nvme module loaded!\n");
-        static_assert!(core::mem::size_of::<MappingData>() <= kernel::bindings::PAGE_SIZE as usize);
-        let registration = driver::DriverRegistration::new_pinned(c_str!("nvme"), module)?;
+        static_assert!(size_of::<MappingData>() <= kernel::bindings::PAGE_SIZE as usize);
+        let registration =
+            Box::try_pin_init(driver::DriverRegistration::new(c_str!("nvme"), module))?;
         pr_info!("pci driver registered\n");
         Ok(Self {
             _registration: registration,

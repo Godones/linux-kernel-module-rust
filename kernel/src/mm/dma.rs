@@ -9,36 +9,37 @@ use core::marker::PhantomData;
 
 use crate::{
     bindings,
-    device::{Device, RawDevice},
+    device::Device,
     error::{linux_err::*, KernelResult as Result},
     str::CStr,
+    types::ARef,
 };
 
 pub trait Allocator {
     type AllocationData;
     type DataSource;
 
-    fn free(cpu_addr: *mut (), dma_handle: u64, size: usize, alloc_data: &mut Self::AllocationData);
+    fn free(cpu_addr: *mut (), dma_handle: u64, size: usize, alloc_data: &Self::AllocationData);
     unsafe fn allocation_data(data: &Self::DataSource) -> Self::AllocationData;
 }
 
 pub struct CoherentAllocator;
 
 impl Allocator for CoherentAllocator {
-    type AllocationData = Device;
-    type DataSource = Device;
+    type AllocationData = ARef<Device>;
+    type DataSource = ARef<Device>;
 
-    fn free(cpu_addr: *mut (), dma_handle: u64, size: usize, dev: &mut Device) {
-        unsafe { bindings::dma_free_attrs(dev.ptr, size, cpu_addr as _, dma_handle, 0) };
+    fn free(cpu_addr: *mut (), dma_handle: u64, size: usize, dev: &ARef<Device>) {
+        unsafe { bindings::dma_free_attrs(dev.as_raw(), size, cpu_addr as _, dma_handle, 0) };
     }
 
-    unsafe fn allocation_data(data: &Device) -> Device {
-        unsafe { Device::from_dev_no_reference(data) }
+    unsafe fn allocation_data(data: &ARef<Device>) -> ARef<Device> {
+        data.clone()
     }
 }
 
 pub fn try_alloc_coherent<T>(
-    dev: &dyn RawDevice,
+    dev: ARef<Device>,
     count: usize,
     atomic: bool,
 ) -> Result<CoherentAllocation<T, CoherentAllocator>> {
@@ -47,7 +48,7 @@ pub fn try_alloc_coherent<T>(
     let mut dma_handle = 0;
     let ret = unsafe {
         bindings::dma_alloc_attrs(
-            dev.raw_device(),
+            dev.as_raw(),
             size,
             &mut dma_handle,
             if atomic {
@@ -61,18 +62,13 @@ pub fn try_alloc_coherent<T>(
     if ret.is_null() {
         Err(ENOMEM)
     } else {
-        Ok(CoherentAllocation::new(
-            ret as _,
-            dma_handle,
-            count,
-            Device::from_dev(dev),
-        ))
+        Ok(CoherentAllocation::new(ret as _, dma_handle, count, dev))
     }
 }
 
 pub struct Pool<T> {
     ptr: *mut bindings::dma_pool,
-    dev: Device,
+    dev: ARef<Device>,
     count: usize,
     _p: PhantomData<T>,
 }
@@ -81,7 +77,7 @@ impl<T> Pool<T> {
     /// Creates a new DMA memory pool.
     pub fn try_new(
         name: &CStr,
-        dev: &dyn RawDevice,
+        dev: ARef<Device>,
         count: usize,
         align: usize,
         boundary: usize,
@@ -89,18 +85,17 @@ impl<T> Pool<T> {
         let t_size = core::mem::size_of::<T>();
         let size = count.checked_mul(t_size).ok_or(ENOMEM)?;
         let ptr = unsafe {
-            bindings::dma_pool_create(name.as_char_ptr(), dev.raw_device(), size, align, boundary)
+            bindings::dma_pool_create(name.as_char_ptr(), dev.as_raw(), size, align, boundary)
         };
         if ptr.is_null() {
             Err(ENOMEM)
         } else {
-            Arc::try_new(Self {
+            Ok(Arc::new(Self {
                 ptr,
                 count,
-                dev: Device::from_dev(dev),
+                dev,
                 _p: PhantomData,
-            })
-            .map_err(|e| e.into())
+            }))
         }
     }
 
@@ -136,7 +131,7 @@ impl<T> Allocator for Pool<T> {
     type AllocationData = *mut bindings::dma_pool;
     type DataSource = Arc<Pool<T>>;
 
-    fn free(cpu_addr: *mut (), dma_handle: u64, _size: usize, pool: &mut *mut bindings::dma_pool) {
+    fn free(cpu_addr: *mut (), dma_handle: u64, _size: usize, pool: &*mut bindings::dma_pool) {
         unsafe { bindings::dma_pool_free(*pool, cpu_addr as _, dma_handle) };
     }
 

@@ -38,6 +38,7 @@ impl Mode {
 /// This trait is meant to be used in cases when Rust objects are stored in C objects and
 /// eventually "freed" back to Rust.
 pub trait ForeignOwnable: Sized {
+    const FOREIGN_ALIGN: usize;
     /// Type used to immutably borrow a value that is currently foreign-owned.
     type Borrowed<'a>;
 
@@ -107,6 +108,7 @@ pub trait ForeignOwnable: Sized {
 impl<T: 'static> ForeignOwnable for Box<T> {
     type Borrowed<'a> = &'a T;
     type BorrowedMut<'a> = &'a mut T;
+    const FOREIGN_ALIGN: usize = core::mem::align_of::<T>();
 
     #[inline(always)]
     fn into_foreign(self) -> *const core::ffi::c_void {
@@ -135,6 +137,7 @@ impl<T: 'static> ForeignOwnable for Box<T> {
 }
 
 impl<T: 'static> ForeignOwnable for Arc<T> {
+    const FOREIGN_ALIGN: usize = core::mem::align_of::<Arc<T>>();
     type Borrowed<'a> = ArcBorrow<'a, T>;
     type BorrowedMut<'a> = ();
 
@@ -218,7 +221,7 @@ impl<T: ?Sized> Deref for ArcBorrow<'_, T> {
 impl ForeignOwnable for () {
     type Borrowed<'a> = ();
     type BorrowedMut<'a> = ();
-
+    const FOREIGN_ALIGN: usize = core::mem::align_of::<()>();
     #[inline(always)]
     fn into_foreign(self) -> *const core::ffi::c_void {
         core::ptr::NonNull::dangling().as_ptr()
@@ -236,6 +239,7 @@ impl ForeignOwnable for () {
 impl<T: ForeignOwnable + Deref> ForeignOwnable for Pin<T> {
     type Borrowed<'a> = T::Borrowed<'a>;
     type BorrowedMut<'a> = T::BorrowedMut<'a>;
+    const FOREIGN_ALIGN: usize = core::mem::align_of::<T>();
 
     fn into_foreign(self) -> *const core::ffi::c_void {
         // SAFETY: We continue to treat the pointer as pinned by returning just a pointer to it to
@@ -546,6 +550,12 @@ impl<T: AlwaysRefCounted> ARef<T> {
             ptr,
             _p: PhantomData,
         }
+    }
+    /// Convert `self` into a pointer without running the destructor. This will
+    /// leak a refcount.
+    pub fn into_raw(self) -> *mut T {
+        let this = ManuallyDrop::new(self);
+        this.ptr.as_ptr()
     }
 }
 

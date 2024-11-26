@@ -9,6 +9,7 @@
 extern crate alloc;
 
 use alloc::{boxed::Box, sync::Arc};
+use core::ops::Deref;
 use core::pin::Pin;
 
 use kernel::{
@@ -18,15 +19,19 @@ use kernel::{
         mq::{self, GenDisk, Operations, TagSet},
     },
     error::{Error, KernelResult as Result},
-    mm::pages::Pages,
     module, new_mutex, new_spinlock, pr_info,
-    radix_tree::RadixTree,
     sync::{Mutex, SpinLock},
     time::hrtimer::{RawTimer, TimerCallback},
     types::ForeignOwnable,
     vtable, ThisModule, UniqueArc,
 };
 use pinned_init::*;
+use kernel::kalloc::{alloc_flags};
+use kernel::mm::cache_padded::CacheAligned;
+use kernel::mm::pages::Page;
+use kernel::radix_tree::XArray;
+use kernel::types::ARef;
+
 module! {
     type: NullBlkModule,
     name: "rnull_mod",
@@ -81,24 +86,25 @@ impl TryFrom<u8> for IRQMode {
         }
     }
 }
-
+#[pin_data(PinnedDrop)]
 struct NullBlkModule {
     _disk: Pin<Box<Mutex<GenDisk<NullBlkDevice>>>>,
 }
+
 
 fn add_disk(tagset: Arc<TagSet<NullBlkDevice>>) -> Result<GenDisk<NullBlkDevice>> {
     let block_size = *param_block_size.read();
     if block_size % 512 != 0 || !(512..=4096).contains(&block_size) {
         return Err(kernel::code::EINVAL);
     }
-    let tree = RadixTree::new()?;
     let mode = (*param_irq_mode.read()).try_into()?;
     let queue_data = Box::pin_init(pin_init!(
     QueueData {
-        tree <- new_spinlock!(tree, "rnullb:mem"),
+        tree <- TreeContainer::new(),
         completion_time_nsec: *param_completion_time_nsec.read(),
         irq_mode: mode,
         memory_backed: *param_memory_backed.read(),
+        block_size,
     }))?;
 
     let disk = GenDisk::try_new(tagset, queue_data)?;
@@ -122,45 +128,83 @@ impl kernel::Module for NullBlkModule {
     }
 }
 
-impl Drop for NullBlkModule {
-    fn drop(&mut self) {
+#[pinned_drop]
+impl PinnedDrop for NullBlkModule {
+    fn drop(self: Pin<&mut Self>) {
         pr_info!("Dropping rnullb\n");
     }
 }
 
 struct NullBlkDevice;
-type Tree = RadixTree<Box<Pages<0>>>;
+type Tree = XArray<Box<Page>>;
+type TreeRef<'a> = &'a Tree;
+
+#[pin_data]
+struct TreeContainer {
+    // `XArray` is safe to use without a lock, as it applies internal locking.
+    // However, there are two reasons to use an external lock: a) cache line
+    // contention and b) we don't want to take the lock for each page we
+    // process.
+    //
+    // A: The `XArray` lock (xa_lock) is located on the same cache line as the
+    // xarray data pointer (xa_head). The effect of this arrangement is that
+    // under heavy contention, we often get a cache miss when we try to follow
+    // the data pointer after acquiring the lock. We would rather have consumers
+    // spinning on another lock, so we do not get a miss on xa_head. This issue
+    // can potentially be fixed by padding the C `struct xarray`.
+    //
+    // B: The current `XArray` Rust API requires that we take the `xa_lock` for
+    // each `XArray` operation. This is very inefficient when the lock is
+    // contended and we have many operations to perform. Eventually we should
+    // update the `XArray` API to allow multiple tree operations under a single
+    // lock acquisition. For now, serialize tree access with an external lock.
+    #[pin]
+    tree: CacheAligned<Tree>,
+    #[pin]
+    lock: CacheAligned<SpinLock<()>>,
+}
+impl TreeContainer {
+    fn new() -> impl PinInit<Self> {
+        pin_init!(TreeContainer {
+            tree <- CacheAligned::new_initializer(XArray::new(0)),
+            lock <- CacheAligned::new_initializer(new_spinlock!((), "rnullb:mem")),
+        })
+    }
+}
 
 #[pin_data]
 struct QueueData {
     #[pin]
-    tree: SpinLock<Tree>,
+    tree: TreeContainer,
     completion_time_nsec: u64,
     irq_mode: IRQMode,
     memory_backed: bool,
+    block_size: u16,
 }
 
 impl NullBlkDevice {
     #[inline(always)]
-    fn write(tree: &mut Tree, sector: usize, segment: &Segment<'_>) -> Result {
-        let idx = sector >> 3; // TODO: PAGE_SECTOR_SHIFT
-        let mut page = if let Some(page) = tree.get_mut(idx as u64) {
+    fn write(tree: TreeRef<'_>, sector: usize, segment: &Segment<'_>) -> Result {
+        let idx = sector >> bindings::PAGE_SECTORS_SHIFT;
+
+        let mut page = if let Some(page) = tree.get_locked(idx) {
             page
         } else {
-            tree.try_insert(idx as u64, Box::try_new(Pages::new()?)?)?;
-            tree.get_mut(idx as u64).unwrap()
+            tree.set(idx, Box::try_new(Page::alloc_page(alloc_flags::GFP_KERNEL)?)?)?;
+            tree.get_locked(idx).unwrap()
         };
 
-        segment.copy_to_page_atomic(&mut page)?;
+        segment.copy_to_page(&mut page)?;
 
         Ok(())
     }
 
     #[inline(always)]
-    fn read(tree: &mut Tree, sector: usize, segment: &mut Segment<'_>) -> Result {
-        let idx = sector >> 3; // TODO: PAGE_SECTOR_SHIFT
-        if let Some(page) = tree.get(idx as u64) {
-            segment.copy_from_page_atomic(page)?;
+    fn read(tree: TreeRef<'_>, sector: usize, segment: &mut Segment<'_>) -> Result {
+        let idx = sector >> bindings::PAGE_SECTORS_SHIFT;
+
+        if let Some(page) = tree.get_locked(idx) {
+            segment.copy_from_page(page.deref())?;
         }
 
         Ok(())
@@ -169,7 +213,7 @@ impl NullBlkDevice {
     #[inline(never)]
     fn transfer(
         command: bindings::req_op,
-        tree: &mut Tree,
+        tree: TreeRef<'_>,
         sector: usize,
         segment: &mut Segment<'_>,
     ) -> Result {
@@ -188,11 +232,14 @@ struct Pdu {
     timer: kernel::time::hrtimer::Timer<Self>,
 }
 
-impl TimerCallback for Pdu {
-    type Receiver<'a> = Pin<&'a mut Self>;
 
-    fn run<'a>(this: Self::Receiver<'a>) {
-        mq::Request::<NullBlkDevice>::request_from_pdu(this).end_ok();
+impl TimerCallback for Pdu {
+    type Receiver = ARef<mq::Request<NullBlkDevice>>;
+
+    fn run(this: Self::Receiver) {
+        mq::Request::end_ok(this)
+            .map_err(|_e| kernel::error::linux_err::EIO)
+            .expect("Failed to complete request");
     }
 }
 
@@ -203,14 +250,13 @@ kernel::impl_has_timer! {
 #[vtable]
 impl Operations for NullBlkDevice {
     type RequestData = Pdu;
-    type RequestDataInit = impl PinInit<Pdu>;
     type QueueData = Pin<Box<QueueData>>;
     type HwData = ();
     type TagSetData = ();
 
     fn new_request_data(
         _tagset_data: <Self::TagSetData as ForeignOwnable>::Borrowed<'_>,
-    ) -> Self::RequestDataInit {
+    ) -> impl PinInit<Self::RequestData> {
         pin_init!( Pdu {
             timer <- kernel::time::hrtimer::Timer::new(),
         })
@@ -220,26 +266,33 @@ impl Operations for NullBlkDevice {
     fn queue_rq(
         _hw_data: (),
         queue_data: &QueueData,
-        rq: mq::Request<Self>,
+        rq: ARef<mq::Request<Self>>,
         _is_last: bool,
     ) -> Result {
-        rq.start();
         if queue_data.memory_backed {
-            let mut tree = queue_data.tree.lock_irqsave();
+            let guard = queue_data.tree.lock.lock();
+            let tree = queue_data.tree.tree.deref();
 
             let mut sector = rq.sector();
             for bio in rq.bio_iter() {
                 for mut segment in bio.segment_iter() {
-                    Self::transfer(rq.command(), &mut tree, sector, &mut segment)?;
-                    sector += segment.len() >> 9; // TODO: SECTOR_SHIFT
+                    Self::transfer(rq.command(), tree, sector, &mut segment)?;
+                    sector += segment.len() >> bindings::SECTOR_SHIFT;
                 }
             }
+
+            drop(guard);
         }
 
         match queue_data.irq_mode {
-            IRQMode::None => rq.end_ok(),
-            IRQMode::Soft => rq.complete(),
-            IRQMode::Timer => rq.data().schedule(queue_data.completion_time_nsec),
+            IRQMode::None => mq::Request::end_ok(rq)
+                .map_err(|_e| kernel::error::linux_err::EIO)
+                // We take no refcounts on the request, so we expect to be able to
+                // end the request. The request reference must be unique at this
+                // point, and so `end_ok` cannot fail.
+                .expect("Fatal error - expected to be able to end request"),
+            IRQMode::Soft => mq::Request::complete(rq),
+            IRQMode::Timer => rq.schedule(queue_data.completion_time_nsec),
         }
 
         Ok(())
@@ -251,8 +304,10 @@ impl Operations for NullBlkDevice {
     ) {
     }
 
-    fn complete(rq: &mq::Request<Self>) {
-        rq.end_ok();
+    fn complete(rq: ARef<mq::Request<Self>>) {
+        mq::Request::end_ok(rq)
+            .map_err(|_e| kernel::error::linux_err::EIO)
+            .expect("Failed to complete request")
     }
 
     fn init_hctx(

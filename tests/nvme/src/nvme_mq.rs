@@ -8,18 +8,17 @@ use core::{
 use kernel::{
     bindings,
     block::mq,
-    device::RawDevice,
     error::{linux_err::*, KernelResult as Result},
     pr_info,
-    types::{ArcBorrow, AtomicOptionalBoxedPtr, ForeignOwnable},
+    types::{ARef, ArcBorrow, AtomicOptionalBoxedPtr, ForeignOwnable},
     BoxExt,
 };
 use kmacro::vtable;
 use pinned_init::*;
 
 use super::{
-    nvme_defs::*, nvme_driver_defs::*, nvme_prp::*, nvme_queue::NvmeQueue, DeviceData, MappingData,
-    NvmeCommand, NvmeNamespace, NvmeRequest,
+    nvme_defs::*, nvme_driver_defs::*, nvme_prp::*, nvme_queue::NvmeQueue, MappingData,
+    NvmeCommand, NvmeData, NvmeNamespace, NvmeRequest,
 };
 
 pub(crate) struct AdminQueueOperations;
@@ -27,16 +26,15 @@ pub(crate) struct AdminQueueOperations;
 #[vtable]
 impl mq::Operations for AdminQueueOperations {
     type RequestData = NvmeRequest;
-    type RequestDataInit = impl PinInit<Self::RequestData>;
     type QueueData = Box<NvmeNamespace>;
     type HwData = Arc<NvmeQueue<Self>>;
-    type TagSetData = Arc<DeviceData>;
+    type TagSetData = Arc<NvmeData>;
 
     fn new_request_data(
         tagset_data: <Self::TagSetData as ForeignOwnable>::Borrowed<'_>,
-    ) -> Self::RequestDataInit {
+    ) -> impl PinInit<Self::RequestData> {
         // TODO: Can't have these clones inside `pin_init!`, why?
-        let device = tagset_data.dev.clone();
+        let device = tagset_data.pci_dev.as_dev();
         let dma_pool = tagset_data.dma_pool.clone();
 
         pin_init!(NvmeRequest {
@@ -58,13 +56,13 @@ impl mq::Operations for AdminQueueOperations {
     fn queue_rq(
         hw_data: <Self::HwData as ForeignOwnable>::Borrowed<'_>,
         queue_data: <Self::QueueData as ForeignOwnable>::Borrowed<'_>,
-        rq: mq::Request<Self>,
+        rq: ARef<mq::Request<Self>>,
         is_last: bool,
     ) -> Result {
         queue_rq(hw_data, queue_data, rq, is_last)
     }
 
-    fn complete(rq: &mq::Request<Self>) {
+    fn complete(rq: ARef<mq::Request<Self>>) {
         complete(rq)
     }
 
@@ -89,14 +87,16 @@ pub(crate) struct IoQueueOperations;
 #[vtable]
 impl mq::Operations for IoQueueOperations {
     type RequestData = NvmeRequest;
-    type RequestDataInit = impl PinInit<Self::RequestData>;
     type QueueData = Box<NvmeNamespace>;
     type HwData = Arc<NvmeQueue<Self>>;
-    type TagSetData = Arc<DeviceData>;
+    type TagSetData = Arc<NvmeData>;
 
-    fn new_request_data(data: ArcBorrow<'_, DeviceData>) -> Self::RequestDataInit {
-        let device = data.dev.clone();
-        let dma_pool = data.dma_pool.clone();
+    fn new_request_data(
+        tagset_data: <Self::TagSetData as ForeignOwnable>::Borrowed<'_>,
+    ) -> impl PinInit<Self::RequestData> {
+        let device = tagset_data.pci_dev.as_dev();
+        let dma_pool = tagset_data.dma_pool.clone();
+
         pin_init!(NvmeRequest {
             dma_addr: AtomicU64::new(!0),
             result: AtomicU32::new(0),
@@ -114,7 +114,7 @@ impl mq::Operations for IoQueueOperations {
     }
 
     fn init_hctx(
-        tagset_data: ArcBorrow<'_, DeviceData>,
+        tagset_data: ArcBorrow<'_, NvmeData>,
         hctx_idx: u32,
     ) -> Result<Arc<NvmeQueue<Self>>> {
         let queues = tagset_data.queues.lock();
@@ -124,13 +124,13 @@ impl mq::Operations for IoQueueOperations {
     fn queue_rq(
         io_queue: ArcBorrow<'_, NvmeQueue<Self>>,
         ns: &NvmeNamespace,
-        rq: mq::Request<Self>,
+        rq: ARef<mq::Request<Self>>,
         is_last: bool,
     ) -> Result {
         queue_rq(io_queue, ns, rq, is_last)
     }
 
-    fn complete(rq: &mq::Request<Self>) {
+    fn complete(rq: ARef<mq::Request<Self>>) {
         complete(rq)
     }
 
@@ -166,7 +166,7 @@ impl mq::Operations for IoQueueOperations {
                 if i != bindings::hctx_type_HCTX_TYPE_POLL && irq_offset != 0 {
                     bindings::blk_mq_pci_map_queues(
                         map,
-                        device_data.pci_dev.as_ptr(),
+                        device_data.pci_dev.as_raw(),
                         irq_offset as i32,
                     );
                 } else {
@@ -183,7 +183,7 @@ impl mq::Operations for IoQueueOperations {
 fn queue_rq<T>(
     io_queue: ArcBorrow<'_, NvmeQueue<T>>,
     ns: &NvmeNamespace,
-    rq: mq::Request<T>,
+    rq: ARef<mq::Request<T>>,
     is_last: bool,
 ) -> Result
 where
@@ -191,12 +191,10 @@ where
 {
     match rq.command() {
         bindings::req_op_REQ_OP_DRV_IN | bindings::req_op_REQ_OP_DRV_OUT => {
-            rq.start();
             io_queue.submit_command(unsafe { &*rq.data_ref().cmd.get() }, is_last);
             Ok(())
         }
         bindings::req_op_REQ_OP_FLUSH => {
-            rq.start();
             let mut cmd = NvmeCommand::new_flush(ns.id);
             cmd.common.command_id = rq.tag() as u16;
             io_queue.submit_command(&cmd, is_last);
@@ -214,6 +212,7 @@ where
                     NvmeOpcode::write,
                 )
             };
+            //pr_info!("Queueing tag: {}\n", rq.tag());
             let len = rq.payload_bytes();
             // TODO: Handle unwrap
             let offset = rq.bio().unwrap().raw_iter().bi_sector;
@@ -235,7 +234,7 @@ where
                 if (bv.offset() % NVME_CTRL_PAGE_SIZE) + len as usize <= NVME_CTRL_PAGE_SIZE * 2 {
                     let dma_addr = unsafe {
                         bindings::dma_map_page_attrs(
-                            io_queue.data.dev.ptr,
+                            io_queue.data.pci_dev.as_dev().as_raw(),
                             bv.page(),
                             bv.offset() as _,
                             len as _,
@@ -247,8 +246,6 @@ where
                         return Err(ENOMEM);
                     }
 
-                    rq.start();
-
                     cmd.rw.prp1 = dma_addr.into();
                     if len > (NVME_CTRL_PAGE_SIZE as u32) {
                         cmd.rw.prp2 = (dma_addr + (NVME_CTRL_PAGE_SIZE as u64)).into();
@@ -259,6 +256,7 @@ where
                     pdu.direction.store(direction, Ordering::Relaxed);
                     pdu.len.store(len, Ordering::Relaxed);
 
+                    drop(rq);
                     io_queue.submit_command(&cmd, is_last);
                     return Ok(());
                 }
@@ -266,11 +264,9 @@ where
 
             let mut md = Box::try_new_atomic(MappingData::default())?;
             let count = rq.map_sg(&mut md.sg)?;
-            let dev = &io_queue.data.dev;
+            let dev = &io_queue.data.pci_dev.as_dev();
             dev.dma_map_sg(&mut md.sg[..count as usize], direction)?;
             let page_count = setup_prps(&io_queue.data, &mut cmd, &mut md, len)?;
-
-            rq.start();
 
             let pdu = rq.data_ref();
             pdu.sg_count.store(count, Ordering::Relaxed);
@@ -279,6 +275,7 @@ where
                 .store(unsafe { cmd.common.prp2.into() }, Ordering::Relaxed);
             pdu.mapping_data.store(Some(md), Ordering::Relaxed);
 
+            drop(rq);
             io_queue.submit_command(&cmd, is_last);
             Ok(())
         }
@@ -287,7 +284,7 @@ where
     }
 }
 
-fn complete<T>(rq: &mq::Request<T>)
+fn complete<T>(rq: ARef<mq::Request<T>>)
 where
     T: mq::Operations<RequestData = NvmeRequest>,
 {
@@ -296,7 +293,9 @@ where
         | bindings::req_op_REQ_OP_DRV_OUT
         | bindings::req_op_REQ_OP_FLUSH => {
             // We just complete right away if flush completes.
-            rq.end_ok();
+            mq::Request::end_ok(rq)
+                .map_err(|_e| EIO)
+                .expect("Failed to end request");
             return;
         }
         _ => {}
@@ -319,7 +318,7 @@ where
         // Unmap the page we mapped.
         unsafe {
             bindings::dma_unmap_page_attrs(
-                pdu.dev.ptr,
+                pdu.dev.as_raw(),
                 pdu.dma_addr.load(Ordering::Relaxed),
                 pdu.len.load(Ordering::Relaxed) as _,
                 pdu.direction.load(Ordering::Relaxed),
@@ -332,9 +331,18 @@ where
     let status = pdu.status.load(Ordering::Relaxed);
     if status != 0 {
         pr_info!("Completing with error {:x}\n", status);
-        rq.end_err(EIO);
+        mq::Request::end_err(rq, EIO)
+            .map_err(|_e| EIO)
+            .expect("Failed to end request");
         return;
     }
 
-    rq.end_ok();
+    let mut rq = rq;
+    loop {
+        if let Err(ret) = mq::Request::end_ok(rq) {
+            rq = ret;
+        } else {
+            break;
+        }
+    }
 }

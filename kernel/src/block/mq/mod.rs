@@ -9,7 +9,7 @@ mod raw_writer;
 mod request;
 mod tag_set;
 
-pub use gen_disk::GenDisk;
+pub use gen_disk::{GenDisk, GenDiskBuilder};
 pub use operations::Operations;
 pub use request::{Request, RequestQueue};
 pub use tag_set::TagSet;

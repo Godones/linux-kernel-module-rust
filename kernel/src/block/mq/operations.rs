@@ -5,7 +5,7 @@
 //! C header: [`include/linux/blk-mq.h`](../../include/linux/blk-mq.h)
 
 use core::marker::PhantomData;
-
+use core::sync::atomic::{AtomicBool, AtomicU64, Ordering};
 use kmacro::vtable;
 
 use crate::{
@@ -14,17 +14,16 @@ use crate::{
     error::{from_result, KernelResult as Result},
     init::PinInit,
     pr_info,
-    types::ForeignOwnable,
+    types::{ARef, ForeignOwnable},
 };
+use crate::block::mq::request::RequestDataWrapper;
 
 /// Implement this trait to interface blk-mq as block devices
 #[vtable]
 pub trait Operations: Sized {
     /// Data associated with a request. This data is located next to the request
     /// structure.
-    type RequestData: Sized;
-
-    type RequestDataInit: PinInit<Self::RequestData>;
+    type RequestData: Sized + Sync;
 
     /// Data associated with the `struct request_queue` that is allocated for
     /// the `GenDisk` associated with this `Operations` implementation.
@@ -42,14 +41,14 @@ pub trait Operations: Sized {
     fn new_request_data(
         //rq: ARef<Request<Self>>,
         tagset_data: <Self::TagSetData as ForeignOwnable>::Borrowed<'_>,
-    ) -> Self::RequestDataInit;
+    ) -> impl PinInit<Self::RequestData>;
 
     /// Called by the kernel to queue a request with the driver. If `is_last` is
-    /// `false`, the driver is allowed to defer commiting the request.
+    /// `false`, the driver is allowed to defer committing the request.
     fn queue_rq(
         hw_data: <Self::HwData as ForeignOwnable>::Borrowed<'_>,
         queue_data: <Self::QueueData as ForeignOwnable>::Borrowed<'_>,
-        rq: Request<Self>,
+        rq: ARef<Request<Self>>,
         is_last: bool,
     ) -> Result;
 
@@ -59,8 +58,8 @@ pub trait Operations: Sized {
         queue_data: <Self::QueueData as ForeignOwnable>::Borrowed<'_>,
     );
 
-    /// Called by the kernel when the request is completed
-    fn complete(_rq: &Request<Self>);
+    /// Called by the kernel when the request is completed.
+    fn complete(rq: ARef<Request<Self>>);
 
     /// Called by the kernel to allocate and initialize a driver specific hardware context data
     fn init_hctx(
@@ -100,19 +99,27 @@ impl<T: Operations> OperationsVtable<T> {
         hctx: *mut bindings::blk_mq_hw_ctx,
         bd: *const bindings::blk_mq_queue_data,
     ) -> bindings::blk_status_t {
-        // pr_info!("queue_rq_callback began");
-        // SAFETY: `bd` is valid as required by the safety requirement for this function.
-        let rq = unsafe { Request::from_ptr((*bd).rq) };
+        // SAFETY: `bd.rq` is valid as required by the safety requirement for
+        // this function.
+        let request = unsafe { &*(*bd).rq.cast::<Request<T>>() };
 
-        // SAFETY: The safety requirement for this function ensure that
-        // `(*hctx).driver_data` was returned by a call to
-        // `Self::init_hctx_callback()`. That function uses
-        // `PointerWrapper::into_pointer()` to create `driver_data`. Further,
-        // the returned value does not outlive this function and
-        // `from_foreign()` is not called until `Self::exit_hctx_callback()` is
-        // called. By the safety requirement of this function and contract with
-        // the `blk-mq` API, `queue_rq_callback()` will not be called after that
-        // point.
+        // One refcount for the ARef, one for being in flight
+        request.wrapper_ref().refcount().store(2, Ordering::Relaxed);
+
+        // The request is not completed yet.
+        request.wrapper_ref().completed().store(false, Ordering::Relaxed);
+
+        // SAFETY:
+        //  - We own a refcount that we took above. We pass that to `ARef`.
+        //  - By the safety requirements of this function, `request` is a valid
+        //    `struct request` and the private data is properly initialized.
+        //  - `rq` will be alive until `blk_mq_end_request` is called and is
+        //    reference counted by `ARef` until then.
+        let rq = unsafe { Request::aref_from_raw((*bd).rq) };
+
+        // SAFETY: The safety requirement for this function ensure that `hctx`
+        // is valid and that `driver_data` was produced by a call to
+        // `into_foreign` in `Self::init_hctx_callback`.
         let hw_data = unsafe { T::HwData::borrow((*hctx).driver_data) };
 
         // SAFETY: `hctx` is valid as required by this function.
@@ -124,11 +131,15 @@ impl<T: Operations> OperationsVtable<T> {
         // dropped, which happens after we are dropped.
         let queue_data = unsafe { T::QueueData::borrow(queue_data) };
 
+        // SAFETY: We have exclusive access and we just set the refcount above.
+        unsafe { Request::start_unchecked(&rq) };
+
         let ret = T::queue_rq(
             hw_data,
             queue_data,
             rq,
-            // SAFETY: `bd` is valid as required by the safety requirement for this function.
+            // SAFETY: `bd` is valid as required by the safety requirement for
+            // this function.
             unsafe { (*bd).last },
         );
         // pr_info!("queue_rq_callback ended");
@@ -141,6 +152,8 @@ impl<T: Operations> OperationsVtable<T> {
 
     unsafe extern "C" fn commit_rqs_callback(hctx: *mut bindings::blk_mq_hw_ctx) {
         // pr_info!("commit_rqs_callback began");
+        // SAFETY: `driver_data` was installed by us in `init_hctx_callback` as
+        // the result of a call to `into_foreign`.
         let hw_data = unsafe { T::HwData::borrow((*hctx).driver_data) };
 
         // SAFETY: `hctx` is valid as required by this function.
@@ -157,7 +170,8 @@ impl<T: Operations> OperationsVtable<T> {
 
     unsafe extern "C" fn complete_callback(rq: *mut bindings::request) {
         // pr_info!("complete_callback began");
-        T::complete(unsafe { &Request::from_ptr(rq) });
+        let aref = unsafe { Request::aref_from_raw(rq) };
+        T::complete(aref);
         // pr_info!("complete_callback ended");
     }
 
@@ -209,20 +223,32 @@ impl<T: Operations> OperationsVtable<T> {
         _hctx_idx: core::ffi::c_uint,
         _numa_node: core::ffi::c_uint,
     ) -> core::ffi::c_int {
-        // static CALL: AtomicUsize = AtomicUsize::new(0);
-        // pr_info!(
-        //     "init_request_callback began, call count: {}, {:p}",
-        //     CALL.fetch_add(1, core::sync::atomic::Ordering::Relaxed),
-        //     rq
-        // );
         let res = from_result(|| {
-            // SAFETY: The tagset invariants guarantee that all requests are allocated with extra memory
-            // for the request data.
-            let pdu = unsafe { bindings::blk_mq_rq_to_pdu(rq) } as *mut T::RequestData;
+            // SAFETY: By the safety requirements of this function, `rq` points
+            // to a valid allocation.
+            let pdu = unsafe { Request::wrapper_ptr(rq.cast::<Request<T>>()) };
+
+            // TODO: Perhaps just pin_init `RequestDataWrapper`?
+
+            // SAFETY: The refcount field is allocated but not initialized, so
+            // it is valid for writes.
+            unsafe { RequestDataWrapper::refcount_ptr(pdu.as_ptr()).write(AtomicU64::new(0)) };
+
+            // SAFETY: The `completed` field is allocated but not initialized,
+            // so it is valid for writes.
+            unsafe { RequestDataWrapper::completed_ptr(pdu.as_ptr()).write(AtomicBool::new(false)) };
+
+            // SAFETY: Because `set` is a `TagSet<T>`, `driver_data` comes from
+            // a call to `into_foregn` by the initializer returned by
+            // `TagSet::try_new`.
             let tagset_data = unsafe { T::TagSetData::borrow((*set).driver_data) };
 
             let initializer = T::new_request_data(tagset_data);
-            unsafe { initializer.__pinned_init(pdu)? };
+
+            // SAFETY: `pdu` is a valid pointer as established above. We do not
+            // touch `pdu` if `__pinned_init` returns an error. We promise ot to
+            // move the pointee of `pdu`.
+            unsafe { initializer.__pinned_init(RequestDataWrapper::data_ptr(pdu.as_ptr()))? };
 
             Ok(0)
         });
@@ -238,7 +264,7 @@ impl<T: Operations> OperationsVtable<T> {
         // pr_info!("exit_request_callback began, rq: {:p}", rq);
         // SAFETY: The tagset invariants guarantee that all requests are allocated with extra memory
         // for the request data.
-        let pdu = unsafe { bindings::blk_mq_rq_to_pdu(rq) } as *mut T::RequestData;
+        let pdu = unsafe { bindings::blk_mq_rq_to_pdu(rq) }.cast::<RequestDataWrapper<T>>();
 
         // SAFETY: `pdu` is valid for read and write and is properly initialised.
         unsafe { core::ptr::drop_in_place(pdu) };
@@ -286,7 +312,7 @@ impl<T: Operations> OperationsVtable<T> {
         show_rq: None,
     };
 
-    pub(crate) const unsafe fn build() -> &'static bindings::blk_mq_ops {
+    pub(crate) const fn build() -> &'static bindings::blk_mq_ops {
         &Self::VTABLE
     }
 }

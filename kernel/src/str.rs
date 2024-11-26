@@ -644,7 +644,7 @@ impl<'a> TryFrom<&'a CStr> for CString {
 impl ForeignOwnable for CString {
     type Borrowed<'a> = &'a CStr;
     type BorrowedMut<'a> = &'a mut CStr;
-
+    const FOREIGN_ALIGN: usize = core::mem::align_of::<u8>();
     fn into_foreign(self) -> *const core::ffi::c_void {
         let s = Vec::into_boxed_slice(self.buf);
         Box::into_raw(s) as _

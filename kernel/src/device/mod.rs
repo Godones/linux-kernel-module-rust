@@ -6,55 +6,208 @@
 //! C header: [`include/linux/device.h`](../../../../include/linux/device.h)
 
 use core::{
+    fmt,
     ops::{Deref, DerefMut},
     pin::Pin,
+    ptr,
 };
 
 use pinned_init::{pin_data, pin_init};
 
 use crate::{
-    bindings,
+    bindings, c_str,
     error::{linux_err::*, Error, KernelResult as Result},
     init::{InPlaceInit, PinInit},
     revocable::{Revocable, RevocableGuard},
     str::CStr,
     sync::{LockClassKey, RevocableMutex},
+    types::{ARef, Opaque},
     UniqueArc,
 };
 
 pub(crate) mod block;
 
-/// A raw device.
+/// A reference-counted device.
 ///
-/// # Safety
+/// This structure represents the Rust abstraction for a C `struct device`. This implementation
+/// abstracts the usage of an already existing C `struct device` within Rust code that we get
+/// passed from the C side.
 ///
-/// Implementers must ensure that the `*mut device` returned by [`RawDevice::raw_device`] is
-/// related to `self`, that is, actions on it will affect `self`. For example, if one calls
-/// `get_device`, then the refcount on the device represented by `self` will be incremented.
+/// An instance of this abstraction can be obtained temporarily or permanent.
 ///
-/// Additionally, implementers must ensure that the device is never renamed. Commit a5462516aa99
-/// ("driver-core: document restrictions on device_rename()") has details on why `device_rename`
-/// should not be used.
-pub unsafe trait RawDevice {
-    /// Returns the raw `struct device` related to `self`.
-    fn raw_device(&self) -> *mut bindings::device;
+/// A temporary one is bound to the lifetime of the C `struct device` pointer used for creation.
+/// A permanent instance is always reference-counted and hence not restricted by any lifetime
+/// boundaries.
+///
+/// For subsystems it is recommended to create a permanent instance to wrap into a subsystem
+/// specific device structure (e.g. `pci::Device`). This is useful for passing it to drivers in
+/// `T::probe()`, such that a driver can store the `ARef<Device>` (equivalent to storing a
+/// `struct device` pointer in a C driver) for arbitrary purposes, e.g. allocating DMA coherent
+/// memory.
+///
+/// # Invariants
+///
+/// A `Device` instance represents a valid `struct device` created by the C portion of the kernel.
+///
+/// Instances of this type are always reference-counted, that is, a call to `get_device` ensures
+/// that the allocation remains valid at least until the matching call to `put_device`.
+///
+/// `bindings::device::release` is valid to be called from any thread, hence `ARef<Device>` can be
+/// dropped from any thread.
+#[repr(transparent)]
+pub struct Device(Opaque<bindings::device>);
 
-    /// Returns the name of the device.
-    fn name(&self) -> &CStr {
-        let ptr = self.raw_device();
+// SAFETY: `Device` only holds a pointer to a C device, which is safe to be used from any thread.
+unsafe impl Send for Device {}
 
-        // SAFETY: `ptr` is valid because `self` keeps it alive.
-        let name = unsafe { bindings::dev_name(ptr) };
+// SAFETY: `Device` only holds a pointer to a C device, references to which are safe to be used
+// from any thread.
+unsafe impl Sync for Device {}
 
-        // SAFETY: The name of the device remains valid while it is alive (because the device is
-        // never renamed, per the safety requirement of this trait). This is guaranteed to be the
-        // case because the reference to `self` outlives the one of the returned `CStr` (enforced
-        // by the compiler because of their lifetimes).
-        unsafe { CStr::from_char_ptr(name) }
+impl Device {
+    /// Creates a new reference-counted abstraction instance of an existing `struct device` pointer.
+    ///
+    /// # Safety
+    ///
+    /// Callers must ensure that `ptr` is valid, non-null, and has a non-zero reference count,
+    /// i.e. it must be ensured that the reference count of the C `struct device` `ptr` points to
+    /// can't drop to zero, for the duration of this function call.
+    ///
+    /// It must also be ensured that `bindings::device::release` can be called from any thread.
+    /// While not officially documented, this should be the case for any `struct device`.
+    pub unsafe fn from_raw(ptr: *mut bindings::device) -> ARef<Self> {
+        // SAFETY: By the safety requirements, ptr is valid.
+        // Initially increase the reference count by one to compensate for the final decrement once
+        // this newly created `ARef<Device>` instance is dropped.
+        unsafe { bindings::get_device(ptr) };
+
+        // CAST: `Self` is a `repr(transparent)` wrapper around `bindings::device`.
+        let ptr = ptr.cast::<Self>();
+
+        // SAFETY: `ptr` is valid by the safety requirements of this function. By the above call to
+        // `bindings::get_device` we also own a reference to the underlying `struct device`.
+        unsafe { ARef::from_raw(ptr::NonNull::new_unchecked(ptr)) }
+    }
+    /// Obtain the raw `struct device *`.
+    pub fn as_raw(&self) -> *mut bindings::device {
+        self.0.get()
     }
 
-    fn dma_set_mask(&self, mask: u64) -> Result {
-        let dev = self.raw_device();
+    /// Convert a raw C `struct device` pointer to a `&'a Device`.
+    ///
+    /// # Safety
+    ///
+    /// Callers must ensure that `ptr` is valid, non-null, and has a non-zero reference count,
+    /// i.e. it must be ensured that the reference count of the C `struct device` `ptr` points to
+    /// can't drop to zero, for the duration of this function call and the entire duration when the
+    /// returned reference exists.
+    pub unsafe fn as_ref<'a>(ptr: *mut bindings::device) -> &'a Self {
+        // SAFETY: Guaranteed by the safety requirements of the function.
+        unsafe { &*ptr.cast() }
+    }
+
+    /// Prints an emergency-level message (level 0) prefixed with device information.
+    ///
+    /// More details are available from [`dev_emerg`].
+    ///
+    /// [`dev_emerg`]: crate::dev_emerg
+    pub fn pr_emerg(&self, args: fmt::Arguments<'_>) {
+        // SAFETY: `klevel` is null-terminated, uses one of the kernel constants.
+        unsafe { self.printk(bindings::KERN_EMERG, args) };
+    }
+
+    /// Prints an alert-level message (level 1) prefixed with device information.
+    ///
+    /// More details are available from [`dev_alert`].
+    ///
+    /// [`dev_alert`]: crate::dev_alert
+    pub fn pr_alert(&self, args: fmt::Arguments<'_>) {
+        // SAFETY: `klevel` is null-terminated, uses one of the kernel constants.
+        unsafe { self.printk(bindings::KERN_ALERT, args) };
+    }
+
+    /// Prints a critical-level message (level 2) prefixed with device information.
+    ///
+    /// More details are available from [`dev_crit`].
+    ///
+    /// [`dev_crit`]: crate::dev_crit
+    pub fn pr_crit(&self, args: fmt::Arguments<'_>) {
+        // SAFETY: `klevel` is null-terminated, uses one of the kernel constants.
+        unsafe { self.printk(bindings::KERN_CRIT, args) };
+    }
+
+    /// Prints an error-level message (level 3) prefixed with device information.
+    ///
+    /// More details are available from [`dev_err`].
+    ///
+    /// [`dev_err`]: crate::dev_err
+    pub fn pr_err(&self, args: fmt::Arguments<'_>) {
+        // SAFETY: `klevel` is null-terminated, uses one of the kernel constants.
+        unsafe { self.printk(bindings::KERN_ERR, args) };
+    }
+
+    /// Prints a warning-level message (level 4) prefixed with device information.
+    ///
+    /// More details are available from [`dev_warn`].
+    ///
+    /// [`dev_warn`]: crate::dev_warn
+    pub fn pr_warn(&self, args: fmt::Arguments<'_>) {
+        // SAFETY: `klevel` is null-terminated, uses one of the kernel constants.
+        unsafe { self.printk(bindings::KERN_WARNING, args) };
+    }
+
+    /// Prints a notice-level message (level 5) prefixed with device information.
+    ///
+    /// More details are available from [`dev_notice`].
+    ///
+    /// [`dev_notice`]: crate::dev_notice
+    pub fn pr_notice(&self, args: fmt::Arguments<'_>) {
+        // SAFETY: `klevel` is null-terminated, uses one of the kernel constants.
+        unsafe { self.printk(bindings::KERN_NOTICE, args) };
+    }
+
+    /// Prints an info-level message (level 6) prefixed with device information.
+    ///
+    /// More details are available from [`dev_info`].
+    ///
+    /// [`dev_info`]: crate::dev_info
+    pub fn pr_info(&self, args: fmt::Arguments<'_>) {
+        // SAFETY: `klevel` is null-terminated, uses one of the kernel constants.
+        unsafe { self.printk(bindings::KERN_INFO, args) };
+    }
+
+    /// Prints a debug-level message (level 7) prefixed with device information.
+    ///
+    /// More details are available from [`dev_dbg`].
+    ///
+    /// [`dev_dbg`]: crate::dev_dbg
+    pub fn pr_dbg(&self, args: fmt::Arguments<'_>) {
+        if cfg!(debug_assertions) {
+            // SAFETY: `klevel` is null-terminated, uses one of the kernel constants.
+            unsafe { self.printk(bindings::KERN_DEBUG, args) };
+        }
+    }
+    /// Prints the provided message to the console.
+    ///
+    /// # Safety
+    ///
+    /// Callers must ensure that `klevel` is null-terminated; in particular, one of the
+    /// `KERN_*`constants, for example, `KERN_CRIT`, `KERN_ALERT`, etc.
+    unsafe fn printk(&self, klevel: &[u8], msg: fmt::Arguments<'_>) {
+        // SAFETY: `klevel` is null-terminated and one of the kernel constants. `self.as_raw`
+        // is valid because `self` is valid. The "%pA" format string expects a pointer to
+        // `fmt::Arguments`, which is what we're passing as the last argument.
+        unsafe {
+            bindings::_dev_printk(
+                klevel as *const _ as *const core::ffi::c_char,
+                self.as_raw(),
+                c_str!("%pA").as_char_ptr(),
+                &msg as *const _ as *const core::ffi::c_void,
+            )
+        };
+    }
+    pub fn dma_set_mask(&self, mask: u64) -> Result {
+        let dev = self.as_raw();
         let ret = unsafe { bindings::dma_set_mask(dev as _, mask) };
         if ret != 0 {
             Err(Error::from_errno(ret))
@@ -62,9 +215,8 @@ pub unsafe trait RawDevice {
             Ok(())
         }
     }
-
-    fn dma_set_coherent_mask(&self, mask: u64) -> Result {
-        let dev = self.raw_device();
+    pub fn dma_set_coherent_mask(&self, mask: u64) -> Result {
+        let dev = self.as_raw();
         let ret = unsafe { bindings::dma_set_coherent_mask(dev as _, mask) };
         if ret != 0 {
             Err(Error::from_errno(ret))
@@ -72,9 +224,8 @@ pub unsafe trait RawDevice {
             Ok(())
         }
     }
-
-    fn dma_map_sg(&self, sglist: &mut [bindings::scatterlist], dir: u32) -> Result {
-        let dev = self.raw_device();
+    pub fn dma_map_sg(&self, sglist: &mut [bindings::scatterlist], dir: u32) -> Result {
+        let dev = self.as_raw();
         let count = sglist.len().try_into()?;
         let ret = unsafe {
             bindings::dma_map_sg_attrs(
@@ -92,82 +243,242 @@ pub unsafe trait RawDevice {
         Ok(())
     }
 
-    fn dma_unmap_sg(&self, sglist: &mut [bindings::scatterlist], dir: u32) {
-        let dev = self.raw_device();
+    pub fn dma_unmap_sg(&self, sglist: &mut [bindings::scatterlist], dir: u32) {
+        let dev = self.as_raw();
         let count = sglist.len() as _;
         unsafe { bindings::dma_unmap_sg_attrs(dev, &mut sglist[0], count, dir, 0) };
     }
 }
 
-/// A ref-counted device.
-///
-/// # Invariants
-///
-/// `ptr` is valid, non-null, and has a non-zero reference count. One of the references is owned by
-/// `self`, and will be decremented when `self` is dropped.
-pub struct Device {
-    // TODO: Make this pub(crate).
-    pub ptr: *mut bindings::device,
+// SAFETY: Instances of `Device` are always reference-counted.
+unsafe impl crate::types::AlwaysRefCounted for Device {
+    fn inc_ref(&self) {
+        // SAFETY: The existence of a shared reference guarantees that the refcount is non-zero.
+        unsafe { bindings::get_device(self.as_raw()) };
+    }
+
+    unsafe fn dec_ref(obj: ptr::NonNull<Self>) {
+        // SAFETY: The safety requirements guarantee that the refcount is non-zero.
+        unsafe { bindings::put_device(obj.cast().as_ptr()) }
+    }
 }
 
-// SAFETY: `Device` only holds a pointer to a C device, which is safe to be used from any thread.
-unsafe impl Send for Device {}
-
-// SAFETY: `Device` only holds a pointer to a C device, references to which are safe to be used
-// from any thread.
-unsafe impl Sync for Device {}
-
-impl Device {
-    /// Creates a new device instance.
-    ///
-    /// # Safety
-    ///
-    /// Callers must ensure that `ptr` is valid, non-null, and has a non-zero reference count.
-    pub unsafe fn new(ptr: *mut bindings::device) -> Self {
-        // SAFETY: By the safety requirements, ptr is valid and its refcounted will be incremented.
-        unsafe { bindings::get_device(ptr) };
-        // INVARIANT: The safety requirements satisfy all but one invariant, which is that `self`
-        // owns a reference. This is satisfied by the call to `get_device` above.
-        Self { ptr }
-    }
-
-    /// Creates a new device instance from an existing [`RawDevice`] instance.
-    pub fn from_dev(dev: &dyn RawDevice) -> Self {
-        // SAFETY: The requirements are satisfied by the existence of `RawDevice` and its safety
-        // requirements.
-        unsafe { Self::new(dev.raw_device()) }
-    }
-
-    // TODO: Review how this is used.
-    /// Creates a new `DeviceRef` from a device whose reference count has already been incremented.
-    /// The returned object takes over the reference, that is, the reference will be decremented
-    /// when the `DeviceRef` instance goes out of scope.
-    pub fn from_dev_no_reference(dev: &dyn RawDevice) -> Self {
-        Self {
-            ptr: dev.raw_device() as _,
+#[doc(hidden)]
+#[macro_export]
+macro_rules! dev_printk {
+    ($method:ident, $dev:expr, $($f:tt)*) => {
+        {
+            ($dev).$method(core::format_args!($($f)*));
         }
     }
 }
 
-// SAFETY: The device returned by `raw_device` is the one for which we hold a reference.
-unsafe impl RawDevice for Device {
-    fn raw_device(&self) -> *mut bindings::device {
-        self.ptr
-    }
+/// Prints an emergency-level message (level 0) prefixed with device information.
+///
+/// This level should be used if the system is unusable.
+///
+/// Equivalent to the kernel's `dev_emerg` macro.
+///
+/// Mimics the interface of [`std::print!`]. More information about the syntax is available from
+/// [`core::fmt`] and [`alloc::format!`].
+///
+/// [`std::print!`]: https://doc.rust-lang.org/std/macro.print.html
+///
+/// # Examples
+///
+/// ```
+/// # use kernel::dev_emerg;
+/// use kernel::device::Device;
+///
+/// fn example(dev: &Device) {
+///     dev_emerg!(dev, "hello {}\n", "there");
+/// }
+/// ```
+#[macro_export]
+macro_rules! dev_emerg {
+    ($($f:tt)*) => { $crate::dev_printk!(pr_emerg, $($f)*); }
 }
 
-impl Drop for Device {
-    fn drop(&mut self) {
-        // SAFETY: By the type invariants, we know that `self` owns a reference, so it is safe to
-        // relinquish it now.
-        unsafe { bindings::put_device(self.ptr) };
-    }
+/// Prints an alert-level message (level 1) prefixed with device information.
+///
+/// This level should be used if action must be taken immediately.
+///
+/// Equivalent to the kernel's `dev_alert` macro.
+///
+/// Mimics the interface of [`std::print!`]. More information about the syntax is available from
+/// [`core::fmt`] and [`alloc::format!`].
+///
+/// [`std::print!`]: https://doc.rust-lang.org/std/macro.print.html
+///
+/// # Examples
+///
+/// ```
+/// # use kernel::dev_alert;
+/// use kernel::device::Device;
+///
+/// fn example(dev: &Device) {
+///     dev_alert!(dev, "hello {}\n", "there");
+/// }
+/// ```
+#[macro_export]
+macro_rules! dev_alert {
+    ($($f:tt)*) => { $crate::dev_printk!(pr_alert, $($f)*); }
 }
 
-impl Clone for Device {
-    fn clone(&self) -> Self {
-        Self::from_dev(self)
-    }
+/// Prints a critical-level message (level 2) prefixed with device information.
+///
+/// This level should be used in critical conditions.
+///
+/// Equivalent to the kernel's `dev_crit` macro.
+///
+/// Mimics the interface of [`std::print!`]. More information about the syntax is available from
+/// [`core::fmt`] and [`alloc::format!`].
+///
+/// [`std::print!`]: https://doc.rust-lang.org/std/macro.print.html
+///
+/// # Examples
+///
+/// ```
+/// # use kernel::dev_crit;
+/// use kernel::device::Device;
+///
+/// fn example(dev: &Device) {
+///     dev_crit!(dev, "hello {}\n", "there");
+/// }
+/// ```
+#[macro_export]
+macro_rules! dev_crit {
+    ($($f:tt)*) => { $crate::dev_printk!(pr_crit, $($f)*); }
+}
+
+/// Prints an error-level message (level 3) prefixed with device information.
+///
+/// This level should be used in error conditions.
+///
+/// Equivalent to the kernel's `dev_err` macro.
+///
+/// Mimics the interface of [`std::print!`]. More information about the syntax is available from
+/// [`core::fmt`] and [`alloc::format!`].
+///
+/// [`std::print!`]: https://doc.rust-lang.org/std/macro.print.html
+///
+/// # Examples
+///
+/// ```
+/// # use kernel::dev_err;
+/// use kernel::device::Device;
+///
+/// fn example(dev: &Device) {
+///     dev_err!(dev, "hello {}\n", "there");
+/// }
+/// ```
+#[macro_export]
+macro_rules! dev_err {
+    ($($f:tt)*) => { $crate::dev_printk!(pr_err, $($f)*); }
+}
+
+/// Prints a warning-level message (level 4) prefixed with device information.
+///
+/// This level should be used in warning conditions.
+///
+/// Equivalent to the kernel's `dev_warn` macro.
+///
+/// Mimics the interface of [`std::print!`]. More information about the syntax is available from
+/// [`core::fmt`] and [`alloc::format!`].
+///
+/// [`std::print!`]: https://doc.rust-lang.org/std/macro.print.html
+///
+/// # Examples
+///
+/// ```
+/// # use kernel::dev_warn;
+/// use kernel::device::Device;
+///
+/// fn example(dev: &Device) {
+///     dev_warn!(dev, "hello {}\n", "there");
+/// }
+/// ```
+#[macro_export]
+macro_rules! dev_warn {
+    ($($f:tt)*) => { $crate::dev_printk!(pr_warn, $($f)*); }
+}
+
+/// Prints a notice-level message (level 5) prefixed with device information.
+///
+/// This level should be used in normal but significant conditions.
+///
+/// Equivalent to the kernel's `dev_notice` macro.
+///
+/// Mimics the interface of [`std::print!`]. More information about the syntax is available from
+/// [`core::fmt`] and [`alloc::format!`].
+///
+/// [`std::print!`]: https://doc.rust-lang.org/std/macro.print.html
+///
+/// # Examples
+///
+/// ```
+/// # use kernel::dev_notice;
+/// use kernel::device::Device;
+///
+/// fn example(dev: &Device) {
+///     dev_notice!(dev, "hello {}\n", "there");
+/// }
+/// ```
+#[macro_export]
+macro_rules! dev_notice {
+    ($($f:tt)*) => { $crate::dev_printk!(pr_notice, $($f)*); }
+}
+
+/// Prints an info-level message (level 6) prefixed with device information.
+///
+/// This level should be used for informational messages.
+///
+/// Equivalent to the kernel's `dev_info` macro.
+///
+/// Mimics the interface of [`std::print!`]. More information about the syntax is available from
+/// [`core::fmt`] and [`alloc::format!`].
+///
+/// [`std::print!`]: https://doc.rust-lang.org/std/macro.print.html
+///
+/// # Examples
+///
+/// ```
+/// # use kernel::dev_info;
+/// use kernel::device::Device;
+///
+/// fn example(dev: &Device) {
+///     dev_info!(dev, "hello {}\n", "there");
+/// }
+/// ```
+#[macro_export]
+macro_rules! dev_info {
+    ($($f:tt)*) => { $crate::dev_printk!(pr_info, $($f)*); }
+}
+
+/// Prints a debug-level message (level 7) prefixed with device information.
+///
+/// This level should be used for debug messages.
+///
+/// Equivalent to the kernel's `dev_dbg` macro, except that it doesn't support dynamic debug yet.
+///
+/// Mimics the interface of [`std::print!`]. More information about the syntax is available from
+/// [`core::fmt`] and [`alloc::format!`].
+///
+/// [`std::print!`]: https://doc.rust-lang.org/std/macro.print.html
+///
+/// # Examples
+///
+/// ```
+/// # use kernel::dev_dbg;
+/// use kernel::device::Device;
+///
+/// fn example(dev: &Device) {
+///     dev_dbg!(dev, "hello {}\n", "there");
+/// }
+/// ```
+#[macro_export]
+macro_rules! dev_dbg {
+    ($($f:tt)*) => { $crate::dev_printk!(pr_dbg, $($f)*); }
 }
 
 /// Device data.

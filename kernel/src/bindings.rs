@@ -93,6 +93,10 @@ extern "C" {
     pub fn kmap_atomic(page: *mut page) -> *mut core::ffi::c_void;
     #[link_name = "rust_helper_kunmap_atomic"]
     pub fn kunmap_atomic(address: *mut core::ffi::c_void);
+
+    #[link_name="rust_helper_kmap_local_page"]
+    pub fn kmap_local_page(page: *mut page) -> *mut core::ffi::c_void;
+
     // Page end
 
     // Block device
@@ -248,10 +252,40 @@ extern "C" {
     #[link_name = "rust_helper_pci_get_drvdata"]
     pub fn pci_get_drvdata(pdev: *mut pci_dev) -> *mut core::ffi::c_void;
 
+    #[link_name = "rust_helper_pci_resource_len"]
+    pub fn pci_resource_len(pdev: *mut pci_dev, bar: core::ffi::c_int) -> core::ffi::c_ulong;
+    #[link_name = "rust_helper_devm_add_action"]
+    pub fn devm_add_action(
+        dev: *mut device,
+        action: Option<unsafe extern "C" fn(arg1: *mut core::ffi::c_void)>,
+        data: *mut core::ffi::c_void,
+    ) -> core::ffi::c_int;
+
     #[link_name = "rust_helper_mdelay"]
     pub fn mdelay(ms: u64);
     #[link_name = "rust_helper_num_possible_cpus"]
     pub fn num_possible_cpus() -> core::ffi::c_uint;
+
+
+    // xarray
+    #[link_name="rust_helper_xa_init_flags"]
+    pub fn xa_init_flags(xa: *mut xarray, flags: gfp_t);
+    #[link_name="rust_helper_xa_empty"]
+    pub fn xa_empty(xa: *mut xarray) -> bool_;
+    #[link_name="rust_helper_xa_alloc"]
+    pub fn xa_alloc(
+        xa: *mut xarray,
+        id: *mut u32_,
+        entry: *mut core::ffi::c_void,
+        limit: xa_limit,
+        gfp: gfp_t,
+    ) -> core::ffi::c_int;
+    #[link_name="rust_helper_xa_lock"]
+    pub fn xa_lock(xa: *mut xarray);
+    #[link_name="rust_helper_xa_unlock"]
+    pub fn xa_unlock(xa: *mut xarray);
+    #[link_name="rust_helper_xa_err"]
+    pub fn xa_err(entry: *mut core::ffi::c_void) -> core::ffi::c_int;
 
 }
 

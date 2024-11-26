@@ -4,15 +4,13 @@
 //!
 //! C header: [`include/linux/blk-mq.h`](../../include/linux/blk-mq.h)
 use core::{convert::TryInto, marker::PhantomData, pin::Pin};
-
+use core::sync::atomic::Ordering;
 use pinned_init::*;
 
-use crate::{
-    bindings,
-    block::mq::{operations::OperationsVtable, request::RequestRef, Operations},
-    error::{Error, KernelResult as Result},
-    types::{ForeignOwnable, Opaque},
-};
+use crate::{bindings, block::mq::{operations::OperationsVtable, Operations}, error::{Error, KernelResult as Result}, types::{ForeignOwnable, Opaque}};
+use crate::block::mq::Request;
+use crate::block::mq::request::RequestDataWrapper;
+use crate::types::ARef;
 
 /// A wrapper for the C `struct blk_mq_tag_set`.
 ///
@@ -95,14 +93,22 @@ impl<T: Operations> TagSet<T> {
         unsafe { &*(ptr.cast::<Self>()) }
     }
 
-    pub fn tag_to_rq(&self, qid: u32, tag: u32) -> Option<RequestRef<'_, T>> {
+    pub fn tag_to_rq(&self, qid: u32, tag: u32) -> Option<ARef<Request<T>>> {
         // TODO: We have to check that qid doesn't overflow hw queue.
         let tags = unsafe { *(*self.inner.get()).tags.add(qid as _) };
-        let rq = unsafe { bindings::blk_mq_tag_to_rq(tags, tag) };
-        if rq.is_null() {
+        let rq_ptr = unsafe { bindings::blk_mq_tag_to_rq(tags, tag) };
+        if rq_ptr.is_null() {
             None
         } else {
-            Some(unsafe { RequestRef::new(rq) })
+            let refcount_ptr = unsafe { RequestDataWrapper::refcount_ptr(Request::wrapper_ptr(rq_ptr.cast::<Request<T>>()).as_ptr()) };
+            let refcount_ref = unsafe {&*refcount_ptr};
+            refcount_ref.fetch_update(Ordering::Relaxed, Ordering::Relaxed, |x| {
+                if x >= 1 {
+                    Some(x+1)
+                } else {
+                    None
+                }
+            }).ok().map(|_| unsafe { Request::aref_from_raw(rq_ptr) })
         }
     }
 }

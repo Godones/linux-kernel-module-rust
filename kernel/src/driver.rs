@@ -6,13 +6,15 @@
 //! using the [`DriverRegistration`] class.
 
 use alloc::{boxed::Box, sync::Arc};
-use core::{cell::UnsafeCell, marker::PhantomData, ops::Deref, pin::Pin};
-
+use core::{marker::PhantomData, ops::Deref, pin::Pin};
+use pinned_init::{pin_data, pinned_drop, try_pin_init, PinInit};
 use crate::{
-    error::{linux_err::*, KernelResult as Result},
+    error::{ KernelResult as Result},
     str::CStr,
     ThisModule,
 };
+use crate::error::Error;
+use crate::types::Opaque;
 
 /// A subsystem (e.g., PCI, Platform, Amba, etc.) that allows drivers to be written for it.
 pub trait DriverOps {
@@ -41,13 +43,19 @@ pub trait DriverOps {
     ///
     /// `reg` must point to valid writable memory, initialised by a previous successful call to
     /// [`DriverOps::register`].
-    unsafe fn unregister(reg: *mut Self::RegType);
+    fn unregister(reg: &mut Self::RegType);
 }
 
-/// The registration of a driver.
+/// A [`Registration`] is a generic type that represents the registration of some driver type (e.g.
+/// `bindings::pci_driver`). Therefore a [`Registration`] is initialized with some type that
+/// implements the [`DriverOps`] trait, such that the generic `T::register` and `T::unregister`
+/// calls result in the subsystem specific registration calls.
+///
+///Once the `Registration` structure is dropped, the driver is unregistered.
+#[pin_data(PinnedDrop)]
 pub struct DriverRegistration<T: DriverOps> {
-    is_registered: bool,
-    concrete_reg: UnsafeCell<T::RegType>,
+    #[pin]
+    reg: Opaque<T::RegType>,
 }
 
 // SAFETY: `Registration` has no fields or methods accessible via `&Registration`, so it is safe to
@@ -56,56 +64,33 @@ unsafe impl<T: DriverOps> Sync for DriverRegistration<T> {}
 
 impl<T: DriverOps> DriverRegistration<T> {
     /// Creates a new instance of the registration object.
-    pub fn new() -> Self {
-        Self {
-            is_registered: false,
-            concrete_reg: UnsafeCell::new(T::RegType::default()),
-        }
-    }
+    pub fn new(name: &'static CStr, module: &'static ThisModule) -> impl PinInit<Self, Error> {
+        let res = try_pin_init!(Self {
+            reg <- Opaque::try_ffi_init(|ptr: *mut T::RegType| unsafe{
+                // SAFETY: `try_ffi_init` guarantees that `ptr` is valid for write.
+                ptr.write(T::RegType::default()) ;
 
-    /// Allocates a pinned registration object and registers it.
-    ///
-    /// Returns a pinned heap-allocated representation of the registration.
-    pub fn new_pinned(name: &'static CStr, module: &'static ThisModule) -> Result<Pin<Box<Self>>> {
-        let mut reg = Pin::from(Box::try_new(Self::new())?);
-        reg.as_mut().register(name, module)?;
-        Ok(reg)
-    }
+                // SAFETY: `try_ffi_init` guarantees that `ptr` is valid for write, and it has
+                // just been initialised above, so it's also valid for read.
+                let drv = &mut *ptr ;
 
-    /// Registers a driver with its subsystem.
-    ///
-    /// It must be pinned because the memory block that represents the registration is potentially
-    /// self-referential.
-    pub fn register(
-        self: Pin<&mut Self>,
-        name: &'static CStr,
-        module: &'static ThisModule,
-    ) -> Result {
-        // SAFETY: We never move out of `this`.
-        let this = unsafe { self.get_unchecked_mut() };
-        if this.is_registered {
-            // Already registered.
-            return Err(EINVAL);
-        }
-
-        // SAFETY: `concrete_reg` was initialised via its default constructor. It is only freed
-        // after `Self::drop` is called, which first calls `T::unregister`.
-        unsafe { T::register(this.concrete_reg.get(), name, module) }?;
-
-        this.is_registered = true;
-        Ok(())
+                T::register(drv, name, module)
+            }),
+        }?Error);
+        res
     }
 }
 
-impl<T: DriverOps> Drop for DriverRegistration<T> {
-    fn drop(&mut self) {
-        if self.is_registered {
-            // SAFETY: This path only runs if a previous call to `T::register` completed
-            // successfully.
-            unsafe { T::unregister(self.concrete_reg.get()) };
-        }
+
+#[pinned_drop]
+impl<T: DriverOps> PinnedDrop for DriverRegistration<T> {
+    fn drop(self: Pin<&mut Self>) {
+        let drv = unsafe { &mut *self.reg.get() };
+
+        T::unregister(drv);
     }
 }
+
 
 /// Conversion from a device id to a raw device id.
 ///

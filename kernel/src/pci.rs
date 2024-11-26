@@ -6,18 +6,23 @@
 
 #![allow(dead_code)]
 
-use core::fmt;
+use core::{fmt, ops::Deref};
+
 
 use crate::{
-    bindings, device, driver,
+    bindings,
+    code::{EBUSY, EINVAL, ENOMEM},
+    container_of, device,
+    devres::Devres,
+    driver,
     error::{from_result, to_result, Error, KernelResult as Result},
     irq,
-    mm::io_mem::Resource,
+    kalloc::alloc_flags::GFP_KERNEL,
+    mm::io_mem::Io,
     str::CStr,
-    types::ForeignOwnable,
+    types::{ARef, ForeignOwnable},
     ThisModule,
 };
-
 /// An adapter for the registration of PCI drivers.
 pub struct PciAdapter<T: PciDriver>(T);
 
@@ -38,8 +43,10 @@ impl<T: PciDriver> driver::DriverOps for PciAdapter<T> {
         to_result(unsafe { bindings::__pci_register_driver(reg, module.0, name.as_char_ptr()) })
     }
 
-    unsafe fn unregister(reg: *mut bindings::pci_driver) {
-        unsafe { bindings::pci_unregister_driver(reg) }
+
+    fn unregister(pdrv: &mut Self::RegType) {
+        // SAFETY: `pdrv` is guaranteed to be a valid `RegType`.
+        unsafe { bindings::pci_unregister_driver(pdrv) }
     }
 }
 
@@ -49,7 +56,11 @@ impl<T: PciDriver> PciAdapter<T> {
         id: *const bindings::pci_device_id,
     ) -> core::ffi::c_int {
         from_result(|| {
-            let mut dev = unsafe { PciDevice::from_ptr(pdev) };
+            // SAFETY: Safe because the core kernel only ever calls the probe callback with a valid
+            // `pdev`.
+            let dev = unsafe { device::Device::from_raw(&mut (*pdev).dev) };
+            // SAFETY: Guaranteed by the rules described above.
+            let mut pdev = unsafe { PciDevice::from_dev(dev) };
 
             // SAFETY: `id` is a pointer within the static table, so it's always valid.
             let offset = unsafe { (*id).driver_data };
@@ -63,8 +74,8 @@ impl<T: PciDriver> PciAdapter<T> {
                 };
                 unsafe { (&*ptr).as_ref() }
             };
-            let data = T::probe(&mut dev, info)?;
-            unsafe { bindings::pci_set_drvdata(pdev, data.into_foreign() as _) };
+            let data = T::probe(&mut pdev, info)?;
+            unsafe { bindings::pci_set_drvdata(pdev.as_raw(), data.into_foreign() as _) };
             Ok(0)
         })
     }
@@ -73,7 +84,6 @@ impl<T: PciDriver> PciAdapter<T> {
         let ptr = unsafe { bindings::pci_get_drvdata(pdev) };
         let data = unsafe { T::Data::from_foreign(ptr) };
         T::remove(&data);
-        <T::Data as driver::DeviceRemoval>::device_remove(&data);
     }
 }
 
@@ -180,7 +190,6 @@ macro_rules! define_pci_id_table {
         };
     };
 }
-pub use define_pci_id_table;
 
 /// A PCI driver
 pub trait PciDriver {
@@ -193,7 +202,7 @@ pub trait PciDriver {
     /// never move the underlying wrapped data structure. This allows
     // TODO: Data Send + Sync ?
     //type Data: ForeignOwnable + Send + Sync + driver::DeviceRemoval = ();
-    type Data: ForeignOwnable + driver::DeviceRemoval = ();
+    type Data: ForeignOwnable;
 
     /// The type holding information about each device id supported by the driver.
     type IdInfo: 'static = ();
@@ -219,22 +228,129 @@ pub trait PciDriver {
 /// # Invariants
 ///
 /// The field `ptr` is non-null and valid for the lifetime of the object.
-pub struct PciDevice {
-    ptr: *mut bindings::pci_dev,
-    res_taken: u64,
+#[derive(Clone)]
+pub struct PciDevice(ARef<device::Device>);
+
+/// A PCI BAR to perform I/O-Operations on.
+///
+/// # Invariants
+///
+/// `Bar` always holds an `Io` inststance that holds a valid pointer to the start of the I/O memory
+/// mapped PCI bar and its size.
+pub struct Bar<const SIZE: usize = 0> {
+    pdev: PciDevice,
+    io: Io<SIZE>,
+    num: i32,
+}
+
+impl<const SIZE: usize> Bar<SIZE> {
+    fn new(pdev: PciDevice, num: u32, name: &CStr) -> Result<Self> {
+        let len = pdev.resource_len(num)?;
+        if len == 0 {
+            return Err(ENOMEM);
+        }
+
+        // Convert to `i32`, since that's what all the C bindings use.
+        let num = i32::try_from(num)?;
+
+        // SAFETY:
+        // `pdev` is valid by the invariants of `Device`.
+        // `num` is checked for validity by a previous call to `Device::resource_len`.
+        // `name` is always valid.
+        let ret = unsafe { bindings::pci_request_region(pdev.as_raw(), num, name.as_char_ptr()) };
+        if ret != 0 {
+            return Err(EBUSY);
+        }
+
+        // SAFETY:
+        // `pdev` is valid by the invariants of `Device`.
+        // `num` is checked for validity by a previous call to `Device::resource_len`.
+        // `name` is always valid.
+        let ioptr: usize = unsafe { bindings::pci_iomap(pdev.as_raw(), num, 0) } as usize;
+        if ioptr == 0 {
+            // SAFETY:
+            // `pdev` valid by the invariants of `Device`.
+            // `num` is checked for validity by a previous call to `Device::resource_len`.
+            unsafe { bindings::pci_release_region(pdev.as_raw(), num) };
+            return Err(ENOMEM);
+        }
+
+        // SAFETY: `ioptr` is guaranteed to be the start of a valid I/O mapped memory region of size
+        // `len`.
+        let io = match unsafe { Io::new(ioptr, len as usize) } {
+            Ok(io) => io,
+            Err(err) => {
+                // SAFETY:
+                // `pdev` is valid by the invariants of `Device`.
+                // `ioptr` is guaranteed to be the start of a valid I/O mapped memory region.
+                // `num` is checked for validity by a previous call to `Device::resource_len`.
+                unsafe { Self::do_release(&pdev, ioptr, num) };
+                return Err(err);
+            }
+        };
+
+        Ok(Bar { pdev, io, num })
+    }
+
+    // SAFETY: `ioptr` must be a valid pointer to the memory mapped PCI bar number `num`.
+    unsafe fn do_release(pdev: &PciDevice, ioptr: usize, num: i32) {
+        // SAFETY:
+        // `pdev` is valid by the invariants of `Device`.
+        // `ioptr` is valid by the safety requirements.
+        // `num` is valid by the safety requirements.
+        unsafe {
+            bindings::pci_iounmap(pdev.as_raw(), ioptr as _);
+            bindings::pci_release_region(pdev.as_raw(), num);
+        }
+    }
+
+    fn release(&self) {
+        // SAFETY: Safe by the invariants of `Device` and `Bar`.
+        unsafe { Self::do_release(&self.pdev, self.io.base_addr(), self.num) };
+    }
+}
+
+impl Bar {
+    fn index_is_valid(index: u32) -> bool {
+        // A `struct pci_dev` owns an array of resources with at most `PCI_NUM_RESOURCES` entries.
+        index < bindings::PCI_NUM_RESOURCES
+    }
+}
+
+impl<const SIZE: usize> Drop for Bar<SIZE> {
+    fn drop(&mut self) {
+        self.release();
+    }
+}
+
+impl<const SIZE: usize> Deref for Bar<SIZE> {
+    type Target = Io<SIZE>;
+
+    fn deref(&self) -> &Self::Target {
+        &self.io
+    }
 }
 
 impl PciDevice {
-    pub unsafe fn from_ptr(ptr: *mut bindings::pci_dev) -> Self {
-        Self { ptr, res_taken: 0 }
+    /// Create a PCI Device instance from an existing `device::Device`.
+    ///
+    /// # Safety
+    ///
+    /// `dev` must be an `ARef<device::Device>` whose underlying `bindings::device` is a member of
+    /// a `bindings::pci_dev`.
+    pub unsafe fn from_dev(dev: ARef<device::Device>) -> Self {
+        Self(dev)
     }
 
-    pub unsafe fn as_ptr(&self) -> *mut bindings::pci_dev {
-        self.ptr
+    pub fn as_raw(&self) -> *mut bindings::pci_dev {
+        // SAFETY: Guaranteed by the type invaraints.
+        container_of!(self.0.as_raw(), bindings::pci_dev, dev) as _
     }
 
+    /// Enable the Device's memory.
     pub fn enable_device_mem(&self) -> Result {
-        let ret = unsafe { bindings::pci_enable_device_mem(self.ptr) };
+        // SAFETY: Safe by the type invariants.
+        let ret = unsafe { bindings::pci_enable_device_mem(self.as_raw()) };
         if ret != 0 {
             Err(Error::from_errno(ret))
         } else {
@@ -242,50 +358,60 @@ impl PciDevice {
         }
     }
 
+    /// Set the Device's master.
     pub fn set_master(&self) {
-        unsafe { bindings::pci_set_master(self.ptr) };
+        // SAFETY: Safe by the type invariants.
+        unsafe { bindings::pci_set_master(self.as_raw()) };
     }
 
-    pub fn select_bars(&self, flags: core::ffi::c_ulong) -> i32 {
-        unsafe { bindings::pci_select_bars(self.ptr, flags) }
-    }
-
-    pub fn request_selected_regions(&self, bars: i32, name: &'static CStr) -> Result {
-        let ret =
-            unsafe { bindings::pci_request_selected_regions(self.ptr, bars, name.as_char_ptr()) };
-        if ret != 0 {
-            Err(Error::from_errno(ret))
-        } else {
-            Ok(())
-        }
-    }
-
-    pub fn take_resource(&mut self, index: usize) -> Option<Resource> {
-        let pdev = unsafe { &*self.ptr };
-
-        // Fail if the index is beyond the end or if it has already been taken.
-        if index >= pdev.resource.len() || self.res_taken & (1 << index) != 0 {
-            return None;
+    /// Returns the size of the given PCI bar resource.
+    pub fn resource_len(&self, bar: u32) -> Result<bindings::resource_size_t> {
+        if !Bar::index_is_valid(bar) {
+            return Err(EINVAL);
         }
 
-        self.res_taken |= 1 << index;
-        Resource::new(pdev.resource[index].start, pdev.resource[index].end)
+        // SAFETY: Safe by the type invariant.
+        Ok(unsafe { bindings::pci_resource_len(self.as_raw(), bar.try_into()?) })
     }
 
+    /// Mapps an entire PCI-BAR after performing a region-request on it. I/O operation bound checks
+    /// can be performed on compile time for offsets (plus the requested type size) < SIZE.
+    pub fn iomap_region_sized<const SIZE: usize>(
+        &self,
+        bar: u32,
+        name: &CStr,
+    ) -> Result<Devres<Bar<SIZE>>> {
+        let bar = Bar::<SIZE>::new(self.clone(), bar, name)?;
+        let devres = Devres::new(self.as_ref(), bar, GFP_KERNEL)?;
+
+        Ok(devres)
+    }
+
+    /// Mapps an entire PCI-BAR after performing a region-request on it.
+    pub fn iomap_region(&self, bar: u32, name: &CStr) -> Result<Devres<Bar>> {
+        self.iomap_region_sized::<0>(bar, name)
+    }
+
+    /// Returns a new `ARef` of the base `device::Device`.
+    pub fn as_dev(&self) -> ARef<device::Device> {
+        self.0.clone()
+    }
+
+    // TODO: check that all these &self methods use internal synchronization
     pub fn irq(&self) -> Option<u32> {
-        let pdev = unsafe { &*self.ptr };
-
-        if pdev.irq == 0 {
+        let pdev = self.as_raw();
+        let irq = unsafe { (*pdev).irq };
+        if irq == 0 {
             None
         } else {
-            Some(pdev.irq)
+            Some(irq)
         }
     }
 
-    pub fn alloc_irq_vectors(&mut self, min_vecs: u32, max_vecs: u32, flags: u32) -> Result<u32> {
+    pub fn alloc_irq_vectors(&self, min_vecs: u32, max_vecs: u32, flags: u32) -> Result<u32> {
         let ret = unsafe {
             bindings::pci_alloc_irq_vectors_affinity(
-                self.ptr,
+                self.as_raw(),
                 min_vecs,
                 max_vecs,
                 flags,
@@ -300,7 +426,7 @@ impl PciDevice {
     }
 
     pub fn alloc_irq_vectors_affinity(
-        &mut self,
+        &self,
         min_vecs: u32,
         max_vecs: u32,
         pre: u32,
@@ -315,7 +441,7 @@ impl PciDevice {
 
         let ret = unsafe {
             bindings::pci_alloc_irq_vectors_affinity(
-                self.ptr,
+                self.as_raw(),
                 min_vecs,
                 max_vecs,
                 flags | bindings::PCI_IRQ_AFFINITY,
@@ -329,8 +455,8 @@ impl PciDevice {
         }
     }
 
-    pub fn free_irq_vectors(&mut self) {
-        unsafe { bindings::pci_free_irq_vectors(self.ptr) };
+    pub fn free_irq_vectors(&self) {
+        unsafe { bindings::pci_free_irq_vectors(self.as_raw()) };
     }
 
     pub fn request_irq<T: irq::IRQHandler>(
@@ -339,7 +465,7 @@ impl PciDevice {
         data: T::Data,
         name_args: fmt::Arguments<'_>,
     ) -> Result<irq::Registration<T>> {
-        let ret = unsafe { bindings::pci_irq_vector(self.ptr, index) };
+        let ret = unsafe { bindings::pci_irq_vector(self.as_raw(), index) };
         if ret < 0 {
             return Err(Error::from_errno(ret));
         }
@@ -349,9 +475,8 @@ impl PciDevice {
     }
 }
 
-unsafe impl device::RawDevice for PciDevice {
-    fn raw_device(&self) -> *mut bindings::device {
-        // SAFETY: By the type invariants, we know that `self.ptr` is non-null and valid.
-        unsafe { &mut (*self.ptr).dev }
+impl AsRef<device::Device> for PciDevice {
+    fn as_ref(&self) -> &device::Device {
+        &self.0
     }
 }

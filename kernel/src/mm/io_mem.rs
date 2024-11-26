@@ -4,232 +4,182 @@
 //!
 //! C header: [`include/asm-generic/io.h`](../../../../include/asm-generic/io.h)
 
-#![allow(dead_code)]
-
-use core::convert::TryInto;
 
 use crate::{
-    bindings,
+    bindings, build_assert,
     error::{linux_err::*, KernelResult as Result},
 };
 
-/// Represents a memory resource.
-pub struct Resource {
-    offset: bindings::resource_size_t,
-    size: bindings::resource_size_t,
-}
 
-impl Resource {
-    pub(crate) fn new(
-        start: bindings::resource_size_t,
-        end: bindings::resource_size_t,
-    ) -> Option<Self> {
-        if start == 0 {
-            return None;
-        }
-        Some(Self {
-            offset: start,
-            size: end.checked_sub(start)?.checked_add(1)?,
-        })
-    }
-}
-
-/// Represents a memory block of at least `SIZE` bytes.
+/// IO-mapped memory, starting at the base address @addr and spanning @maxlen bytes.
 ///
-/// # Invariants
+/// The creator (usually a subsystem such as PCI) is responsible for creating the
+/// mapping, performing an additional region request etc.
 ///
-/// `ptr` is a non-null and valid address of a memory area of a length of at
-/// least `SIZE` bytes. It is returned by an `ioremap` variant. `ptr` is also
-/// 8-byte aligned.
+/// # Invariant
+///
+/// `addr` is the start and `maxsize` the length of valid I/O remapped memory region.
 ///
 /// # Examples
 ///
 /// ```
-/// use kernel::mm::io_mem::{IoMem, Resource};
-/// use kernel::error::KernelResult as Result;
-/// fn test(res: Resource) -> Result {
-///     // Create an io mem block of at least 100 bytes.
-///     // SAFETY: No DMA operations are initiated through `mem`.
-///     let mem = unsafe { IoMem::<100>::try_new(res) }?;
+/// # use kernel::{bindings, mm::io_mem::Io, error::KernelResult as Result };
+/// # use core::ops::Deref;
 ///
-///     // Read one byte from offset 10.
-///     let v = mem.readb(10);
+/// use kernel::code::ENOMEM;
 ///
-///     // Write value to offset 20.
-///     mem.writeb(v, 20);
+/// // See also [`pci::Bar`] for a real example.
+/// struct IoMem<const SIZE: usize>(Io<SIZE>);
 ///
-///     Ok(())
+/// impl<const SIZE: usize> IoMem<SIZE> {
+///     fn new(paddr: usize) -> Result<Self>{
+///
+///         // SAFETY: assert safety for this example
+///         let addr = unsafe { bindings::ioremap(paddr as _, SIZE.try_into().unwrap()) };
+///         if addr.is_null() {
+///             return Err(ENOMEM);
+///         }
+///
+///         // SAFETY: `addr` is guaranteed to be the start of a valid I/O mapped memory region of
+///         // size `SIZE`.
+///         let io = unsafe { Io::new(addr as _, SIZE)? };
+///
+///         Ok(IoMem(io))
+///     }
 /// }
+///
+/// impl<const SIZE: usize> Drop for IoMem<SIZE> {
+///     fn drop(&mut self) {
+///         // SAFETY: Safe as by the invariant of `Io`.
+///         unsafe { bindings::iounmap(self.0.base_addr() as _); };
+///     }
+/// }
+///
+/// impl<const SIZE: usize> Deref for IoMem<SIZE> {
+///    type Target = Io<SIZE>;
+///
+///    fn deref(&self) -> &Self::Target {
+///        &self.0
+///    }
+/// }
+///
+/// let iomem = IoMem::<{ core::mem::size_of::<u32>() }>::new(0xBAAAAAAD).unwrap();
+/// iomem.writel(0x42, 0x0);
+/// assert!(iomem.try_writel(0x42, 0x0).is_ok());
+/// assert!(iomem.try_writel(0x42, 0x4).is_err());
 /// ```
-pub struct IoMem<const SIZE: usize> {
-    ptr: usize,
+pub struct Io<const SIZE: usize = 0> {
+    addr: usize,
+    maxsize: usize,
 }
 
 macro_rules! define_read {
     ($(#[$attr:meta])* $name:ident, $try_name:ident, $type_name:ty) => {
-        /// Reads IO data from the given offset known, at compile time.
+        /// Read IO data from a given offset known at compile time.
         ///
-        /// If the offset is not known at compile time, the build will fail.
+        /// Bound checks are performed on compile time, hence if the offset is not known at compile
+        /// time, the build will fail.
         $(#[$attr])*
         #[inline]
         pub fn $name(&self, offset: usize) -> $type_name {
-            Self::check_offset::<$type_name>(offset);
-            let ptr = self.ptr.wrapping_add(offset);
-            // SAFETY: The type invariants guarantee that `ptr` is a valid pointer. The check above
-            // guarantees that the code won't build if `offset` makes the read go out of bounds
-            // (including the type size).
-            unsafe { bindings::$name(ptr as _) }
+            let addr = self.io_addr_assert::<$type_name>(offset);
+
+            unsafe { bindings::$name(addr as _) }
         }
 
-        /// Reads IO data from the given offset.
+        /// Read IO data from a given offset.
         ///
-        /// It fails if/when the offset (plus the type size) is out of bounds.
+        /// Bound checks are performed on runtime, it fails if the offset (plus the type size) is
+        /// out of bounds.
         $(#[$attr])*
         pub fn $try_name(&self, offset: usize) -> Result<$type_name> {
-            if !Self::offset_ok::<$type_name>(offset) {
-                return Err(EINVAL);
-            }
-            let ptr = self.ptr.wrapping_add(offset);
-            // SAFETY: The type invariants guarantee that `ptr` is a valid pointer. The check above
-            // returns an error if `offset` would make the read go out of bounds (including the
-            // type size).
-            Ok(unsafe { bindings::$name(ptr as _) })
+            let addr = self.io_addr::<$type_name>(offset)?;
+
+            Ok(unsafe { bindings::$name(addr as _) })
         }
     };
 }
 
 macro_rules! define_write {
     ($(#[$attr:meta])* $name:ident, $try_name:ident, $type_name:ty) => {
-        /// Writes IO data to the given offset, known at compile time.
+        /// Write IO data from a given offset known at compile time.
         ///
-        /// If the offset is not known at compile time, the build will fail.
+        /// Bound checks are performed on compile time, hence if the offset is not known at compile
+        /// time, the build will fail.
         $(#[$attr])*
         #[inline]
         pub fn $name(&self, value: $type_name, offset: usize) {
-            Self::check_offset::<$type_name>(offset);
-            let ptr = self.ptr.wrapping_add(offset);
-            // SAFETY: The type invariants guarantee that `ptr` is a valid pointer. The check above
-            // guarantees that the code won't link if `offset` makes the write go out of bounds
-            // (including the type size).
-            unsafe { bindings::$name(value, ptr as _) }
+            let addr = self.io_addr_assert::<$type_name>(offset);
+
+            unsafe { bindings::$name(value, addr as _, ) }
         }
 
-        /// Writes IO data to the given offset.
+        /// Write IO data from a given offset.
         ///
-        /// It fails if/when the offset (plus the type size) is out of bounds.
+        /// Bound checks are performed on runtime, it fails if the offset (plus the type size) is
+        /// out of bounds.
         $(#[$attr])*
         pub fn $try_name(&self, value: $type_name, offset: usize) -> Result {
-            if !Self::offset_ok::<$type_name>(offset) {
-                return Err(EINVAL);
-            }
-            let ptr = self.ptr.wrapping_add(offset);
-            // SAFETY: The type invariants guarantee that `ptr` is a valid pointer. The check above
-            // returns an error if `offset` would make the write go out of bounds (including the
-            // type size).
-            unsafe { bindings::$name(value, ptr as _) };
+            let addr = self.io_addr::<$type_name>(offset)?;
+
+            unsafe { bindings::$name(value, addr as _) }
             Ok(())
         }
     };
 }
 
-impl<const SIZE: usize> IoMem<SIZE> {
-    /// Tries to create a new instance of a memory block.
+impl<const SIZE: usize> Io<SIZE> {
     ///
-    /// The resource described by `res` is mapped into the CPU's address space so that it can be
-    /// accessed directly. It is also consumed by this function so that it can't be mapped again
-    /// to a different address.
     ///
     /// # Safety
     ///
-    /// Callers must ensure that either (a) the resulting interface cannot be used to initiate DMA
-    /// operations, or (b) that DMA operations initiated via the returned interface use DMA handles
-    /// allocated through the `dma` module.
-    pub unsafe fn try_new(res: Resource) -> Result<Self> {
-        // Check that the resource has at least `SIZE` bytes in it.
-        if res.size < SIZE.try_into()? {
+    /// Callers must ensure that `addr` is the start of a valid I/O mapped memory region of size
+    /// `maxsize`.
+    pub unsafe fn new(addr: usize, maxsize: usize) -> Result<Self> {
+        if maxsize < SIZE {
             return Err(EINVAL);
         }
 
-        // To be able to check pointers at compile time based only on offsets, we need to guarantee
-        // that the base pointer is minimally aligned. So we conservatively expect at least 8 bytes.
-        if res.offset % 8 != 0 {
-            crate::pr_err!("Physical address is not 64-bit aligned: {:x}", res.offset);
-            return Err(EDOM);
-        }
+        Ok(Self { addr, maxsize })
+    }
 
-        // Try to map the resource.
-        // SAFETY: Just mapping the memory range.
-        let addr = unsafe { bindings::ioremap(res.offset, res.size as _) };
-        if addr.is_null() {
-            Err(ENOMEM)
-        } else {
-            // INVARIANT: `addr` is non-null and was returned by `ioremap`, so it is valid. It is
-            // also 8-byte aligned because we checked it above.
-            Ok(Self { ptr: addr as usize })
-        }
+    /// Returns the base address of this mapping.
+    #[inline]
+    pub fn base_addr(&self) -> usize {
+        self.addr
+    }
+
+    /// Returns the size of this mapping.
+    #[inline]
+    pub fn maxsize(&self) -> usize {
+        self.maxsize
     }
 
     #[inline]
-    const fn offset_ok<T>(offset: usize) -> bool {
-        let type_size = core::mem::size_of::<T>();
+    const fn offset_valid<U>(offset: usize, size: usize) -> bool {
+        let type_size = core::mem::size_of::<U>();
         if let Some(end) = offset.checked_add(type_size) {
-            end <= SIZE && offset % type_size == 0
-        } else {
-            false
-        }
-    }
-
-    fn offset_ok_of_val<T: ?Sized>(offset: usize, value: &T) -> bool {
-        let value_size = core::mem::size_of_val(value);
-        let value_alignment = core::mem::align_of_val(value);
-        if let Some(end) = offset.checked_add(value_size) {
-            end <= SIZE && offset % value_alignment == 0
+            end <= size && offset % type_size == 0
         } else {
             false
         }
     }
 
     #[inline]
-    const fn check_offset<T>(offset: usize) {
-        crate::build_assert!(Self::offset_ok::<T>(offset), "IoMem offset overflow");
-    }
-
-    /// Copy memory block from an i/o memory by filling the specified buffer with it.
-    ///
-    /// # Examples
-    /// ```
-    /// use kernel::mm::io_mem::{self, IoMem, Resource};
-    /// use kernel::error::KernelResult as Result;
-    /// fn test(res: Resource) -> Result {
-    ///     // Create an i/o memory block of at least 100 bytes.
-    ///     let mem = unsafe { IoMem::<100>::try_new(res) }?;
-    ///
-    ///     let mut buffer: [u8; 32] = [0; 32];
-    ///
-    ///     // Memcpy 16 bytes from an offset 10 of i/o memory block into the buffer.
-    ///     mem.try_memcpy_fromio(&mut buffer[..16], 10)?;
-    ///
-    ///     Ok(())
-    /// }
-    /// ```
-    pub fn try_memcpy_fromio(&self, buffer: &mut [u8], offset: usize) -> Result {
-        if !Self::offset_ok_of_val(offset, buffer) {
+    fn io_addr<U>(&self, offset: usize) -> Result<usize> {
+        if !Self::offset_valid::<U>(offset, self.maxsize()) {
             return Err(EINVAL);
         }
 
-        let ptr = self.ptr.wrapping_add(offset);
+        // Probably no need to check, since the safety requirements of `Self::new` guarantee that
+        // this can't overflow.
+        self.base_addr().checked_add(offset).ok_or(EINVAL)
+    }
 
-        // SAFETY:
-        //   - The type invariants guarantee that `ptr` is a valid pointer.
-        //   - The bounds of `buffer` are checked with a call to `offset_ok_of_val()`.
-        unsafe {
-            bindings::memcpy_fromio(
-                buffer.as_mut_ptr() as *mut _,
-                ptr as *const _,
-                buffer.len() as _,
-            )
-        };
-        Ok(())
+    #[inline]
+    fn io_addr_assert<U>(&self, offset: usize) -> usize {
+        build_assert!(Self::offset_valid::<U>(offset, SIZE));
+        self.base_addr() + offset
     }
 
     define_read!(readb, try_readb, u8);
@@ -251,12 +201,4 @@ impl<const SIZE: usize> IoMem<SIZE> {
     define_write!(writew_relaxed, try_writew_relaxed, u16);
     define_write!(writel_relaxed, try_writel_relaxed, u32);
     define_write!(writeq_relaxed, try_writeq_relaxed, u64);
-}
-
-impl<const SIZE: usize> Drop for IoMem<SIZE> {
-    fn drop(&mut self) {
-        // SAFETY: By the type invariant, `self.ptr` is a value returned by a previous successful
-        // call to `ioremap`.
-        unsafe { bindings::iounmap(self.ptr as _) };
-    }
 }

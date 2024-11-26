@@ -113,7 +113,10 @@ void *rust_helper_kmap(struct page *page){ return kmap(page); }
 void rust_helper_kunmap(struct page *page){ return kunmap(page); }
 void *rust_helper_kmap_atomic(struct page *page){ return kmap_atomic(page); }
 void rust_helper_kunmap_atomic(void *address){ kunmap_atomic(address); }
-
+void *rust_helper_kmap_local_page(struct page *page)
+{
+    return kmap_local_page(page);
+}
 
 // block device
 void rust_helper_bio_advance_iter_single(const struct bio *bio,
@@ -240,5 +243,27 @@ const char *rust_helper_dev_name(const struct device *dev) { return dev_name(dev
 void rust_helper_pci_set_drvdata(struct pci_dev *pdev, void *data) { pci_set_drvdata(pdev, data); }
 void *rust_helper_pci_get_drvdata(struct pci_dev *pdev) { return pci_get_drvdata(pdev); }
 
+
+u64 rust_helper_pci_resource_len(struct pci_dev *pdev, int barnr)
+{
+    return pci_resource_len(pdev, barnr);
+}
+int rust_helper_devm_add_action(struct device *dev, void (*action)(void *), void *data)
+{
+    return devm_add_action(dev, action, data);
+}
+
 void rust_helper_mdelay(uint64_t ms) { mdelay(ms); }
 unsigned int rust_helper_num_possible_cpus(void) { return  num_possible_cpus(); }
+
+
+// xarray
+void rust_helper_xa_init_flags(struct xarray *xa, gfp_t flags) { xa_init_flags(xa, flags); }
+bool rust_helper_xa_empty(struct xarray *xa) { return xa_empty(xa); }
+int rust_helper_xa_alloc(struct xarray *xa, u32 *id, void *entry,
+                         struct xa_limit limit, gfp_t gfp) {
+    return xa_alloc(xa, id, entry, limit, gfp); }
+void rust_helper_xa_lock(struct xarray *xa) { xa_lock(xa); }
+void rust_helper_xa_unlock(struct xarray *xa) { xa_unlock(xa); }
+int rust_helper_xa_err(void *entry) { return xa_err(entry); }
+

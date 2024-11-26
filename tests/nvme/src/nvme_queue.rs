@@ -10,7 +10,7 @@ use kernel::{
 };
 use pinned_init::*;
 
-use crate::{DeviceData, NvmeCommand, NvmeCompletion, NvmeRequest};
+use crate::{NvmeCommand, NvmeCompletion, NvmeData, NvmeRequest};
 struct NvmeQueueInner<T: mq::Operations<RequestData = NvmeRequest> + 'static> {
     sq_tail: u16,
     last_sq_tail: u16,
@@ -19,7 +19,7 @@ struct NvmeQueueInner<T: mq::Operations<RequestData = NvmeRequest> + 'static> {
 
 #[pin_data]
 pub(crate) struct NvmeQueue<T: mq::Operations<RequestData = NvmeRequest> + 'static> {
-    pub(crate) data: Arc<DeviceData>,
+    pub(crate) data: Arc<NvmeData>,
     pub(crate) db_offset: usize,
     pub(crate) sdb_index: usize,
     pub(crate) qid: u16,
@@ -44,7 +44,7 @@ where
     T: mq::Operations<RequestData = NvmeRequest>,
 {
     pub(crate) fn try_new(
-        data: Arc<DeviceData>,
+        data: Arc<NvmeData>,
         dev: &pci::PciDevice,
         qid: u16,
         depth: u16,
@@ -52,8 +52,8 @@ where
         tagset: Arc<mq::TagSet<T>>,
         polled: bool,
     ) -> Result<Arc<Self>> {
-        let cq = dma::try_alloc_coherent::<NvmeCompletion>(dev, depth.into(), false)?;
-        let sq = dma::try_alloc_coherent(dev, depth.into(), false)?;
+        let cq = dma::try_alloc_coherent::<NvmeCompletion>(dev.as_dev(), depth.into(), false)?;
+        let sq = dma::try_alloc_coherent(dev.as_dev(), depth.into(), false)?;
 
         // Zero out all completions. This is necessary so that we can check the phase.
         for i in 0..depth {
@@ -110,6 +110,8 @@ where
                 phase ^= 1;
             }
 
+            let tag = cqe.command_id;
+            //pr_info!("Completing tag: {}\n", tag);
             if let Some(rq) = self
                 .tagset
                 .tag_to_rq(self.qid.saturating_sub(1).into(), cqe.command_id.into())
@@ -117,7 +119,7 @@ where
                 let pdu = rq.data_ref();
                 pdu.result.store(cqe.result.into(), Ordering::Relaxed);
                 pdu.status.store(cqe.status.into() >> 1, Ordering::Relaxed);
-                rq.complete();
+                mq::Request::complete(rq);
             } else {
                 let command_id = cqe.command_id;
                 pr_warn!("invalid id completed: {}", command_id);
@@ -129,10 +131,8 @@ where
         }
 
         if self.dbbuf_update_and_check_event(head.into(), self.data.db_stride / 4) {
-            if let Some(res) = self.data.resources() {
-                let _ = res
-                    .bar
-                    .try_writel(head.into(), self.db_offset + self.data.db_stride);
+            if let Some(bar) = self.data.bar.try_access() {
+                let _ = bar.try_writel(head.into(), self.db_offset + self.data.db_stride);
             }
         }
 
@@ -194,8 +194,8 @@ where
         }
 
         if self.dbbuf_update_and_check_event(inner.sq_tail, 0) {
-            if let Some(res) = self.data.resources() {
-                let _ = res.bar.try_writel(inner.sq_tail.into(), self.db_offset);
+            if let Some(bar) = self.data.bar.try_access() {
+                let _ = bar.try_writel(inner.sq_tail.into(), self.db_offset);
             }
         }
         inner.last_sq_tail = inner.sq_tail;

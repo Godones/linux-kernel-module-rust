@@ -6,6 +6,7 @@
 //!
 //! TODO
 
+use alloc::sync::Arc;
 use core::{marker::PhantomData, pin::Pin};
 
 use crate::{
@@ -51,7 +52,12 @@ impl<T: TimerCallback> Timer<T> {
         })
     }
 }
+// SAFETY: A `Timer` can be moved to other threads and used from there.
+unsafe impl<T> Send for Timer<T> {}
 
+// SAFETY: Timer operations are locked on C side, so it is safe to operate on a
+// timer from multiple threads
+unsafe impl<T> Sync for Timer<T> {}
 #[pinned_drop]
 impl<T> PinnedDrop for Timer<T> {
     fn drop(self: Pin<&mut Self>) {
@@ -64,7 +70,7 @@ impl<T> PinnedDrop for Timer<T> {
 }
 
 /// Implemented by structs that can use a closure to encueue itself with the timer subsystem
-pub unsafe trait RawTimer {
+pub trait RawTimer: Sync {
     /// Schedule the timer after `expires` time units
     fn schedule(self, expires: u64);
 }
@@ -74,60 +80,69 @@ pub unsafe trait HasTimer<T> {
     /// Offset of the [`Timer`] field within `Self`
     const OFFSET: usize;
 
-    /// Returns offset of the [`Timer`] struct within `Self`.
+    /// Return a pointer to the [`Timer`] within `Self`.
     ///
-    /// Required because [`OFFSET`] cannot be accessed when `Self` is `!Sized`.
-    fn get_timer_offset(&self) -> usize {
-        Self::OFFSET
+    /// # Safety
+    ///
+    /// `ptr` must point to a valid struct of type `Self`.
+    unsafe fn raw_get_timer(ptr: *const Self) -> *const Timer<T> {
+        // SAFETY: By the safety requirement of this trait, the trait
+        // implementor will have a `Timer` field at the specified offset.
+        unsafe { ptr.cast::<u8>().add(Self::OFFSET).cast::<Timer<T>>() }
     }
 
-    /// Return a pointer to the [`Timer`] within `Self`
-    unsafe fn raw_get_timer(ptr: *mut Self) -> *mut Timer<T> {
-        unsafe { (ptr as *mut u8).add(Self::OFFSET) as *mut Timer<T> }
-    }
-
+    /// Return a pointer to the struct that is embedding the [`Timer`] pointed
+    /// to by `ptr`.
+    ///
+    /// # Safety
+    ///
+    /// `ptr` must point to a [`Timer<T>`] field in a struct of type `Self`.
     unsafe fn timer_container_of(ptr: *mut Timer<T>) -> *mut Self
     where
         Self: Sized,
     {
-        unsafe { (ptr as *mut u8).sub(Self::OFFSET) as *mut Self }
+        // SAFETY: By the safety requirement of this trait, the trait
+        // implementor will have a `Timer` field at the specified offset.
+        unsafe { ptr.cast::<u8>().sub(Self::OFFSET).cast::<Self>() }
     }
 }
 
 /// Implemented by structs that can be the target of a C timer callback
-pub unsafe trait RawTimerCallback: RawTimer {
+pub trait RawTimerCallback: RawTimer {
     unsafe extern "C" fn run(ptr: *mut bindings::hrtimer) -> bindings::hrtimer_restart;
 }
 
-/// Implemented by structs that can the target of a timer callback
+/// Implemented by pointers to structs that can the target of a timer callback
 pub trait TimerCallback {
-    type Receiver<'a>: RawTimerCallback;
+    /// Type of `this` argument for `run()`.
+    type Receiver: RawTimerCallback;
 
-    fn run<'a>(this: Self::Receiver<'a>);
+    /// Called by the timer logic when the timer fires
+    fn run(this: Self::Receiver);
 }
 
-unsafe impl<T> RawTimer for Pin<&mut T>
+impl<T> RawTimer for Arc<T>
 where
-    //T: TimerCallback,
+    T: Send + Sync,
     T: HasTimer<T>,
 {
     fn schedule(self, expires: u64) {
-        // Remove pin
-        let unpinned = unsafe { Pin::into_inner_unchecked(self) };
+        let self_ptr = Arc::into_raw(self);
 
-        // Cast to raw pointer
-        let self_ptr = unpinned as *mut T;
-
-        // Get a pointer to the timer struct
+        // SAFETY: `self_ptr` is a valid pointer to a `T`
         let timer_ptr = unsafe { T::raw_get_timer(self_ptr) };
 
         // `Timer` is `repr(transparent)`
-        let c_timer_ptr = timer_ptr as *mut bindings::hrtimer;
+        let c_timer_ptr = timer_ptr.cast::<bindings::hrtimer>();
 
-        // Schedule the timer - if it is already scheduled it is removed and inserted
+        // Schedule the timer - if it is already scheduled it is removed and
+        // inserted
+
+        // SAFETY: c_timer_ptr points to a valid hrtimer instance that was
+        // initialized by `hrtimer_init`
         unsafe {
             bindings::hrtimer_start_range_ns(
-                c_timer_ptr,
+                c_timer_ptr.cast_mut(),
                 expires as i64,
                 0,
                 bindings::hrtimer_mode_HRTIMER_MODE_REL,
@@ -136,27 +151,34 @@ where
     }
 }
 
-unsafe impl<'a, T> RawTimerCallback for Pin<&'a mut T>
+impl<T> RawTimerCallback for Arc<T>
 where
+    T: Send + Sync,
     T: HasTimer<T>,
-    T: TimerCallback<Receiver<'a> = Self> + 'a,
+    T: TimerCallback<Receiver = Self>,
 {
     unsafe extern "C" fn run(ptr: *mut bindings::hrtimer) -> bindings::hrtimer_restart {
         // `Timer` is `repr(transparent)`
-        let timer_ptr = ptr as *mut Timer<T>;
+        let timer_ptr = ptr.cast::<Timer<T>>();
 
-        let receiver_ptr = unsafe { T::timer_container_of(timer_ptr) };
+        // SAFETY: By C API contract `ptr` is the pointer we passed when
+        // enqueing the timer, so it is a `Timer<T>` embedded in a `T`
+        let data_ptr = unsafe { T::timer_container_of(timer_ptr) };
 
-        let receiver_ref = unsafe { &mut *receiver_ptr };
+        // SAFETY: This `Arc` comes from a call to `Arc::into_raw()`
+        let receiver = unsafe { Arc::from_raw(data_ptr) };
 
-        let receiver_pin = unsafe { Pin::new_unchecked(receiver_ref) };
-
-        T::run(receiver_pin);
+        T::run(receiver);
 
         bindings::hrtimer_restart_HRTIMER_NORESTART
     }
 }
 
+/// Use to implement the [`HasTimer<T>`] trait.
+///
+/// See [`module`] documentation for an example.
+///
+/// [`module`]: crate::hrtimer
 #[macro_export]
 macro_rules! impl_has_timer {
     ($(impl$(<$($implarg:ident),*>)?
@@ -170,12 +192,13 @@ macro_rules! impl_has_timer {
             const OFFSET: usize = ::core::mem::offset_of!(Self, $field) as usize;
 
             #[inline]
-            unsafe fn raw_get_timer(ptr: *mut Self) -> *mut $crate::time::hrtimer::Timer<$timer_type $(, $id)?> {
+            unsafe fn raw_get_timer(ptr: *const Self) -> *const $crate::time::hrtimer::Timer<$timer_type $(, $id)?> {
                 // SAFETY: The caller promises that the pointer is not dangling.
                 unsafe {
-                    ::core::ptr::addr_of_mut!((*ptr).$field)
+                    ::core::ptr::addr_of!((*ptr).$field)
                 }
             }
+
         }
     )*};
 }

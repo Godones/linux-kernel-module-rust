@@ -259,7 +259,13 @@ mod shim {
         ) -> core::ffi::c_int {
             let driver_data = unsafe { HctxDataShim::from_raw((*hctx).driver_data) };
             let domain = driver_data.domain();
-            let res = domain.poll_queues(SafePtr::new(hctx as _), SafePtr::new(iob as _), IO);
+            let hctx_driver_data_ptr = driver_data.original_hcxt_data;
+            let res = domain.poll_queues(
+                SafePtr::new(hctx as _),
+                SafePtr::new(iob as _),
+                SafePtr::new(hctx_driver_data_ptr as _),
+                IO,
+            );
             res.unwrap_or_else(|e| e as i32)
         }
 

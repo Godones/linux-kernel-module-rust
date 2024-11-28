@@ -221,11 +221,25 @@ impl BlkMqOp for NvmeDomain {
         })
     }
 
-    fn poll_queues(&self, hctx_ptr: SafePtr, iob_ptr: SafePtr, io_queue: bool) -> LinuxResult<i32> {
+    fn poll_queues(
+        &self,
+        hctx_ptr: SafePtr,
+        iob_ptr: SafePtr,
+        hctx_driver_data_ptr: SafePtr,
+        io_queue: bool,
+    ) -> LinuxResult<i32> {
         let res = if io_queue {
-            OperationsConverter::<IoQueueOperations>::poll_queues(hctx_ptr, iob_ptr)
+            OperationsConverter::<IoQueueOperations>::poll_queues(
+                hctx_ptr,
+                iob_ptr,
+                hctx_driver_data_ptr,
+            )
         } else {
-            OperationsConverter::<AdminQueueOperations>::poll_queues(hctx_ptr, iob_ptr)
+            OperationsConverter::<AdminQueueOperations>::poll_queues(
+                hctx_ptr,
+                iob_ptr,
+                hctx_driver_data_ptr,
+            )
         };
         res.map_err(|e| {
             println!("NullBlkModule poll_queues error: {:?}", e);
@@ -373,8 +387,17 @@ impl BlkMqOp for UnwindWrap {
         basic::catch_unwind(|| self.0.map_queues(tag_set_ptr, driver_data_ptr, io_queue))
     }
 
-    fn poll_queues(&self, hctx_ptr: SafePtr, iob_ptr: SafePtr, io_queue: bool) -> LinuxResult<i32> {
-        basic::catch_unwind(|| self.0.poll_queues(hctx_ptr, iob_ptr, io_queue))
+    fn poll_queues(
+        &self,
+        hctx_ptr: SafePtr,
+        iob_ptr: SafePtr,
+        hctx_driver_data_ptr: SafePtr,
+        io_queue: bool,
+    ) -> LinuxResult<i32> {
+        basic::catch_unwind(|| {
+            self.0
+                .poll_queues(hctx_ptr, iob_ptr, hctx_driver_data_ptr, io_queue)
+        })
     }
 }
 

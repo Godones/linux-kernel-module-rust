@@ -56,7 +56,13 @@ pub trait BlkMqOp: DowncastSync {
         driver_data_ptr: SafePtr,
         io_queue: bool,
     ) -> LinuxResult<()>;
-    fn poll_queues(&self, hctx_ptr: SafePtr, iob_ptr: SafePtr, io_queue: bool) -> LinuxResult<i32>;
+    fn poll_queues(
+        &self,
+        hctx_ptr: SafePtr,
+        iob_ptr: SafePtr,
+        hctx_driver_data_ptr: SafePtr,
+        io_queue: bool,
+    ) -> LinuxResult<i32>;
 }
 
 pub trait NvmeBlockDeviceDomain:

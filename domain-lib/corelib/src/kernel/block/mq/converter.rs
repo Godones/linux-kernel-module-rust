@@ -133,13 +133,16 @@ impl<T: MqOperations> OperationsConverter<T> {
     }
 
     unsafe fn poll_callback(
-        hctx: *mut bindings::blk_mq_hw_ctx,
+        _hctx: *mut bindings::blk_mq_hw_ctx,
         _iob: *mut bindings::io_comp_batch,
+        driver_data: *mut core::ffi::c_void,
     ) -> core::ffi::c_int {
         // SAFETY: By function safety requirement, `hctx` was initialized by
         // `init_hctx_callback` and thus `driver_data` came from a call to
         // `into_foreign`.
-        let hw_data = unsafe { T::HwData::borrow((*hctx).driver_data) };
+        // let hw_data = unsafe { T::HwData::borrow((*hctx).driver_data) };
+        let hw_data = unsafe { T::HwData::borrow(driver_data) };
+
         T::poll(hw_data).into()
     }
 
@@ -218,8 +221,18 @@ impl<T: MqOperations> OperationsConverter<T> {
         Ok(())
     }
 
-    pub fn poll_queues(hctx_ptr: SafePtr, iob_ptr: SafePtr) -> KernelResult<i32> {
-        let res = unsafe { Self::poll_callback(hctx_ptr.raw_ptr() as _, iob_ptr.raw_ptr() as _) };
+    pub fn poll_queues(
+        hctx_ptr: SafePtr,
+        iob_ptr: SafePtr,
+        hctx_driver_data_ptr: SafePtr,
+    ) -> KernelResult<i32> {
+        let res = unsafe {
+            Self::poll_callback(
+                hctx_ptr.raw_ptr() as _,
+                iob_ptr.raw_ptr() as _,
+                hctx_driver_data_ptr.raw_ptr() as _,
+            )
+        };
         Ok(res)
     }
 }

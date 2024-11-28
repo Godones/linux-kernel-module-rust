@@ -153,10 +153,10 @@ impl NvmeDevice {
 
         let lbaf = (id.flbas & 0xf) as usize;
         let lba_shift = id.lbaf[lbaf].ds as u32;
-        let ns = Box::new(NvmeNamespace {
+        let ns = Box::try_new(NvmeNamespace {
             id: nsid,
             lba_shift,
-        });
+        })?;
         let disk = mq::GenDisk::try_new(tagset, ns)?;
         disk.set_name(format_args!("nvme{}n{}", instance, nsid))?;
         disk.set_capacity(id.nsze.into() << (lba_shift - bindings::SECTOR_SHIFT));
@@ -177,7 +177,7 @@ impl NvmeDevice {
         let nr_io_queues = dev.poll_queue_count + dev.irq_queue_count;
         let result = Self::set_queue_count(nr_io_queues, mq)?;
         if result < nr_io_queues {
-            unimplemented!("Failed to set queue count");
+            todo!();
             nr_io_queues = result;
         }
 

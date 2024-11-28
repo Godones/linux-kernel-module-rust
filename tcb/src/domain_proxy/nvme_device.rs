@@ -417,20 +417,23 @@ impl NvmeDeviceDomainProxy {
         &self,
         hctx_ptr: SafePtr,
         iob_ptr: SafePtr,
+        hctx_driver_data_ptr: SafePtr,
         io_queue: bool,
     ) -> LinuxResult<i32> {
-        self.domain
-            .read_directly(|domain| domain.poll_queues(hctx_ptr, iob_ptr, io_queue))
+        self.domain.read_directly(|domain| {
+            domain.poll_queues(hctx_ptr, iob_ptr, hctx_driver_data_ptr, io_queue)
+        })
     }
     #[inline]
     fn _poll_queues_with_lock(
         &self,
         hctx_ptr: SafePtr,
         iob_ptr: SafePtr,
+        hctx_driver_data_ptr: SafePtr,
         io_queue: bool,
     ) -> LinuxResult<i32> {
         let lock = self.lock.lock();
-        let r = self._poll_queues(hctx_ptr, iob_ptr, io_queue);
+        let r = self._poll_queues(hctx_ptr, iob_ptr, hctx_driver_data_ptr, io_queue);
         drop(lock);
         r
     }
@@ -439,12 +442,13 @@ impl NvmeDeviceDomainProxy {
         &self,
         hctx_ptr: SafePtr,
         iob_ptr: SafePtr,
+        hctx_driver_data_ptr: SafePtr,
         io_queue: bool,
     ) -> LinuxResult<i32> {
         self.counter.get_with(|counter| {
             *counter += 1;
         });
-        let r = self._poll_queues(hctx_ptr, iob_ptr, io_queue);
+        let r = self._poll_queues(hctx_ptr, iob_ptr, hctx_driver_data_ptr, io_queue);
         self.counter.get_with(|counter| {
             *counter -= 1;
         });
@@ -640,11 +644,17 @@ impl BlkMqOp for NvmeDeviceDomainProxy {
         }
     }
 
-    fn poll_queues(&self, hctx_ptr: SafePtr, iob_ptr: SafePtr, io_queue: bool) -> LinuxResult<i32> {
+    fn poll_queues(
+        &self,
+        hctx_ptr: SafePtr,
+        iob_ptr: SafePtr,
+        hctx_driver_data_ptr: SafePtr,
+        io_queue: bool,
+    ) -> LinuxResult<i32> {
         if self.flag.load(core::sync::atomic::Ordering::Relaxed) {
-            self._poll_queues_with_lock(hctx_ptr, iob_ptr, io_queue)
+            self._poll_queues_with_lock(hctx_ptr, iob_ptr, hctx_driver_data_ptr, io_queue)
         } else {
-            self._poll_queues_no_lock(hctx_ptr, iob_ptr, io_queue)
+            self._poll_queues_no_lock(hctx_ptr, iob_ptr, hctx_driver_data_ptr, io_queue)
         }
     }
 }
@@ -818,6 +828,7 @@ impl BlkMqOp for NvmeDeviceDomainEmptyImpl {
         &self,
         _hctx_ptr: SafePtr,
         _iob_ptr: SafePtr,
+        _hctx_driver_data_ptr: SafePtr,
         _io_queue: bool,
     ) -> LinuxResult<i32> {
         Err(LinuxError::ENOSYS)

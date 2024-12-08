@@ -78,7 +78,7 @@ impl NullBlkDomain {
         let mut disk = self.disk.lock();
         disk.set_gen_disk(gen_disk);
 
-        disk.set_name(format_args!("rnullb{}", 0))?;
+        disk.set_name(format_args!("drnullb{}", 0))?;
         disk.set_capacity(self.args.param_capacity_mib << 11);
         disk.set_queue_logical_block_size(4096);
         disk.set_queue_physical_block_size(4096);

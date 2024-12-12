@@ -242,3 +242,15 @@ void *rust_helper_pci_get_drvdata(struct pci_dev *pdev) { return pci_get_drvdata
 
 void rust_helper_mdelay(uint64_t ms) { mdelay(ms); }
 unsigned int rust_helper_num_possible_cpus(void) { return  num_possible_cpus(); }
+
+unsigned int rust_helper_sg_dma_len(struct scatterlist* sg) {
+    return sg_dma_len(sg);
+}
+
+struct scatterlist* rust_helper_sg_next(struct scatterlist* sg) {
+    return sg_next(sg);
+}
+
+dma_addr_t rust_helper_sg_dma_address(struct scatterlist* sg) {
+    return sg_dma_address(sg);
+}

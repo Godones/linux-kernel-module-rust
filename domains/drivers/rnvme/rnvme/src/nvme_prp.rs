@@ -42,7 +42,7 @@ pub(crate) fn setup_prps(
     let mut i = 0;
     let mut sg = &md.sg[i];
     let mut dma_addr = sg.dma_address; // TODO: Use macro.
-    let mut dma_len = sg.length; // TODO: Use macro.
+    let mut dma_len = sg.dma_length; // TODO: Use macro.
     let offset = dma_addr & ((nvme_driver_defs::NVME_CTRL_PAGE_SIZE - 1) as u64);
 
     let consumed = ((nvme_driver_defs::NVME_CTRL_PAGE_SIZE as u64) - offset) as u32;
@@ -61,7 +61,7 @@ pub(crate) fn setup_prps(
         // TODO: Use sg_next.
         sg = &md.sg[i];
         dma_addr = sg.dma_address;
-        dma_len = sg.length;
+        dma_len = sg.dma_length;
     }
 
     if length <= nvme_driver_defs::NVME_CTRL_PAGE_SIZE as u32 {
@@ -129,7 +129,7 @@ pub(crate) fn setup_prps(
         // TODO: use sg_next.
         sg = &md.sg[i];
         dma_addr = sg.dma_address;
-        dma_len = sg.length;
+        dma_len = sg.dma_length;
     }
 
     Ok(guard.dismiss().page_count as _)

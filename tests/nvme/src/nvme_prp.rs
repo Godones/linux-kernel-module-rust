@@ -1,7 +1,13 @@
 use alloc::sync::Arc;
 use core::mem::ManuallyDrop;
 
-use kernel::{code::EIO, error::KernelResult as Result, mm::dma, types::ScopeGuard};
+use kernel::{
+    bindings::{sg_dma_address, sg_dma_len, sg_next},
+    code::EIO,
+    error::KernelResult as Result,
+    mm::dma,
+    types::ScopeGuard,
+};
 
 use crate::{le, nvme_driver_defs, MappingData, NvmeCommand, NvmeData};
 
@@ -37,8 +43,8 @@ pub(crate) fn setup_prps(
 ) -> Result<u32> {
     let mut i = 0;
     let mut sg = &md.sg[i];
-    let mut dma_addr = sg.dma_address; // TODO: Use macro.
-    let mut dma_len = sg.length; // TODO: Use macro.
+    let mut dma_addr = unsafe { sg_dma_address(sg) };
+    let mut dma_len = unsafe { sg_dma_len(sg) };
     let offset = dma_addr & ((nvme_driver_defs::NVME_CTRL_PAGE_SIZE - 1) as u64);
 
     let consumed = ((nvme_driver_defs::NVME_CTRL_PAGE_SIZE as u64) - offset) as u32;
@@ -54,10 +60,9 @@ pub(crate) fn setup_prps(
         dma_addr += consumed as u64;
     } else {
         i += 1;
-        // TODO: Use sg_next.
-        sg = &md.sg[i];
-        dma_addr = sg.dma_address;
-        dma_len = sg.length;
+        sg = unsafe { &*sg_next(sg) };
+        dma_addr = unsafe { sg_dma_address(sg) };
+        dma_len = unsafe { sg_dma_len(sg) };
     }
 
     if length <= nvme_driver_defs::NVME_CTRL_PAGE_SIZE as u32 {
@@ -122,10 +127,9 @@ pub(crate) fn setup_prps(
         }
 
         i += 1;
-        // TODO: use sg_next.
-        sg = &md.sg[i];
-        dma_addr = sg.dma_address;
-        dma_len = sg.length;
+        sg = unsafe { &*sg_next(sg) };
+        dma_addr = unsafe { sg_dma_address(sg) };
+        dma_len = unsafe { sg_dma_len(sg) };
     }
 
     Ok(guard.dismiss().page_count as _)

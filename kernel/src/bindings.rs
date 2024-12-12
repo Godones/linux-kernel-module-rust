@@ -252,7 +252,14 @@ extern "C" {
     pub fn mdelay(ms: u64);
     #[link_name = "rust_helper_num_possible_cpus"]
     pub fn num_possible_cpus() -> core::ffi::c_uint;
+    #[link_name = "rust_helper_sg_dma_len"]
+    pub fn sg_dma_len(sg: *const scatterlist) -> core::ffi::c_uint;
 
+    #[link_name = "rust_helper_sg_dma_address"]
+    pub fn sg_dma_address(sg: *const scatterlist) -> dma_addr_t;
+
+    #[link_name = "rust_helper_sg_next"]
+    pub fn sg_next(sg: *const scatterlist) -> *const scatterlist;
 }
 
 #[repr(C)]

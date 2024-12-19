@@ -1,5 +1,5 @@
 use alloc::{boxed::Box, sync::Arc};
-use core::{fmt::Debug, pin::Pin};
+use core::{fmt::Debug, pin::Pin, sync::atomic::AtomicU64};
 
 use basic::{
     console::*,
@@ -206,6 +206,16 @@ impl MqOperations for NullBlkDevice {
         rq: mq::Request<Self>,
         _is_last: bool,
     ) -> KernelResult {
+        static KTIME: AtomicU64 = AtomicU64::new(0);
+
+        let now = time::ktime_get_ns();
+        let old = KTIME.load(core::sync::atomic::Ordering::Relaxed);
+        if now - old > 2_000_000_000 {
+            // 1 second
+            KTIME.store(now, core::sync::atomic::Ordering::Relaxed);
+            panic!("NullBlkDevice::queue_rq: too long");
+        }
+
         rq.start();
         if queue_data.memory_backed {
             let mut tree = queue_data.tree.lock_irqsave();

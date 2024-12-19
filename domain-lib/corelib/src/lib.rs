@@ -356,6 +356,8 @@ pub trait CoreFunction: Send + Sync {
 
     fn sys_num_possible_cpus(&self) -> core::ffi::c_uint;
     fn sys_mdelay(&self, msecs: u64);
+    fn sys_ktime_get_ns(&self) -> u64;
+    fn sys_sg_next(&self, sg: *const scatterlist) -> *const scatterlist;
 }
 
 #[cfg(feature = "core_impl")]
@@ -1041,6 +1043,12 @@ mod core_impl {
     }
     pub fn sys_mdelay(ms: u64) {
         CORE_FUNC.get_must().sys_mdelay(ms)
+    }
+    pub fn sys_ktime_get_ns() -> u64 {
+        CORE_FUNC.get_must().sys_ktime_get_ns()
+    }
+    pub fn sys_sg_next(sg: *const scatterlist) -> *const scatterlist {
+        CORE_FUNC.get_must().sys_sg_next(sg)
     }
 }
 

@@ -23,6 +23,7 @@
 #include <linux/srcu.h>
 #include <linux/delay.h>
 #include <linux/pci.h>
+#include <linux/timekeeping.h>
 void bug_helper(void) { BUG(); }
 
 int access_ok_helper(const void __user *addr, unsigned long n) {
@@ -241,6 +242,9 @@ void rust_helper_pci_set_drvdata(struct pci_dev *pdev, void *data) { pci_set_drv
 void *rust_helper_pci_get_drvdata(struct pci_dev *pdev) { return pci_get_drvdata(pdev); }
 
 void rust_helper_mdelay(uint64_t ms) { mdelay(ms); }
+
+unsigned long long  rust_helper_ktime_get_ns(void) { return ktime_get_ns(); }
+
 unsigned int rust_helper_num_possible_cpus(void) { return  num_possible_cpus(); }
 
 unsigned int rust_helper_sg_dma_len(struct scatterlist* sg) {

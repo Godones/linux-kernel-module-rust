@@ -248,13 +248,14 @@ extern "C" {
     #[link_name = "rust_helper_pci_get_drvdata"]
     pub fn pci_get_drvdata(pdev: *mut pci_dev) -> *mut core::ffi::c_void;
 
+    #[link_name = "rust_helper_ktime_get_ns"]
+    pub fn ktime_get_ns() -> u64_;
     #[link_name = "rust_helper_mdelay"]
     pub fn mdelay(ms: u64);
     #[link_name = "rust_helper_num_possible_cpus"]
     pub fn num_possible_cpus() -> core::ffi::c_uint;
     #[link_name = "rust_helper_sg_dma_len"]
     pub fn sg_dma_len(sg: *const scatterlist) -> core::ffi::c_uint;
-
     #[link_name = "rust_helper_sg_dma_address"]
     pub fn sg_dma_address(sg: *const scatterlist) -> dma_addr_t;
 

@@ -53,7 +53,7 @@ impl SysctlStorage for CommandChannel {
         let mut inner = self.inner.lock();
         match command {
             Some(Command::Start(ref start_command)) => {
-                println!("Command: {:?}", command);
+                log::info!("Command: {:?}", command);
                 inner.id = Some(self.id.fetch_add(1, atomic::Ordering::Relaxed));
                 let ty = DomainTypeRaw::try_from(start_command.domain_type);
                 if ty.is_err() {
@@ -92,7 +92,7 @@ impl SysctlStorage for CommandChannel {
                 (data.len(), Ok(()))
             }
             Some(Command::Stop(ref stop_command)) => {
-                println!("Command: {:?}", command);
+                log::info!("Command: {:?}", command);
                 if stop_command.id != inner.id.unwrap() {
                     pr_err!("Invalid id");
                     return (0, Err(linux_err::EINVAL));
@@ -110,7 +110,7 @@ impl SysctlStorage for CommandChannel {
                 (data.len(), Ok(()))
             }
             Some(Command::Update(ref update_command)) => {
-                println!("Command: {:?}", command);
+                log::info!("Command: {:?}", command);
                 let old_domain_ident = update_command.domain_ident;
                 let new_domain_ident = update_command.register_domain_elf_ident;
                 let domain_type = DomainTypeRaw::try_from(update_command.domain_type);
@@ -124,7 +124,7 @@ impl SysctlStorage for CommandChannel {
                 (data.len(), Ok(()))
             }
             Some(Command::Load(ref load_command)) => {
-                println!("Command: {:?}", command);
+                log::info!("Command: {:?}", command);
                 let ty = DomainTypeRaw::try_from(load_command.domain_type);
                 if ty.is_err() {
                     pr_err!("Invalid domain type");
@@ -143,7 +143,7 @@ impl SysctlStorage for CommandChannel {
                 (data.len(), Ok(()))
             }
             Some(Command::Unload(ref unload_command)) => {
-                println!("Command: {:?}", command);
+                log::info!("Command: {:?}", command);
                 let res = super::unload_domain(unload_command.domain_ident);
                 if res.is_err() {
                     return (0, Err(linux_err::EINVAL));
@@ -164,7 +164,7 @@ impl SysctlStorage for CommandChannel {
 
     fn read_value(&self, data: &mut KernelSlicePtrWriter) -> (usize, KernelResult<()>) {
         let mut inner = self.inner.lock();
-        println!("Response: {:?}", inner.response);
+        // println!("Response: {:?}", inner.response);
         if inner.response.is_none() {
             return (0, Err(linux_err::EAGAIN));
         }

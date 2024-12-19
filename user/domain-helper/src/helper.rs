@@ -46,11 +46,10 @@ pub fn register_domain(name: &str, ty: u8, register_domain_elf_ident: &str) -> R
 
     let res_buf = read_from_channel()?;
     let response = Response::parse(&res_buf).ok_or("Parse response failed")?;
-    println!("Response: {:?}", response);
+    // println!("Response: {:?}", response);
     let id = match response {
         Response::Ok(id) => id,
         _ => {
-            println!("Invalid response");
             return Err("Invalid response".into());
         }
     };
@@ -74,25 +73,21 @@ pub fn register_domain(name: &str, ty: u8, register_domain_elf_ident: &str) -> R
         // read response to make sure the data is sent
         let res_buf = read_from_channel()?;
         let response = Response::parse(&res_buf).ok_or("Parse response failed")?;
-        println!("Response: {:?}", response);
+        // println!("Response: {:?}", response);
 
         match response {
             Response::Receive(id, data_id, bytes) => {
                 if id != id {
-                    println!("Invalid id");
                     return Err("Invalid id".into());
                 }
                 if data_id != data_id {
-                    println!("Invalid data id");
                     return Err("Invalid data id".into());
                 }
                 if bytes != res {
-                    println!("Invalid data length");
                     return Err("Invalid data length".into());
                 }
             }
             _ => {
-                println!("Invalid response");
                 return Err("Invalid response".into());
             }
         }
@@ -107,11 +102,10 @@ pub fn register_domain(name: &str, ty: u8, register_domain_elf_ident: &str) -> R
 
     let res_buf = read_from_channel()?;
     let response = Response::parse(&res_buf).ok_or("Parse response failed")?;
-    println!("Response: {:?}", response);
+    // println!("Response: {:?}", response);
     let id = match response {
         Response::Ok(id) => id,
         _ => {
-            println!("Invalid response");
             return Err("Invalid response".into());
         }
     };
@@ -130,7 +124,7 @@ pub fn update_domain(old_ident: &str, register_domain_elf_ident: &str, ty: u8) -
 
     let res_buf = read_from_channel()?;
     let response = Response::parse(&res_buf).ok_or("Parse response failed")?;
-    println!("Response: {:?}", response);
+    println!("update_domain: Response: {:?}", response);
     Ok(())
 }
 
@@ -145,7 +139,7 @@ pub fn load_domain(register_domain_elf_ident: &str, domain_ident: &str, ty: u8) 
 
     let res_buf = read_from_channel()?;
     let response = Response::parse(&res_buf).ok_or("Parse response failed")?;
-    println!("Response: {:?}", response);
+    println!("load_domain: Response: {:?}", response);
     Ok(())
 }
 
@@ -156,7 +150,7 @@ pub fn unload_domain(domain_ident: &str) -> Result<()> {
 
     let res_buf = read_from_channel()?;
     let response = Response::parse(&res_buf).ok_or("Parse response failed")?;
-    println!("Response: {:?}", response);
+    println!("unload_domain: Response: {:?}", response);
     Ok(())
 }
 

@@ -767,6 +767,14 @@ impl CoreFunction for DomainSyscall {
     fn sys_mdelay(&self, msecs: u64) {
         unsafe { kernel::bindings::mdelay(msecs) }
     }
+
+    fn sys_ktime_get_ns(&self) -> u64 {
+        unsafe { kernel::bindings::ktime_get_ns() }
+    }
+
+    fn sys_sg_next(&self, sg: *const scatterlist) -> *const scatterlist {
+        unsafe { kernel::bindings::sg_next(sg) }
+    }
 }
 
 static BLK_CRASH: AtomicBool = AtomicBool::new(true);

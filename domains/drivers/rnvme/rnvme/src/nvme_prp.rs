@@ -2,6 +2,7 @@ use alloc::sync::Arc;
 use core::mem::ManuallyDrop;
 
 use basic::kernel::{
+    block::sg_next_ref,
     error::{linux_err::EIO, KernelResult as Result},
     mm::dma,
     types::ScopeGuard,
@@ -59,7 +60,8 @@ pub(crate) fn setup_prps(
     } else {
         i += 1;
         // TODO: Use sg_next.
-        sg = &md.sg[i];
+        // sg = &md.sg[i];
+        sg = sg_next_ref(sg);
         dma_addr = sg.dma_address;
         dma_len = sg.dma_length;
     }
@@ -127,7 +129,7 @@ pub(crate) fn setup_prps(
 
         i += 1;
         // TODO: use sg_next.
-        sg = &md.sg[i];
+        sg = sg_next_ref(sg);
         dma_addr = sg.dma_address;
         dma_len = sg.dma_length;
     }

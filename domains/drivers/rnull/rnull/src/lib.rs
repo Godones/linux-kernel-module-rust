@@ -11,7 +11,7 @@ use core::fmt::Debug;
 use basic::{console::*, kernel::block::mq::OperationsConverter, LinuxError, LinuxResult, SafePtr};
 use interface::{
     null_block::{BlockArgs, BlockDeviceDomain},
-    Basic,
+    Basic, LinuxErrno,
 };
 use spin::Mutex;
 
@@ -214,7 +214,14 @@ impl BlockDeviceDomain for UnwindWrap {
         bd_ptr: SafePtr,
         hctx_driver_data_ptr: SafePtr,
     ) -> LinuxResult<()> {
-        basic::catch_unwind(|| self.0.queue_rq(hctx_ptr, bd_ptr, hctx_driver_data_ptr))
+        let res = basic::catch_unwind(|| self.0.queue_rq(hctx_ptr, bd_ptr, hctx_driver_data_ptr));
+        match res {
+            Err(LinuxErrno::DOMAINCRASH) => {
+                println!("Restarting queue_rq");
+                basic::catch_unwind(|| self.0.queue_rq(hctx_ptr, bd_ptr, hctx_driver_data_ptr))
+            }
+            e => e,
+        }
     }
 
     fn commit_rqs(&self, hctx_ptr: SafePtr, hctx_driver_data_ptr: SafePtr) -> LinuxResult<()> {

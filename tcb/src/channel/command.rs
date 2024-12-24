@@ -9,7 +9,7 @@ use interface::DomainTypeRaw;
 use kernel::{
     buf::KernelSlicePtrWriter,
     error::{linux_err, KernelResult},
-    pr_err, println,
+    pr_err,
     sysctl::SysctlStorage,
 };
 use spin::Mutex;

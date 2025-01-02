@@ -11,3 +11,4 @@ modules.order
 dummy.c
 .idea
 build
+fio*

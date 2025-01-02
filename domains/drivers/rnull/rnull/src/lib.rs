@@ -217,7 +217,7 @@ impl BlockDeviceDomain for UnwindWrap {
         let res = basic::catch_unwind(|| self.0.queue_rq(hctx_ptr, bd_ptr, hctx_driver_data_ptr));
         match res {
             Err(LinuxErrno::DOMAINCRASH) => {
-                println!("Restarting queue_rq");
+                // println!("Restarting queue_rq");
                 basic::catch_unwind(|| self.0.queue_rq(hctx_ptr, bd_ptr, hctx_driver_data_ptr))
             }
             e => e,

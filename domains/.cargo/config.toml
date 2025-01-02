@@ -20,5 +20,5 @@ build-std-features = ["compiler-builtins-mem"]
 
 [profile.release]
 #lto = true
-strip = true
+#strip = true
 #opt-level = 3

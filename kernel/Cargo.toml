@@ -10,7 +10,7 @@ bitflags = "2.6.0"
 log = "0.4.22"
 kbind = { path = "../kbind" }
 
-unwinding = { version= "*", default-features = false, features = [
+unwinding = { git = "https://github.com/nbdd0121/unwinding", rev = "ff0e91b", default-features = false, features = [
     "unwinder",
     "fde-static",
     "panic",

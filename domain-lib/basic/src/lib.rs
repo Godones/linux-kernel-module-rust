@@ -29,7 +29,7 @@ pub fn domain_info() -> Arc<DomainInfoSet> {
 #[cfg(feature = "unwind")]
 pub fn catch_unwind<F: FnOnce() -> LinuxResult<R>, R>(f: F) -> LinuxResult<R> {
     let res = unwinding::panic::catch_unwind(f).unwrap_or_else(|_| {
-        println_color!(31, "[Panic] catch unwind error");
+        // println_color!(31, "[Panic] catch unwind error");
         Err(LinuxError::DOMAINCRASH)
     });
     res

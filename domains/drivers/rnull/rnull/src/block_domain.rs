@@ -206,17 +206,6 @@ impl MqOperations for NullBlkDevice {
         rq: mq::Request<Self>,
         _is_last: bool,
     ) -> KernelResult {
-        static KTIME: AtomicU64 = AtomicU64::new(0);
-
-        let now = time::ktime_get_ns();
-        let old = KTIME.load(core::sync::atomic::Ordering::Relaxed);
-
-        let command = rq.command();
-        if now - old > 3_000_000_000 && now != 0 && block::req_op_REQ_OP_WRITE != command {
-            // 2 second
-            KTIME.store(now, core::sync::atomic::Ordering::Relaxed);
-            panic!("NullBlkDevice::queue_rq: too long");
-        }
         rq.start();
         if queue_data.memory_backed {
             let mut tree = queue_data.tree.lock_irqsave();

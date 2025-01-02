@@ -11,7 +11,7 @@ use core::{
 use crate::{bindings, pr_warn};
 
 pub type KernelResult<T = (), E = Error> = Result<T, E>;
-
+#[derive(Clone, Copy, PartialEq, Eq)]
 pub struct Error(core::ffi::c_int);
 
 impl Error {

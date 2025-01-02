@@ -10,11 +10,12 @@ rref = { path = "../rref" }
 ksync = { path = "../ksync" }
 domain_main = { path = "../domain_main" }
 
-unwinding = { version = "0.2.3", default-features = false, features = [
+unwinding = { git = "https://github.com/nbdd0121/unwinding", rev = "ff0e91b", default-features = false, features = [
     "unwinder",
     "fde-gnu-eh-frame-hdr",
     "panic",
-    "personality"
+    "personality",
+    "dwarf-expr",
 ], optional = true }
 spin = "0.9.8"
 

@@ -127,9 +127,6 @@ impl From<Timespec> for bindings::timespec64 {
     }
 }
 
-
-pub fn ktime_get_ns() -> u64{
-    unsafe {
-        bindings::ktime_get_ns()
-    }
+pub fn ktime_get_ns() -> u64 {
+    unsafe { bindings::ktime_get_ns() }
 }

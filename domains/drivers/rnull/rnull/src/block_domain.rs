@@ -1,5 +1,5 @@
 use alloc::{boxed::Box, sync::Arc};
-use core::{fmt::Debug, pin::Pin, sync::atomic::AtomicU64};
+use core::{fmt::Debug, pin::Pin};
 
 use basic::{
     console::*,
@@ -12,7 +12,7 @@ use basic::{
             mq::{GenDisk, MqOperations, TagSet},
         },
         error,
-        error::{Error, KernelResult},
+        error::{linux_err, Error, KernelResult},
         mm::pages::Pages,
         radix_tree::RadixTree,
         sync::{Mutex, SpinLock, UniqueArc},
@@ -22,9 +22,10 @@ use basic::{
     },
     new_mutex, new_spinlock, SafePtr,
 };
-use interface::null_block::BlockArgs;
+use interface::{empty_device::EmptyDeviceDomain, null_block::BlockArgs, DomainType};
 use kmacro::vtable;
 use pinned_init::{pin_data, pin_init, InPlaceInit, PinInit};
+use rref::RRefVec;
 
 #[derive(Debug)]
 enum IRQMode {
@@ -51,6 +52,11 @@ pub struct NullBlkDomain {
     args: BlockArgs,
 }
 
+pub struct MultiDomainTest {
+    empty_blk: Arc<dyn EmptyDeviceDomain>,
+    buf: RRefVec<u8>,
+}
+
 impl Debug for NullBlkDomain {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "NullBlkDomain")
@@ -64,6 +70,9 @@ impl NullBlkDomain {
         let tagset = UniqueArc::try_pin_init(TagSet::try_new_no_alloc(1, (), 256, 1))?.into();
 
         let disk = Box::pin_init(new_mutex!(add_disk(tagset, args)?, "nullb:disk"))?;
+
+        #[cfg(any(feature = "multi_domain_no", feature = "multi_domain"))]
+        init_multi_domain()?;
         Ok(Self {
             disk,
             args: args.clone(),
@@ -90,6 +99,48 @@ impl NullBlkDomain {
 impl Drop for NullBlkDomain {
     fn drop(&mut self) {
         println!("Dropping NullBlkDomain");
+    }
+}
+
+pub static MULTI_DOMAIN: spin::Mutex<Option<MultiDomainTest>> = spin::Mutex::new(None);
+
+#[cfg(feature = "multi_domain")]
+fn init_multi_domain() -> KernelResult {
+    let buf = RRefVec::new(0, 4096);
+    let empty_blk = basic::get_domain("empty_device").ok_or(linux_err::EINVAL)?;
+    let empty_blk = match empty_blk {
+        DomainType::EmptyDeviceDomain(empty_blk) => empty_blk,
+        _ => return Err(linux_err::EINVAL),
+    };
+    let multi_domain = MultiDomainTest { empty_blk, buf };
+    let mut lock = MULTI_DOMAIN.lock();
+    lock.replace(multi_domain);
+    println!("multi_domain init success");
+    Ok(())
+}
+
+#[cfg(feature = "multi_domain_no")]
+fn init_multi_domain() -> KernelResult {
+    use null::NullDeviceDomainImpl;
+    let buf = RRefVec::new(8, 4096);
+    let empty_blk = Arc::new(NullDeviceDomainImpl::new());
+    let multi_domain = MultiDomainTest { empty_blk, buf };
+    let mut lock = MULTI_DOMAIN.lock();
+    lock.replace(multi_domain);
+    println!("multi_domain_no init success");
+    Ok(())
+}
+
+const CROSS_NUM: usize = 1;
+
+#[cfg(any(feature = "multi_domain_no", feature = "multi_domain"))]
+fn multi_domain_run() {
+    let lock = MULTI_DOMAIN.lock();
+    let domain = lock.as_ref().unwrap();
+    let buf = &domain.buf;
+    let empty_blk = &domain.empty_blk;
+    for _ in 0..CROSS_NUM {
+        let _res = empty_blk.write(buf);
     }
 }
 
@@ -140,6 +191,9 @@ impl NullBlkDevice {
 
     #[inline(always)]
     fn read(tree: &mut Tree, sector: usize, segment: &mut Segment<'_>) -> KernelResult {
+        #[cfg(any(feature = "multi_domain_no", feature = "multi_domain"))]
+        multi_domain_run();
+
         let idx = sector >> 3; // TODO: PAGE_SECTOR_SHIFT
         if let Some(page) = tree.get(idx as u64) {
             segment.copy_from_page_atomic(page)?;

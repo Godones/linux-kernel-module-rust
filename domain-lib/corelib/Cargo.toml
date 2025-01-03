@@ -19,3 +19,4 @@ log = "0.4.22"
 
 [features]
 core_impl = []
+blk-panic = []

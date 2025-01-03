@@ -10,6 +10,7 @@ use core::fmt::Debug;
 
 use basic::{console::*, kernel::block::mq::OperationsConverter, LinuxError, LinuxResult, SafePtr};
 use interface::{
+    empty_device::EmptyDeviceDomain,
     null_block::{BlockArgs, BlockDeviceDomain},
     Basic, LinuxErrno,
 };
@@ -19,13 +20,17 @@ use crate::block_domain::{NullBlkDevice, NullBlkDomain};
 
 #[derive(Debug)]
 struct NullDeviceDomainImpl {
-    block: Mutex<Option<NullBlkDomain>>,
+    inner_data: Mutex<Option<InnerData>>,
+}
+#[derive(Debug)]
+struct InnerData {
+    null_blk_domain: NullBlkDomain,
 }
 
 impl NullDeviceDomainImpl {
     pub fn new() -> Self {
         Self {
-            block: Mutex::new(None),
+            inner_data: Mutex::new(None),
         }
     }
 }
@@ -44,13 +49,18 @@ impl BlockDeviceDomain for NullDeviceDomainImpl {
             println!("NullBlkModule init error: {:?}", e);
             LinuxError::EINVAL
         })?;
-        *self.block.lock() = Some(block);
+
+        let inner_data = InnerData {
+            null_blk_domain: block,
+        };
+        self.inner_data.lock().replace(inner_data);
+        println!("NullDeviceDomainImpl init end");
         Ok(())
     }
     fn tag_set_with_queue_data(&self) -> LinuxResult<(SafePtr, SafePtr)> {
-        let blk = self.block.lock();
-        let blk = blk.as_ref().ok_or(LinuxError::EINVAL)?;
-        let res = blk.tag_set_with_queue_data();
+        let inner = self.inner_data.lock();
+        let inner = inner.as_ref().ok_or(LinuxError::EINVAL)?;
+        let res = inner.null_blk_domain.tag_set_with_queue_data();
         match res {
             Ok(r) => Ok(r),
             Err(e) => {
@@ -61,9 +71,9 @@ impl BlockDeviceDomain for NullDeviceDomainImpl {
     }
 
     fn set_gen_disk(&self, gen_disk: SafePtr) -> LinuxResult<()> {
-        let blk = self.block.lock();
-        let blk = blk.as_ref().ok_or(LinuxError::EINVAL)?;
-        blk.set_gen_disk(gen_disk).map_err(|e| {
+        let inner = self.inner_data.lock();
+        let inner = inner.as_ref().ok_or(LinuxError::EINVAL)?;
+        inner.null_blk_domain.set_gen_disk(gen_disk).map_err(|e| {
             println!("NullBlkModule set_gen_disk error: {:?}", e);
             LinuxError::EINVAL
         })
@@ -145,8 +155,10 @@ impl BlockDeviceDomain for NullDeviceDomainImpl {
     }
 
     fn exit(&self) -> LinuxResult<()> {
-        let v = self.block.lock().take();
+        let v = self.inner_data.lock().take();
         drop(v);
+        #[cfg(any(feature = "multi_domain", feature = "multi_domain_no"))]
+        block_domain::MULTI_DOMAIN.lock().take();
         println!("NullDeviceDomainImpl exit");
         Ok(())
     }

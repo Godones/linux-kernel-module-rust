@@ -2,15 +2,45 @@
 #![forbid(unsafe_code)]
 extern crate alloc;
 
-use alloc::{boxed::Box, string::String};
-use core::{fmt::Debug, sync::atomic::AtomicBool};
+use alloc::boxed::Box;
+use core::fmt::Debug;
 
-use basic::{console::*, LinuxResult};
+use basic::{console::println, LinuxResult};
 use interface::{empty_device::EmptyDeviceDomain, Basic};
 use rref::RRefVec;
+use spin::Mutex;
 
-#[derive(Debug)]
-pub struct NullDeviceDomainImpl;
+pub struct NullDeviceDomainImpl {
+    fake_mem: Mutex<[u8; 4096]>,
+}
+
+impl NullDeviceDomainImpl {
+    pub fn new() -> Self {
+        Self {
+            fake_mem: Mutex::new([0; 4096]),
+        }
+    }
+
+    pub fn do_read(&self, mut data: RRefVec<u8>) -> LinuxResult<RRefVec<u8>> {
+        let fake_mem = self.fake_mem.lock();
+        let copy_len = core::cmp::min(data.len(), fake_mem.len());
+        data.as_mut_slice()[..copy_len].copy_from_slice(&fake_mem[..copy_len]);
+        Ok(data)
+    }
+
+    pub fn do_write(&self, data: &RRefVec<u8>) -> LinuxResult<usize> {
+        let mut fake_mem = self.fake_mem.lock();
+        let copy_len = core::cmp::min(data.len(), fake_mem.len());
+        fake_mem[..copy_len].copy_from_slice(&data.as_slice()[..copy_len]);
+        Ok(copy_len)
+    }
+}
+
+impl Debug for NullDeviceDomainImpl {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "NullDeviceDomainImpl")
+    }
+}
 
 impl Basic for NullDeviceDomainImpl {
     fn domain_id(&self) -> u64 {
@@ -20,21 +50,16 @@ impl Basic for NullDeviceDomainImpl {
 
 impl EmptyDeviceDomain for NullDeviceDomainImpl {
     fn init(&self) -> LinuxResult<()> {
+        println!("NullDeviceDomainImpl init");
         Ok(())
     }
 
-    fn read(&self, mut data: RRefVec<u8>) -> LinuxResult<RRefVec<u8>> {
-        data.as_mut_slice().fill(1);
-        Ok(data)
+    fn read(&self, data: RRefVec<u8>) -> LinuxResult<RRefVec<u8>> {
+        self.do_read(data)
     }
     fn write(&self, data: &RRefVec<u8>) -> LinuxResult<usize> {
-        static FLAG: AtomicBool = AtomicBool::new(true);
-        if FLAG.load(core::sync::atomic::Ordering::Relaxed) {
-            println!("NullDeviceDomainImpl::read: panic test");
-            FLAG.store(false, core::sync::atomic::Ordering::Relaxed);
-            bar();
-        }
-        Ok(data.len())
+        println!("NullDeviceDomainImpl write");
+        self.do_write(data)
     }
 }
 #[derive(Debug)]
@@ -63,27 +88,5 @@ impl EmptyDeviceDomain for UnwindWrap {
 }
 
 pub fn main() -> Box<dyn EmptyDeviceDomain> {
-    Box::new(UnwindWrap::new(NullDeviceDomainImpl))
-}
-
-#[derive(Debug)]
-struct PrintOnDrop(String);
-
-impl Drop for PrintOnDrop {
-    fn drop(&mut self) {
-        println!("dropped: {:?}", self.0);
-    }
-}
-
-fn foo() {
-    panic!("panic at foo\n");
-}
-
-#[inline(never)]
-fn bar() {
-    use alloc::string::String;
-    let p1 = PrintOnDrop(String::from("PrintOnDrop1"));
-    let p2 = PrintOnDrop(String::from("PrintOnDrop2"));
-    println!("p1: {:?}, p2: {:?}", p1, p2);
-    foo()
+    Box::new(UnwindWrap::new(NullDeviceDomainImpl::new()))
 }

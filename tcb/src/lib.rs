@@ -49,16 +49,6 @@ impl kernel::Module for TcbModule {
             code::EINVAL
         })?;
         let kobj = kshim::init_kernel_shim()?;
-        // let now = kernel::time::ktime_get_ns();
-        // println!("Now: {}s",now / 1000_000_000);
-        // loop{
-        //     let new = kernel::time::ktime_get_ns();
-        //     if (new - now) > 3_000_000_000{
-        //         break
-        //     }
-        // }
-        // let now = kernel::time::ktime_get_ns();
-        // println!("Now: {}s",now / 1000_000_000);
         Ok(TcbModule {
             _sysctl_domain_command: channel,
             kobj,

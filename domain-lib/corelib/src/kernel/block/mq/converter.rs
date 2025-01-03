@@ -20,24 +20,27 @@ impl<T: MqOperations> OperationsConverter<T> {
         bd: *const bindings::blk_mq_queue_data,
         driver_data: *mut core::ffi::c_void,
     ) -> KernelResult {
-        use core::sync::atomic::AtomicU64;
+        #[cfg(feature = "blk-panic")]
+        {
+            use core::sync::atomic::AtomicU64;
 
-        use crate::kernel::block;
-        static KTIME: AtomicU64 = AtomicU64::new(0);
-        let now = crate::kernel::time::ktime_get_ns();
-        let old = KTIME.load(core::sync::atomic::Ordering::Relaxed);
-        static FAKE_LOCK: spin::Mutex<usize> = spin::Mutex::new(0);
-        let mut lock = FAKE_LOCK.lock();
-        let command = unsafe {
-            let rq = (*bd).rq;
-            (*rq).cmd_flags & ((1 << bindings::REQ_OP_BITS) - 1)
-        };
-        if now - old > 5000_000 && now != 0 && block::req_op_REQ_OP_READ == command {
-            KTIME.store(now, core::sync::atomic::Ordering::Relaxed);
-            *lock += 1;
-            panic!("NullBlkDevice::queue_rq: too long, num: {}", *lock);
-        } else {
-            *lock += 0;
+            use crate::kernel::block;
+            static KTIME: AtomicU64 = AtomicU64::new(0);
+            let now = crate::kernel::time::ktime_get_ns();
+            let old = KTIME.load(core::sync::atomic::Ordering::Relaxed);
+            static FAKE_LOCK: spin::Mutex<usize> = spin::Mutex::new(0);
+            let mut lock = FAKE_LOCK.lock();
+            let command = unsafe {
+                let rq = (*bd).rq;
+                (*rq).cmd_flags & ((1 << bindings::REQ_OP_BITS) - 1)
+            };
+            if now - old > 5000_000 && now != 0 && block::req_op_REQ_OP_READ == command {
+                KTIME.store(now, core::sync::atomic::Ordering::Relaxed);
+                *lock += 1;
+                panic!("NullBlkDevice::queue_rq: too long, num: {}", *lock);
+            } else {
+                *lock += 0;
+            }
         }
 
         // SAFETY: `bd` is valid as required by the safety requirement for this function.

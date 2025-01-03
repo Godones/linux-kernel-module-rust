@@ -11,3 +11,10 @@ spin = "0.9.8"
 
 kmacro = { path = "../../../../kmacro" }
 pinned-init = { version = "0.0.8", default-features = false, features = ["alloc"]}
+
+null = { path = "../../null/null", optional = true }
+
+[features]
+default = ["multi_domain_no"]
+multi_domain_no = ["dep:null"]
+multi_domain = []

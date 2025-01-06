@@ -5,7 +5,11 @@ use corelib::{LinuxError, LinuxResult};
 use interface::{empty_device::EmptyDeviceDomain, Basic};
 use kernel::{
     init::InPlaceInit,
-    sync::{LongLongPerCpu, Mutex, SRcuData},
+    sync::{
+        local_irq_restore, local_irq_save, switch_task_to_cpus, sync_cpus, LongLongPerCpu, Mutex,
+        SRcuData,
+    },
+    time::TimeTick,
 };
 use rref::{RRefVec, SharedData};
 
@@ -22,6 +26,7 @@ pub struct EmptyDeviceDomainProxy {
     domain_loader: Pin<Box<Mutex<DomainLoader>>>,
     flag: AtomicBool,
     counter: LongLongPerCpu,
+    f: AtomicBool,
 }
 
 impl EmptyDeviceDomainProxy {
@@ -32,6 +37,7 @@ impl EmptyDeviceDomainProxy {
             domain_loader: Box::pin_init(new_mutex!(domain_loader)).unwrap(),
             flag: AtomicBool::new(false),
             counter: LongLongPerCpu::new(),
+            f: AtomicBool::new(false),
         }
     }
 }
@@ -71,10 +77,11 @@ impl EmptyDeviceDomain for EmptyDeviceDomainProxy {
     }
 
     fn read(&self, data: RRefVec<u8>) -> LinuxResult<RRefVec<u8>> {
+        // let irq = local_irq_save();
         if self.flag.load(core::sync::atomic::Ordering::Relaxed) {
-            self._read_with_lock(data)
+            self._read_with_lock(data, 0)
         } else {
-            self._read_no_lock(data)
+            self._read_no_lock(data, 0)
         }
     }
 
@@ -127,10 +134,15 @@ impl EmptyDeviceDomainProxy {
         self.domain.read_directly(|domain| domain.write(data))
     }
 
-    fn _read_no_lock(&self, data: RRefVec<u8>) -> LinuxResult<RRefVec<u8>> {
+    fn _read_no_lock(&self, data: RRefVec<u8>, irq: u64) -> LinuxResult<RRefVec<u8>> {
+        if self.f.load(core::sync::atomic::Ordering::Relaxed) {
+            println!("EmptyDeviceDomainProxy _read_no_lock");
+        }
         self.counter.get_with(|counter| {
             *counter += 1;
         });
+        local_irq_restore(irq);
+
         let r = self._read(data);
         self.counter.get_with(|counter| {
             *counter -= 1;
@@ -149,7 +161,8 @@ impl EmptyDeviceDomainProxy {
         r
     }
 
-    fn _read_with_lock(&self, data: RRefVec<u8>) -> LinuxResult<RRefVec<u8>> {
+    fn _read_with_lock(&self, data: RRefVec<u8>, irq: u64) -> LinuxResult<RRefVec<u8>> {
+        local_irq_restore(irq);
         let lock = self.lock.lock();
         let r = self._read(data);
         drop(lock);
@@ -170,7 +183,10 @@ impl EmptyDeviceDomainProxy {
         new_domain: Box<dyn EmptyDeviceDomain>,
         domain_loader: DomainLoader,
     ) -> LinuxResult<()> {
-        println!("EmptyDeviceDomainProxy replace");
+        // println!("EmptyDeviceDomainProxy replace");
+        self.f.store(true, core::sync::atomic::Ordering::Relaxed);
+
+        let tick = TimeTick::new("Task Sync");
         let mut loader_guard = self.domain_loader.lock();
         // The writer lock before enable the lock path
         let w_lock = self.lock.lock();
@@ -178,21 +194,33 @@ impl EmptyDeviceDomainProxy {
         // enable lock path
         self.flag.store(true, core::sync::atomic::Ordering::Relaxed);
 
+        // switch_task_to_cpus();
+        sync_cpus();
+        // println!("EmptyDeviceDomainProxy replace: switch_task_to_cpus");
+
         // wait all readers to finish
         while self.counter.sum() != 0 {
             println!("Wait for all reader to finish");
-            // yield_now();
         }
+        drop(tick);
 
+        let tick = TimeTick::new("Reinit and state transfer");
         let new_domain_id = new_domain.domain_id();
         new_domain.init().unwrap();
+        drop(tick);
 
+        let tick = TimeTick::new("Domain swap");
         // stage4: swap the domain and change to normal state
         let old_domain = self.domain.update_directly(new_domain);
 
+        self.f.store(false, core::sync::atomic::Ordering::Relaxed);
         // disable lock path
         self.flag
             .store(false, core::sync::atomic::Ordering::Relaxed);
+
+        drop(tick);
+
+        let tick = TimeTick::new("Recycle resources");
         // stage5: recycle all resources
         let real_domain = Box::into_inner(old_domain);
         // forget the old domain, it will be dropped by the `free_domain_resource`
@@ -201,6 +229,8 @@ impl EmptyDeviceDomainProxy {
         // We should not free the shared data here, because the shared data will be used
         // in new domain.
         free_domain_resource(old_id, FreeShared::NotFree(new_domain_id));
+        drop(tick);
+
         *loader_guard = domain_loader;
         drop(w_lock);
         drop(loader_guard);

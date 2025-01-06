@@ -62,3 +62,19 @@ macro_rules! optional_name {
         $crate::c_str!($name)
     };
 }
+
+pub fn switch_task_to_cpus() {
+    unsafe { bindings::switch_task_to_cpus() };
+}
+
+pub fn sync_cpus() {
+    unsafe { bindings::sync_cpus() };
+}
+
+pub fn local_irq_save() -> u64 {
+    unsafe { bindings::local_irq_save() }
+}
+
+pub fn local_irq_restore(flags: u64) {
+    unsafe { bindings::local_irq_restore(flags) }
+}

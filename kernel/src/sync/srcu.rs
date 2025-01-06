@@ -2,7 +2,7 @@ use alloc::boxed::Box;
 
 use kbind::srcu_struct;
 
-use crate::{bindings, bindings::CRcuData, pr_warn};
+use crate::{bindings, bindings::CRcuData, pr_warn, time::TimeTick};
 
 #[derive(Debug)]
 pub struct SRcuData<T> {
@@ -55,12 +55,17 @@ impl<T> SRcuData<T> {
     }
 
     pub fn update(&self, data: T) -> Box<T> {
+        let tick = TimeTick::new("Domain swap");
         let old_ptr = self.crcu_data.data_ptr;
         let new_ptr = Box::into_raw(Box::new(data));
         srcu_assign_pointer(&self.crcu_data, new_ptr);
-        pr_warn!("before synchronize_srcu");
+
+        drop(tick);
+        // pr_warn!("before synchronize_srcu");
+        let tick = TimeTick::new("SRCU Synchronize");
         synchronize_srcu(self.ssp);
-        pr_warn!("after synchronize_srcu");
+        // pr_warn!("after synchronize_srcu");
+        drop(tick);
         let old_data = unsafe { Box::from_raw(old_ptr as *mut T) };
         old_data
     }

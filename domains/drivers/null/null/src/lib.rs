@@ -50,7 +50,7 @@ impl Basic for NullDeviceDomainImpl {
 
 impl EmptyDeviceDomain for NullDeviceDomainImpl {
     fn init(&self) -> LinuxResult<()> {
-        println!("NullDeviceDomainImpl init");
+        // println!("NullDeviceDomainImpl init");
         Ok(())
     }
 
@@ -58,7 +58,7 @@ impl EmptyDeviceDomain for NullDeviceDomainImpl {
         self.do_read(data)
     }
     fn write(&self, data: &RRefVec<u8>) -> LinuxResult<usize> {
-        println!("NullDeviceDomainImpl write");
+        // println!("NullDeviceDomainImpl write");
         self.do_write(data)
     }
 }

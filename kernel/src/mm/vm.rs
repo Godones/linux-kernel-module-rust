@@ -96,7 +96,7 @@ impl Drop for VSpace {
         unsafe {
             bindings::vfree(self.start as *mut core::ffi::c_void);
         }
-        pr_warn!("Dropping VSpace: {:x?}", self.start);
+        // pr_warn!("Dropping VSpace: {:x?}", self.start);
     }
 }
 

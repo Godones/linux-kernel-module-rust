@@ -43,7 +43,7 @@ impl DomainDataMapManager {
     /// Move the domain data map from the source domain to the target domain.
     fn move_domain(&mut self, from: u64, to: u64) {
         if let Some(data) = self.remove(from) {
-            println_color!(32, "move domain database, it's length: {}", data.len());
+            // println_color!(32, "move domain database, it's length: {}", data.len());
             self.map_per_domain.insert(to, data);
         }
     }
@@ -175,7 +175,7 @@ static DATA_BASE_MANAGER: Mutex<DomainDataMapManager> = Mutex::new(DomainDataMap
 pub fn create_domain_database(domain_id: u64) {
     let mut manager = DATA_BASE_MANAGER.lock();
     manager.create(domain_id);
-    println_color!(32, "create domain database for domain_id: {}", domain_id);
+    // println_color!(32, "create domain database for domain_id: {}", domain_id);
 }
 
 /// Get the domain data map with the given domain id.
@@ -198,5 +198,5 @@ pub fn remove_domain_database(domain_id: u64) -> Option<Box<DomainDataMap>> {
 pub fn move_domain_database(from: u64, to: u64) {
     let mut manager = DATA_BASE_MANAGER.lock();
     manager.move_domain(from, to);
-    println_color!(32, "move domain database from {} to {}", from, to);
+    // println_color!(32, "move domain database from {} to {}", from, to);
 }

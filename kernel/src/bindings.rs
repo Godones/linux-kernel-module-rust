@@ -67,6 +67,19 @@ extern "C" {
     // error end
 
     // Per-cpu
+    // unsigned long rust_helper_local_irq_save
+
+    #[link_name = "rust_helper_local_irq_save"]
+    pub fn local_irq_save() -> core::ffi::c_ulong;
+    #[link_name = "rust_helper_local_irq_restore"]
+    pub fn local_irq_restore(flags: core::ffi::c_ulong);
+
+    // rust_helper_sync_cpus
+    #[link_name = "rust_helper_sync_cpus"]
+    pub fn sync_cpus() -> core::ffi::c_int;
+
+    #[link_name = "rust_helper_switch_task_to_cpus"]
+    pub fn switch_task_to_cpus() -> core::ffi::c_int;
     #[link_name = "rust_helper_num_online_cpus"]
     pub fn num_online_cpus() -> core::ffi::c_uint;
     #[link_name = "rust_helper_alloc_percpu_longlong"]

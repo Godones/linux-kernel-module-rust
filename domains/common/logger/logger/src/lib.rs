@@ -25,7 +25,7 @@ impl LogDomain for Logger {
         log::set_logger(&SimpleLogger).unwrap();
         // default log level
         log::set_max_level(log::LevelFilter::Trace);
-        println!("Logger init");
+        // println!("Logger init");
         Ok(())
     }
 

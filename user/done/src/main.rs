@@ -1,18 +1,32 @@
-use std::{fs::OpenOptions, io::Write, sync::Arc, thread::sleep, time::Duration};
+use std::{
+    fs::OpenOptions,
+    io::{Read, Write},
+    sync::Arc,
+    thread::sleep,
+    time::Duration,
+};
 
 use domain_helper::{DomainHelperBuilder, DomainTypeRaw};
 use spin::Mutex;
 
 fn main() {
     let argv: Vec<String> = std::env::args().collect();
-    if argv.len() != 2 {
-        println!("Usage: done [new]/[test]/[panic]");
+    if argv.len() < 2 {
+        println!("Usage: done [new]/[test]/[panic]/[old]");
         return;
     }
     let option = argv[1].as_str();
     match option {
         "new" => {
             update_to_new();
+        }
+        "old" => {
+            update_to_old();
+        }
+        "thread" => {
+            let num = argv[2].parse::<usize>().unwrap();
+            println!("Run null device domain test with {} threads", num);
+            multi_thread_test(num);
         }
         "test" => {
             println!("Run null device domain test");
@@ -22,7 +36,7 @@ fn main() {
             panic_test();
         }
         _ => {
-            println!("Usage: done [new]/[test]/[panic]");
+            println!("Usage: done [new]/[test]/[panic]/[old]");
             return;
         }
     }
@@ -38,6 +52,50 @@ fn update_to_new() {
     builder.clone().register_domain_file().unwrap();
     builder.clone().update_domain().unwrap();
     println!("Register and update null device domain to new version successfully");
+}
+
+fn update_to_old() {
+    println!("Register and update null device domain to old version");
+    DomainHelperBuilder::new()
+        .ty(DomainTypeRaw::EmptyDeviceDomain)
+        .domain_name("empty_device")
+        .domain_register_ident("xnull")
+        .update_domain()
+        .unwrap();
+    println!("Register and update null device domain to old version successfully");
+}
+
+fn multi_thread_test(thread_num: usize) {
+    let mut threads = Vec::new();
+    for i in 0..thread_num {
+        let thread = std::thread::spawn(move || {
+            let start = std::time::Instant::now();
+            let path = format!("{}{}", PATH, i);
+            let mut file = OpenOptions::new()
+                .write(true)
+                .read(true)
+                .open(path)
+                .unwrap();
+            loop {
+                let mut buf = [0u8; 100];
+                let _r = file.read(&mut buf);
+                if start.elapsed().as_secs() > 10 {
+                    break;
+                }
+            }
+            println!("Thread {} is done, run {}sec", i, start.elapsed().as_secs());
+        });
+        threads.push(thread);
+    }
+
+    let updater = std::thread::spawn(move || {
+        sleep(Duration::from_secs(5));
+        update_to_new();
+    });
+    threads.push(updater);
+    for handle in threads.into_iter() {
+        handle.join().unwrap();
+    }
 }
 
 fn panic_test() {

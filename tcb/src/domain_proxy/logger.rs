@@ -6,6 +6,7 @@ use interface::{logger::LogDomain, Basic};
 use kernel::{
     init::InPlaceInit,
     sync::{Mutex, SRcuData},
+    time::TimeTick,
 };
 use rref::RRefVec;
 
@@ -59,16 +60,22 @@ impl LogDomainProxy {
         new_domain: Box<dyn LogDomain>,
         domain_loader: DomainLoader,
     ) -> LinuxResult<()> {
+        let tick = TimeTick::new("Reinit domain without state");
         let mut loader_guard = self.domain_loader.lock();
         let old_id = self.domain_id();
         // init new domain
         new_domain.init().unwrap();
+        drop(tick);
+
         // swap domain
         let old_domain = self.domain.update(new_domain);
+
+        let tick = TimeTick::new("Recycle resources");
         // free old domain
         let real_domain = Box::into_inner(old_domain);
         forget(real_domain);
         free_domain_resource(old_id, FreeShared::Free);
+        drop(tick);
         *loader_guard = domain_loader;
         Ok(())
     }

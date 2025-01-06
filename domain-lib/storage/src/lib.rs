@@ -127,7 +127,7 @@ mod __private {
 
     pub fn init_database(database: Box<dyn DomainDataStorage>) {
         DATABASE.call_once(|| database);
-        log::error!("init database success");
+        log::info!("init database success");
     }
 }
 

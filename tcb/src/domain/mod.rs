@@ -12,7 +12,7 @@ use crate::{
     register_domain,
 };
 
-static NULL_BLK: &[u8] = include_bytes!("../../../build/disk/gnull");
+// static NULL_BLK: &[u8] = include_bytes!("../../../build/disk/gnull");
 
 pub fn init_domain_system() -> LinuxResult<()> {
     init_kernel_domain();
@@ -34,8 +34,7 @@ pub fn init_domain_system() -> LinuxResult<()> {
     let (null_device, domain_file_info) = create_domain!(
         EmptyDeviceDomainProxy,
         DomainTypeRaw::EmptyDeviceDomain,
-        "empty_device",
-        Some(NULL_BLK.to_vec())
+        "empty_device" // Some(NULL_BLK.to_vec())
     )?;
     null_device.init_by_box(Box::new(()))?;
     register_domain!(

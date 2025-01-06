@@ -20,10 +20,10 @@ impl OneDevice {
 
 impl SysctlStorage for OneDevice {
     fn store_value(&self, data: &[u8]) -> (usize, KernelResult<()>) {
-        let str = core::str::from_utf8(data).unwrap();
-        CpuId::read(|id| {
-            println!("[core: {}] OneDevice::store_value: {}", id, str);
-        });
+        // let str = core::str::from_utf8(data).unwrap();
+        // CpuId::read(|id| {
+        //     println!("[core: {}] OneDevice::store_value", id);
+        // });
         let rvec = RRefVec::from_slice(data);
         let r = self.domain.write(&rvec);
         match r {

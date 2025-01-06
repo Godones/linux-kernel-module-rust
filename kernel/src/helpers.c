@@ -258,3 +258,70 @@ struct scatterlist* rust_helper_sg_next(struct scatterlist* sg) {
 dma_addr_t rust_helper_sg_dma_address(struct scatterlist* sg) {
     return sg_dma_address(sg);
 }
+
+int rust_helper_switch_task_to_cpus(void) {
+    int cpu;
+    struct task_struct *task = current; // 当前任务
+    cpumask_var_t cpu_mask;
+
+    if (!zalloc_cpumask_var(&cpu_mask, GFP_KERNEL)) {
+        pr_err("Failed to allocate CPU mask.\n");
+        return -ENOMEM;
+    }
+
+//    pr_info("Starting to switch task across CPUs.\n");
+
+    // 遍历每个在线 CPU
+    for_each_online_cpu(cpu) {
+        // pr_info("Trying to move task to CPU %d\n", cpu);
+
+        // 设置任务的 CPU 亲和性
+        cpumask_clear(cpu_mask);
+        cpumask_set_cpu(cpu, cpu_mask);
+        set_cpus_allowed_ptr(task, cpu_mask);
+
+        // 主动触发调度，迫使任务迁移到目标 CPU
+        schedule();
+
+        // 检查任务是否迁移成功
+        if (task_cpu(task) == cpu) {
+            // pr_info("Task successfully moved to CPU %d\n", cpu);
+        } else {
+            // pr_warn("Failed to move task to CPU %d\n", cpu);
+        }
+    }
+
+    free_cpumask_var(cpu_mask);
+//    pr_info("Task switching across CPUs completed.\n");
+    return 0;
+}
+
+
+unsigned long rust_helper_local_irq_save(void) {
+    unsigned long flags;
+    local_irq_save(flags);
+    return flags;
+}
+
+void rust_helper_local_irq_restore(unsigned long flags) {
+    local_irq_restore(flags);
+}
+
+static void execute_on_target_cpu(void *info) {
+//    int cpu = smp_processor_id();
+//    pr_info("Function executed on CPU %d\n", cpu);
+}
+
+
+int rust_helper_sync_cpus(void){
+    int cpu;
+    for_each_online_cpu(cpu) {
+        // pr_info("Calling function on CPU %d\n", cpu);
+        if (smp_call_function_single(cpu, execute_on_target_cpu, NULL, 1)) {
+            pr_err("Failed to execute function on CPU %d\n", cpu);
+        } else {
+            // pr_info("Successfully executed function on CPU %d\n", cpu);
+        }
+    }
+    return 0;
+}

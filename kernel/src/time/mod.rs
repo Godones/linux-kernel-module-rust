@@ -10,7 +10,7 @@
 
 pub mod hrtimer;
 
-use crate::{bindings, code::EDOM, error::KernelResult};
+use crate::{bindings, code::EDOM, error::KernelResult, pr_err};
 
 /// The number of nanoseconds per millisecond.
 pub const NSEC_PER_MSEC: i64 = bindings::NSEC_PER_MSEC as i64;
@@ -129,4 +129,33 @@ impl From<Timespec> for bindings::timespec64 {
 
 pub fn ktime_get_ns() -> u64 {
     unsafe { bindings::ktime_get_ns() }
+}
+
+pub struct TimeTick {
+    start: u64,
+    info: &'static str,
+}
+
+impl TimeTick {
+    pub fn new(info: &'static str) -> Self {
+        TimeTick {
+            info,
+            start: ktime_get_ns(),
+        }
+    }
+}
+
+impl Drop for TimeTick {
+    fn drop(&mut self) {
+        let end = ktime_get_ns();
+        if (end - self.start) > 2000 {
+            pr_err!(
+                "[{}] Time elapsed: {} us\n",
+                self.info,
+                (end - self.start) / 1000
+            );
+        } else {
+            pr_err!("[{}] Time elapsed: {} ns\n", self.info, end - self.start);
+        }
+    }
 }

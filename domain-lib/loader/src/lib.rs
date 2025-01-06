@@ -132,13 +132,13 @@ impl<V: DomainVmOps> DomainLoader<V> {
                 }
                 let vaddr = VirtAddr::from(start_vaddr).align_down_4k().as_usize();
                 let end_vaddr = VirtAddr::from(end_vaddr).align_up_4k().as_usize();
-                log::error!(
-                    "map range: [{:#x}-{:#x}], memsize:{}, perm:{:?}",
-                    vaddr,
-                    end_vaddr,
-                    ph.mem_size(),
-                    permission
-                );
+                // log::error!(
+                //     "map range: [{:#x}-{:#x}], memsize:{}, perm:{:?}",
+                //     vaddr,
+                //     end_vaddr,
+                //     ph.mem_size(),
+                //     permission
+                // );
                 let data =
                     &elf.input[ph.offset() as usize..(ph.offset() + ph.file_size()) as usize];
                 let data_len = data.len();
@@ -147,11 +147,11 @@ impl<V: DomainVmOps> DomainLoader<V> {
                 let module_slice = module_area.as_mut_slice();
                 let copy_start = start_vaddr - self.virt_start;
                 module_slice[copy_start..copy_start + data_len].copy_from_slice(data);
-                log::error!(
-                    "copy data to {:#x}-{:#x}",
-                    copy_start,
-                    copy_start + data_len
-                );
+                // log::error!(
+                //     "copy data to {:#x}-{:#x}",
+                //     copy_start,
+                //     copy_start + data_len
+                // );
                 if permission.contains(DomainMappingFlags::EXECUTE) {
                     self.text_section = vaddr..end_vaddr;
                 }
@@ -191,11 +191,11 @@ impl<V: DomainVmOps> DomainLoader<V> {
         // alloc free page to map elf
         let module_area = V::map_domain_area(end_paddr.as_usize());
         let region_start = module_area.start_virtual_address().as_usize();
-        log::error!(
-            "region range:{:#x}-{:#x}",
-            region_start,
-            region_start + end_paddr.as_usize()
-        );
+        // log::error!(
+        //     "region range:{:#x}-{:#x}",
+        //     region_start,
+        //     region_start + end_paddr.as_usize()
+        // );
         self.virt_start = region_start;
         self.module_area = Some(module_area);
         self.load_program(&elf)?;
@@ -203,11 +203,11 @@ impl<V: DomainVmOps> DomainLoader<V> {
         // update text section permission
         let text_pages = (self.text_section.end - self.text_section.start) / FRAME_SIZE;
         V::set_memory_x(self.text_section.start, text_pages)?;
-        log::error!(
-            "set_memory_x range: {:#x}-{:#x}",
-            self.text_section.start,
-            self.text_section.end
-        );
+        // log::error!(
+        //     "set_memory_x range: {:#x}-{:#x}",
+        //     self.text_section.start,
+        //     self.text_section.end
+        // );
         let entry = elf.header.pt2.entry_point() as usize + region_start;
         info!("entry: {:#x}", entry);
         self.entry_point = entry;

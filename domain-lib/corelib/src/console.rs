@@ -42,7 +42,7 @@ impl fmt::Write for LogLineWriter {
 macro_rules! print {
     ($($arg:tt)*) => {
         let mut writer = $crate::console::LogLineWriter::new();
-        let _ = core::fmt::write(&mut writer, format_args!("[0][Domain:{}] {}",rref::domain_id(), format_args!($($arg)*))).unwrap();
+        let _ = core::fmt::write(&mut writer, format_args!("[0][Domain:{}] {}",shared_heap::domain_id(), format_args!($($arg)*))).unwrap();
         $crate::console::__print(format_args!("{}", writer.as_str()));
     };
 }
@@ -78,7 +78,7 @@ macro_rules! println_color {
             34 => "[DEBUG] ",
             _ => "[UNKNOWN] ",
         };
-         let _ = core::fmt::write(&mut writer, format_args!("[0][Domain:{}]{} {}\n",rref::domain_id(), prefix, format_args!($($arg)*))).unwrap();
+         let _ = core::fmt::write(&mut writer, format_args!("[0][Domain:{}]{} {}\n",shared_heap::domain_id(), prefix, format_args!($($arg)*))).unwrap();
         $crate::console::__print(format_args!("{}", writer.as_str()));
     };
 }

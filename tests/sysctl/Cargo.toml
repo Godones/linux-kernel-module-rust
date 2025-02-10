@@ -13,7 +13,3 @@ default = ["kernel"]
 
 [dependencies]
 kernel = { path = "../../kernel", optional = true }
-
-[dev-dependencies]
-kernel-module-testlib = { path = "../../testlib" }
-libc = "0.2.58"

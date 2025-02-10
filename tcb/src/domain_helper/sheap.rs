@@ -9,7 +9,7 @@ use core::{alloc::Layout, any::TypeId};
 
 use hashbrown::HashMap;
 use ksync::{Lazy, Mutex};
-use rref::{SharedHeapAlloc, SharedHeapAllocation};
+use shared_heap::{SharedHeapAlloc, SharedHeapAllocation};
 
 use crate::config::FRAME_SIZE;
 

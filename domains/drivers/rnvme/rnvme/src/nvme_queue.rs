@@ -5,7 +5,7 @@ use core::{
 };
 
 use basic::{
-    console::{print as pr_info, println_color},
+    print as pr_info, println_color,
     kernel::{
         block::mq,
         error::KernelResult as Result,

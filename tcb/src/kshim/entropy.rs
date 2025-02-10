@@ -8,7 +8,7 @@ use kernel::{
     sync::{CpuId, LongLongPerCpu},
     sysctl::SysctlStorage,
 };
-use rref::RRefVec;
+use shared_heap::DVec;
 
 pub struct EntropySource {
     log_domain: Arc<dyn LogDomain>,
@@ -36,7 +36,7 @@ impl SysctlStorage for EntropySource {
             *counter += 1;
         });
         let str = core::str::from_utf8(data).unwrap();
-        let log_message = RRefVec::from_slice(str.as_bytes());
+        let log_message = DVec::from_slice(str.as_bytes());
         let _r = self
             .log_domain
             .log(interface::logger::Level::Info, &log_message);

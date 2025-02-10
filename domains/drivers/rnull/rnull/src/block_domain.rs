@@ -1,31 +1,26 @@
 use alloc::{boxed::Box, sync::Arc};
 use core::{fmt::Debug, pin::Pin};
 
-use basic::{
-    console::*,
-    impl_has_timer,
-    kernel::{
-        block,
-        block::{
-            bio::Segment,
-            mq,
-            mq::{GenDisk, MqOperations, TagSet},
-        },
-        error,
-        error::{linux_err, Error, KernelResult},
-        mm::pages::Pages,
-        radix_tree::RadixTree,
-        sync::{Mutex, SpinLock, UniqueArc},
-        time,
-        time::hrtimer::{RawTimer, TimerCallback},
-        types::ForeignOwnable,
+use basic::{impl_has_timer, kernel::{
+    block,
+    block::{
+        bio::Segment,
+        mq,
+        mq::{GenDisk, MqOperations, TagSet},
     },
-    new_mutex, new_spinlock, SafePtr,
-};
+    error,
+    error::{linux_err, Error, KernelResult},
+    mm::pages::Pages,
+    radix_tree::RadixTree,
+    sync::{Mutex, SpinLock, UniqueArc},
+    time,
+    time::hrtimer::{RawTimer, TimerCallback},
+    types::ForeignOwnable,
+}, new_mutex, new_spinlock, println, SafePtr};
 use interface::{empty_device::EmptyDeviceDomain, null_block::BlockArgs, DomainType};
 use kmacro::vtable;
 use pinned_init::{pin_data, pin_init, InPlaceInit, PinInit};
-use rref::RRefVec;
+use shared_heap::DVec;
 
 #[derive(Debug)]
 enum IRQMode {
@@ -54,7 +49,7 @@ pub struct NullBlkDomain {
 
 pub struct MultiDomainTest {
     empty_blk: Arc<dyn EmptyDeviceDomain>,
-    buf: RRefVec<u8>,
+    buf: DVec<u8>,
 }
 
 impl Debug for NullBlkDomain {
@@ -106,7 +101,7 @@ pub static MULTI_DOMAIN: spin::Mutex<Option<MultiDomainTest>> = spin::Mutex::new
 
 #[cfg(feature = "multi_domain")]
 fn init_multi_domain() -> KernelResult {
-    let buf = RRefVec::new(0, 4096);
+    let buf = DVec::new(0, 4096);
     let empty_blk = basic::get_domain("empty_device").ok_or(linux_err::EINVAL)?;
     let empty_blk = match empty_blk {
         DomainType::EmptyDeviceDomain(empty_blk) => empty_blk,
@@ -122,7 +117,7 @@ fn init_multi_domain() -> KernelResult {
 #[cfg(feature = "multi_domain_no")]
 fn init_multi_domain() -> KernelResult {
     use null::NullDeviceDomainImpl;
-    let buf = RRefVec::new(8, 4096);
+    let buf = DVec::new(8, 4096);
     let empty_blk = Arc::new(NullDeviceDomainImpl::new());
     let multi_domain = MultiDomainTest { empty_blk, buf };
     let mut lock = MULTI_DOMAIN.lock();

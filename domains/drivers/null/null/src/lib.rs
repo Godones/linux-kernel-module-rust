@@ -5,9 +5,9 @@ extern crate alloc;
 use alloc::boxed::Box;
 use core::fmt::Debug;
 
-use basic::{console::println, LinuxResult};
+use basic::{println, LinuxResult};
 use interface::{empty_device::EmptyDeviceDomain, Basic};
-use rref::RRefVec;
+use shared_heap::DVec;
 use spin::Mutex;
 
 pub struct NullDeviceDomainImpl {
@@ -21,14 +21,14 @@ impl NullDeviceDomainImpl {
         }
     }
 
-    pub fn do_read(&self, mut data: RRefVec<u8>) -> LinuxResult<RRefVec<u8>> {
+    pub fn do_read(&self, mut data: DVec<u8>) -> LinuxResult<DVec<u8>> {
         let fake_mem = self.fake_mem.lock();
         let copy_len = core::cmp::min(data.len(), fake_mem.len());
         data.as_mut_slice()[..copy_len].copy_from_slice(&fake_mem[..copy_len]);
         Ok(data)
     }
 
-    pub fn do_write(&self, data: &RRefVec<u8>) -> LinuxResult<usize> {
+    pub fn do_write(&self, data: &DVec<u8>) -> LinuxResult<usize> {
         let mut fake_mem = self.fake_mem.lock();
         let copy_len = core::cmp::min(data.len(), fake_mem.len());
         fake_mem[..copy_len].copy_from_slice(&data.as_slice()[..copy_len]);
@@ -44,7 +44,7 @@ impl Debug for NullDeviceDomainImpl {
 
 impl Basic for NullDeviceDomainImpl {
     fn domain_id(&self) -> u64 {
-        rref::domain_id()
+        shared_heap::domain_id()
     }
 }
 
@@ -54,10 +54,10 @@ impl EmptyDeviceDomain for NullDeviceDomainImpl {
         Ok(())
     }
 
-    fn read(&self, data: RRefVec<u8>) -> LinuxResult<RRefVec<u8>> {
+    fn read(&self, data: DVec<u8>) -> LinuxResult<DVec<u8>> {
         self.do_read(data)
     }
-    fn write(&self, data: &RRefVec<u8>) -> LinuxResult<usize> {
+    fn write(&self, data: &DVec<u8>) -> LinuxResult<usize> {
         // println!("NullDeviceDomainImpl write");
         self.do_write(data)
     }
@@ -79,10 +79,10 @@ impl EmptyDeviceDomain for UnwindWrap {
     fn init(&self) -> LinuxResult<()> {
         self.0.init()
     }
-    fn read(&self, data: RRefVec<u8>) -> LinuxResult<RRefVec<u8>> {
+    fn read(&self, data: DVec<u8>) -> LinuxResult<DVec<u8>> {
         basic::catch_unwind(|| self.0.read(data))
     }
-    fn write(&self, data: &RRefVec<u8>) -> LinuxResult<usize> {
+    fn write(&self, data: &DVec<u8>) -> LinuxResult<usize> {
         basic::catch_unwind(|| self.0.write(data))
     }
 }

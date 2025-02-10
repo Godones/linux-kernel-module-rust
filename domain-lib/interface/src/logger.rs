@@ -1,11 +1,11 @@
 use downcast_rs::{impl_downcast, DowncastSync};
-use rref::RRefVec;
+use shared_heap::DVec;
 
 use crate::{Basic, LinuxResult};
 
 pub trait LogDomain: Basic + DowncastSync {
     fn init(&self) -> LinuxResult<()>;
-    fn log(&self, level: Level, msg: &RRefVec<u8>) -> LinuxResult<()>;
+    fn log(&self, level: Level, msg: &DVec<u8>) -> LinuxResult<()>;
     fn set_max_level(&self, level: LevelFilter) -> LinuxResult<()>;
 }
 

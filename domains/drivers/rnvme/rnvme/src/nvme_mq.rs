@@ -7,7 +7,7 @@ use core::{
 
 use basic::{
     bindings,
-    console::print as pr_info,
+    print as pr_info,
     kernel::{
         block::mq,
         device::RawDevice,

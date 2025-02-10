@@ -4,12 +4,12 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-malloc = { path = "../../../../domain-lib/malloc" }
+malloc = { git = "https://github.com/os-module/domain-lib" }
 corelib = { path = "../../../../domain-lib/corelib" }
 basic = { path = "../../../../domain-lib/basic",  default-features = false  }
-rref = { path = "../../../../domain-lib/rref" }
+shared_heap = { git = "https://github.com/os-module/domain-lib" }
 interface = { path = "../../../../domain-lib/interface",  features = ["domain"]  }
-storage = { path = "../../../../domain-lib/storage", features = ["impl"] }
+storage = { git = "https://github.com/os-module/domain-lib", features = ["impl"] }
 
 null = { path = "../null" }
 

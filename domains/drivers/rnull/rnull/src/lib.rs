@@ -8,7 +8,7 @@ extern crate alloc;
 use alloc::boxed::Box;
 use core::fmt::Debug;
 
-use basic::{console::*, kernel::block::mq::OperationsConverter, LinuxError, LinuxResult, SafePtr};
+use basic::{kernel::block::mq::OperationsConverter, println, LinuxError, LinuxResult, SafePtr};
 use interface::{
     empty_device::EmptyDeviceDomain,
     null_block::{BlockArgs, BlockDeviceDomain},
@@ -37,7 +37,7 @@ impl NullDeviceDomainImpl {
 
 impl Basic for NullDeviceDomainImpl {
     fn domain_id(&self) -> u64 {
-        rref::domain_id()
+        shared_heap::domain_id()
     }
 }
 

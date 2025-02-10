@@ -50,6 +50,8 @@ pub fn build_domain(name: &str, log: String, dir: &str, arch: Arch) {
                 .arg(path)
                 .arg("--target")
                 .arg(arch.target_json())
+                .arg("-Zbuild-std=core,alloc")
+                .arg("-Zbuild-std-features=compiler-builtins-mem")
                 .arg("--target-dir")
                 .arg("../target")
                 .current_dir("./domains")

@@ -5,8 +5,6 @@ use serde::Deserialize;
 pub mod build;
 pub mod clean;
 pub mod fmt;
-pub mod r#move;
-pub mod new;
 
 #[derive(Deserialize)]
 pub struct Config {

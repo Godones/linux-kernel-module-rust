@@ -6,7 +6,7 @@ use core::{
 
 use basic::{
     c_str,
-    console::{print as pr_info, println},
+    {print as pr_info, println},
     kernel::{
         block::mq::OperationsConverter,
         driver::DriverRegistration,
@@ -37,7 +37,7 @@ unsafe impl Sync for NvmeDomain {}
 
 impl Basic for NvmeDomain {
     fn domain_id(&self) -> u64 {
-        rref::domain_id()
+        shared_heap::domain_id()
     }
 }
 

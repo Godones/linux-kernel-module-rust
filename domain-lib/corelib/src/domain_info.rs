@@ -56,4 +56,7 @@ impl DomainFileInfo {
     pub fn new(name: String, size: usize) -> Self {
         Self { name, size }
     }
+    pub fn from((name, size): (String, usize)) -> Self {
+        Self { name, size }
+    }
 }

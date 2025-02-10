@@ -6,7 +6,7 @@ use kernel::{
     buf::KernelSlicePtrWriter, code::EINVAL, error::KernelResult, sync::CpuId,
     sysctl::SysctlStorage,
 };
-use rref::RRefVec;
+use shared_heap::DVec;
 
 pub struct OneDevice {
     domain: Arc<dyn EmptyDeviceDomain>,
@@ -24,7 +24,7 @@ impl SysctlStorage for OneDevice {
         // CpuId::read(|id| {
         //     println!("[core: {}] OneDevice::store_value", id);
         // });
-        let rvec = RRefVec::from_slice(data);
+        let rvec = DVec::from_slice(data);
         let r = self.domain.write(&rvec);
         match r {
             Ok(r) => (r, Ok(())),
@@ -37,7 +37,7 @@ impl SysctlStorage for OneDevice {
         }
     }
     fn read_value(&self, data: &mut KernelSlicePtrWriter) -> (usize, KernelResult<()>) {
-        let rvec = RRefVec::new_uninit(data.len());
+        let rvec = DVec::new_uninit(data.len());
         let r = self.domain.read(rvec);
         if let Ok(r) = r {
             (r.len(), data.write(r.as_slice()))

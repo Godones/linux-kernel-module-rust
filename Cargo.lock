@@ -65,7 +65,7 @@ version = "1.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6d36fc52c7f6c869915e99412912f22093507da8d9e942ceaf66fe4b7c14422a"
 dependencies = [
- "windows-sys 0.52.0",
+ "windows-sys",
 ]
 
 [[package]]
@@ -75,7 +75,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5bf74e1b6e971609db8ca7a9ce79fd5768ab6ae46441c572e46cf596f59e57f8"
 dependencies = [
  "anstyle",
- "windows-sys 0.52.0",
+ "windows-sys",
 ]
 
 [[package]]
@@ -92,7 +92,7 @@ dependencies = [
  "domain_main",
  "ksync",
  "log",
- "rref",
+ "shared_heap",
  "spin",
  "unwinding",
 ]
@@ -128,15 +128,6 @@ name = "bitflags"
 version = "2.6.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b048fb63fd8b5923fc5aa7b340d8e156aec7ec02f0c78fa8a6ddc2613f6f71de"
-
-[[package]]
-name = "buddy_system_allocator"
-version = "0.9.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d44d578cadd17312c75e7d0ef489361f160ace58f7139aa32001fee1a51b89b5"
-dependencies = [
- "spin",
-]
 
 [[package]]
 name = "cc"
@@ -252,7 +243,7 @@ dependencies = [
  "log",
  "pconst",
  "pinned-init",
- "rref",
+ "shared_heap",
  "spin",
 ]
 
@@ -289,6 +280,7 @@ dependencies = [
 [[package]]
 name = "domain_main"
 version = "0.1.0"
+source = "git+https://github.com/os-module/domain-lib#2a5d40d7716c6f0d41370d1bc9507dc70089a9ec"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -319,22 +311,6 @@ name = "equivalent"
 version = "1.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5443807d6dff69373d433ab9ef5378ad8df50ca6298caf15de6e52e24aaf54d5"
-
-[[package]]
-name = "errno"
-version = "0.3.9"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "534c5cf6194dfab3db3242765c03bbe257cf92f22b38f6bc0c58d59108a820ba"
-dependencies = [
- "libc",
- "windows-sys 0.52.0",
-]
-
-[[package]]
-name = "fastrand"
-version = "2.1.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e8c02a5121d4ea3eb16a80748c74f5549a5665e4c21333c6098f283870fbdea6"
 
 [[package]]
 name = "fio"
@@ -425,7 +401,7 @@ dependencies = [
  "kbind",
  "pconst",
  "pod",
- "rref",
+ "shared_heap",
 ]
 
 [[package]]
@@ -468,14 +444,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "kernel-module-testlib"
-version = "0.1.0"
-dependencies = [
- "libc",
- "tempfile",
-]
-
-[[package]]
 name = "kmacro"
 version = "0.1.0"
 
@@ -503,20 +471,14 @@ dependencies = [
 ]
 
 [[package]]
-name = "linux-raw-sys"
-version = "0.4.14"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "78b3ae25bc7c8c38cec158d1f2757ee79e9b3740fbc7ccf0e59e4b08d793fa89"
-
-[[package]]
 name = "loader"
 version = "0.1.0"
+source = "git+https://github.com/os-module/domain-lib#2a5d40d7716c6f0d41370d1bc9507dc70089a9ec"
 dependencies = [
  "bitflags 2.6.0",
- "corelib",
  "log",
  "memory_addr",
- "rref",
+ "shared_heap",
  "storage",
  "xmas-elf",
 ]
@@ -536,15 +498,6 @@ name = "log"
 version = "0.4.22"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a7a70ba024b9dc04c27ea2f0c0548feb474ec5c54bba33a7f72f873a39d07b24"
-
-[[package]]
-name = "malloc"
-version = "0.1.0"
-dependencies = [
- "buddy_system_allocator",
- "corelib",
- "rref",
-]
 
 [[package]]
 name = "memchr"
@@ -755,16 +708,6 @@ name = "rrandom"
 version = "0.1.0"
 dependencies = [
  "kernel",
- "kernel-module-testlib",
- "libc",
-]
-
-[[package]]
-name = "rref"
-version = "0.1.0"
-dependencies = [
- "log",
- "spin",
 ]
 
 [[package]]
@@ -772,19 +715,6 @@ name = "rustc-hash"
 version = "1.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "08d43f7aa6b08d49f382cde6a7982047c3426db949b1424bc4b7ec9ae12c6ce2"
-
-[[package]]
-name = "rustix"
-version = "0.38.37"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8acb788b847c24f28525660c4d7758620a7210875711f79e7f663cc152726811"
-dependencies = [
- "bitflags 2.6.0",
- "errno",
- "libc",
- "linux-raw-sys",
- "windows-sys 0.52.0",
-]
 
 [[package]]
 name = "scopeguard"
@@ -822,6 +752,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "shared_heap"
+version = "0.1.0"
+source = "git+https://github.com/os-module/domain-lib#2a5d40d7716c6f0d41370d1bc9507dc70089a9ec"
+dependencies = [
+ "log",
+ "spin",
+]
+
+[[package]]
 name = "shlex"
 version = "1.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -839,6 +778,7 @@ dependencies = [
 [[package]]
 name = "storage"
 version = "0.1.0"
+source = "git+https://github.com/os-module/domain-lib#2a5d40d7716c6f0d41370d1bc9507dc70089a9ec"
 dependencies = [
  "log",
  "spin",
@@ -885,8 +825,6 @@ name = "sysctl"
 version = "0.1.0"
 dependencies = [
  "kernel",
- "kernel-module-testlib",
- "libc",
 ]
 
 [[package]]
@@ -904,23 +842,10 @@ dependencies = [
  "loader",
  "log",
  "memory_addr",
- "rref",
+ "shared_heap",
  "spin",
  "storage",
  "xmas-elf",
-]
-
-[[package]]
-name = "tempfile"
-version = "3.13.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f0f2c9fc62d0beef6951ccffd757e241266a2c833136efbe35af6cd2567dca5b"
-dependencies = [
- "cfg-if",
- "fastrand",
- "once_cell",
- "rustix",
- "windows-sys 0.59.0",
 ]
 
 [[package]]
@@ -1010,15 +935,6 @@ name = "windows-sys"
 version = "0.52.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "282be5f36a8ce781fad8c8ae18fa3f9beff57ec1b52cb3de0789201425d9a33d"
-dependencies = [
- "windows-targets",
-]
-
-[[package]]
-name = "windows-sys"
-version = "0.59.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1e38bc4d79ed67fd075bcc251a1c39b32a1776bbe92e5bef1f0bf1f8c531853b"
 dependencies = [
  "windows-targets",
 ]

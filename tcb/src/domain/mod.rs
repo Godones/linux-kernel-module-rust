@@ -50,6 +50,6 @@ pub fn init_domain_system() -> LinuxResult<()> {
 
 /// set the kernel to the specific domain
 fn init_kernel_domain() {
-    rref::init(SHARED_HEAP_ALLOCATOR, alloc_domain_id());
+    shared_heap::init(SHARED_HEAP_ALLOCATOR, alloc_domain_id());
     storage::init_data_allocator(DOMAIN_DATA_ALLOCATOR);
 }

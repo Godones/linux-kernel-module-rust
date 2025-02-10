@@ -14,10 +14,6 @@ rustflags = [
     "-A", "unused_imports",
 ]
 
-[unstable]
-build-std = ["core", "alloc"]
-build-std-features = ["compiler-builtins-mem"]
-
 [profile.release]
 #lto = "fat"
 strip = true

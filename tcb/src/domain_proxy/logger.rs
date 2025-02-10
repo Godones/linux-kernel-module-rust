@@ -8,7 +8,7 @@ use kernel::{
     sync::{Mutex, SRcuData},
     time::TimeTick,
 };
-use rref::RRefVec;
+use shared_heap::DVec;
 
 use crate::{
     domain_helper::{free_domain_resource, FreeShared},
@@ -45,7 +45,7 @@ impl LogDomain for LogDomainProxy {
         self.domain.read(|domain| domain.init())
     }
 
-    fn log(&self, level: interface::logger::Level, msg: &RRefVec<u8>) -> LinuxResult<()> {
+    fn log(&self, level: interface::logger::Level, msg: &DVec<u8>) -> LinuxResult<()> {
         self.domain.read(|domain| domain.log(level, msg))
     }
 
@@ -99,7 +99,7 @@ impl LogDomain for LogDomainEmptyImpl {
         Ok(())
     }
 
-    fn log(&self, _level: interface::logger::Level, _msg: &RRefVec<u8>) -> LinuxResult<()> {
+    fn log(&self, _level: interface::logger::Level, _msg: &DVec<u8>) -> LinuxResult<()> {
         Err(LinuxErrno::ENOSYS)
     }
 

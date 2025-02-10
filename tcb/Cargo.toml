@@ -12,9 +12,9 @@ interface = { path = "../domain-lib/interface" }
 corelib = { path = "../domain-lib/corelib" }
 basic = { path = "../domain-lib/basic", default-features = false }
 ksync = { path = "../domain-lib/ksync" }
-rref = { path = "../domain-lib/rref" }
-storage = { path = "../domain-lib/storage" }
-loader = { path = "../domain-lib/loader" }
+shared_heap = { git = "https://github.com/os-module/domain-lib" }
+storage = { git = "https://github.com/os-module/domain-lib" }
+loader = { git = "https://github.com/os-module/domain-lib" }
 command = { path = "../domain-lib/command" }
 
 #

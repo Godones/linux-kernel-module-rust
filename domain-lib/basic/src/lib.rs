@@ -45,8 +45,4 @@ pub fn unwind_from_panic() {
 pub mod sync {
     pub use spin::Mutex;
 }
-
-#[macro_use]
-pub mod console {
-    pub use corelib::{print, println, println_color};
-}
+pub use corelib::{print, println, println_color};

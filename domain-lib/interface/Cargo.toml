@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-rref = { path = "../rref" }
+shared_heap = { git = "https://github.com/os-module/domain-lib" }
 pod = { git = "https://github.com/asterinas/pod", rev = "d7dba56" }
 pconst = { git = "https://github.com/os-module/pconst.git", features = ["special_error"] }
 downcast-rs = { version = "1.2.0", default-features = false }

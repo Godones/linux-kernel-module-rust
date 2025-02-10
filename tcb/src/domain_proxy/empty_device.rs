@@ -11,7 +11,7 @@ use kernel::{
     },
     time::TimeTick,
 };
-use rref::{RRefVec, SharedData};
+use shared_heap::{DVec, SharedData};
 
 use crate::{
     domain_helper::{free_domain_resource, FreeShared},
@@ -76,7 +76,7 @@ impl EmptyDeviceDomain for EmptyDeviceDomainProxy {
         self.domain.read_directly(|domain| domain.init())
     }
 
-    fn read(&self, data: RRefVec<u8>) -> LinuxResult<RRefVec<u8>> {
+    fn read(&self, data: DVec<u8>) -> LinuxResult<DVec<u8>> {
         // let irq = local_irq_save();
         if self.flag.load(core::sync::atomic::Ordering::Relaxed) {
             self._read_with_lock(data, 0)
@@ -85,7 +85,7 @@ impl EmptyDeviceDomain for EmptyDeviceDomainProxy {
         }
     }
 
-    fn write(&self, data: &RRefVec<u8>) -> LinuxResult<usize> {
+    fn write(&self, data: &DVec<u8>) -> LinuxResult<usize> {
         if self.flag.load(core::sync::atomic::Ordering::Relaxed) {
             self._write_with_lock(data)
         } else {
@@ -117,7 +117,7 @@ impl EmptyDeviceDomainProxy {
         r
     }
 
-    fn _read(&self, data: RRefVec<u8>) -> LinuxResult<RRefVec<u8>> {
+    fn _read(&self, data: DVec<u8>) -> LinuxResult<DVec<u8>> {
         let (res, old_id) = self.domain.read_directly(|domain| {
             let id = domain.domain_id();
             let old_id = data.move_to(id);
@@ -130,11 +130,11 @@ impl EmptyDeviceDomainProxy {
         })
     }
 
-    fn _write(&self, data: &RRefVec<u8>) -> LinuxResult<usize> {
+    fn _write(&self, data: &DVec<u8>) -> LinuxResult<usize> {
         self.domain.read_directly(|domain| domain.write(data))
     }
 
-    fn _read_no_lock(&self, data: RRefVec<u8>, irq: u64) -> LinuxResult<RRefVec<u8>> {
+    fn _read_no_lock(&self, data: DVec<u8>, irq: u64) -> LinuxResult<DVec<u8>> {
         if self.f.load(core::sync::atomic::Ordering::Relaxed) {
             println!("EmptyDeviceDomainProxy _read_no_lock");
         }
@@ -150,7 +150,7 @@ impl EmptyDeviceDomainProxy {
         r
     }
 
-    fn _write_no_lock(&self, data: &RRefVec<u8>) -> LinuxResult<usize> {
+    fn _write_no_lock(&self, data: &DVec<u8>) -> LinuxResult<usize> {
         self.counter.get_with(|counter| {
             *counter += 1;
         });
@@ -161,7 +161,7 @@ impl EmptyDeviceDomainProxy {
         r
     }
 
-    fn _read_with_lock(&self, data: RRefVec<u8>, irq: u64) -> LinuxResult<RRefVec<u8>> {
+    fn _read_with_lock(&self, data: DVec<u8>, irq: u64) -> LinuxResult<DVec<u8>> {
         local_irq_restore(irq);
         let lock = self.lock.lock();
         let r = self._read(data);
@@ -169,7 +169,7 @@ impl EmptyDeviceDomainProxy {
         r
     }
 
-    fn _write_with_lock(&self, data: &RRefVec<u8>) -> LinuxResult<usize> {
+    fn _write_with_lock(&self, data: &DVec<u8>) -> LinuxResult<usize> {
         let lock = self.lock.lock();
         let r = self._write(data);
         drop(lock);
@@ -258,11 +258,11 @@ impl EmptyDeviceDomain for EmptyDeviceDomainEmptyImpl {
         Ok(())
     }
 
-    fn read(&self, _data: RRefVec<u8>) -> LinuxResult<RRefVec<u8>> {
+    fn read(&self, _data: DVec<u8>) -> LinuxResult<DVec<u8>> {
         Err(LinuxError::ENOSYS)
     }
 
-    fn write(&self, _data: &RRefVec<u8>) -> LinuxResult<usize> {
+    fn write(&self, _data: &DVec<u8>) -> LinuxResult<usize> {
         Err(LinuxError::ENOSYS)
     }
 }

@@ -22,7 +22,7 @@ use core::{
 
 use basic::{
     bindings, c_str,
-    console::print as pr_info,
+    print as pr_info,
     kernel::{
         block::{mq, mq::TagSet},
         device::{self, Device, RawDevice},

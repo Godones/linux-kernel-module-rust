@@ -697,9 +697,9 @@ void execmem_free(void *ptr);
 [17481.450613] [LKM] domain has 0 data
 [17481.450613] [LKM] free_shared is Free, free 0 data
 [17481.450614] [LKM] [Domain: 1] free DomainDataMap resource
-[17481.450845] [LKM] [ WARN] [rref::rvec] <drop> for RRefVec
-[17481.450845] [LKM] [ WARN] [rref::rref] <drop> for RRef 0xffff9c9e8178b7a0
-[17481.450846] [LKM] [ WARN] [rref::rref] <custom_drop> for RRef 0xffff9c9e8178b7a0
+[17481.450845] [LKM] [ WARN] [rref::rvec] <drop> for DVec
+[17481.450845] [LKM] [ WARN] [rref::rref] <drop> for DBox 0xffff9c9e8178b7a0
+[17481.450846] [LKM] [ WARN] [rref::rref] <custom_drop> for DBox 0xffff9c9e8178b7a0
 [17481.450846] [LKM] [ WARN] [rref] default for u8
 [17481.450847] [LKM] [ERROR] [tcb::domain_helper::sheap] <SharedHeap> dealloc: 0xffff9c9e8178b7a0
 [17481.451171] [LKM] [ INFO] [loader] drop domain loader [logger]
@@ -808,7 +808,7 @@ https://www.cnblogs.com/wangzahngjun/p/4992045.html
 
 > 通过逐渐将更多kernel中的功能变成域实现，我们可以逐步过渡到更好的实现上
 
-为了解决第二个问题，我们需要禁止域去注册回调函数，而是**通过创建内核功能到域功能的中介来间接地使用域功能**，但是这种方式需要对内核的功能逐个做封装，并且需要仔细设计域的接口形式。在域的接口上，我们只能使用`RRef<T>` 相应的共享堆上的数据结构来进行通信，而内核中的大多数数据结构包含了裸指针，因此它们之间的对应关系也需要进行转换。
+为了解决第二个问题，我们需要禁止域去注册回调函数，而是**通过创建内核功能到域功能的中介来间接地使用域功能**，但是这种方式需要对内核的功能逐个做封装，并且需要仔细设计域的接口形式。在域的接口上，我们只能使用`DBox<T>` 相应的共享堆上的数据结构来进行通信，而内核中的大多数数据结构包含了裸指针，因此它们之间的对应关系也需要进行转换。
 
 到现在为止，可以看到这些域的实现和当前用Rust实现的内核模块是很相似的，但它们又存在一些区别:
 

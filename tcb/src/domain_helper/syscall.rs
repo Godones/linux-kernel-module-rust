@@ -5,7 +5,10 @@ use core::{
     sync::atomic::AtomicBool,
 };
 
-use corelib::{domain_info::DomainDataInfo, CoreFunction, LinuxError, LinuxResult};
+use corelib::{
+    domain_info::{DomainDataInfo, DomainFileInfo, DomainInfo},
+    CoreFunction, LinuxError, LinuxResult,
+};
 use interface::*;
 use kernel::bindings::*;
 
@@ -103,7 +106,7 @@ impl CoreFunction for DomainSyscall {
                     Some(old_domain_id),
                 );
                 let logger_proxy = logger.downcast_arc::<LogDomainProxy>().unwrap();
-                let domain_info = loader.domain_file_info();
+                let domain_info = DomainFileInfo::from(loader.domain_file_info());
                 logger_proxy.replace(new_domain, loader)?;
                 println!(
                     "Try to replace logger domain {} with {} ok",
@@ -122,7 +125,7 @@ impl CoreFunction for DomainSyscall {
                 let empty_device = empty_device
                     .downcast_arc::<EmptyDeviceDomainProxy>()
                     .unwrap();
-                let domain_info = loader.domain_file_info();
+                let domain_info = DomainFileInfo::from(loader.domain_file_info());
                 empty_device.replace(new_domain, loader)?;
                 println!(
                     "Try to replace empty device domain {} with {} ok",
@@ -141,7 +144,7 @@ impl CoreFunction for DomainSyscall {
                 let block_device = block_device
                     .downcast_arc::<BlockDeviceDomainProxy>()
                     .unwrap();
-                let domain_info = loader.domain_file_info();
+                let domain_info = DomainFileInfo::from(loader.domain_file_info());
                 block_device.replace(new_domain, loader)?;
                 println!(
                     "Try to replace block device domain {} with {} ok",

@@ -3,20 +3,20 @@
 extern crate alloc;
 use alloc::boxed::Box;
 
-use basic::{console::println, LinuxResult};
+use basic::{println, LinuxResult};
 use interface::{
     logger::{Level, LevelFilter, LogDomain},
     Basic,
 };
 use log::{Log, Metadata, Record};
-use rref::RRefVec;
+use shared_heap::DVec;
 
 #[derive(Debug)]
 pub struct Logger;
 
 impl Basic for Logger {
     fn domain_id(&self) -> u64 {
-        rref::domain_id()
+        shared_heap::domain_id()
     }
 }
 
@@ -29,7 +29,7 @@ impl LogDomain for Logger {
         Ok(())
     }
 
-    fn log(&self, level: Level, msg: &RRefVec<u8>) -> LinuxResult<()> {
+    fn log(&self, level: Level, msg: &DVec<u8>) -> LinuxResult<()> {
         let msg = core::str::from_utf8(msg.as_slice()).unwrap();
         let level = match level {
             Level::Error => log::Level::Error,
@@ -94,7 +94,7 @@ impl LogDomain for UnwindWrap {
     fn init(&self) -> LinuxResult<()> {
         self.0.init()
     }
-    fn log(&self, level: Level, msg: &RRefVec<u8>) -> LinuxResult<()> {
+    fn log(&self, level: Level, msg: &DVec<u8>) -> LinuxResult<()> {
         basic::catch_unwind(|| self.0.log(level, msg))
     }
     fn set_max_level(&self, level: LevelFilter) -> LinuxResult<()> {

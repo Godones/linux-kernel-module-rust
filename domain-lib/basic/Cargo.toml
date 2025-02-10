@@ -6,9 +6,9 @@ edition = "2021"
 [dependencies]
 corelib = { path = "../corelib", features = ["core_impl"]}
 log = "0.4.22"
-rref = { path = "../rref" }
+shared_heap = { git = "https://github.com/os-module/domain-lib" }
 ksync = { path = "../ksync" }
-domain_main = { path = "../domain_main" }
+domain_main = { git = "https://github.com/os-module/domain-lib" }
 
 unwinding = { git = "https://github.com/nbdd0121/unwinding", rev = "ff0e91b", default-features = false, features = [
     "unwinder",

@@ -6,7 +6,7 @@ edition = "2021"
 [dependencies]
 basic = { path = "../../../../domain-lib/basic" }
 interface = { path = "../../../../domain-lib/interface" }
-rref = { path = "../../../../domain-lib/rref" }
+shared_heap = { git = "https://github.com/os-module/domain-lib" }
 spin = "0.9.8"
 
 kmacro = { path = "../../../../kmacro" }

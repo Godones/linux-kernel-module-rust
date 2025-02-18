@@ -7,13 +7,13 @@ use core::{
 
 use basic::{
     bindings,
-    print as pr_info,
     kernel::{
         block::mq,
         device::RawDevice,
         error::{linux_err::*, KernelResult as Result},
         types::{ArcBorrow, AtomicOptionalBoxedPtr, ForeignOwnable},
     },
+    print as pr_info,
 };
 use interface::nvme::BlkMqOp;
 use kmacro::vtable;

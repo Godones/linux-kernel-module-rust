@@ -5,7 +5,6 @@ use core::{
 };
 
 use basic::{
-    print as pr_info, println_color,
     kernel::{
         block::mq,
         error::KernelResult as Result,
@@ -16,7 +15,7 @@ use basic::{
         sync::{SpinLock, UniqueArc},
         types::{ArcBorrow, ForeignOwnable},
     },
-    new_spinlock, SafePtr,
+    new_spinlock, print as pr_info, println_color, SafePtr,
 };
 use interface::nvme::{BlkMqOp, IrqHandlerOp, NvmeBlockDeviceDomain};
 use pinned_init::*;

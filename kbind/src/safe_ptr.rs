@@ -1,7 +1,7 @@
 /// A safe wrapper around a raw pointer.
 #[derive(Copy, Clone, Debug)]
 #[repr(transparent)]
-pub struct SafePtr(*mut core::ffi::c_void);
+pub struct SafePtr(usize);
 
 impl SafePtr {
     /// # Safety
@@ -32,6 +32,3 @@ impl SafePtr {
         &mut *(self.0 as *mut T)
     }
 }
-
-unsafe impl Send for SafePtr {}
-unsafe impl Sync for SafePtr {}

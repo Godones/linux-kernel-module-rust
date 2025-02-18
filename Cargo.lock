@@ -575,9 +575,8 @@ dependencies = [
 
 [[package]]
 name = "pinned-init"
-version = "0.0.8"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2bf55f7030b0b17ea0c23525b8a18d9b52a53a586ec355128ac2304aa2fa8c04"
+version = "0.0.9"
+source = "git+https://github.com/Godones/pinned-init#2451467887408ac2e3bfcb55eb0a251e40cd6d9d"
 dependencies = [
  "paste",
  "pinned-init-macro",
@@ -586,8 +585,7 @@ dependencies = [
 [[package]]
 name = "pinned-init-macro"
 version = "0.0.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "569a3fcf0e6334c6c46c1507f83a99ba30ae9cdc5761bdb2ca40f7eb55138bd4"
+source = "git+https://github.com/Godones/pinned-init#2451467887408ac2e3bfcb55eb0a251e40cd6d9d"
 dependencies = [
  "proc-macro2",
  "quote",

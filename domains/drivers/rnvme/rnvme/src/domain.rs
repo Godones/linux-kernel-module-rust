@@ -6,7 +6,6 @@ use core::{
 
 use basic::{
     c_str,
-    {print as pr_info, println},
     kernel::{
         block::mq::OperationsConverter,
         driver::DriverRegistration,
@@ -14,7 +13,7 @@ use basic::{
         pci::{PciAdapter, PciAdapterShim},
         ThisModule,
     },
-    static_assert, LinuxError, LinuxResult, SafePtr,
+    print as pr_info, println, static_assert, LinuxError, LinuxResult, SafePtr,
 };
 use interface::{
     nvme::{BlkMqOp, IrqHandlerOp, NvmeBlockArgs, NvmeBlockDeviceDomain, PCIDeviceOp},

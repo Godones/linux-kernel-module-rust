@@ -12,7 +12,7 @@ pconst = { git = "https://github.com/os-module/pconst.git", features = ["special
 shared_heap = { git = "https://github.com/os-module/domain-lib" }
 
 kbind  = { path = "../../kbind" }
-pinned-init = { version = "0.0.8", default-features = false, features = ["alloc"] }
+pinned-init = { git = "https://github.com/Godones/pinned-init", default-features = false, features = ["alloc"] }
 kmacro = { path = "../../kmacro" }
 log = "0.4.22"
 

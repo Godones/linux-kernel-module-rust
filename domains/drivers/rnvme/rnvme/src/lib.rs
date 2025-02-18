@@ -22,7 +22,6 @@ use core::{
 
 use basic::{
     bindings, c_str,
-    print as pr_info,
     kernel::{
         block::{mq, mq::TagSet},
         device::{self, Device, RawDevice},
@@ -35,7 +34,7 @@ use basic::{
         types::AtomicOptionalBoxedPtr,
         ThisModule,
     },
-    new_spinlock, static_assert,
+    new_spinlock, print as pr_info, static_assert,
 };
 use interface::nvme::NvmeBlockDeviceDomain;
 use kmacro::module;

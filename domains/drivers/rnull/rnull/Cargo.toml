@@ -10,7 +10,7 @@ shared_heap = { git = "https://github.com/os-module/domain-lib" }
 spin = "0.9.8"
 
 kmacro = { path = "../../../../kmacro" }
-pinned-init = { version = "0.0.8", default-features = false, features = ["alloc"]}
+pinned-init = { git = "https://github.com/Godones/pinned-init", default-features = false, features = ["alloc"] }
 
 null = { path = "../../null/null", optional = true }
 

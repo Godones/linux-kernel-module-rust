@@ -25,7 +25,7 @@ fn main(
     corelib::init(sys);
     // init shared_heap's shared heap
     shared_heap::init(shared_heap, domain_id);
-    basic::logging::init_logger();
+    basic::logging::init_logger_with_level("");
     // init storage
     let StorageArg { allocator, storage } = storage_arg;
     storage::init_database(storage);

@@ -15,7 +15,6 @@ use interface::{
     Basic, LinuxErrno,
 };
 use spin::Mutex;
-
 use crate::block_domain::{NullBlkDevice, NullBlkDomain};
 
 #[derive(Debug)]

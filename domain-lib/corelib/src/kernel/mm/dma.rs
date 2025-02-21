@@ -72,6 +72,7 @@ pub fn try_alloc_coherent<T>(
 
 pub struct Pool<T> {
     ptr: *mut bindings::dma_pool,
+    #[allow(dead_code)]
     dev: Device,
     count: usize,
     _p: PhantomData<T>,

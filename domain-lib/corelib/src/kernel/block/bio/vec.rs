@@ -93,7 +93,7 @@ impl Segment<'_> {
 
     /// Copy data of this segment into `page`.
     #[inline(always)]
-    pub fn copy_to_page_atomic(&self, page: &mut Pages<0>) -> Result {
+    pub fn copy_to_page_atomic(&self, page: &Pages<0>) -> Result {
         // SAFETY: self.bio_vec is valid and thus bv_page must be a valid
         // pointer to a `struct page`. We do not own the page, but we prevent
         // drop by wrapping the `Pages` in `ManuallyDrop`.

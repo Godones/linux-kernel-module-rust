@@ -14,7 +14,9 @@ basic = { path = "../domain-lib/basic", default-features = false }
 ksync = { path = "../domain-lib/ksync" }
 shared_heap = { git = "https://github.com/os-module/domain-lib" }
 storage = { git = "https://github.com/os-module/domain-lib" }
+# storage = { path = "../domain-lib/storage", features = ["impl"] }
 loader = { git = "https://github.com/os-module/domain-lib" }
+#loader = { path = "../domain-lib/loader" }
 command = { path = "../domain-lib/command" }
 
 #

@@ -4,8 +4,10 @@
 //!
 //! C header: [`include/linux/radix_tree.h`](../../include/linux/radix_tree.h)
 
-use alloc::boxed::Box;
-use core::{marker::PhantomData, pin::Pin};
+use alloc::{alloc::Global, boxed::Box};
+use core::{alloc::Allocator, marker::PhantomData, pin::Pin};
+
+use storage::CustomStorge;
 
 use crate::{
     bindings,
@@ -14,7 +16,6 @@ use crate::{
         types::{ForeignOwnable, Opaque},
     },
 };
-
 type Key = u64;
 
 /// A map of `u64` to `ForeignOwnable`
@@ -23,32 +24,33 @@ type Key = u64;
 ///
 /// - `tree` always points to a valid and initialized `struct radix_tree`.
 /// - Pointers stored in the tree are created by a call to `ForignOwnable::into_foreign()`
-pub struct RadixTree<V: ForeignOwnable> {
-    tree: Pin<Box<Opaque<bindings::xarray>>>,
+pub struct RadixTree<V: ForeignOwnable, A: Allocator + Clone = Global> {
+    tree: Pin<Box<Opaque<bindings::xarray>, A>>,
     _marker: PhantomData<V>,
 }
 
-impl<V: ForeignOwnable> RadixTree<V> {
+impl<V: ForeignOwnable> RadixTree<V, CustomStorge> {
     /// Create a new radix tree
     ///
     /// Note: This function allocates memory with `GFP_ATOMIC`.
-    pub fn new() -> Result<Self> {
-        let tree = Pin::from(Box::try_new(Opaque::uninit())?);
-
+    pub fn new_in() -> Result<Self> {
         // SAFETY: `tree` points to allocated but not initialized memory. This
         // call will initialize the memory.
+        let tree = Pin::from(Box::try_new_in(Opaque::uninit(), CustomStorge)?);
         crate::sys_init_radix_tree(tree.get(), bindings::GFP_ATOMIC);
-
         Ok(Self {
             tree,
             _marker: PhantomData,
         })
     }
+}
 
+impl<V: ForeignOwnable, A: Allocator + Clone + 'static> RadixTree<V, A> {
     /// Try to insert a value into the tree
     pub fn try_insert(&mut self, key: Key, value: V) -> Result<()> {
         // SAFETY: `self.tree` points to a valid and initialized `struct radix_tree`
-        let ret = crate::sys_radix_tree_insert(self.tree.get(), key, value.into_foreign() as _);
+        let ptr = value.into_foreign();
+        let ret = crate::sys_radix_tree_insert(self.tree.get(), key, ptr as _);
         to_result(ret)
     }
 
@@ -92,7 +94,7 @@ impl<V: ForeignOwnable> RadixTree<V> {
     }
 }
 
-impl<V: ForeignOwnable> Drop for RadixTree<V> {
+impl<V: ForeignOwnable, A: Allocator + Clone> Drop for RadixTree<V, A> {
     fn drop(&mut self) {
         let mut iter = bindings::radix_tree_iter {
             index: 0,

@@ -5,8 +5,9 @@
 //! C header: [`include/linux/blkdev.h`](../../include/linux/blkdev.h)
 //! C header: [`include/linux/blk_mq.h`](../../include/linux/blk_mq.h)
 
-use alloc::sync::Arc;
+use alloc::{alloc::Global, sync::Arc};
 use core::{
+    alloc::Allocator,
     ffi::c_void,
     fmt::{self, Write},
 };
@@ -29,8 +30,8 @@ use crate::{
 /// # Invariants
 ///
 ///  - `gendisk` must always point to an initialized and valid `struct gendisk`.
-pub struct GenDisk<T: MqOperations> {
-    tagset: Arc<TagSet<T>>,
+pub struct GenDisk<T: MqOperations, A: Allocator = Global> {
+    tagset: Arc<TagSet<T>, A>,
     gendisk: *mut bindings::gendisk,
     queue_data: *const c_void,
     over_write: bool,
@@ -38,14 +39,16 @@ pub struct GenDisk<T: MqOperations> {
 
 // SAFETY: `GenDisk` is an owned pointer to a `struct gendisk` and an `Arc` to a
 // `TagSet` It is safe to send this to other threads as long as T is Send.
-unsafe impl<T: MqOperations + Send> Send for GenDisk<T> {}
+unsafe impl<T: MqOperations + Send, A: Allocator> Send for GenDisk<T, A> {}
+unsafe impl<T: MqOperations + Sync, A: Allocator> Sync for GenDisk<T, A> {}
 
-impl<T: MqOperations> GenDisk<T> {
-    pub fn new_no_alloc(tagset: Arc<TagSet<T>>, queue_data: T::QueueData) -> Self {
+impl<T: MqOperations, A: Allocator> GenDisk<T, A> {
+    pub fn new_no_alloc(tagset: Arc<TagSet<T>, A>, queue_data: T::QueueData) -> Self {
+        let queue_data_ptr = queue_data.into_foreign();
         Self {
             tagset,
             gendisk: core::ptr::null_mut(),
-            queue_data: queue_data.into_foreign(),
+            queue_data: queue_data_ptr,
             over_write: false,
         }
     }
@@ -65,7 +68,7 @@ impl<T: MqOperations> GenDisk<T> {
     }
 
     /// Try to create a new `GenDisk`
-    pub fn try_new(tagset: Arc<TagSet<T>>, queue_data: T::QueueData) -> Result<Self> {
+    pub fn try_new(tagset: Arc<TagSet<T>, A>, queue_data: T::QueueData) -> Result<Self> {
         let data = queue_data.into_foreign();
         let recover_data = ScopeGuard::new(|| {
             // SAFETY: T::QueueData was created by the call to `into_foreign()` above
@@ -173,7 +176,7 @@ impl<T: MqOperations> GenDisk<T> {
     }
 }
 
-impl<T: MqOperations> Drop for GenDisk<T> {
+impl<T: MqOperations, A: Allocator> Drop for GenDisk<T, A> {
     fn drop(&mut self) {
         let queue_data = unsafe { (*(*self.gendisk).queue).queuedata };
 
@@ -184,6 +187,7 @@ impl<T: MqOperations> Drop for GenDisk<T> {
         // SAFETY: `queue.queuedata` was created by `GenDisk::try_new()` with a
         // call to `ForeignOwnable::into_pointer()` to create `queuedata`.
         // `ForeignOwnable::from_foreign()` is only called here.
-        let _queue_data = unsafe { T::QueueData::from_foreign(queue_data) };
+        let _ = unsafe { T::QueueData::from_foreign(queue_data) };
+        log::warn!("GenDisk dropped");
     }
 }

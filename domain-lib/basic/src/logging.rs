@@ -42,3 +42,16 @@ pub fn init_logger() {
         _ => LevelFilter::Error,
     });
 }
+
+pub fn init_logger_with_level(level: &str) {
+    // println!("Init logger {:?}", option_env!("LOG"));
+    log::set_logger(&SimpleLogger).unwrap();
+    log::set_max_level(match level {
+        "ERROR" => LevelFilter::Error,
+        "WARN" => LevelFilter::Warn,
+        "INFO" => LevelFilter::Info,
+        "DEBUG" => LevelFilter::Debug,
+        "TRACE" => LevelFilter::Trace,
+        _ => LevelFilter::Error,
+    });
+}

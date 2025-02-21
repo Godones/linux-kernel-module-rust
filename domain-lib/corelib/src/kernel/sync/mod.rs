@@ -1,7 +1,11 @@
-use alloc::sync::Arc;
-use core::{alloc::AllocError, ops::Deref, pin::Pin};
+use alloc::{alloc::Global, sync::Arc};
+use core::{
+    alloc::{AllocError, Allocator},
+    ops::Deref,
+    pin::Pin,
+};
 
-use pinned_init::{InPlaceInit, Init, PinInit};
+use pinned_init::{InPlaceInit, InPlaceInitIn, Init, PinInit};
 
 use crate::{bindings, kernel::types::Opaque};
 mod lock;
@@ -54,8 +58,8 @@ macro_rules! optional_name {
 }
 
 #[repr(transparent)]
-pub struct UniqueArc<T: ?Sized> {
-    inner: Arc<T>,
+pub struct UniqueArc<T: ?Sized, A: Allocator = Global> {
+    inner: Arc<T, A>,
 }
 
 impl<T> InPlaceInit<T> for UniqueArc<T> {
@@ -77,7 +81,28 @@ impl<T> InPlaceInit<T> for UniqueArc<T> {
     }
 }
 
-impl<T: ?Sized> Deref for UniqueArc<T> {
+impl<T, A: Allocator> InPlaceInitIn<T, A> for UniqueArc<T, A> {
+    fn try_pin_init_in<E>(init: impl PinInit<T, E>, alloc: A) -> Result<Pin<Self>, E>
+    where
+        E: From<AllocError>,
+    {
+        let v = Arc::try_pin_init_in(init, alloc)?;
+        unsafe {
+            let inner = Pin::into_inner_unchecked(v);
+            let r = Pin::new_unchecked(UniqueArc { inner });
+            Ok(r)
+        }
+    }
+    fn try_init_in<E>(init: impl Init<T, E>, alloc: A) -> Result<Self, E>
+    where
+        E: From<AllocError>,
+    {
+        let v = Arc::try_init_in(init, alloc)?;
+        Ok(Self { inner: v })
+    }
+}
+
+impl<T: ?Sized, A: Allocator> Deref for UniqueArc<T, A> {
     type Target = T;
 
     fn deref(&self) -> &Self::Target {
@@ -85,8 +110,8 @@ impl<T: ?Sized> Deref for UniqueArc<T> {
     }
 }
 
-impl<T: ?Sized> From<Pin<UniqueArc<T>>> for Arc<T> {
-    fn from(item: Pin<UniqueArc<T>>) -> Self {
+impl<T: ?Sized, A: Allocator> From<Pin<UniqueArc<T, A>>> for Arc<T, A> {
+    fn from(item: Pin<UniqueArc<T, A>>) -> Self {
         // SAFETY: The type invariants of `Arc` guarantee that the data is pinned.
         unsafe { Pin::into_inner_unchecked(item).inner }
     }

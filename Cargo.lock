@@ -223,6 +223,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "constcat"
+version = "0.6.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5ffb5df6dd5dadb422897e8132f415d7a054e3cd757e5070b663f75bea1840fb"
+
+[[package]]
 name = "core_affinity"
 version = "0.8.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -245,6 +251,7 @@ dependencies = [
  "pinned-init",
  "shared_heap",
  "spin",
+ "storage",
 ]
 
 [[package]]
@@ -280,7 +287,7 @@ dependencies = [
 [[package]]
 name = "domain_main"
 version = "0.1.0"
-source = "git+https://github.com/os-module/domain-lib#2a5d40d7716c6f0d41370d1bc9507dc70089a9ec"
+source = "git+https://github.com/os-module/domain-lib#cdea07caf82dfab65a23686886fe58d53947da3c"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -473,7 +480,7 @@ dependencies = [
 [[package]]
 name = "loader"
 version = "0.1.0"
-source = "git+https://github.com/os-module/domain-lib#2a5d40d7716c6f0d41370d1bc9507dc70089a9ec"
+source = "git+https://github.com/os-module/domain-lib#cdea07caf82dfab65a23686886fe58d53947da3c"
 dependencies = [
  "bitflags 2.6.0",
  "log",
@@ -752,7 +759,7 @@ dependencies = [
 [[package]]
 name = "shared_heap"
 version = "0.1.0"
-source = "git+https://github.com/os-module/domain-lib#2a5d40d7716c6f0d41370d1bc9507dc70089a9ec"
+source = "git+https://github.com/os-module/domain-lib#cdea07caf82dfab65a23686886fe58d53947da3c"
 dependencies = [
  "log",
  "spin",
@@ -776,9 +783,11 @@ dependencies = [
 [[package]]
 name = "storage"
 version = "0.1.0"
-source = "git+https://github.com/os-module/domain-lib#2a5d40d7716c6f0d41370d1bc9507dc70089a9ec"
+source = "git+https://github.com/os-module/domain-lib#cdea07caf82dfab65a23686886fe58d53947da3c"
 dependencies = [
+ "constcat",
  "log",
+ "shared_heap",
  "spin",
 ]
 

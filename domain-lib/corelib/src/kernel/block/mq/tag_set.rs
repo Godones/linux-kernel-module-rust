@@ -4,8 +4,8 @@
 //!
 //! C header: [`include/linux/blk-mq.h`](../../include/linux/blk-mq.h)
 
-use alloc::boxed::Box;
-use core::{convert::TryInto, ffi::c_void, marker::PhantomData, pin::Pin};
+use alloc::{alloc::Global, boxed::Box};
+use core::{alloc::Allocator, convert::TryInto, ffi::c_void, marker::PhantomData, pin::Pin};
 
 use pinned_init::{pin_data, pinned_drop, try_pin_init, PinInit, PinnedDrop};
 
@@ -197,6 +197,7 @@ impl<T: MqOperations> PinnedDrop for TagSet<T> {
 
         // SAFETY: `tagset_data` was created by a call to
         // `ForeignOwnable::into_foreign` in `TagSet::try_new()`
-        unsafe { T::TagSetData::from_foreign(tagset_data_shim) };
+        let _ = unsafe { T::TagSetData::from_foreign(tagset_data_shim) };
+        log::warn!("TagSet dropped");
     }
 }

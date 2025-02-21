@@ -3,7 +3,7 @@ use domain_helper::{DomainHelperBuilder, DomainTypeRaw};
 fn main() {
     let argv: Vec<String> = std::env::args().collect();
     if argv.len() != 2 {
-        println!("Usage: dblk [load]/[unload]/[reload]/[test]");
+        println!("Usage: dblk [load]/[unload]/[reload]/[update]");
         return;
     }
     let option = argv[1].as_str();
@@ -19,6 +19,9 @@ fn main() {
         }
         "test" => {
             run_block_device_domain_test();
+        }
+        "update" => {
+            update_block_device_domain();
         }
         _ => {
             println!("Usage: dblk [load]/[unload]/[reload]/[test]");
@@ -58,6 +61,20 @@ fn reload_block_device_domain() {
         .load_domain()
         .unwrap();
     println!("Reload block device domain successfully");
+}
+
+fn update_block_device_domain() {
+    println!("Update block device domain");
+    let builder = DomainHelperBuilder::new()
+        .ty(DomainTypeRaw::BlockDeviceDomain)
+        .domain_file_name("rnull")
+        .domain_name("block_device")
+        .domain_register_ident("rnull");
+
+    builder.clone().register_domain_file().unwrap();
+    builder.clone().update_domain().unwrap();
+
+    println!("Update block device domain successfully");
 }
 
 fn run_block_device_domain_test() {}

@@ -5,19 +5,16 @@
 //! C header: [`include/linux/blk-mq.h`](../../include/linux/blk-mq.h)
 
 use alloc::sync::Arc;
-use core::marker::PhantomData;
+use core::alloc::Allocator;
 
 use interface::nvme::BlkMqOp;
 use kmacro::vtable;
 use pinned_init::PinInit;
 
-use crate::{
-    bindings,
-    kernel::{
-        block::mq::{Request, TagSet},
-        error::{from_result, KernelResult as Result},
-        types::ForeignOwnable,
-    },
+use crate::kernel::{
+    block::mq::{Request, TagSet},
+    error::KernelResult as Result,
+    types::ForeignOwnable,
 };
 
 /// Implement this trait to interface blk-mq as block devices
@@ -124,7 +121,7 @@ pub use shim::OperationsVtableShim;
 
 mod shim {
     use alloc::boxed::Box;
-    use core::{marker::PhantomData, sync::atomic::AtomicBool};
+    use core::marker::PhantomData;
 
     use kbind::safe_ptr::SafePtr;
 

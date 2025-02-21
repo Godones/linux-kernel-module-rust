@@ -2,7 +2,7 @@
 
 //! Kernel types.
 
-use alloc::{boxed::Box, sync::Arc};
+use alloc::{alloc::Global, boxed::Box, sync::Arc};
 use core::{
     cell::UnsafeCell,
     ffi::c_void,
@@ -16,6 +16,7 @@ use core::{
 };
 
 use pinned_init::*;
+use storage::CustomStorge;
 
 use crate::bindings;
 
@@ -104,7 +105,7 @@ pub trait ForeignOwnable: Sized {
     unsafe fn borrow_mut<'a>(ptr: *const core::ffi::c_void) -> Self::BorrowedMut<'a>;
 }
 
-impl<T: 'static> ForeignOwnable for Box<T> {
+impl<T: 'static> ForeignOwnable for Box<T, Global> {
     type Borrowed<'a> = &'a T;
     type BorrowedMut<'a> = &'a mut T;
 
@@ -134,7 +135,37 @@ impl<T: 'static> ForeignOwnable for Box<T> {
     }
 }
 
-impl<T: 'static> ForeignOwnable for Arc<T> {
+impl<T: 'static> ForeignOwnable for Box<T, CustomStorge> {
+    type Borrowed<'a> = &'a T;
+    type BorrowedMut<'a> = &'a mut T;
+
+    #[inline(always)]
+    fn into_foreign(self) -> *const core::ffi::c_void {
+        Box::into_raw(self) as _
+    }
+
+    unsafe fn from_foreign(ptr: *const core::ffi::c_void) -> Self {
+        // SAFETY: The safety requirements of this function ensure that `ptr` comes from a previous
+        // call to `Self::into_foreign`.
+        unsafe { Box::from_raw_in(ptr as _, CustomStorge) }
+    }
+
+    #[inline(always)]
+    unsafe fn borrow<'a>(ptr: *const core::ffi::c_void) -> &'a T {
+        // SAFETY: The safety requirements of this method ensure that the object remains alive and
+        // immutable for the duration of 'a.
+        unsafe { &*ptr.cast() }
+    }
+
+    #[inline(always)]
+    unsafe fn borrow_mut<'a>(ptr: *const core::ffi::c_void) -> &'a mut T {
+        // SAFETY: The safety requirements of this method ensure that the pointer is valid and that
+        // nothing else will access the value for the duration of 'a.
+        unsafe { &mut *ptr.cast_mut().cast() }
+    }
+}
+
+impl<T: 'static> ForeignOwnable for Arc<T, Global> {
     type Borrowed<'a> = ArcBorrow<'a, T>;
     type BorrowedMut<'a> = ();
 
@@ -150,6 +181,39 @@ impl<T: 'static> ForeignOwnable for Arc<T> {
         // a previous call to `Arc::into_foreign`, which guarantees that `ptr` is valid and
         // holds a reference count increment that is transferrable to us.
         unsafe { Self::from_raw(ptr as _) }
+    }
+
+    unsafe fn borrow<'a>(ptr: *const core::ffi::c_void) -> ArcBorrow<'a, T> {
+        // SAFETY: By the safety requirement of this function, we know that `ptr` came from
+        // a previous call to `Arc::into_foreign`.
+        let inner = unsafe { &*(ptr as *const T) };
+
+        // SAFETY: The safety requirements of `from_foreign` ensure that the object remains alive
+        // for the lifetime of the returned value.
+        ArcBorrow::new(inner)
+    }
+
+    unsafe fn borrow_mut<'a>(_ptr: *const c_void) -> Self::BorrowedMut<'a> {
+        todo!()
+    }
+}
+
+impl<T: 'static> ForeignOwnable for Arc<T, CustomStorge> {
+    type Borrowed<'a> = ArcBorrow<'a, T>;
+    type BorrowedMut<'a> = ();
+
+    fn into_foreign(self) -> *const core::ffi::c_void {
+        // SAFETY: We are transferring ownership of the reference count increment to the foreign
+        // code.
+        let ptr = Arc::into_raw(self);
+        ptr as _
+    }
+
+    unsafe fn from_foreign(ptr: *const core::ffi::c_void) -> Self {
+        // SAFETY: By the safety requirement of this function, we know that `ptr` came from
+        // a previous call to `Arc::into_foreign`, which guarantees that `ptr` is valid and
+        // holds a reference count increment that is transferrable to us.
+        unsafe { Self::from_raw_in(ptr as _, CustomStorge) }
     }
 
     unsafe fn borrow<'a>(ptr: *const core::ffi::c_void) -> ArcBorrow<'a, T> {
@@ -319,6 +383,9 @@ pub struct Opaque<T> {
     value: UnsafeCell<MaybeUninit<T>>,
     _pin: PhantomPinned,
 }
+
+unsafe impl<T> Send for Opaque<T> {}
+unsafe impl<T> Sync for Opaque<T> {}
 
 impl<T> Opaque<T> {
     /// Creates a new opaque value.

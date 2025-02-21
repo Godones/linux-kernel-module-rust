@@ -2,12 +2,19 @@
 
 //! String representations.
 
-use alloc::{alloc::AllocError, boxed::Box, vec::Vec};
+use alloc::{
+    alloc::{AllocError, Global},
+    boxed::Box,
+    vec::Vec,
+};
 use core::{
+    alloc::Allocator,
     ffi::c_void,
     fmt::{self, Write},
     ops::{self, Deref, DerefMut, Index},
 };
+
+use storage::CustomStorge;
 
 use crate::kernel::{
     error::{linux_err::*, Error, KernelResult},
@@ -475,8 +482,18 @@ impl fmt::Write for Formatter {
     }
 }
 
-pub struct CString {
-    buf: Vec<u8>,
+pub struct CString<A: Allocator = Global> {
+    buf: Vec<u8, A>,
+}
+
+impl CString<CustomStorge> {
+    pub fn new_in<T: Into<Vec<u8>>>(t: T) -> Result<Self, Error> {
+        let str = alloc::ffi::CString::new(t).map_err(|_| EINVAL)?;
+        let buf = str.into_bytes_with_nul();
+        let mut this = Vec::new_in(CustomStorge);
+        this.extend_from_slice(&buf);
+        Ok(Self { buf: this })
+    }
 }
 
 impl CString {
@@ -528,7 +545,7 @@ impl CString {
     }
 }
 
-impl Deref for CString {
+impl<A: Allocator> Deref for CString<A> {
     type Target = CStr;
 
     fn deref(&self) -> &Self::Target {
@@ -537,7 +554,7 @@ impl Deref for CString {
         unsafe { CStr::from_bytes_with_nul_unchecked(self.buf.as_slice()) }
     }
 }
-impl DerefMut for CString {
+impl<A: Allocator> DerefMut for CString<A> {
     fn deref_mut(&mut self) -> &mut Self::Target {
         // SAFETY: A `CString` is always NUL-terminated and contains no other
         // NUL bytes.
@@ -559,7 +576,7 @@ impl<'a> TryFrom<&'a CStr> for CString {
     }
 }
 
-impl ForeignOwnable for CString {
+impl ForeignOwnable for CString<Global> {
     type Borrowed<'a> = &'a CStr;
     type BorrowedMut<'a> = &'a mut CStr;
 
@@ -576,6 +593,36 @@ impl ForeignOwnable for CString {
         Self {
             buf: unsafe {
                 let s = Box::from_raw(ptr.cast_mut());
+                Vec::from(s)
+            },
+        }
+    }
+
+    unsafe fn borrow<'a>(ptr: *const core::ffi::c_void) -> Self::Borrowed<'a> {
+        unsafe { CStr::from_char_ptr(ptr.cast::<core::ffi::c_char>()) }
+    }
+
+    unsafe fn borrow_mut<'a>(ptr: *const c_void) -> Self::BorrowedMut<'a> {
+        unsafe { CStr::from_char_ptr_mut(ptr.cast::<core::ffi::c_char>()) }
+    }
+}
+impl ForeignOwnable for CString<CustomStorge> {
+    type Borrowed<'a> = &'a CStr;
+    type BorrowedMut<'a> = &'a mut CStr;
+
+    fn into_foreign(self) -> *const core::ffi::c_void {
+        let s = Vec::into_boxed_slice(self.buf);
+        Box::into_raw(s) as _
+    }
+
+    unsafe fn from_foreign(ptr: *const core::ffi::c_void) -> Self {
+        // SAFETY: The safety requirements of this function satisfy those of `Self::borrow`.
+        let str = unsafe { Self::borrow(ptr) };
+        let ptr = &str.0 as *const [u8];
+        // SAFETY: The safety requirements of this function satisfy those of `Box::from_raw`.
+        Self {
+            buf: unsafe {
+                let s = Box::from_raw_in(ptr.cast_mut(), CustomStorge);
                 Vec::from(s)
             },
         }

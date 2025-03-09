@@ -5,6 +5,7 @@ use core::{
     fmt,
     fmt::Debug,
     num::TryFromIntError,
+    ptr::null,
     str::Utf8Error,
 };
 
@@ -56,13 +57,14 @@ impl Error {
     /// Returns a string representing the error, if one exists.
     pub fn name(&self) -> Option<&'static CStr> {
         // SAFETY: Just an FFI call, there are no extra safety requirements.
-        let ptr = crate::sys_errname(-self.0);
-        if ptr.is_null() {
-            None
-        } else {
-            // SAFETY: The string returned by `errname` is static and `NUL`-terminated.
-            Some(unsafe { CStr::from_ptr(ptr) })
-        }
+        // let ptr = null();
+        // if ptr.is_null() {
+        //     None
+        // } else {
+        //     // SAFETY: The string returned by `errname` is static and `NUL`-terminated.
+        //     Some(unsafe { CStr::from_ptr(ptr) })
+        // }
+        None
     }
 
     pub fn to_blk_status(self) -> bindings::blk_status_t {

@@ -6,10 +6,10 @@ use interface::{empty_device::EmptyDeviceDomain, Basic};
 use kernel::{
     init::InPlaceInit,
     sync::{
-        local_irq_restore, local_irq_save, switch_task_to_cpus, sync_cpus, LongLongPerCpu, Mutex,
-        SRcuData,
+        local_irq_restore, local_irq_save, switch_task_to_cpus, sync_cpus, CpuId, LongLongPerCpu,
+        Mutex, SRcuData,
     },
-    time::TimeTick,
+    time::{ktime_get_ns, TimeTick},
 };
 use shared_heap::{DVec, SharedData};
 
@@ -17,6 +17,7 @@ use crate::{
     domain_helper::{free_domain_resource, FreeShared},
     domain_loader::loader::DomainLoader,
     domain_proxy::ProxyBuilder,
+    mem::free_frames,
 };
 
 #[derive(Debug)]
@@ -63,10 +64,11 @@ impl ProxyBuilder for EmptyDeviceDomainProxy {
 
 impl Basic for EmptyDeviceDomainProxy {
     fn domain_id(&self) -> u64 {
+        let irq = local_irq_save();
         if self.flag.load(core::sync::atomic::Ordering::Relaxed) {
-            self._domain_id_with_lock()
+            self._domain_id_with_lock(irq)
         } else {
-            self._domain_id_no_lock()
+            self._domain_id_no_lock(irq)
         }
     }
 }
@@ -77,19 +79,21 @@ impl EmptyDeviceDomain for EmptyDeviceDomainProxy {
     }
 
     fn read(&self, data: DVec<u8>) -> LinuxResult<DVec<u8>> {
-        // let irq = local_irq_save();
+        let irq = local_irq_save();
+        // => no reschedule if interrupt
         if self.flag.load(core::sync::atomic::Ordering::Relaxed) {
-            self._read_with_lock(data, 0)
+            self._read_with_lock(data, irq)
         } else {
-            self._read_no_lock(data, 0)
+            self._read_no_lock(data, irq)
         }
     }
 
     fn write(&self, data: &DVec<u8>) -> LinuxResult<usize> {
+        let irq = local_irq_save();
         if self.flag.load(core::sync::atomic::Ordering::Relaxed) {
-            self._write_with_lock(data)
+            self._write_with_lock(data, irq)
         } else {
-            self._write_no_lock(data)
+            self._write_no_lock(data, irq)
         }
     }
 }
@@ -99,18 +103,16 @@ impl EmptyDeviceDomainProxy {
         self.domain.read_directly(|domain| domain.domain_id())
     }
 
-    fn _domain_id_no_lock(&self) -> u64 {
-        self.counter.get_with(|counter| {
-            *counter += 1;
-        });
+    fn _domain_id_no_lock(&self, irq: u64) -> u64 {
+        self.counter.inc();
+        local_irq_restore(irq);
         let r = self._domain_id();
-        self.counter.get_with(|counter| {
-            *counter -= 1;
-        });
+        self.counter.dec();
         r
     }
 
-    fn _domain_id_with_lock(&self) -> u64 {
+    fn _domain_id_with_lock(&self, irq: u64) -> u64 {
+        local_irq_restore(irq);
         let lock = self.lock.lock();
         let r = self._domain_id();
         drop(lock);
@@ -136,32 +138,43 @@ impl EmptyDeviceDomainProxy {
 
     fn _read_no_lock(&self, data: DVec<u8>, irq: u64) -> LinuxResult<DVec<u8>> {
         if self.f.load(core::sync::atomic::Ordering::Relaxed) {
-            println!("EmptyDeviceDomainProxy _read_no_lock");
+            // println!("EmptyDeviceDomainProxy _read_no_lock");
+            CpuId::read(|id| {
+                println!("[core: {}] EmptyDeviceDomainProxy _read_no_lock", id);
+            });
         }
-        self.counter.get_with(|counter| {
-            *counter += 1;
-        });
+        self.counter.inc();
         local_irq_restore(irq);
 
         let r = self._read(data);
-        self.counter.get_with(|counter| {
-            *counter -= 1;
-        });
+        self.counter.dec();
+        if self.f.load(core::sync::atomic::Ordering::Relaxed) {
+            CpuId::read(|id| {
+                println!("[core: {}] EmptyDeviceDomainProxy _read_no_lock end", id);
+            });
+        }
         r
     }
 
-    fn _write_no_lock(&self, data: &DVec<u8>) -> LinuxResult<usize> {
-        self.counter.get_with(|counter| {
-            *counter += 1;
-        });
+    fn _write_no_lock(&self, data: &DVec<u8>, irq: u64) -> LinuxResult<usize> {
+        self.counter.inc();
+        local_irq_restore(irq);
         let r = self._write(data);
-        self.counter.get_with(|counter| {
-            *counter -= 1;
-        });
+        self.counter.dec();
         r
     }
 
     fn _read_with_lock(&self, data: DVec<u8>, irq: u64) -> LinuxResult<DVec<u8>> {
+        if self.f.load(core::sync::atomic::Ordering::Relaxed) {
+            // println!("EmptyDeviceDomainProxy _read_with_lock");
+            CpuId::read(|id| {
+                println!("[core: {}] EmptyDeviceDomainProxy _read_with_lock", id);
+            });
+        }
+        // let now = ktime_get_ns();
+        // while ktime_get_ns() - now < 1_000_000_000 {
+        //     // println!("EmptyDeviceDomainProxy _read_with_lock");
+        // }
         local_irq_restore(irq);
         let lock = self.lock.lock();
         let r = self._read(data);
@@ -169,7 +182,8 @@ impl EmptyDeviceDomainProxy {
         r
     }
 
-    fn _write_with_lock(&self, data: &DVec<u8>) -> LinuxResult<usize> {
+    fn _write_with_lock(&self, data: &DVec<u8>, irq: u64) -> LinuxResult<usize> {
+        local_irq_restore(irq);
         let lock = self.lock.lock();
         let r = self._write(data);
         drop(lock);
@@ -185,12 +199,11 @@ impl EmptyDeviceDomainProxy {
     ) -> LinuxResult<()> {
         // println!("EmptyDeviceDomainProxy replace");
         self.f.store(true, core::sync::atomic::Ordering::Relaxed);
-
-        let tick = TimeTick::new("Task Sync");
         let mut loader_guard = self.domain_loader.lock();
         // The writer lock before enable the lock path
-        let w_lock = self.lock.lock();
         let old_id = self.domain_id();
+        let tick = TimeTick::new("Task Sync");
+        let w_lock = self.lock.lock();
         // enable lock path
         self.flag.store(true, core::sync::atomic::Ordering::Relaxed);
 
@@ -228,7 +241,7 @@ impl EmptyDeviceDomainProxy {
 
         // We should not free the shared data here, because the shared data will be used
         // in new domain.
-        free_domain_resource(old_id, FreeShared::NotFree(new_domain_id));
+        free_domain_resource(old_id, FreeShared::NotFree(new_domain_id), free_frames);
         drop(tick);
 
         *loader_guard = domain_loader;

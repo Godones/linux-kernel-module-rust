@@ -1,6 +1,3 @@
-mod resource;
-mod sheap;
-mod storage_heap;
 mod syscall;
 
 extern crate alloc;
@@ -19,11 +16,13 @@ use corelib::{
     domain_info::{DomainDataInfo, DomainFileInfo, DomainInfo},
     LinuxResult,
 };
+pub use domain_manager::{
+    resource::*,
+    sheap::{checkout_shared_data, FreeShared, SHARED_HEAP_ALLOCATOR},
+    storage_heap::*,
+};
 pub use interface::DomainType;
 use ksync::{Lazy, Mutex, Once};
-pub use resource::*;
-pub use sheap::{checkout_shared_data, FreeShared, SHARED_HEAP_ALLOCATOR};
-pub use storage_heap::*;
 pub use syscall::DOMAIN_SYS;
 
 static DOMAIN_IDS: AtomicU64 = AtomicU64::new(0);

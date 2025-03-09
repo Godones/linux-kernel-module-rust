@@ -10,7 +10,9 @@
 
 pub mod hrtimer;
 
-use crate::{bindings, code::EDOM, error::KernelResult, pr_err};
+use crate::{
+    bindings, bindings::smp_processor_id, code::EDOM, error::KernelResult, pr_err, sync::CpuId,
+};
 
 /// The number of nanoseconds per millisecond.
 pub const NSEC_PER_MSEC: i64 = bindings::NSEC_PER_MSEC as i64;
@@ -134,13 +136,16 @@ pub fn ktime_get_ns() -> u64 {
 pub struct TimeTick {
     start: u64,
     info: &'static str,
+    cpu_id: u32,
 }
 
 impl TimeTick {
     pub fn new(info: &'static str) -> Self {
+        let cpu_id = CpuId::read(|id| id as u32);
         TimeTick {
             info,
             start: ktime_get_ns(),
+            cpu_id,
         }
     }
 }
@@ -148,14 +153,24 @@ impl TimeTick {
 impl Drop for TimeTick {
     fn drop(&mut self) {
         let end = ktime_get_ns();
+        let cpu_id = CpuId::read(|id| id as u32);
         if (end - self.start) > 2000 {
             pr_err!(
-                "[{}] Time elapsed: {} us\n",
+                "[{}]-[{}] [{}] Time elapsed: {} us\n",
+                self.cpu_id,
+                cpu_id,
                 self.info,
                 (end - self.start) / 1000
             );
         } else {
-            pr_err!("[{}] Time elapsed: {} ns\n", self.info, end - self.start);
+            // pr_err!("[{}] Time elapsed: {} ns\n", self.info, end - self.start);
+            pr_err!(
+                "[{}]-[{}] [{}] Time elapsed: {} ns\n",
+                self.cpu_id,
+                cpu_id,
+                self.info,
+                end - self.start
+            );
         }
     }
 }

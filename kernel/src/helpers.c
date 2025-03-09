@@ -108,6 +108,15 @@ int rust_helper_get_cpu(void){ return get_cpu(); }
 void rust_helper_put_cpu(void){ put_cpu(); }
 long long *rust_helper_per_cpu_ptr(long long *p, int cpu){ return per_cpu_ptr(p, cpu); }
 
+long long rust_helper_per_cpu_total_counter(long long *p){
+    long long total = 0;
+    int cpu;
+    for_each_possible_cpu(cpu){
+        total += *per_cpu_ptr(p, cpu);
+    }
+    return total;
+}
+
 
 // Page
 void *rust_helper_kmap(struct page *page){ return kmap(page); }
@@ -308,20 +317,25 @@ void rust_helper_local_irq_restore(unsigned long flags) {
 }
 
 static void execute_on_target_cpu(void *info) {
-//    int cpu = smp_processor_id();
-//    pr_info("Function executed on CPU %d\n", cpu);
+    int cpu = smp_processor_id();
+    pr_info("Function executed on CPU %d\n", cpu);
+}
+
+int rust_helper_smp_processor_id(void) {
+    return smp_processor_id();
 }
 
 
 int rust_helper_sync_cpus(void){
-    int cpu;
-    for_each_online_cpu(cpu) {
-        // pr_info("Calling function on CPU %d\n", cpu);
-        if (smp_call_function_single(cpu, execute_on_target_cpu, NULL, 1)) {
-            pr_err("Failed to execute function on CPU %d\n", cpu);
-        } else {
-            // pr_info("Successfully executed function on CPU %d\n", cpu);
-        }
-    }
+//    int cpu;
+//    for_each_online_cpu(cpu) {
+//        // pr_info("Calling function on CPU %d\n", cpu);
+//        if (smp_call_function_single(cpu, execute_on_target_cpu, NULL, 1)) {
+//            pr_err("Failed to execute function on CPU %d\n", cpu);
+//        } else {
+//            // pr_info("Successfully executed function on CPU %d\n", cpu);
+//        }
+//    }
+    smp_call_function(execute_on_target_cpu, NULL, 1);
     return 0;
 }

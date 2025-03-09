@@ -230,9 +230,9 @@ checksum = "5ffb5df6dd5dadb422897e8132f415d7a054e3cd757e5070b663f75bea1840fb"
 
 [[package]]
 name = "core_affinity"
-version = "0.8.1"
+version = "0.8.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "622892f5635ce1fc38c8f16dfc938553ed64af482edb5e150bf4caedbfcb2304"
+checksum = "a034b3a7b624016c6e13f5df875747cc25f884156aad2abd12b6c46797971342"
 dependencies = [
  "libc",
  "num_cpus",
@@ -252,13 +252,16 @@ dependencies = [
  "shared_heap",
  "spin",
  "storage",
+ "wrapper_macro",
 ]
 
 [[package]]
 name = "dblk"
 version = "0.1.0"
 dependencies = [
+ "core_affinity",
  "domain-helper",
+ "libc",
 ]
 
 [[package]]
@@ -287,10 +290,22 @@ dependencies = [
 [[package]]
 name = "domain_main"
 version = "0.1.0"
-source = "git+https://github.com/os-module/domain-lib#cdea07caf82dfab65a23686886fe58d53947da3c"
+source = "git+https://github.com/os-module/domain-lib#677103cee3118d37561faca1f4d3d1b6db7960f5"
 dependencies = [
  "proc-macro2",
  "quote",
+]
+
+[[package]]
+name = "domain_manager"
+version = "0.1.0"
+source = "git+https://github.com/os-module/domain-lib#677103cee3118d37561faca1f4d3d1b6db7960f5"
+dependencies = [
+ "hashbrown 0.14.5",
+ "log",
+ "shared_heap",
+ "spin",
+ "storage",
 ]
 
 [[package]]
@@ -318,10 +333,6 @@ name = "equivalent"
 version = "1.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5443807d6dff69373d433ab9ef5378ad8df50ca6298caf15de6e52e24aaf54d5"
-
-[[package]]
-name = "fio"
-version = "0.1.0"
 
 [[package]]
 name = "fs_extra"
@@ -463,9 +474,9 @@ dependencies = [
 
 [[package]]
 name = "libc"
-version = "0.2.159"
+version = "0.2.170"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "561d97a539a36e26a9a5fad1ea11a3039a67714694aaa379433e580854bc3dc5"
+checksum = "875b3680cb2f8f71bdcf9a30f38d48282f5d3c95cbf9b3fa57269bb5d5c06828"
 
 [[package]]
 name = "libloading"
@@ -480,7 +491,7 @@ dependencies = [
 [[package]]
 name = "loader"
 version = "0.1.0"
-source = "git+https://github.com/os-module/domain-lib#cdea07caf82dfab65a23686886fe58d53947da3c"
+source = "git+https://github.com/os-module/domain-lib#677103cee3118d37561faca1f4d3d1b6db7960f5"
 dependencies = [
  "bitflags 2.6.0",
  "log",
@@ -502,9 +513,9 @@ dependencies = [
 
 [[package]]
 name = "log"
-version = "0.4.22"
+version = "0.4.26"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a7a70ba024b9dc04c27ea2f0c0548feb474ec5c54bba33a7f72f873a39d07b24"
+checksum = "30bde2b3dc3671ae49d8e2e9f044c7c005836e7a023ee57cffa25ab82764bb9e"
 
 [[package]]
 name = "memchr"
@@ -759,7 +770,7 @@ dependencies = [
 [[package]]
 name = "shared_heap"
 version = "0.1.0"
-source = "git+https://github.com/os-module/domain-lib#cdea07caf82dfab65a23686886fe58d53947da3c"
+source = "git+https://github.com/os-module/domain-lib#677103cee3118d37561faca1f4d3d1b6db7960f5"
 dependencies = [
  "log",
  "spin",
@@ -783,7 +794,7 @@ dependencies = [
 [[package]]
 name = "storage"
 version = "0.1.0"
-source = "git+https://github.com/os-module/domain-lib#cdea07caf82dfab65a23686886fe58d53947da3c"
+source = "git+https://github.com/os-module/domain-lib#677103cee3118d37561faca1f4d3d1b6db7960f5"
 dependencies = [
  "constcat",
  "log",
@@ -842,6 +853,7 @@ dependencies = [
  "bitflags 2.6.0",
  "command",
  "corelib",
+ "domain_manager",
  "hashbrown 0.14.5",
  "interface",
  "kernel",
@@ -1017,6 +1029,16 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "36c1fec1a2bb5866f07c25f68c26e565c4c200aebb96d7e55710c19d3e8ac49b"
 dependencies = [
  "memchr",
+]
+
+[[package]]
+name = "wrapper_macro"
+version = "0.1.0"
+source = "git+https://github.com/os-module/domain-lib#677103cee3118d37561faca1f4d3d1b6db7960f5"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 2.0.79",
 ]
 
 [[package]]

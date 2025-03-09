@@ -5,7 +5,7 @@ extern crate alloc;
 use alloc::boxed::Box;
 use core::fmt::Debug;
 
-use basic::{println, LinuxResult};
+use basic::{kernel::time::ktime_get_ns, println, LinuxResult};
 use interface::{empty_device::EmptyDeviceDomain, Basic};
 use shared_heap::DVec;
 use spin::Mutex;
@@ -22,9 +22,16 @@ impl NullDeviceDomainImpl {
     }
 
     pub fn do_read(&self, mut data: DVec<u8>) -> LinuxResult<DVec<u8>> {
-        let fake_mem = self.fake_mem.lock();
-        let copy_len = core::cmp::min(data.len(), fake_mem.len());
-        data.as_mut_slice()[..copy_len].copy_from_slice(&fake_mem[..copy_len]);
+        let now = ktime_get_ns();
+        data.as_mut_slice().fill(now as u8);
+        // wait 10 ms
+        // loop {
+        //     let n = ktime_get_ns();
+        //     if n - now > 10_000_000 {
+        //         break;
+        //     }
+        //     data.as_mut_slice()[n as usize%100] = 0;
+        // }
         Ok(data)
     }
 

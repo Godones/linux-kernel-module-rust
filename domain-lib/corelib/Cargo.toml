@@ -17,7 +17,7 @@ kbind  = { path = "../../kbind" }
 pinned-init = { git = "https://github.com/Godones/pinned-init", default-features = false, features = ["alloc"] }
 kmacro = { path = "../../kmacro" }
 log = "0.4.22"
-
+wrapper_macro = { git = "https://github.com/os-module/domain-lib" }
 
 [features]
 core_impl = []

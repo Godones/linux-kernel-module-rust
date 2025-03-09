@@ -39,6 +39,22 @@ impl LongLongPerCpu {
         result
     }
 
+    pub fn inc(&self) {
+        let cpu = unsafe { crate::bindings::get_cpu() };
+        let ptr = unsafe { crate::bindings::per_cpu_ptr(self.ptr, cpu) };
+        let value = unsafe { &mut *ptr };
+        *value += 1;
+        unsafe { crate::bindings::put_cpu() };
+    }
+
+    pub fn dec(&self) {
+        let cpu = unsafe { crate::bindings::get_cpu() };
+        let ptr = unsafe { crate::bindings::per_cpu_ptr(self.ptr, cpu) };
+        let value = unsafe { &mut *ptr };
+        *value -= 1;
+        unsafe { crate::bindings::put_cpu() };
+    }
+
     /// Execute a closure for each CPU.
     pub fn for_each_cpu(&self, f: impl Fn(&mut i64)) {
         for cpu in 0..unsafe { crate::bindings::num_online_cpus() } {
@@ -50,13 +66,14 @@ impl LongLongPerCpu {
 
     /// Calculate the sum of the per-cpu variables.
     pub fn sum(&self) -> i64 {
-        let mut sum = 0;
-        for cpu in 0..unsafe { crate::bindings::num_online_cpus() } {
-            let ptr = unsafe { crate::bindings::per_cpu_ptr(self.ptr, cpu as c_int) };
-            let value = unsafe { *ptr };
-            sum += value;
-        }
-        sum
+        // let mut sum = 0;
+        // for cpu in 0..unsafe { crate::bindings::num_online_cpus() } {
+        //     let ptr = unsafe { crate::bindings::per_cpu_ptr(self.ptr, cpu as c_int) };
+        //     let value = unsafe { *ptr };
+        //     sum += value;
+        // }
+        // sum
+        unsafe { crate::bindings::per_cpu_total_counter(self.ptr) }
     }
 }
 

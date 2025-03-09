@@ -9,12 +9,13 @@ use corelib::{
     domain_info::{DomainDataInfo, DomainFileInfo, DomainInfo},
     CoreFunction, LinuxError, LinuxResult,
 };
+use domain_manager::resource::DOMAIN_RESOURCE;
 use interface::*;
 use kernel::bindings::*;
 
 use crate::{
     config::FRAME_BITS,
-    domain_helper::{resource::DOMAIN_RESOURCE, DOMAIN_CREATE, DOMAIN_INFO},
+    domain_helper::{DOMAIN_CREATE, DOMAIN_INFO},
     domain_loader::creator,
     domain_proxy::{
         block_device::BlockDeviceDomainProxy, empty_device::EmptyDeviceDomainProxy,

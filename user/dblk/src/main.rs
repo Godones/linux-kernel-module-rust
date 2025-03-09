@@ -1,3 +1,10 @@
+use std::{
+    fs::OpenOptions,
+    io::{Read, Seek},
+    os::unix::fs::OpenOptionsExt,
+};
+
+use core_affinity::CoreId;
 use domain_helper::{DomainHelperBuilder, DomainTypeRaw};
 
 fn main() {
@@ -77,4 +84,59 @@ fn update_block_device_domain() {
     println!("Update block device domain successfully");
 }
 
-fn run_block_device_domain_test() {}
+fn run_block_device_domain_test() {
+    {
+        let mut file = OpenOptions::new()
+            .read(true)
+            .custom_flags(libc::O_DIRECT)
+            .open("/dev/drnullb0")
+            .expect("Can't open");
+        let mut buf = Vec::with_capacity(1024 * 128); // 32KB
+        buf.resize(1024 * 128, 0);
+        // let mut buf = [0;8096];
+        let start = std::time::Instant::now();
+        let r = file.read(&mut buf).unwrap();
+        println!("Read {} bytes in {:?}", r, start.elapsed());
+    }
+
+    let thread_num = 8;
+    let mut threads = vec![];
+    for i in 0..thread_num {
+        let thread = std::thread::spawn(move || {
+            let id = CoreId { id: i + 4 };
+            let res = core_affinity::set_for_current(id);
+            assert!(res);
+
+            let mut file = OpenOptions::new()
+                .read(true)
+                // .custom_flags(libc::O_DIRECT)
+                .open("/dev/drnullb0")
+                .expect("Can't open");
+            let mut buf = Vec::with_capacity(1024 * 128); // 32KB
+            buf.resize(1024 * 128, 0);
+            let mut count = 0;
+            let start = std::time::Instant::now();
+            loop {
+                let r = file.read(&mut buf).unwrap();
+                if r == 0 {
+                    file.rewind().expect("Can't rewind");
+                }
+                count += r;
+                if start.elapsed().as_secs() > 10 {
+                    println!(
+                        "Thread {} read {} KB in {:?}",
+                        i,
+                        count / 1024,
+                        start.elapsed()
+                    );
+                    break;
+                }
+            }
+        });
+        threads.push(thread);
+    }
+    for thread in threads {
+        thread.join().unwrap();
+    }
+    println!("Read block device domain successfully");
+}

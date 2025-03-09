@@ -38,6 +38,9 @@ impl SysctlStorage for OneDevice {
     }
     fn read_value(&self, data: &mut KernelSlicePtrWriter) -> (usize, KernelResult<()>) {
         let rvec = DVec::new_uninit(data.len());
+        // CpuId::read(|id| {
+        // println!("[core: {}] OneDevice::store_value", id);
+        // });
         let r = self.domain.read(rvec);
         if let Ok(r) = r {
             (r.len(), data.write(r.as_slice()))

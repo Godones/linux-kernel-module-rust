@@ -5,3 +5,5 @@ edition = "2021"
 
 [dependencies]
 domain-helper = { path = "../domain-helper" }
+libc = "0.2.170"
+core_affinity = "0.8.3"

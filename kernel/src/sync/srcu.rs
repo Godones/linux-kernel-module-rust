@@ -2,7 +2,7 @@ use alloc::boxed::Box;
 
 use kbind::srcu_struct;
 
-use crate::{bindings, bindings::CRcuData, pr_warn, time::TimeTick};
+use crate::{bindings, bindings::CRcuData, pr_err, pr_warn, time::TimeTick};
 
 #[derive(Debug)]
 pub struct SRcuData<T> {
@@ -74,6 +74,7 @@ impl<T> SRcuData<T> {
 impl<T> Drop for SRcuData<T> {
     fn drop(&mut self) {
         unsafe {
+            pr_err!("SRcuData drop");
             bindings::cleanup_srcu_struct(self.ssp);
             let _v = Box::from_raw(self.ssp);
         }

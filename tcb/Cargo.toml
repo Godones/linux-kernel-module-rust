@@ -18,6 +18,7 @@ storage = { git = "https://github.com/os-module/domain-lib" }
 loader = { git = "https://github.com/os-module/domain-lib" }
 #loader = { path = "../domain-lib/loader" }
 command = { path = "../domain-lib/command" }
+domain_manager = { git = "https://github.com/os-module/domain-lib" }
 
 #
 log = "0"

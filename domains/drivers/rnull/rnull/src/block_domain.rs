@@ -1,34 +1,34 @@
-use alloc::{boxed::Box, format, sync::Arc};
-use alloc::alloc::Global;
-use alloc::ffi::CString;
-use alloc::string::String;
-use alloc::vec::Vec;
-use core::{fmt::Debug, pin::Pin};
-use core::alloc::Allocator;
-use core::any::TypeId;
-use core::ops::Deref;
-use basic::{bindings, impl_has_timer, kernel::{
-    block,
-    block::{
-        bio::Segment,
-        mq,
-        mq::{GenDisk, MqOperations, TagSet},
+use alloc::{alloc::Global, boxed::Box, ffi::CString, format, string::String, sync::Arc, vec::Vec};
+use core::{alloc::Allocator, any::TypeId, fmt::Debug, ops::Deref, pin::Pin};
+
+use basic::{
+    bindings, impl_has_timer,
+    kernel::{
+        block,
+        block::{
+            bio::Segment,
+            mq,
+            mq::{GenDisk, MqOperations, TagSet},
+        },
+        error,
+        error::{linux_err, Error, KernelResult},
+        mm::pages::Pages,
+        radix_tree::RadixTree,
+        sync::{SpinLock, UniqueArc},
+        time,
+        time::hrtimer::{RawTimer, TimerCallback},
+        types::ForeignOwnable,
     },
-    error,
-    error::{linux_err, Error, KernelResult},
-    mm::pages::Pages,
-    radix_tree::RadixTree,
-    sync::{SpinLock, UniqueArc},
-    time,
-    time::hrtimer::{RawTimer, TimerCallback},
-    types::ForeignOwnable,
-}, new_spinlock, println, println_color, SafePtr};
+    new_spinlock, println, println_color, SafePtr,
+};
 use interface::{empty_device::EmptyDeviceDomain, null_block::BlockArgs, DomainType};
 use kmacro::vtable;
-use pinned_init::{pin_data, pin_init, pinned_drop, InPlaceInit, InPlaceInitIn, PinInit, PinnedDrop};
+use pinned_init::{
+    pin_data, pin_init, pinned_drop, InPlaceInit, InPlaceInitIn, PinInit, PinnedDrop,
+};
 use shared_heap::DVec;
 use spin::Mutex;
-use storage::{CustomStorge};
+use storage::CustomStorge;
 
 #[derive(Debug)]
 enum IRQMode {
@@ -70,23 +70,19 @@ impl NullBlkDomain {
     pub fn init(args: &BlockArgs) -> KernelResult<Self> {
         println!("Rust null_blk loaded");
         // TODO: Major device number?
-        let tagset = storage::get_or_insert_in(
-            "nullb:tagset",
-            || {
-                let v = UniqueArc::try_pin_init_in(TagSet::try_new_no_alloc(1, (), 256, 1),CustomStorge).unwrap();
-                let v= Arc::from(v);
-                v
-            },
-        );
+        let tagset = storage::get_or_insert_in("nullb:tagset", || {
+            let v =
+                UniqueArc::try_pin_init_in(TagSet::try_new_no_alloc(1, (), 256, 1), CustomStorge)
+                    .unwrap();
+            let v = Arc::from(v);
+            v
+        });
         // let tagset = UniqueArc::try_pin_init(TagSet::try_new_no_alloc(1, (), 256, 1))?.into();
         // let disk = Arc::new(Mutex::new(add_disk(tagset, args)?));
-        let disk = storage::get_or_insert(
-            "nullb:disk",
-            || {
-                let disk = add_disk(tagset, args).unwrap();
-                Mutex::new(disk)
-            },
-        );
+        let disk = storage::get_or_insert("nullb:disk", || {
+            let disk = add_disk(tagset, args).unwrap();
+            Mutex::new(disk)
+        });
 
         #[cfg(any(feature = "multi_domain_no", feature = "multi_domain"))]
         init_multi_domain()?;
@@ -119,34 +115,37 @@ impl Drop for NullBlkDomain {
             .expect("cannot remove disk");
         drop(disk);
 
-        let tag_set = storage::remove::<TagSet<NullBlkDevice>>("nullb:tagset").expect("cannot remove tagset");
+        let tag_set =
+            storage::remove::<TagSet<NullBlkDevice>>("nullb:tagset").expect("cannot remove tagset");
         drop(tag_set);
         println!("Dropping NullBlkDomain");
     }
 }
 
-fn add_disk<A:Allocator>(
-    tagset: Arc<TagSet<NullBlkDevice>,A>,
+fn add_disk<A: Allocator>(
+    tagset: Arc<TagSet<NullBlkDevice>, A>,
     args: &BlockArgs,
-) -> KernelResult<GenDisk<NullBlkDevice,A>> {
+) -> KernelResult<GenDisk<NullBlkDevice, A>> {
     let tree = RadixTree::new_in()?;
     let mode = args.param_irq_mode.try_into()?;
     let alloc_page = Mutex::new(Vec::new_in(CustomStorge));
-    let queue_data = Box::pin_init_in(pin_init!(
-    QueueData {
-        tree <- new_spinlock!(tree, "rnullb:mem"),
-        completion_time_nsec: args.param_completion_time_nsec,
-        irq_mode: mode,
-        alloc_page,
-        memory_backed: args.param_memory_backed,
-    }),CustomStorge)?;
+    let queue_data = Box::pin_init_in(
+        pin_init!(
+        QueueData {
+            tree <- new_spinlock!(tree, "rnullb:mem"),
+            completion_time_nsec: args.param_completion_time_nsec,
+            irq_mode: mode,
+            alloc_page,
+            memory_backed: args.param_memory_backed,
+        }),
+        CustomStorge,
+    )?;
     let disk = GenDisk::new_no_alloc(tagset, queue_data);
     Ok(disk)
 }
 
-
 pub struct NullBlkDevice;
-pub type Tree = RadixTree<Arc<Pages<0>,CustomStorge>, CustomStorge>;
+pub type Tree = RadixTree<Arc<Pages<0>, CustomStorge>, CustomStorge>;
 pub type PageList = Vec<usize, CustomStorge>;
 
 #[pin_data(PinnedDrop)]
@@ -156,14 +155,14 @@ pub struct QueueData {
     completion_time_nsec: u64,
     irq_mode: IRQMode,
     memory_backed: bool,
-    alloc_page:Mutex<PageList>,
+    alloc_page: Mutex<PageList>,
 }
 
 #[pinned_drop]
-impl PinnedDrop for QueueData{
+impl PinnedDrop for QueueData {
     fn drop(self: Pin<&mut Self>) {
-        let list=  self.alloc_page.lock();
-        for idx in list.iter(){
+        let list = self.alloc_page.lock();
+        for idx in list.iter() {
             let key = format!("rnullb:page{}", idx);
             // log::warn!("drop page:{}", key);
             let page = storage::remove::<Pages<0>>(&key).expect("cannot remove page");
@@ -174,19 +173,21 @@ impl PinnedDrop for QueueData{
 
 impl NullBlkDevice {
     #[inline(always)]
-    fn write(tree: &mut Tree, list: &mut PageList,sector: usize, segment: &Segment<'_>) -> KernelResult {
+    fn write(
+        tree: &mut Tree,
+        list: &mut PageList,
+        sector: usize,
+        segment: &Segment<'_>,
+    ) -> KernelResult {
         let idx = sector >> 3; // TODO: PAGE_SECTOR_SHIFT
         let page = if let Some(page) = tree.get(idx as u64) {
             page
         } else {
             let key = format!("rnullb:page{}", idx);
-            let page = storage::get_or_insert(
-                &key,
-                || {
-                    let page = Pages::<0>::new().unwrap();
-                    page
-                },
-            );
+            let page = storage::get_or_insert(&key, || {
+                let page = Pages::<0>::new().unwrap();
+                page
+            });
             tree.try_insert(idx as u64, page)?;
             list.push(idx);
             tree.get(idx as u64).unwrap()
@@ -217,7 +218,7 @@ impl NullBlkDevice {
         segment: &mut Segment<'_>,
     ) -> KernelResult {
         match command {
-            block::req_op_REQ_OP_WRITE => Self::write(tree, list,sector, segment)?,
+            block::req_op_REQ_OP_WRITE => Self::write(tree, list, sector, segment)?,
             block::req_op_REQ_OP_READ => Self::read(tree, sector, segment)?,
             _ => (),
         }
@@ -247,7 +248,7 @@ impl_has_timer! {
 impl MqOperations for NullBlkDevice {
     type RequestData = Pdu;
     type RequestDataInit = impl PinInit<Pdu>;
-    type QueueData = Pin<Box<QueueData,CustomStorge>>;
+    type QueueData = Pin<Box<QueueData, CustomStorge>>;
     type HwData = ();
     type TagSetData = ();
     type DomainType = ();
@@ -274,7 +275,7 @@ impl MqOperations for NullBlkDevice {
             let mut sector = rq.sector();
             for bio in rq.bio_iter() {
                 for mut segment in bio.segment_iter() {
-                    Self::transfer(rq.command(), &mut tree,&mut list, sector, &mut segment)?;
+                    Self::transfer(rq.command(), &mut tree, &mut list, sector, &mut segment)?;
                     sector += segment.len() >> 9; // TODO: SECTOR_SHIFT
                 }
             }
@@ -312,7 +313,7 @@ pub static MULTI_DOMAIN: spin::Mutex<Option<MultiDomainTest>> = spin::Mutex::new
 #[cfg(feature = "multi_domain")]
 fn init_multi_domain() -> KernelResult {
     let buf = DVec::new(0, 4096);
-    let empty_blk = basic::get_domain("empty_device").ok_or(linux_err::EINVAL)?;
+    let empty_blk = basic::sys_get_domain("empty_device").ok_or(linux_err::EINVAL)?;
     let empty_blk = match empty_blk {
         DomainType::EmptyDeviceDomain(empty_blk) => empty_blk,
         _ => return Err(linux_err::EINVAL),

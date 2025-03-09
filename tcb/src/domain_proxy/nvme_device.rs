@@ -17,6 +17,7 @@ use crate::{
     domain_helper::{free_domain_resource, FreeShared},
     domain_loader::loader::DomainLoader,
     domain_proxy::ProxyBuilder,
+    mem::free_frames,
 };
 
 #[derive(Debug)]
@@ -72,13 +73,9 @@ impl NvmeDeviceDomainProxy {
     }
     #[inline]
     fn _exit_no_lock(&self) -> LinuxResult<()> {
-        self.counter.get_with(|counter| {
-            *counter += 1;
-        });
+        self.counter.inc();
         let r = self._exit();
-        self.counter.get_with(|counter| {
-            *counter -= 1;
-        });
+        self.counter.dec();
         r
     }
 
@@ -95,13 +92,9 @@ impl NvmeDeviceDomainProxy {
     }
     #[inline]
     fn _domain_id_no_lock(&self) -> u64 {
-        self.counter.get_with(|counter| {
-            *counter += 1;
-        });
+        self.counter.inc();
         let r = self._domain_id();
-        self.counter.get_with(|counter| {
-            *counter -= 1;
-        });
+        self.counter.dec();
         r
     }
     #[inline]
@@ -132,13 +125,9 @@ impl NvmeDeviceDomainProxy {
         driver_data_ptr: SafePtr,
         io_queue: bool,
     ) -> LinuxResult<()> {
-        self.counter.get_with(|counter| {
-            *counter += 1;
-        });
+        self.counter.inc();
         let r = self._init_request(tag_set_ptr, rq_ptr, driver_data_ptr, io_queue);
-        self.counter.get_with(|counter| {
-            *counter -= 1;
-        });
+        self.counter.dec();
         r
     }
     #[inline]
@@ -172,13 +161,9 @@ impl NvmeDeviceDomainProxy {
         rq_ptr: SafePtr,
         io_queue: bool,
     ) -> LinuxResult<()> {
-        self.counter.get_with(|counter| {
-            *counter += 1;
-        });
+        self.counter.inc();
         let r = self._exit_request(tag_set_ptr, rq_ptr, io_queue);
-        self.counter.get_with(|counter| {
-            *counter -= 1;
-        });
+        self.counter.dec();
         r
     }
     #[inline]
@@ -214,13 +199,9 @@ impl NvmeDeviceDomainProxy {
         hctx_idx: usize,
         io_queue: bool,
     ) -> LinuxResult<()> {
-        self.counter.get_with(|counter| {
-            *counter += 1;
-        });
+        self.counter.inc();
         let r = self._init_hctx(hctx_ptr, tag_set_data_ptr, hctx_idx, io_queue);
-        self.counter.get_with(|counter| {
-            *counter -= 1;
-        });
+        self.counter.dec();
         r
     }
     #[inline]
@@ -248,13 +229,9 @@ impl NvmeDeviceDomainProxy {
         hctx_idx: usize,
         io_queue: bool,
     ) -> LinuxResult<()> {
-        self.counter.get_with(|counter| {
-            *counter += 1;
-        });
+        self.counter.inc();
         let r = self._exit_hctx(hctx_ptr, hctx_idx, io_queue);
-        self.counter.get_with(|counter| {
-            *counter -= 1;
-        });
+        self.counter.dec();
         r
     }
     #[inline]
@@ -289,13 +266,9 @@ impl NvmeDeviceDomainProxy {
         hctx_driver_data_ptr: SafePtr,
         io_queue: bool,
     ) -> LinuxResult<()> {
-        self.counter.get_with(|counter| {
-            *counter += 1;
-        });
+        self.counter.inc();
         let r = self._queue_rq(hctx_ptr, bd_ptr, hctx_driver_data_ptr, io_queue);
-        self.counter.get_with(|counter| {
-            *counter -= 1;
-        });
+        self.counter.dec();
         r
     }
     #[inline]
@@ -329,13 +302,9 @@ impl NvmeDeviceDomainProxy {
         hctx_driver_data_ptr: SafePtr,
         io_queue: bool,
     ) -> LinuxResult<()> {
-        self.counter.get_with(|counter| {
-            *counter += 1;
-        });
+        self.counter.inc();
         let r = self._commit_rqs(hctx_ptr, hctx_driver_data_ptr, io_queue);
-        self.counter.get_with(|counter| {
-            *counter -= 1;
-        });
+        self.counter.dec();
         r
     }
     #[inline]
@@ -357,13 +326,9 @@ impl NvmeDeviceDomainProxy {
     }
     #[inline]
     fn _complete_request_no_lock(&self, rq_ptr: SafePtr, io_queue: bool) -> LinuxResult<()> {
-        self.counter.get_with(|counter| {
-            *counter += 1;
-        });
+        self.counter.inc();
         let r = self._complete_request(rq_ptr, io_queue);
-        self.counter.get_with(|counter| {
-            *counter -= 1;
-        });
+        self.counter.dec();
         r
     }
     #[inline]
@@ -403,13 +368,9 @@ impl NvmeDeviceDomainProxy {
         driver_data_ptr: SafePtr,
         io_queue: bool,
     ) -> LinuxResult<()> {
-        self.counter.get_with(|counter| {
-            *counter += 1;
-        });
+        self.counter.inc();
         let r = self._map_queues(tag_set_ptr, driver_data_ptr, io_queue);
-        self.counter.get_with(|counter| {
-            *counter -= 1;
-        });
+        self.counter.dec();
         r
     }
     #[inline]
@@ -445,13 +406,9 @@ impl NvmeDeviceDomainProxy {
         hctx_driver_data_ptr: SafePtr,
         io_queue: bool,
     ) -> LinuxResult<i32> {
-        self.counter.get_with(|counter| {
-            *counter += 1;
-        });
+        self.counter.inc();
         let r = self._poll_queues(hctx_ptr, iob_ptr, hctx_driver_data_ptr, io_queue);
-        self.counter.get_with(|counter| {
-            *counter -= 1;
-        });
+        self.counter.dec();
         r
     }
     #[inline]
@@ -467,13 +424,9 @@ impl NvmeDeviceDomainProxy {
     }
     #[inline]
     fn _handle_irq_no_lock(&self, data: SafePtr) -> LinuxResult<u32> {
-        self.counter.get_with(|counter| {
-            *counter += 1;
-        });
+        self.counter.inc();
         let r = self._handle_irq(data);
-        self.counter.get_with(|counter| {
-            *counter -= 1;
-        });
+        self.counter.dec();
         r
     }
     #[inline]
@@ -483,13 +436,9 @@ impl NvmeDeviceDomainProxy {
     }
     #[inline]
     fn _probe_no_lock(&self, pdev: SafePtr, pci_device_id: SafePtr) -> LinuxResult<i32> {
-        self.counter.get_with(|counter| {
-            *counter += 1;
-        });
+        self.counter.inc();
         let r = self._probe(pdev, pci_device_id);
-        self.counter.get_with(|counter| {
-            *counter -= 1;
-        });
+        self.counter.dec();
         r
     }
     #[inline]
@@ -505,13 +454,9 @@ impl NvmeDeviceDomainProxy {
     }
     #[inline]
     fn _remove_no_lock(&self, pdev: SafePtr) -> LinuxResult<()> {
-        self.counter.get_with(|counter| {
-            *counter += 1;
-        });
+        self.counter.inc();
         let r = self._remove(pdev);
-        self.counter.get_with(|counter| {
-            *counter -= 1;
-        });
+        self.counter.dec();
         r
     }
     #[inline]
@@ -719,7 +664,7 @@ impl NvmeDeviceDomainProxy {
 
         // We should not free the shared data here, because the shared data will be used
         // in new domain.
-        free_domain_resource(old_id, FreeShared::NotFree(new_domain_id));
+        free_domain_resource(old_id, FreeShared::NotFree(new_domain_id), free_frames);
         *loader_guard = domain_loader;
         drop(w_lock);
         drop(loader_guard);

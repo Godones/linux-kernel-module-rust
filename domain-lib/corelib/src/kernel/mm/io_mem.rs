@@ -38,7 +38,7 @@ pub struct IoMem<const SIZE: usize> {
 }
 
 macro_rules! define_read {
-    ($(#[$attr:meta])* $name:ident, $try_name:ident, $type_name:ty) => {
+    ($(#[$attr:meta])* $name:ident,$sys_name:ident,$try_name:ident, $type_name:ty) => {
         /// Reads IO data from the given offset known, at compile time.
         ///
         /// If the offset is not known at compile time, the build will fail.
@@ -50,7 +50,7 @@ macro_rules! define_read {
             // SAFETY: The type invariants guarantee that `ptr` is a valid pointer. The check above
             // guarantees that the code won't build if `offset` makes the read go out of bounds
             // (including the type size).
-             crate::io::$name(ptr as _)
+             crate::$sys_name(ptr as _)
         }
 
         /// Reads IO data from the given offset.
@@ -65,13 +65,13 @@ macro_rules! define_read {
             // SAFETY: The type invariants guarantee that `ptr` is a valid pointer. The check above
             // returns an error if `offset` would make the read go out of bounds (including the
             // type size).
-            Ok( crate::io::$name(ptr as _) )
+            Ok( crate::$sys_name(ptr as _) )
         }
     };
 }
 
 macro_rules! define_write {
-    ($(#[$attr:meta])* $name:ident, $try_name:ident, $type_name:ty) => {
+    ($(#[$attr:meta])* $name:ident, $sys_name:ident,$try_name:ident, $type_name:ty) => {
         /// Writes IO data to the given offset, known at compile time.
         ///
         /// If the offset is not known at compile time, the build will fail.
@@ -83,7 +83,7 @@ macro_rules! define_write {
             // SAFETY: The type invariants guarantee that `ptr` is a valid pointer. The check above
             // guarantees that the code won't link if `offset` makes the write go out of bounds
             // (including the type size).
-            crate::io::$name(value, ptr as _)
+            crate::$sys_name(value, ptr as _)
         }
 
         /// Writes IO data to the given offset.
@@ -98,7 +98,7 @@ macro_rules! define_write {
             // SAFETY: The type invariants guarantee that `ptr` is a valid pointer. The check above
             // returns an error if `offset` would make the write go out of bounds (including the
             // type size).
-            crate::io::$name(value, ptr as _);
+            crate::$sys_name(value, ptr as _);
             Ok(())
         }
     };
@@ -185,25 +185,25 @@ impl<const SIZE: usize> IoMem<SIZE> {
         Ok(())
     }
 
-    define_read!(readb, try_readb, u8);
-    define_read!(readw, try_readw, u16);
-    define_read!(readl, try_readl, u32);
-    define_read!(readq, try_readq, u64);
+    define_read!(readb, sys_readb, try_readb, u8);
+    define_read!(readw, sys_readw, try_readw, u16);
+    define_read!(readl, sys_readl, try_readl, u32);
+    define_read!(readq, sys_readq, try_readq, u64);
 
-    define_read!(readb_relaxed, try_readb_relaxed, u8);
-    define_read!(readw_relaxed, try_readw_relaxed, u16);
-    define_read!(readl_relaxed, try_readl_relaxed, u32);
-    define_read!(readq_relaxed, try_readq_relaxed, u64);
+    define_read!(readb_relaxed, sys_readb_relaxed, try_readb_relaxed, u8);
+    define_read!(readw_relaxed, sys_readw_relaxed, try_readw_relaxed, u16);
+    define_read!(readl_relaxed, sys_readl_relaxed, try_readl_relaxed, u32);
+    define_read!(readq_relaxed, sys_readq_relaxed, try_readq_relaxed, u64);
 
-    define_write!(writeb, try_writeb, u8);
-    define_write!(writew, try_writew, u16);
-    define_write!(writel, try_writel, u32);
-    define_write!(writeq, try_writeq, u64);
+    define_write!(writeb, sys_writeb, try_writeb, u8);
+    define_write!(writew, sys_writew, try_writew, u16);
+    define_write!(writel, sys_writel, try_writel, u32);
+    define_write!(writeq, sys_writeq, try_writeq, u64);
 
-    define_write!(writeb_relaxed, try_writeb_relaxed, u8);
-    define_write!(writew_relaxed, try_writew_relaxed, u16);
-    define_write!(writel_relaxed, try_writel_relaxed, u32);
-    define_write!(writeq_relaxed, try_writeq_relaxed, u64);
+    define_write!(writeb_relaxed, sys_writeb_relaxed, try_writeb_relaxed, u8);
+    define_write!(writew_relaxed, sys_writew_relaxed, try_writew_relaxed, u16);
+    define_write!(writel_relaxed, sys_writel_relaxed, try_writel_relaxed, u32);
+    define_write!(writeq_relaxed, sys_writeq_relaxed, try_writeq_relaxed, u64);
 }
 
 impl<const SIZE: usize> Drop for IoMem<SIZE> {

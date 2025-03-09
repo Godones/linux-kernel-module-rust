@@ -95,6 +95,12 @@ extern "C" {
         p: *mut core::ffi::c_longlong,
         cpu: core::ffi::c_int,
     ) -> *mut core::ffi::c_longlong;
+
+    #[link_name = "rust_helper_per_cpu_total_counter"]
+    pub fn per_cpu_total_counter(p: *mut core::ffi::c_longlong) -> core::ffi::c_longlong;
+    #[link_name = "rust_helper_smp_processor_id"]
+    pub fn smp_processor_id() -> core::ffi::c_uint;
+
     // Per-cpu end
 
     // Page

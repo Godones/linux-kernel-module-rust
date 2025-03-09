@@ -53,61 +53,16 @@ pub fn init_kernel_shim() -> KernelResult<KObj> {
             return Err(linux_err::EINVAL);
         }
     };
-    // let one_device = OneDevice::new(empty_device);
-    // let one_device = Sysctl::register(
-    //     c_str!("rust/domain"),
-    //     c_str!("one"),
-    //     one_device,
-    //     Mode::from_int(0o666),
-    // )?;
-
-    const ONE_NAME: &[&'static CStr] = &[
-        c_str!("one0"),
-        c_str!("one1"),
-        c_str!("one2"),
-        c_str!("one3"),
-        c_str!("one4"),
-        c_str!("one5"),
-        c_str!("one6"),
-        c_str!("one7"),
-        c_str!("one8"),
-        c_str!("one9"),
-        c_str!("one10"),
-        c_str!("one11"),
-        c_str!("one12"),
-        c_str!("one13"),
-        c_str!("one14"),
-        c_str!("one15"),
-        c_str!("one16"),
-        c_str!("one17"),
-        c_str!("one18"),
-        c_str!("one19"),
-        c_str!("one20"),
-        c_str!("one21"),
-        c_str!("one22"),
-        c_str!("one23"),
-        c_str!("one24"),
-        c_str!("one25"),
-        c_str!("one26"),
-        c_str!("one27"),
-        c_str!("one28"),
-        c_str!("one29"),
-        c_str!("one30"),
-        c_str!("one31"),
-        c_str!("one32"),
-    ];
+    let one_device = OneDevice::new(empty_device);
+    let one_device = Sysctl::register(
+        c_str!("rust/domain"),
+        c_str!("one"),
+        one_device,
+        Mode::from_int(0o666),
+    )?;
 
     let mut one_device_list = Vec::new();
-    for i in 0..32 {
-        let one_device = OneDevice::new(empty_device.clone());
-        let one_device = Sysctl::register(
-            c_str!("rust/domain"),
-            ONE_NAME[i],
-            one_device,
-            Mode::from_int(0o666),
-        )?;
-        one_device_list.push(one_device);
-    }
+    one_device_list.push(one_device);
 
     println!("One device registered");
     Ok(KObj {

@@ -14,6 +14,7 @@ use crate::{
     domain_helper::{free_domain_resource, FreeShared},
     domain_loader::loader::DomainLoader,
     domain_proxy::ProxyBuilder,
+    mem::free_frames,
 };
 
 #[derive(Debug)]
@@ -60,9 +61,9 @@ impl LogDomainProxy {
         new_domain: Box<dyn LogDomain>,
         domain_loader: DomainLoader,
     ) -> LinuxResult<()> {
-        let tick = TimeTick::new("Reinit domain without state");
         let mut loader_guard = self.domain_loader.lock();
         let old_id = self.domain_id();
+        let tick = TimeTick::new("Reinit domain without state");
         // init new domain
         new_domain.init().unwrap();
         drop(tick);
@@ -74,7 +75,7 @@ impl LogDomainProxy {
         // free old domain
         let real_domain = Box::into_inner(old_domain);
         forget(real_domain);
-        free_domain_resource(old_id, FreeShared::Free);
+        free_domain_resource(old_id, FreeShared::Free, free_frames);
         drop(tick);
         *loader_guard = domain_loader;
         Ok(())

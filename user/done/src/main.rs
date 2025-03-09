@@ -1,6 +1,6 @@
 use std::{
     fs::OpenOptions,
-    io::{Read, Write},
+    io::{Read, Seek, Write},
     sync::Arc,
     thread::sleep,
     time::Duration,
@@ -70,16 +70,17 @@ fn multi_thread_test(thread_num: usize) {
     for i in 0..thread_num {
         let thread = std::thread::spawn(move || {
             let start = std::time::Instant::now();
-            let path = format!("{}{}", PATH, i);
             let mut file = OpenOptions::new()
                 .write(true)
                 .read(true)
-                .open(path)
+                .open(PATH)
                 .unwrap();
             loop {
                 let mut buf = [0u8; 100];
-                let _r = file.read(&mut buf);
-                if start.elapsed().as_secs() > 10 {
+                let r = file.read(&mut buf).unwrap();
+                assert!(r > 0);
+                file.rewind().unwrap();
+                if start.elapsed().as_secs() > 5 {
                     break;
                 }
             }
@@ -88,11 +89,11 @@ fn multi_thread_test(thread_num: usize) {
         threads.push(thread);
     }
 
-    let updater = std::thread::spawn(move || {
-        sleep(Duration::from_secs(5));
-        update_to_new();
-    });
-    threads.push(updater);
+    // let updater = std::thread::spawn(move || {
+    //     sleep(Duration::from_secs(5));
+    //     update_to_new();
+    // });
+    // threads.push(updater);
     for handle in threads.into_iter() {
         handle.join().unwrap();
     }

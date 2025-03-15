@@ -27,6 +27,9 @@ fn main() {
         "test" => {
             run_block_device_domain_test();
         }
+        "read" => {
+            run_block_device_domain_test_read();
+        }
         "update" => {
             update_block_device_domain();
         }
@@ -43,7 +46,7 @@ fn load_block_device_domain() {
         .ty(DomainTypeRaw::BlockDeviceDomain)
         .domain_name("block_device")
         .domain_file_name("rnull")
-        .domain_register_ident("rnull");
+        .domain_register_ident("block_device");
     builder.clone().register_domain_file().unwrap();
     builder.clone().load_domain().unwrap();
     println!("Load block device domain successfully");
@@ -82,6 +85,17 @@ fn update_block_device_domain() {
     builder.clone().update_domain().unwrap();
 
     println!("Update block device domain successfully");
+}
+
+fn run_block_device_domain_test_read() {
+    let mut file = OpenOptions::new()
+        .read(true)
+        .open("/dev/drnullb0")
+        .expect("Can't open");
+    let mut buf = [0; 4096];
+    let start = std::time::Instant::now();
+    let r = file.read(&mut buf).unwrap();
+    println!("Read {} bytes in {:?}", r, start.elapsed());
 }
 
 fn run_block_device_domain_test() {

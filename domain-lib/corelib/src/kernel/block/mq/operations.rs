@@ -5,7 +5,6 @@
 //! C header: [`include/linux/blk-mq.h`](../../include/linux/blk-mq.h)
 
 use alloc::sync::Arc;
-use core::alloc::Allocator;
 
 use interface::nvme::BlkMqOp;
 use kmacro::vtable;

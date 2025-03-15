@@ -290,7 +290,6 @@ dependencies = [
 [[package]]
 name = "domain_main"
 version = "0.1.0"
-source = "git+https://github.com/os-module/domain-lib#677103cee3118d37561faca1f4d3d1b6db7960f5"
 dependencies = [
  "proc-macro2",
  "quote",

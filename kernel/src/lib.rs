@@ -59,7 +59,7 @@ use crate::error::{linux_err, KernelResult};
 #[panic_handler]
 fn panic(info: &core::panic::PanicInfo) -> ! {
     pr_err!("Kernel panic!\n");
-    pr_err!("{:?}\n", info);
+    pr_err!("{:?}: {}\n", info.location(), info.message());
     unwind_from_panic();
     unsafe {
         bug_helper();

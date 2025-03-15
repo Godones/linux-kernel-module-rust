@@ -8,7 +8,9 @@ corelib = { path = "../corelib", features = ["core_impl"]}
 log = "0.4.22"
 shared_heap = { git = "https://github.com/os-module/domain-lib" }
 ksync = { path = "../ksync" }
-domain_main = { git = "https://github.com/os-module/domain-lib" }
+#domain_main = { git = "https://github.com/os-module/domain-lib" }
+
+domain_main = { path = "../domain_main" }
 
 unwinding = { git = "https://github.com/nbdd0121/unwinding", rev = "ff0e91b", default-features = false, features = [
     "unwinder",

@@ -5,7 +5,7 @@ edition = "2021"
 
 [dependencies]
 malloc = { git = "https://github.com/os-module/domain-lib" }
-corelib = { path = "../../../../domain-lib/corelib" }
+corelib = { path = "../../../../domain-lib/corelib", features = ["blk-panic"] }
 basic = { path = "../../../../domain-lib/basic",  default-features = false  }
 shared_heap = { git = "https://github.com/os-module/domain-lib" }
 interface = { path = "../../../../domain-lib/interface",  features = ["domain"]  }
@@ -14,5 +14,6 @@ storage = { git = "https://github.com/os-module/domain-lib", features = ["impl"]
 rnull = { path = "../rnull" }
 
 [features]
-default = ["rust-unwind"]
+default = ["rust-unwind-time"]
 rust-unwind = []
+rust-unwind-time = []

@@ -528,10 +528,14 @@ impl BlockDeviceDomainProxy {
         new_domain: Box<dyn BlockDeviceDomain>,
         domain_loader: DomainLoader,
     ) -> LinuxResult<()> {
+        let total = TimeTick::new("Total Time");
+
+        let init_time = TimeTick::new("Init Time");
         self.f.store(true, core::sync::atomic::Ordering::Relaxed);
 
         let mut loader_guard = self.domain_loader.lock();
         let old_id = self.domain_id();
+        drop(init_time);
 
         let tick = TimeTick::new("Task Sync");
         // The writer lock before enable the lock path
@@ -563,6 +567,7 @@ impl BlockDeviceDomainProxy {
         // disable lock path
         self.flag
             .store(false, core::sync::atomic::Ordering::Relaxed);
+        drop(w_lock);
         drop(tick);
 
         let tick = TimeTick::new("Recycle resources");
@@ -574,11 +579,11 @@ impl BlockDeviceDomainProxy {
         // We should not free the shared data here, because the shared data will be used
         // in new domain.
         free_domain_resource(old_id, FreeShared::NotFree(new_domain_id), free_frames);
+        *loader_guard = domain_loader;
         drop(tick);
 
-        *loader_guard = domain_loader;
-        drop(w_lock);
         drop(loader_guard);
+        drop(total);
         Ok(())
     }
 }

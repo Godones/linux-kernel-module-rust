@@ -13,7 +13,7 @@ mod command;
 pub use command::CommandChannel;
 use corelib::{LinuxError, LinuxResult};
 use interface::{null_block::BlockArgs, nvme::NvmeBlockArgs, DomainType, DomainTypeRaw};
-use kernel::{error::KernelResult, types::Mode};
+use kernel::{error::KernelResult, time::TimeTick, types::Mode};
 
 use crate::{
     create_domain,
@@ -44,7 +44,9 @@ fn register_domain(ident: &str, elf: Vec<u8>, ty: DomainTypeRaw) -> LinuxResult<
 
 pub fn update_domain(old_ident: &str, new_ident: &str, ty: DomainTypeRaw) -> LinuxResult<()> {
     println!("Update domain: {} -> {} ({:?})", old_ident, new_ident, ty);
+    let time = TimeTick::new("Update Process");
     DOMAIN_SYS.sys_update_domain(old_ident, new_ident, ty)?;
+    drop(time);
     Ok(())
 }
 

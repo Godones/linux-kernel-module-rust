@@ -61,6 +61,7 @@ impl LogDomainProxy {
         new_domain: Box<dyn LogDomain>,
         domain_loader: DomainLoader,
     ) -> LinuxResult<()> {
+        let total = TimeTick::new("Total Time");
         let mut loader_guard = self.domain_loader.lock();
         let old_id = self.domain_id();
         let tick = TimeTick::new("Reinit domain without state");
@@ -78,6 +79,7 @@ impl LogDomainProxy {
         free_domain_resource(old_id, FreeShared::Free, free_frames);
         drop(tick);
         *loader_guard = domain_loader;
+        drop(total);
         Ok(())
     }
 }

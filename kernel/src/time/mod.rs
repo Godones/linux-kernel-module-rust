@@ -141,10 +141,11 @@ pub struct TimeTick {
 
 impl TimeTick {
     pub fn new(info: &'static str) -> Self {
+        let start = ktime_get_ns();
         let cpu_id = CpuId::read(|id| id as u32);
         TimeTick {
             info,
-            start: ktime_get_ns(),
+            start,
             cpu_id,
         }
     }

@@ -2,11 +2,11 @@ use core::ffi::{c_int, c_longlong};
 
 /// Dynamically allocate and free per-cpu variables with long long (i64) type.
 #[derive(Debug)]
-pub struct LongLongPerCpu {
+pub struct PerCpuCounter {
     ptr: *mut c_longlong,
 }
 
-impl LongLongPerCpu {
+impl PerCpuCounter {
     pub fn new() -> Self {
         let ptr = unsafe { crate::bindings::alloc_percpu_longlong() };
         Self { ptr }
@@ -77,10 +77,10 @@ impl LongLongPerCpu {
     }
 }
 
-unsafe impl Send for LongLongPerCpu {}
-unsafe impl Sync for LongLongPerCpu {}
+unsafe impl Send for PerCpuCounter {}
+unsafe impl Sync for PerCpuCounter {}
 
-impl Drop for LongLongPerCpu {
+impl Drop for PerCpuCounter {
     fn drop(&mut self) {
         unsafe { crate::bindings::free_percpu_longlong(self.ptr) };
     }

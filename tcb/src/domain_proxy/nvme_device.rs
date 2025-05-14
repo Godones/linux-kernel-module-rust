@@ -9,7 +9,7 @@ use interface::{
 };
 use kernel::{
     init::InPlaceInit,
-    sync::{LongLongPerCpu, Mutex, SRcuData},
+    sync::{PerCpuCounter, Mutex, SRcuData},
 };
 use spin::Once;
 
@@ -26,7 +26,7 @@ pub struct NvmeDeviceDomainProxy {
     lock: Pin<Box<Mutex<()>>>,
     domain_loader: Pin<Box<Mutex<DomainLoader>>>,
     flag: AtomicBool,
-    counter: LongLongPerCpu,
+    counter: PerCpuCounter,
     resource: Once<Box<dyn Any + Send + Sync>>,
 }
 
@@ -37,7 +37,7 @@ impl NvmeDeviceDomainProxy {
             lock: Box::pin_init(new_mutex!(())).unwrap(),
             domain_loader: Box::pin_init(new_mutex!(domain_loader)).unwrap(),
             flag: AtomicBool::new(false),
-            counter: LongLongPerCpu::new(),
+            counter: PerCpuCounter::new(),
             resource: Once::new(),
         }
     }

@@ -1,3 +1,5 @@
+pub mod cross_domain_test;
+
 use alloc::boxed::Box;
 
 use corelib::LinuxResult;
@@ -12,7 +14,7 @@ use crate::{
     register_domain,
 };
 
-// static NULL_BLK: &[u8] = include_bytes!("../../../build/disk/gnull");
+static NULL_BLK: &[u8] = include_bytes!("../../../build/disk/gnull");
 
 pub fn init_domain_system() -> LinuxResult<()> {
     init_kernel_domain();
@@ -34,13 +36,14 @@ pub fn init_domain_system() -> LinuxResult<()> {
     let (null_device, domain_file_info) = create_domain!(
         EmptyDeviceDomainProxy,
         DomainTypeRaw::EmptyDeviceDomain,
-        "empty_device" // Some(NULL_BLK.to_vec())
+        "empty_device",
+        Some(NULL_BLK.to_vec()) // "empty_device"
     )?;
     null_device.init_by_box(Box::new(()))?;
     register_domain!(
         "empty_device",
         domain_file_info,
-        DomainType::EmptyDeviceDomain(null_device),
+        DomainType::EmptyDeviceDomain(null_device.clone()),
         true
     );
     println!("Register a empty device domain");

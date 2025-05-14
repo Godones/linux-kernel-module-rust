@@ -7,7 +7,7 @@ use core::fmt::Debug;
 
 use basic::{kernel::time::ktime_get_ns, println, LinuxResult};
 use interface::{empty_device::EmptyDeviceDomain, Basic};
-use shared_heap::DVec;
+use shared_heap::{DBox, DVec};
 use spin::Mutex;
 
 pub struct NullDeviceDomainImpl {
@@ -68,6 +68,25 @@ impl EmptyDeviceDomain for NullDeviceDomainImpl {
         // println!("NullDeviceDomainImpl write");
         self.do_write(data)
     }
+
+    fn no_arg(&self) -> LinuxResult<()>{
+        Ok(())
+    }
+    fn one_arg(&self, arg: u64) -> LinuxResult<u64>{
+        Ok(arg+1)
+    }
+    fn one_darg(&self, arg: DBox<usize>) -> LinuxResult<DBox<usize>>{
+        let mut arg = arg;
+        *arg +=1;
+        Ok(arg)
+    }
+    fn two_dargs(&self, arg1: DBox<usize>, arg2: DBox<usize>) -> LinuxResult<(DBox<usize>,DBox<usize>)>{
+        let mut arg1 = arg1;
+        let mut arg2 = arg2;
+        *arg1 += 1;
+        *arg2 += 2;
+        Ok((arg1,arg2))
+    }
 }
 #[derive(Debug)]
 pub struct UnwindWrap(NullDeviceDomainImpl);
@@ -91,6 +110,18 @@ impl EmptyDeviceDomain for UnwindWrap {
     }
     fn write(&self, data: &DVec<u8>) -> LinuxResult<usize> {
         basic::catch_unwind(|| self.0.write(data))
+    }
+    fn no_arg(&self) -> LinuxResult<()>{
+        basic::catch_unwind(|| self.0.no_arg())
+    }
+    fn one_arg(&self, arg: u64) -> LinuxResult<u64>{
+        basic::catch_unwind(|| self.0.one_arg(arg))
+    }
+    fn one_darg(&self, arg: DBox<usize>) -> LinuxResult<DBox<usize>>{
+        basic::catch_unwind(|| self.0.one_darg(arg))
+    }
+    fn two_dargs(&self, arg1: DBox<usize>, arg2: DBox<usize>) -> LinuxResult<(DBox<usize>,DBox<usize>)>{
+        basic::catch_unwind(|| self.0.two_dargs(arg1,arg2))
     }
 }
 

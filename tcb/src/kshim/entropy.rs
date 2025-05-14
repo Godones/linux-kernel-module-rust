@@ -5,21 +5,21 @@ use kernel::{
     buf::KernelSlicePtrWriter,
     error::KernelResult,
     random,
-    sync::{CpuId, LongLongPerCpu},
+    sync::{CpuId, PerCpuCounter},
     sysctl::SysctlStorage,
 };
 use shared_heap::DVec;
 
 pub struct EntropySource {
     log_domain: Arc<dyn LogDomain>,
-    counter: LongLongPerCpu,
+    counter: PerCpuCounter,
 }
 
 impl EntropySource {
     pub fn new(log_domain: Arc<dyn LogDomain>) -> Self {
         Self {
             log_domain,
-            counter: LongLongPerCpu::new(),
+            counter: PerCpuCounter::new(),
         }
     }
 }

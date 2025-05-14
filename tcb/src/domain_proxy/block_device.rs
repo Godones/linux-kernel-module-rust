@@ -9,7 +9,7 @@ use interface::{
 };
 use kernel::{
     init::InPlaceInit,
-    sync::{local_irq_restore, local_irq_save, sync_cpus, CpuId, LongLongPerCpu, Mutex, SRcuData},
+    sync::{local_irq_restore, local_irq_save, sync_cpus, CpuId, PerCpuCounter, Mutex, SRcuData},
     time::TimeTick,
 };
 use spin::Once;
@@ -27,7 +27,7 @@ pub struct BlockDeviceDomainProxy {
     lock: Pin<Box<Mutex<()>>>,
     domain_loader: Pin<Box<Mutex<DomainLoader>>>,
     flag: AtomicBool,
-    counter: LongLongPerCpu,
+    counter: PerCpuCounter,
     resource: Once<Box<dyn Any + Send + Sync>>,
     f: AtomicBool,
 }
@@ -39,7 +39,7 @@ impl BlockDeviceDomainProxy {
             lock: Box::pin_init(new_mutex!(())).unwrap(),
             domain_loader: Box::pin_init(new_mutex!(domain_loader)).unwrap(),
             flag: AtomicBool::new(false),
-            counter: LongLongPerCpu::new(),
+            counter: PerCpuCounter::new(),
             resource: Once::new(),
             f: AtomicBool::new(false),
         }

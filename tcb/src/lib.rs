@@ -48,8 +48,8 @@ impl kernel::Module for TcbModule {
             error!("Failed to init domain system: {:?}", e);
             code::EINVAL
         })?;
-       
-        domain::cross_domain_test::test_cross_domain();
+
+        domain::cross_domain_test::cycle_test();
         let kobj = kshim::init_kernel_shim()?;
         Ok(TcbModule {
             _sysctl_domain_command: channel,

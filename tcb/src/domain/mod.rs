@@ -1,5 +1,4 @@
 pub mod cross_domain_test;
-
 use alloc::boxed::Box;
 
 use corelib::LinuxResult;

@@ -6,8 +6,8 @@ use interface::{empty_device::EmptyDeviceDomain, Basic};
 use kernel::{
     init::InPlaceInit,
     sync::{
-        local_irq_restore, local_irq_save, switch_task_to_cpus, sync_cpus, CpuId, PerCpuCounter,
-        Mutex, SRcuData,
+        local_irq_restore, local_irq_save, switch_task_to_cpus, sync_cpus, CpuId, Mutex,
+        PerCpuCounter, SRcuData,
     },
     time::{ktime_get_ns, TimeTick},
 };
@@ -53,6 +53,7 @@ impl ProxyBuilder for EmptyDeviceDomainProxy {
     fn build_empty(domain_loader: DomainLoader) -> Self {
         Self::new(Box::new(EmptyDeviceDomainEmptyImpl::new()), domain_loader)
     }
+    
     fn build_empty_no_proxy() -> Self::T {
         Box::new(EmptyDeviceDomainEmptyImpl::new())
     }
@@ -97,7 +98,7 @@ impl EmptyDeviceDomain for EmptyDeviceDomainProxy {
         }
     }
 
-    fn no_arg(&self) -> LinuxResult<()>{
+    fn no_arg(&self) -> LinuxResult<()> {
         let irq = local_irq_save();
         if self.flag.load(core::sync::atomic::Ordering::Relaxed) {
             self._no_arg_with_lock(irq)
@@ -105,15 +106,15 @@ impl EmptyDeviceDomain for EmptyDeviceDomainProxy {
             self._no_arg_no_lock(irq)
         }
     }
-    fn one_arg(&self, arg: u64) -> LinuxResult<u64>{
-       let irq = local_irq_save();
+    fn one_arg(&self, arg: u64) -> LinuxResult<u64> {
+        let irq = local_irq_save();
         if self.flag.load(core::sync::atomic::Ordering::Relaxed) {
             self._one_arg_with_lock(arg, irq)
         } else {
             self._one_arg_no_lock(arg, irq)
         }
     }
-    fn one_darg(&self, arg: DBox<usize>) -> LinuxResult<DBox<usize>>{
+    fn one_darg(&self, arg: DBox<usize>) -> LinuxResult<DBox<usize>> {
         let irq = local_irq_save();
         if self.flag.load(core::sync::atomic::Ordering::Relaxed) {
             self._one_darg_with_lock(arg, irq)
@@ -121,7 +122,11 @@ impl EmptyDeviceDomain for EmptyDeviceDomainProxy {
             self._one_darg_no_lock(arg, irq)
         }
     }
-    fn two_dargs(&self, arg1: DBox<usize>, arg2: DBox<usize>) -> LinuxResult<(DBox<usize>,DBox<usize>)>{
+    fn two_dargs(
+        &self,
+        arg1: DBox<usize>,
+        arg2: DBox<usize>,
+    ) -> LinuxResult<(DBox<usize>, DBox<usize>)> {
         let irq = local_irq_save();
         if self.flag.load(core::sync::atomic::Ordering::Relaxed) {
             self._two_dargs_with_lock(arg1, arg2, irq)
@@ -129,7 +134,6 @@ impl EmptyDeviceDomain for EmptyDeviceDomainProxy {
             self._two_dargs_no_lock(arg1, arg2, irq)
         }
     }
-
 }
 
 impl EmptyDeviceDomainProxy {
@@ -154,7 +158,7 @@ impl EmptyDeviceDomainProxy {
     }
 
     fn _read(&self, data: DVec<u8>) -> LinuxResult<DVec<u8>> {
-       self.domain.read_directly(|domain| {
+        self.domain.read_directly(|domain| {
             let id = domain.domain_id();
             let old_id = data.move_to(id);
             domain.read(data).map(|r| {
@@ -222,25 +226,33 @@ impl EmptyDeviceDomainProxy {
         r
     }
 
+    fn _no_arg(&self) -> LinuxResult<()> {
+        self.domain.read_directly(|domain| domain.no_arg())
+    }
+
     fn _no_arg_with_lock(&self, irq: u64) -> LinuxResult<()> {
         local_irq_restore(irq);
         let lock = self.lock.lock();
-        let r = self.no_arg();
+        let r = self._no_arg();
         drop(lock);
         r
     }
     fn _no_arg_no_lock(&self, irq: u64) -> LinuxResult<()> {
         self.counter.inc();
         local_irq_restore(irq);
-        let r = self.no_arg();
+        let r = self._no_arg();
         self.counter.dec();
         r
+    }
+
+    fn _one_arg(&self, arg: u64) -> LinuxResult<u64> {
+        self.domain.read_directly(|domain| domain.one_arg(arg))
     }
 
     fn _one_arg_with_lock(&self, arg: u64, irq: u64) -> LinuxResult<u64> {
         local_irq_restore(irq);
         let lock = self.lock.lock();
-        let r = self.one_arg(arg);
+        let r = self._one_arg(arg);
         drop(lock);
         r
     }
@@ -248,15 +260,26 @@ impl EmptyDeviceDomainProxy {
     fn _one_arg_no_lock(&self, arg: u64, irq: u64) -> LinuxResult<u64> {
         self.counter.inc();
         local_irq_restore(irq);
-        let r = self.one_arg(arg);
+        let r = self._one_arg(arg);
         self.counter.dec();
         r
+    }
+
+    fn _one_darg(&self, arg: DBox<usize>) -> LinuxResult<DBox<usize>> {
+        self.domain.read_directly(|domain| {
+            let id = domain.domain_id();
+            let old_id = arg.move_to(id);
+            domain.one_darg(arg).map(|r| {
+                r.move_to(old_id);
+                r
+            })
+        })
     }
 
     fn _one_darg_with_lock(&self, arg: DBox<usize>, irq: u64) -> LinuxResult<DBox<usize>> {
         local_irq_restore(irq);
         let lock = self.lock.lock();
-        let r = self.one_darg(arg);
+        let r = self._one_darg(arg);
         drop(lock);
         r
     }
@@ -264,23 +287,50 @@ impl EmptyDeviceDomainProxy {
     fn _one_darg_no_lock(&self, arg: DBox<usize>, irq: u64) -> LinuxResult<DBox<usize>> {
         self.counter.inc();
         local_irq_restore(irq);
-        let r = self.one_darg(arg);
+        let r = self._one_darg(arg);
         self.counter.dec();
         r
     }
 
-    fn _two_dargs_with_lock(&self, arg1: DBox<usize>, arg2: DBox<usize>, irq: u64) -> LinuxResult<(DBox<usize>,DBox<usize>)> {
+    fn _two_dargs(
+        &self,
+        arg1: DBox<usize>,
+        arg2: DBox<usize>,
+    ) -> LinuxResult<(DBox<usize>, DBox<usize>)> {
+        self.domain.read_directly(|domain| {
+            let id = domain.domain_id();
+            let old_id1 = arg1.move_to(id);
+            let old_id2 = arg2.move_to(id);
+            domain.two_dargs(arg1, arg2).map(|(r1, r2)| {
+                r1.move_to(old_id1);
+                r2.move_to(old_id2);
+                (r1, r2)
+            })
+        })
+    }
+
+    fn _two_dargs_with_lock(
+        &self,
+        arg1: DBox<usize>,
+        arg2: DBox<usize>,
+        irq: u64,
+    ) -> LinuxResult<(DBox<usize>, DBox<usize>)> {
         local_irq_restore(irq);
         let lock = self.lock.lock();
-        let r = self.two_dargs(arg1, arg2);
+        let r = self._two_dargs(arg1, arg2);
         drop(lock);
         r
     }
 
-    fn _two_dargs_no_lock(&self, arg1: DBox<usize>, arg2: DBox<usize>, irq: u64) -> LinuxResult<(DBox<usize>,DBox<usize>)> {
+    fn _two_dargs_no_lock(
+        &self,
+        arg1: DBox<usize>,
+        arg2: DBox<usize>,
+        irq: u64,
+    ) -> LinuxResult<(DBox<usize>, DBox<usize>)> {
         self.counter.inc();
         local_irq_restore(irq);
-        let r = self.two_dargs(arg1, arg2);
+        let r = self._two_dargs(arg1, arg2);
         self.counter.dec();
         r
     }
@@ -373,16 +423,20 @@ impl EmptyDeviceDomain for EmptyDeviceDomainEmptyImpl {
     fn write(&self, _data: &DVec<u8>) -> LinuxResult<usize> {
         Err(LinuxError::ENOSYS)
     }
-    fn no_arg(&self) -> LinuxResult<()>{
+    fn no_arg(&self) -> LinuxResult<()> {
         Err(LinuxError::ENOSYS)
     }
-    fn one_arg(&self, _arg: u64) -> LinuxResult<u64>{
+    fn one_arg(&self, _arg: u64) -> LinuxResult<u64> {
         Err(LinuxError::ENOSYS)
     }
-    fn one_darg(&self, _arg: DBox<usize>) -> LinuxResult<DBox<usize>>{
+    fn one_darg(&self, _arg: DBox<usize>) -> LinuxResult<DBox<usize>> {
         Err(LinuxError::ENOSYS)
     }
-    fn two_dargs(&self, _arg1: DBox<usize>, _arg2: DBox<usize>) -> LinuxResult<(DBox<usize>,DBox<usize>)>{
+    fn two_dargs(
+        &self,
+        _arg1: DBox<usize>,
+        _arg2: DBox<usize>,
+    ) -> LinuxResult<(DBox<usize>, DBox<usize>)> {
         Err(LinuxError::ENOSYS)
     }
 }

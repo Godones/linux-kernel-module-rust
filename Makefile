@@ -1,13 +1,12 @@
 
+runtime:
+	make -C tcb rebuild
 
-all:
+domains:
+	cargo domain build-all -a x86_64
 
+run: domains runtime
+	sudo insmod tcb/tcb.ko
+	sudo dmesg | tail -n 10
 
-build:
-
-
-run:
-
-
-
-.PHONY: all build run
+.PHONY: runtime run domains

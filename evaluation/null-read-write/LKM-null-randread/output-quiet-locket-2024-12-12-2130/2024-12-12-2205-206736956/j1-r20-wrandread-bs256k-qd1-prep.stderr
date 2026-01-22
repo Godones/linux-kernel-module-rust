@@ -1,0 +1,30 @@
+prep: (g=0): rw=write, bs=(R) 4096B-4096B, (W) 4096B-4096B, (T) 4096B-4096B, ioengine=psync, iodepth=1
+fio-3.38
+Starting 1 process
+
+prep: (groupid=0, jobs=1): err= 0: pid=22056: Thu Dec 12 22:14:27 2024
+  write: IOPS=541k, BW=2114MiB/s (2216MB/s)(4096MiB/1938msec); 0 zone resets
+    clat (nsec): min=1341, max=163105, avg=1536.15, stdev=682.91
+     lat (nsec): min=1392, max=163195, avg=1585.39, stdev=684.44
+    clat percentiles (nsec):
+     |  1.00th=[ 1384],  5.00th=[ 1400], 10.00th=[ 1416], 20.00th=[ 1432],
+     | 30.00th=[ 1464], 40.00th=[ 1480], 50.00th=[ 1496], 60.00th=[ 1528],
+     | 70.00th=[ 1544], 80.00th=[ 1576], 90.00th=[ 1592], 95.00th=[ 1624],
+     | 99.00th=[ 1832], 99.50th=[ 3088], 99.90th=[ 5600], 99.95th=[23424],
+     | 99.99th=[27264]
+   bw (  MiB/s): min= 2082, max= 2125, per=99.88%, avg=2110.88, stdev=25.00, samples=3
+   iops        : min=532996, max=544214, avg=540385.33, stdev=6400.75, samples=3
+  lat (usec)   : 2=99.11%, 4=0.64%, 10=0.19%, 20=0.01%, 50=0.05%
+  lat (usec)   : 100=0.01%, 250=0.01%
+  cpu          : usr=23.75%, sys=76.20%, ctx=7, majf=0, minf=10
+  IO depths    : 1=100.0%, 2=0.0%, 4=0.0%, 8=0.0%, 16=0.0%, 32=0.0%, >=64=0.0%
+     submit    : 0=0.0%, 4=100.0%, 8=0.0%, 16=0.0%, 32=0.0%, 64=0.0%, >=64=0.0%
+     complete  : 0=0.0%, 4=100.0%, 8=0.0%, 16=0.0%, 32=0.0%, 64=0.0%, >=64=0.0%
+     issued rwts: total=0,1048576,0,0 short=0,0,0,0 dropped=0,0,0,0
+     latency   : target=0, window=0, percentile=100.00%, depth=1
+
+Run status group 0 (all jobs):
+  WRITE: bw=2114MiB/s (2216MB/s), 2114MiB/s-2114MiB/s (2216MB/s-2216MB/s), io=4096MiB (4295MB), run=1938-1938msec
+
+Disk stats (read/write):
+  rnullb0: ios=0/0, sectors=0/0, merge=0/0, ticks=0/0, in_queue=0, util=0.00%

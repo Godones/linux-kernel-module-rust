@@ -7,38 +7,65 @@ Old introduction: See [old readme](./README_OLD.md).
 
 - kernel version: 6.6 or 6.8
 
+Source code: [linux 6.6](https://github.com/Godones/linux/tree/null_blk-6.6)
 
+## Building all domain
 
-## Building hello-world
-
-1. Install clang, kernel headers, and the `rust-src` and `rustfmt` components
-   from `rustup`:
-
+To build all domain for x86_64 architecture, run:
 ```
-apt-get install llvm clang linux-headers-"$(uname -r)" # or the equivalent for your OS
-rustup component add --toolchain=nightly rust-src rustfmt
+cargo domain build-all -a x86_64
 ```
+This will build all example domains located in the `domains/` directory.
+- null(test domain)
+- logger(logging domain)
+- rnull(null block device domain)
+- rnvme(nvme block device domain)
 
-2. cd to one of the examples
 
+## Build and Run TCB
+To build and run the TCB (Trusted Computing Base) module, execute the following commands:
 ```
-cd tests/hello-world
-```
-
-3. Build the kernel module using the Linux kernel build system (kbuild), this
-   will invoke `cargo` to build the Rust code
-
-```
-make
-```
-
-4. Load and unload the module!
-
-```
-sudo insmod helloworld.ko
-sudo rmmod helloworld
-dmesg | tail
+make run
 ```
 
 
+## logger domain
+To load the logger domain module, execute the following commands:
+```
+cargo run -p dlog new
+```
+Then, you can test the logger domain by running:
+```
+cargo run -p dlog test
+```
+See dmesg for log messages.
+
+
+
+## null blk device domain
+To load or unload the null block device domain module, execute the following commands:
+```
+cargo run -p dblk load/unload
+```
+Then, you can test the null block device by running:
+```
+sudo ./target/debug/dblk test
+```
+
+## NVMe blk device domain
+You need make sure that the kernel has not already loaded the default NVMe driver.
+
+To load or unload the NVMe block device domain module, execute the following commands:
+```
+cargo run -p dnvme load/unload
+```
+
+
+
+## Documentation
+
+[rust for linux](./doc/rust_for_linux.md)
+
+## Evaluation Results
+[Evaluation Results](./evaluation)
 ## Reference

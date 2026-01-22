@@ -1,0 +1,8 @@
+Type          IOPS/s
+
+No crash      480754
+5ms-crash     474555
+1ms-crash     466268
+500us-crash   463496
+200us-crash   441027
+100us-crash   417952
